@@ -32,7 +32,7 @@ module userlogic_test();
     wire [31:0] owest;
     wire [31:0] osouth;
     wire [31:0] oeast;
-    top ul (
+    sbox ul (
         .clk(clk),
         .reset(rst),
         .inorth(inorth),
