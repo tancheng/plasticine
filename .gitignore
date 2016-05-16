@@ -2,3 +2,6 @@
 *.vcd
 .out
 build/
+generated/
+lib_managed/
+target/
