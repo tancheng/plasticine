@@ -21,6 +21,7 @@ def main():
     parser.add_option("--sim", dest="sim", action="store_true", default=False, help="Generate C++ simulator")
     parser.add_option("--dot", dest="dot", action="store_true", default=False, help="Generate dot output")
     parser.add_option("--hex", dest="hex", action="store_true", default=False, help="Generate hex output")
+    parser.add_option("--vcd", dest="vcd", action="store_true", default=False, help="Generate waveform")
     parser.add_option("--verilog", dest="verilog", action="store_true", default=False, help="Generate Verilog RTL")
     parser.add_option("-d", "--dest", action="store", dest="build_dir", default=os.getenv("PWD"), help="output location for generated files")
 
@@ -45,6 +46,8 @@ def stage(app, params, opts):
         sbt_opts = sbt_opts + " --backend v"
     if opts.hex == True:
         sbt_opts = sbt_opts + " --backend flo"
+    if opts.vcd == True:
+        sbt_opts = sbt_opts + " --vcd"
 
     cp = "../target/scala-2.11/classes"
     app_prefix = "plasticine.test"
