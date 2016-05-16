@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+
+from optparse import OptionParser
+import multiprocessing
+import os, sys, datetime
+import math
+from socket import gethostname
+from string import *
+import ConfigParser
+from time import localtime, strftime
+
+def err(s):
+    exit("error: " + s)
+
+def warn(s):
+    print("warn: " + s)
+
+def main():
+    usage = "usage: %prog <application runner> [staging args] [options]"
+    parser = OptionParser(usage)
+    parser.add_option("--sim", dest="sim", action="store_true", default=False, help="Generate C++ simulator")
+    parser.add_option("--dot", dest="dot", action="store_true", default=False, help="Generate dot output")
+    parser.add_option("--hex", dest="hex", action="store_true", default=False, help="Generate hex output")
+    parser.add_option("--verilog", dest="verilog", action="store_true", default=False, help="Generate Verilog RTL")
+    parser.add_option("-d", "--dest", action="store", dest="build_dir", default=os.getenv("PWD"), help="output location for generated files")
+
+    (opts, args) = parser.parse_args()
+    if len(args) < 1:
+        parser.error("an application file must be passed to delitec as an argument")
+
+    stage(args[0], args[1:len(args)], opts)
+
+def stage(app, params, opts):
+    sbt_opts = ""
+
+    build_dir = opts.build_dir + os.sep + "generated" + os.sep + app + os.sep
+    sbt_opts = sbt_opts + " --targetDir " + build_dir
+    if (opts.sim == True | opts.hex == True | opts.verilog == True):
+        sbt_opts = sbt_opts + " --genHarness"
+    if opts.dot == True:
+        sbt_opts = sbt_opts + " --backend dot"
+    if opts.sim == True:
+        sbt_opts = sbt_opts + " --compile --test --backend c"
+    if opts.verilog == True:
+        sbt_opts = sbt_opts + " --backend v"
+    if opts.hex == True:
+        sbt_opts = sbt_opts + " --backend flo"
+
+    cp = "../target/scala-2.11/classes"
+    app_prefix = "plasticine.test"
+    sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s\"" %(cp, app_prefix, app, sbt_opts, ' '.join(params))
+    print sbt_cmd
+    ecode = os.system(sbt_cmd)
+    if ecode != 0:
+        err("SADL compilation failed")
+
+if __name__ == "__main__":
+    main()
