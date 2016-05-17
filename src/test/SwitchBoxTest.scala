@@ -5,7 +5,7 @@ import plasticine.templates.SwitchBox
 
 class SwitchBoxTests(c: SwitchBox) extends Tester(c) {
   for (i <- 0 until 16) {
-    val north = rnd.nextInt(16)
+    val north = i
     val west = rnd.nextInt(16)
     val south = rnd.nextInt(16)
     val east = rnd.nextInt(16)
@@ -19,9 +19,9 @@ class SwitchBoxTests(c: SwitchBox) extends Tester(c) {
     poke(c.io.ieast, east)
     step(1)
     expect(c.io.onorth, ex_onorth)
-    expect(c.io.owest, ex_owest)
-    expect(c.io.osouth, ex_osouth)
-    expect(c.io.oeast, ex_oeast)
+    expect(c.io.owest, ex_onorth)
+    expect(c.io.osouth, ex_onorth)
+    expect(c.io.oeast, ex_onorth)
   }
 }
 
