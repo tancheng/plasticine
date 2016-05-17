@@ -1,5 +1,6 @@
 *.log
 *.vcd
+*.swp
 .out
 build/
 generated/
