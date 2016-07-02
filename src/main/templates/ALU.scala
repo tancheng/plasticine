@@ -28,17 +28,17 @@ class BasicALU extends Module {
     io.out := io.a - io.b //subtract B from A
   } .elsewhen (io.opcode === UInt(8)) {
     io.out := io.a < io.b //set on A less than B
-  } .otherwise { 
+  } .otherwise {
     io.out :=  (io.a === io.b).toUInt() //set on A equal to B
   }
 }
 
-class ALU extends Module {
+class ALU(val w: Int) extends Module {
   val io = new Bundle {
-    val a      = UInt(INPUT,  4)
-    val b      = UInt(INPUT,  4)
+    val a      = UInt(INPUT,  w)
+    val b      = UInt(INPUT,  w)
     val opcode = UInt(INPUT,  2)
-    val out = UInt(OUTPUT, 4)
+    val out = UInt(OUTPUT, w)
   }
   io.out := UInt(0)
   when (io.opcode === UInt(0)) {

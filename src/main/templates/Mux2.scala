@@ -3,19 +3,18 @@ package plasticine.templates
 import Chisel._
 import scala.math._
 
-class Mux2 extends Module {
+class Mux2(val w: Int) extends Module {
   val io = new Bundle {
     val sel = Bits(INPUT,  1)
-    val in0 = Bits(INPUT,  4)
-    val in1 = Bits(INPUT,  4)
-    val out = Bits(OUTPUT, 4)
+    val in0 = Bits(INPUT,  width = w)
+    val in1 = Bits(INPUT,  width = w)
+    val out = Bits(OUTPUT, width = w)
   }
   when (io.sel === UInt(1)) {
     io.out := io.in1
   } .otherwise {
     io.out := io.in0
   }
-//  io.out := (io.sel & io.in1) | (~io.sel & io.in0)
 }
 
 class Mux2Tests(c: Mux2) extends Tester(c) {

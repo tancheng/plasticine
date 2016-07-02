@@ -2,14 +2,14 @@ package plasticine.templates
 
 import Chisel._
 
-class Mux4 extends Module {
+class Mux4(val w: Int) extends Module {
   val io = new Bundle {
-    val in0 = Bits(INPUT,  4)
-    val in1 = Bits(INPUT,  4)
-    val in2 = Bits(INPUT,  4)
-    val in3 = Bits(INPUT,  4)
+    val in0 = Bits(INPUT,  width = w)
+    val in1 = Bits(INPUT,  width = w)
+    val in2 = Bits(INPUT,  width = w)
+    val in3 = Bits(INPUT,  width = w)
     val sel = Bits(INPUT,  2)
-    val out = Bits(OUTPUT, 4)
+    val out = Bits(OUTPUT, width = w)
   }
 
   //-------------------------------------------------------------------------\\
@@ -20,17 +20,17 @@ class Mux4 extends Module {
 
   //-------------------------------------------------------------------------\\
 
-  val m0 = Module(new Mux2())
+  val m0 = Module(new Mux2(w))
   m0.io.sel := io.sel(0)
   m0.io.in0 := io.in0
   m0.io.in1 := io.in1
 
-  val m1 = Module(new Mux2())
+  val m1 = Module(new Mux2(w))
   m1.io.sel := io.sel(0)
   m1.io.in0 := io.in2
   m1.io.in1 := io.in3
 
-  val m2 = Module(new Mux2())
+  val m2 = Module(new Mux2(w))
   m2.io.sel := io.sel(1)
   m2.io.in0 := m0.io.out
   m2.io.in1 := m1.io.out
@@ -38,7 +38,7 @@ class Mux4 extends Module {
   io.out := m2.io.out
 }
 
-class Mux4Tests(c: Mux4) extends Tester(c) {  
+class Mux4Tests(c: Mux4) extends Tester(c) {
   for (s0 <- 0 until 2) {
     for (s1 <- 0 until 2) {
       for(i0 <- 0 until 2) {

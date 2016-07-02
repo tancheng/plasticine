@@ -27,7 +27,7 @@ class SwitchBoxTests(c: SwitchBox) extends Tester(c) {
 
 object SwitchBoxTest {
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new SwitchBox())) {
+    chiselMainTest(args, () => Module(new SwitchBox(4))) {
       c => new SwitchBoxTests(c)
     }
   }

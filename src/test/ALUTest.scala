@@ -32,7 +32,7 @@ class ALUTests(c: ALU) extends Tester(c) {
 
 object ALUTest {
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new ALU())) {
+    chiselMainTest(args, () => Module(new ALU(4))) {
       c => new ALUTests(c)
     }
   }
