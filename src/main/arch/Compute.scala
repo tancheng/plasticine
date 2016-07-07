@@ -5,18 +5,18 @@ import plasticine.templates._
 
 class Compute(override val w: Int) extends In4Out4(w) {
 
-  // Instantiate MUXes that control each input to ALU
+  // Instantiate MUXes that control each input to IntFU
   val aluMux0 = Module(new Mux8(w))
   val aluMux1 = Module(new Mux8(w))
 
-  // Instantiate Register at output of ALU
+  // Instantiate Register at output of IntFU
   val reg_out = Reg(Bits(width = w))
 
   // Instantiate Constant Register
   val reg_const = Reg(Bits(width = w))
 
-  // Instantiate ALU
-  val alu = Module(new ALU(w))
+  // Instantiate IntFU
+  val alu = Module(new IntFU(w))
   alu.io.a := aluMux0.io.out
   alu.io.a := aluMux1.io.out
 
