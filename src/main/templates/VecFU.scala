@@ -51,7 +51,6 @@ class VecFUTests(c: VecFU) extends Tester(c) {
     poke(c.io.opcode, opcode)
     step(1)
     (c.io.out zip output) foreach { case (out, expected) => expect(out, expected) }
-//    expect(c.io.out, output)
   }
 }
 
