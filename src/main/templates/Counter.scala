@@ -17,26 +17,25 @@ class Counter(val w: Int) extends Module {
     val control = new Bundle {
       val reset  = Bool(INPUT)
       val enable = Bool(INPUT)
+      val saturate = Bool(INPUT)
       val done   = Bool(OUTPUT)
     }
   }
 
-  // register wires - should this be another module?
+  val reg = Module(new FF(w))
   val init = UInt(0, width = w)
-  val d = UInt(width = w)
-  val count = Reg(Bits(w), d, init)
+  reg.io.data.init := init
+  reg.io.control.enable := io.control.enable
 
-//  val feedbackval = Mux(io.control.enable, count, init)
+  val count = reg.io.data.out
   val newval = count + io.data.stride
-  val isMax = count === io.data.max
+  val isMax = newval === io.data.max
+
   when (io.control.reset) {
-    d := init
-  } .elsewhen (io.control.enable) {
-    d := Mux(isMax, io.data.max, newval)
+    reg.io.data.in := init
   } .otherwise {
-    d := count
+    reg.io.data.in := Mux(isMax, Mux(io.control.saturate, count, init), newval)
   }
-//  d := Mux(io.control.reset, init, Mux(io.control.enable, Mux(isMax, io.data.max, newval), count))
 
   io.data.out := count
   io.control.done := isMax
@@ -50,25 +49,39 @@ class CounterTests(c: Counter) extends Tester(c) {
 
   val max = 10 % saturationVal
   val stride = 1
+  val saturate = 0
   poke(c.io.data.max, max)
   poke(c.io.data.stride, stride)
   poke(c.io.control.enable, 1)
+  poke(c.io.control.saturate, saturate)
   poke(c.io.control.reset, 0)
 
   println("[reset = 0, enable = 1]")
   expect(c.io.data.out, 0)
   expect(c.io.control.done, 0)
-  for (i <- 1 until (max+10)) {
+
+  def testOneStep(i: Int) = {
     step(1)
-    val expectedCount = if (i <= max) i else max
-    val expectedDone = if (i < max) 0 else 1
+    val (expectedCount, expectedDone) = saturate match {
+      case 1 =>
+        val count = if (i < max) i else max-1
+        val done = if (i < max-1) 0 else 1
+        (count, done)
+      case 0 =>
+        val count = i % max
+        val done = if (math.abs(i%max - (max-1)) < stride)  1 else 0
+        (count, done)
+    }
     expect(c.io.data.out, expectedCount)
     expect(c.io.control.done, expectedDone)
+  }
+  for (i <- 1 until (max+10)) {
+    testOneStep(i)
   }
 
   println("[reset = 1, enable = 1]")
   poke(c.io.control.reset, 1)
-  expect(c.io.data.out, max)
+  expect(c.io.data.out, max-1)
   expect(c.io.control.done, 1)
   for (i <- 0 until 5) {
     step(1)
@@ -90,11 +103,7 @@ class CounterTests(c: Counter) extends Tester(c) {
   expect(c.io.data.out, 0)
   expect(c.io.control.done, 0)
   for (i <- 1 until 5) {
-    step(1)
-    val expectedCount = if (i <= max) i else max
-    val expectedDone = if (i < max) 0 else 1
-    expect(c.io.data.out, expectedCount)
-    expect(c.io.control.done, expectedDone)
+    testOneStep(i)
   }
   val currentCount = 4
 
@@ -111,11 +120,7 @@ class CounterTests(c: Counter) extends Tester(c) {
   expect(c.io.data.out, currentCount)
   expect(c.io.control.done, 0)
   for (i <- currentCount+1 until max+10) {
-    step(1)
-    val expectedCount = if (i <= max) i else max
-    val expectedDone = if (i < max) 0 else 1
-    expect(c.io.data.out, expectedCount)
-    expect(c.io.control.done, expectedDone)
+    testOneStep(i)
   }
 }
 
