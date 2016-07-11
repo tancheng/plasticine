@@ -8,13 +8,20 @@ import scala.collection.mutable.HashMap
  * Counter opcode format
  */
 case class CounterOpcode(val w: Int) extends OpcodeT {
-  val max = UInt(INPUT, width = w)
-  val stride = UInt(INPUT, width = w)
-  val maxConst = Bool(INPUT)
-  val strideConst = Bool(INPUT)
+  var max = UInt(width = w)
+  var stride = UInt(width = w)
+  var maxConst = Bool()
+  var strideConst = Bool()
 
   override def cloneType(): this.type = {
     new CounterOpcode(w).asInstanceOf[this.type]
+  }
+
+  def init(inst: HashMap[String, Int]) {
+    max = max.fromInt(inst("max"))
+    stride = stride.fromInt(inst("stride"))
+    maxConst = maxConst.fromInt(inst("maxConst"))
+    strideConst = strideConst.fromInt(inst("strideConst"))
   }
 }
 
@@ -22,8 +29,8 @@ case class CounterOpcode(val w: Int) extends OpcodeT {
  * CounterRC: Wrapper around counter module with reconfig muxes.
  * @param w: Word width
  */
-class CounterRC(val w: Int) extends ConfigurableModule[CounterOpcode] {
-  val io = new ConfigInterface(CounterOpcode(w)) {
+class CounterRC(val w: Int, inst: HashMap[String, Int] = null) extends ConfigurableModule[CounterOpcode] {
+  val io = new ConfigInterface {
     val data = new Bundle {
       val max      = UInt(INPUT,  w)
       val stride   = UInt(INPUT,  w)
@@ -37,7 +44,9 @@ class CounterRC(val w: Int) extends ConfigurableModule[CounterOpcode] {
     }
   }
 
-  val config = RegInit(io.opcode)
+  val configWires = CounterOpcode(w)
+  configWires.init(inst)
+  val config = RegInit(configWires)
 
   val counter = Module(new Counter(w))
 
@@ -61,18 +70,6 @@ class CounterRCTests(c: CounterRC) extends PlasticineTester(c) {
   val stride = 2
   val saturate = 0
 
-  // Set configuration
-//  poke(c.io.bits.max, 96)
-//  poke(c.io.bits.stride, 1)
-//  poke(c.io.bits.maxConst, 1)
-//  poke(c.io.bits.strideConst, 0)
-
-//  poke(c.io.opcode, Array[BigInt](1, 1, 1, 96))
-  val inst = HashMap[String, Int]( "max" -> 16, "stride" -> 4, "maxConst" -> 0, "strideConst" -> 1)
-  set(c.io.opcode, inst)
-  step(1)
-  reset(10)
-
   poke(c.io.data.max, max)
   poke(c.io.data.stride, stride)
 
@@ -94,7 +91,11 @@ object CounterRCTest {
 
     val bitwidth = 7
 
-    chiselMainTest(args, () => Module(new CounterRC(bitwidth))) {
+    // Configuration passed to design as register initial values
+    // When the design is reset, config is set
+    val inst = HashMap[String, Int]( "max" -> 16, "stride" -> 3, "maxConst" -> 1, "strideConst" -> 0)
+
+    chiselMainTest(args, () => Module(new CounterRC(bitwidth, inst))) {
       c => new CounterRCTests(c)
     }
   }

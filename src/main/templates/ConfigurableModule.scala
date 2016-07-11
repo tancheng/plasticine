@@ -9,9 +9,7 @@ import scala.collection.mutable.HashMap
  */
 abstract class OpcodeT extends Bundle
 
-abstract class ConfigInterface[T<:OpcodeT](chiselType: T) extends Bundle {
-  val opcode = chiselType
-}
+abstract class ConfigInterface extends Bundle
 
 /**
  * Abstract 'ConfigurableModule' class. This class is a thin wrapper
@@ -19,7 +17,7 @@ abstract class ConfigInterface[T<:OpcodeT](chiselType: T) extends Bundle {
  * and methods related to reconfiguration logic to be defined.
  */
 abstract class ConfigurableModule[M<:OpcodeT] extends Module {
-  val io: ConfigInterface[M]
+  val io: ConfigInterface
 
   /** Storage for configuration bits */
   val config : M

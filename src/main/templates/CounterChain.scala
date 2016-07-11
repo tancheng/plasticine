@@ -7,10 +7,14 @@ import scala.collection.mutable.HashMap
  * CounterChain opcode format
  */
 case class CounterChainOpcode(val w: Int) extends OpcodeT {
-  val chain = Bool(INPUT)
+  var chain = Bool(INPUT)
 
   override def cloneType(): this.type = {
     new CounterChainOpcode(w).asInstanceOf[this.type]
+  }
+
+  def init(inst: HashMap[String, Any]) {
+    chain = chain.fromInt(inst("chain").asInstanceOf[Int])
   }
 }
 
@@ -19,9 +23,9 @@ case class CounterChainOpcode(val w: Int) extends OpcodeT {
  * @param w: Word width
  * @param d: Counter chain depth
  */
-class CounterChain(val w: Int) extends ConfigurableModule[CounterChainOpcode] {
+class CounterChain(val w: Int, inst: HashMap[String, Any]) extends ConfigurableModule[CounterChainOpcode] {
   val d = 2 // Counter chain depth
-  val io = new ConfigInterface(CounterChainOpcode(w)) {
+  val io = new ConfigInterface {
     val data = Vec.fill(d) { new Bundle {
         val max      = UInt(INPUT,  w)
         val stride   = UInt(INPUT,  w)
@@ -35,10 +39,13 @@ class CounterChain(val w: Int) extends ConfigurableModule[CounterChainOpcode] {
     }
   }
 
-  val config = RegInit(io.opcode)
+  val configWires = CounterChainOpcode(w)
+  configWires.init(inst)
+  val config = RegInit(configWires)
 
+  val counterInsn = inst("counters").asInstanceOf[Seq[HashMap[String,Int]]]
   val counters = (0 until d) map { i =>
-    val c = Module(new CounterRC(w))
+    val c = Module(new CounterRC(w, counterInsn(i)))
     c.io.data.max := io.data(i).max
     c.io.data.stride := io.data(i).stride
     io.data(i).out := c.io.data.out
@@ -75,23 +82,11 @@ class CounterChainTests(c: CounterChain) extends PlasticineTester(c) {
   val stride = 2
   val saturate = 0
 
-  // Set configuration
-  val chainInst = HashMap[String, Int]( "chain" -> 0)
-  set(c.io.opcode, chainInst)
-  c.counters map { ctr =>
-    val inst = HashMap[String, Int]( "max" -> 5, "stride" -> 1, "maxConst" -> 1, "strideConst" -> 1)
-    set(ctr.io.opcode, inst)
-
-  }
-  step(1)
-  reset(10)
-
   (0 until c.counters.size) map { i =>
     poke(c.io.data(i).max, max)
     poke(c.io.data(i).stride, stride)
     poke(c.io.control(i).enable, 1)
   }
-
 
   val counts = peek(c.io.data)
   val done = peek(c.io.control)
@@ -108,7 +103,13 @@ object CounterChainTest {
 
     val bitwidth = 7
 
-    chiselMainTest(args, () => Module(new CounterChain(bitwidth))) {
+    val chainInst = HashMap[String, Any]("chain" -> 1)
+    val countersInst = (0 until 2) map { i =>
+      HashMap[String, Int]("max" -> 5, "stride" -> 1, "maxConst" -> 1, "strideConst" -> 1)
+    }
+    chainInst("counters") = countersInst
+
+    chiselMainTest(args, () => Module(new CounterChain(bitwidth, chainInst))) {
       c => new CounterChainTests(c)
     }
   }
