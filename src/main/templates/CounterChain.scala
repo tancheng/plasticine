@@ -4,7 +4,7 @@ import Chisel._
 
 import scala.collection.mutable.HashMap
 /**
- * CounterChain opcode format
+ * CounterChain config register format
  */
 case class CounterChainOpcode(val w: Int) extends OpcodeT {
   var chain = Bool(INPUT)
@@ -13,9 +13,30 @@ case class CounterChainOpcode(val w: Int) extends OpcodeT {
     new CounterChainOpcode(w).asInstanceOf[this.type]
   }
 
-  def init(inst: HashMap[String, Any]) {
-    chain = chain.fromInt(inst("chain").asInstanceOf[Int])
+  def init(inst: CounterChainConfig) {
+    chain = chain.fromInt(inst.chain)
   }
+}
+
+/**
+ * CounterChain config information
+ */
+class CounterChainConfig(config: HashMap[String, Any]) {
+  // To chain or not?
+  private var _chain: Int = 0
+  def chain() = _chain
+  def chain_=(x: Int) { _chain = x }
+
+  // Configuration for individual counters
+  private var _counters: Seq[CounterRCConfig] = Seq[CounterRCConfig]()
+  def counters() = _counters
+  def counters_=(x: Seq[CounterRCConfig]) { _counters = x }
+
+  // Construct class here
+  _chain = config("chain").asInstanceOf[Int]
+  _counters = config("counters")
+                .asInstanceOf[Seq[HashMap[String, Any]]]
+                .map { h => new CounterRCConfig(h) }
 }
 
 /**
@@ -23,7 +44,7 @@ case class CounterChainOpcode(val w: Int) extends OpcodeT {
  * @param w: Word width
  * @param d: Counter chain depth
  */
-class CounterChain(val w: Int, inst: HashMap[String, Any]) extends ConfigurableModule[CounterChainOpcode] {
+class CounterChain(val w: Int, inst: CounterChainConfig) extends ConfigurableModule[CounterChainOpcode] {
   val d = 2 // Counter chain depth
   val io = new ConfigInterface {
     val data = Vec.fill(d) { new Bundle {
@@ -43,7 +64,7 @@ class CounterChain(val w: Int, inst: HashMap[String, Any]) extends ConfigurableM
   configWires.init(inst)
   val config = RegInit(configWires)
 
-  val counterInsn = inst("counters").asInstanceOf[Seq[HashMap[String,Int]]]
+  val counterInsn = inst.counters
   val counters = (0 until d) map { i =>
     val c = Module(new CounterRC(w, counterInsn(i)))
     c.io.data.max := io.data(i).max
@@ -109,7 +130,8 @@ object CounterChainTest {
     }
     chainInst("counters") = countersInst
 
-    chiselMainTest(args, () => Module(new CounterChain(bitwidth, chainInst))) {
+    val config = new CounterChainConfig(chainInst)
+    chiselMainTest(args, () => Module(new CounterChain(bitwidth, config))) {
       c => new CounterChainTests(c)
     }
   }

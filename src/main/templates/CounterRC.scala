@@ -5,7 +5,7 @@ import Chisel._
 import scala.collection.mutable.HashMap
 
 /**
- * Counter opcode format
+ * Counter config register format
  */
 case class CounterOpcode(val w: Int) extends OpcodeT {
   var max = UInt(width = w)
@@ -17,19 +17,50 @@ case class CounterOpcode(val w: Int) extends OpcodeT {
     new CounterOpcode(w).asInstanceOf[this.type]
   }
 
-  def init(inst: HashMap[String, Int]) {
-    max = max.fromInt(inst("max"))
-    stride = stride.fromInt(inst("stride"))
-    maxConst = maxConst.fromInt(inst("maxConst"))
-    strideConst = strideConst.fromInt(inst("strideConst"))
+  def init(inst: CounterRCConfig) {
+    max = max.fromInt(inst.max)
+    stride = stride.fromInt(inst.stride)
+    maxConst = maxConst.fromInt(inst.maxConst)
+    strideConst = strideConst.fromInt(inst.strideConst)
   }
+}
+
+/**
+ * Parsed config information for a single counter
+ */
+class CounterRCConfig(config: HashMap[String, Any]) {
+  /** Counter max */
+  private var _max: Int = 0
+  def max() = _max
+  def max_=(x: Int) { _max = x }
+
+  /** Counter stride */
+  private var _stride: Int = 0
+  def stride() = _stride
+  def stride_=(x: Int) { _stride = x }
+
+  /** Is max const */
+  private var _maxConst: Int = 0
+  def maxConst() = _maxConst
+  def maxConst_=(x: Int) { _maxConst = x }
+
+  /** Is stride const */
+  private var _strideConst: Int = 0
+  def strideConst() = _strideConst
+  def strideConst_=(x: Int) { _strideConst = x }
+
+  // Construct the class here
+  _max = config("max").asInstanceOf[Int]
+  _stride = config("stride").asInstanceOf[Int]
+  _maxConst = config("maxConst").asInstanceOf[Int]
+  _strideConst = config("strideConst").asInstanceOf[Int]
 }
 
 /**
  * CounterRC: Wrapper around counter module with reconfig muxes.
  * @param w: Word width
  */
-class CounterRC(val w: Int, inst: HashMap[String, Int] = null) extends ConfigurableModule[CounterOpcode] {
+class CounterRC(val w: Int, inst: CounterRCConfig = null) extends ConfigurableModule[CounterOpcode] {
   val io = new ConfigInterface {
     val data = new Bundle {
       val max      = UInt(INPUT,  w)
@@ -93,9 +124,10 @@ object CounterRCTest {
 
     // Configuration passed to design as register initial values
     // When the design is reset, config is set
-    val inst = HashMap[String, Int]( "max" -> 16, "stride" -> 3, "maxConst" -> 1, "strideConst" -> 0)
+    val inst = HashMap[String, Any]( "max" -> 16, "stride" -> 3, "maxConst" -> 1, "strideConst" -> 0)
+    val config = new CounterRCConfig(inst)
 
-    chiselMainTest(args, () => Module(new CounterRC(bitwidth, inst))) {
+    chiselMainTest(args, () => Module(new CounterRC(bitwidth, config))) {
       c => new CounterRCTests(c)
     }
   }
