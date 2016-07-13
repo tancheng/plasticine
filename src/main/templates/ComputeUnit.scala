@@ -10,19 +10,13 @@ import scala.collection.mutable.ListBuffer
  * @param l: Number of local registers
  * @param r: Number of remote registers
  */
-class OperandBundle(l: Int, r: Int) extends Bundle {
-  var isLocal = Bool()
-  var regLocal = UInt(width=log2Up(l+r))
-  var regRemote = UInt(width=log2Up(r))
+class OperandBundle(l: Int, r: Int, config: Option[OperandConfig] = None) extends Bundle {
+  var isLocal = if (config.isDefined) Bool(config.get.isLocal) else Bool()
+  var regLocal = if (config.isDefined) UInt(config.get.regLocal, width=log2Up(l+r)) else UInt(width=log2Up(l+r))
+  var regRemote = if (config.isDefined) UInt(config.get.regRemote, width=log2Up(r)) else UInt(width=log2Up(r))
 
   override def cloneType(): this.type = {
     new OperandBundle(l, r).asInstanceOf[this.type]
-  }
-
-  def init(inst: OperandConfig) {
-    isLocal = isLocal.fromInt(inst.isLocal)
-    regLocal = regLocal.fromInt(inst.regLocal)
-    regRemote = regRemote.fromInt(inst.regRemote)
   }
 }
 
@@ -32,21 +26,14 @@ class OperandBundle(l: Int, r: Int) extends Bundle {
  * @param l: Number of local registers
  * @param r: Number of remote registers
  */
-class PipeStageBundle(l: Int, r: Int) extends Bundle {
-  var opA = new OperandBundle(l, r)
-  var opB = new OperandBundle(l, r)
-  var opcode = UInt(width=4) // TODO: Remove hardcoded number!
-  var result = UInt(width=l+r) // One-hot encoded
+class PipeStageBundle(l: Int, r: Int, config: Option[PipeStageConfig] = None) extends Bundle {
+  var opA = if (config.isDefined) new OperandBundle(l, r, Some(config.get.opA)) else new OperandBundle(l, r)
+  var opB = if (config.isDefined) new OperandBundle(l, r, Some(config.get.opB)) else new OperandBundle(l, r)
+  var opcode = if (config.isDefined) UInt(config.get.opcode, width=4) else UInt(width=4) // TODO: Remove hardcoded number!
+  var result = if (config.isDefined) UInt(config.get.result, width=l+r) else UInt(width=l+r) // One-hot encoded
 
   override def cloneType(): this.type = {
     new PipeStageBundle(l,r).asInstanceOf[this.type]
-  }
-
-  def init(inst: PipeStageConfig) {
-    opA.init(inst.opA)
-    opB.init(inst.opB)
-    opcode = opcode.fromInt(inst.opcode)
-    result = result.fromInt(inst.result)
   }
 }
 
@@ -57,23 +44,20 @@ class PipeStageBundle(l: Int, r: Int) extends Bundle {
  * @param l: Number of local registers
  * @param r: Number of remote registers
  */
-case class ComputeUnitOpcode(val w: Int, val d: Int, val l: Int, val r: Int) extends OpcodeT {
-  var remoteMux0 = UInt(width=1)
-  var remoteMux1 = UInt(width=1)
+case class ComputeUnitOpcode(val w: Int, val d: Int, val l: Int, val r: Int, config: Option[ComputeUnitConfig] = None) extends OpcodeT {
+  var remoteMux0 = if (config.isDefined) UInt(config.get.remoteMux0, width=1) else UInt(width=1)
+  var remoteMux1 = if (config.isDefined) UInt(config.get.remoteMux1, width=1) else UInt(width=1)
 
-  var pipeStage = Vec.fill(d) {
-    new PipeStageBundle(l, r)
+  var pipeStage = Vec.tabulate(d) { i =>
+    if (config.isDefined) {
+      new PipeStageBundle(l, r, Some(config.get.pipeStage(i)))
+    } else {
+      new PipeStageBundle(l, r)
+    }
   }
 
   override def cloneType(): this.type = {
-    new ComputeUnitOpcode(w, d, l, r).asInstanceOf[this.type]
-  }
-
-  def init(inst: ComputeUnitConfig) {
-    remoteMux0 = remoteMux0.fromInt(inst.remoteMux0)
-    remoteMux1 = remoteMux1.fromInt(inst.remoteMux1)
-    println(s"inst.remoteMux0 = ${inst.remoteMux0}, inst.remoteMux1 = ${inst.remoteMux1}")
-//    pipeStage zip inst.pipeStage foreach { case (lhs, config) => lhs.init(config) }
+    new ComputeUnitOpcode(w, d, l, r, config).asInstanceOf[this.type]
   }
 }
 
@@ -81,9 +65,9 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, val l: Int, val r: Int) ext
  * Parsed configuration information for ComputeUnit
  */
 class OperandConfig(config: HashMap[String, Any]) {
-  private var _isLocal = config("isLocal").asInstanceOf[Int]
+  private var _isLocal = config("isLocal").asInstanceOf[Boolean]
   def isLocal() = _isLocal
-  def isLocal_=(x: Int) { _isLocal = x }
+  def isLocal_=(x: Boolean) { _isLocal = x }
 
   private var _regLocal = config("regLocal").asInstanceOf[Int]
   def regLocal() = _regLocal
@@ -167,13 +151,30 @@ class ComputeUnit(val w: Int, val d: Int, val l: Int, val r: Int, inst: ComputeU
   val io = new ConfigInterface {
     val enable      = Bool(INPUT)
     val done        = Bool(OUTPUT)
-    val scalarOut = UInt(OUTPUT, w)
+    val scalarOut   = UInt(OUTPUT, w)
+    val config_enable = Bool(INPUT)
+    val rmux0 = UInt(OUTPUT, 1)
+    val rmux1 = UInt(OUTPUT, 1)
+    val opcode = UInt(OUTPUT, w)
+    val opA_isLocal = UInt(OUTPUT, 1)
+    val opA_local = UInt(OUTPUT, w)
+    val opA_remote = UInt(OUTPUT, w)
+    val opB_isLocal = UInt(OUTPUT, 1)
+    val opB_local = UInt(OUTPUT, w)
+    val opB_remote = UInt(OUTPUT, w)
+    val result = UInt(OUTPUT, w)
   }
 
-  val configWires = ComputeUnitOpcode(w, d, l, r)
-  configWires.init(inst)
-  configWires.remoteMux1 = UInt(1, width=1)
-  val config = RegInit(configWires)
+  val configType = ComputeUnitOpcode(w, d, l, r)
+  val configIn = ComputeUnitOpcode(w, d, l, r)
+  val configInit = ComputeUnitOpcode(w, d, l, r, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType
+  } .otherwise {
+    configIn := config
+  }
+
 
   /** CounterChain */
   val counterChain = Module(new CounterChain(w, inst.counterChain))
@@ -194,8 +195,6 @@ class ComputeUnit(val w: Int, val d: Int, val l: Int, val r: Int, inst: ComputeU
   val remoteMux1 = Module(new MuxN(remotes.size, w))
   remoteMux1.io.ins := remotes
   remoteMux1.io.sel := config.remoteMux1
-
-  io.scalarOut := configWires.remoteMux1
 
   val passValues = remotes
 
@@ -229,9 +228,20 @@ class ComputeUnit(val w: Int, val d: Int, val l: Int, val r: Int, inst: ComputeU
     fus.append(fu)
     pipeRegs.append(regblock)
   }
-
-//  io.scalarOut := fus.last.io.out
+  io.scalarOut := fus.last.io.out
   io.done := counterChain.io.control(1).done
+
+  // Temporary, for debugging
+  io.rmux0       := config.remoteMux0
+  io.rmux1       := config.remoteMux1
+  io.opcode      := config.pipeStage(0).opcode
+  io.opA_isLocal := config.pipeStage(0).opA.isLocal
+  io.opA_local   := config.pipeStage(0).opA.regLocal
+  io.opA_remote  := config.pipeStage(0).opA.regRemote
+  io.opB_isLocal := config.pipeStage(0).opB.isLocal
+  io.opB_local   := config.pipeStage(0).opB.regLocal
+  io.opB_remote  := config.pipeStage(0).opB.regRemote
+  io.result      := config.pipeStage(0).result
 }
 
 /**
@@ -247,7 +257,17 @@ class ComputeUnitTests(c: ComputeUnit) extends PlasticineTester(c) {
     step(1)
     numCycles += 1
     done = peek(c.io.done)
-    val scalarOut = peek(c.io.scalarOut)
+//    peek(c.io.rmux0      )
+//    peek(c.io.rmux1      )
+//    peek(c.io.opcode     )
+//    peek(c.io.opA_isLocal)
+//    peek(c.io.opA_local  )
+//    peek(c.io.opA_remote )
+//    peek(c.io.opB_isLocal)
+//    peek(c.io.opB_local  )
+//    peek(c.io.opB_remote )
+//    peek(c.io.result     )
+    peek(c.io.scalarOut)
   }
   poke(c.io.enable, 0)
 
@@ -277,9 +297,9 @@ object ComputeUnitTest {
 
     // Pipeline stages
     val pipeStage = HashMap[String, Any](
-      "opA" -> HashMap[String, Any]("isLocal" -> 0, "regLocal" -> 0, "regRemote" -> 0),
-      "opB" -> HashMap[String, Any]("isLocal" -> 0, "regLocal" -> 0, "regRemote" -> 1),
-      "opcode" -> 2,
+      "opA" -> HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 0),
+      "opB" -> HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
+      "opcode" -> 7,
       "result" -> 1
     )
     cuConfig("pipeStage") = Seq(pipeStage)
