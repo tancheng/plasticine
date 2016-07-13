@@ -279,11 +279,11 @@ object ComputeUnitTest {
   def main(args: Array[String]): Unit = {
 
     val bitwidth = 7
-    val d = 1
+    val d = 2
     val l = 2
     val r = 2
     // Counter chain
-    val chainInst = HashMap[String, Any]("chain" -> 1)
+    val chainInst = HashMap[String, Any]("chain" -> 0)
     val countersInst = (0 until 2) map { i =>
       HashMap[String, Int]("max" -> 5, "stride" -> 1, "maxConst" -> 1, "strideConst" -> 1)
     }
@@ -296,13 +296,20 @@ object ComputeUnitTest {
     cuConfig("remoteMux1") = 1
 
     // Pipeline stages
-    val pipeStage = HashMap[String, Any](
+    val pipeStage0 = HashMap[String, Any](
       "opA" -> HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 0),
       "opB" -> HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
-      "opcode" -> 7,
-      "result" -> 1
+      "opcode" -> 2,
+      "result" -> 8 // One-hot encoded
     )
-    cuConfig("pipeStage") = Seq(pipeStage)
+    val pipeStage1 = HashMap[String, Any](
+      "opA" -> HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
+      "opB" -> HashMap[String, Any]("isLocal" -> true, "regLocal" -> 1, "regRemote" -> 0),
+      "opcode" -> 0,
+      "result" -> 2
+    )
+
+    cuConfig("pipeStage") = Seq(pipeStage0, pipeStage1)
 
     val config = new ComputeUnitConfig(cuConfig)
     println(s"config = $config")
