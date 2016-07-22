@@ -15,23 +15,23 @@ function cleanup {
 	rm -rf post_pr_gatelevel_netlist
 	rm -rf work
 }
-# while read cmd var val
-# do
-# #	echo $cmd $var $val
-# 	if $cmd == "set"
-# 	then 
-# 		echo "export $var=$val"
-# 		eval "export $var=$val"
-# 	fi
-# done < ./param.tcl
+while read cmd var val
+do
+#	echo $cmd $var $val
+	if $cmd == "set"
+	then 
+		echo "export $var=$val"
+		eval "export $var=$val"
+	fi
+done < ./param.tcl
 cleanup
-# mkdir log
-# dc_shell-t -f synth/CU_dc.tcl > dc.log
-# icc_shell -f synth/CU_icc.tcl > icc.log
-# iverilog -o ${PROJECT_NAME}_sim  post_pr_gatelevel_netlist/${PROJECT_NAME}.output.v verif/${PROJECT_NAME}_tb.v /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/verilog/tcbn45gsbwp_110b/tcbn45gsbwp.v
-# vvp ${PROJECT_NAME}_sim > sim.log
-# pt_shell -f synth/CU_pt.tcl > pt.log
-# mv *.log log
-# mv *.txt log
-# mv *.svf log
-# exit
+mkdir log
+dc_shell-t -f synth/CU_dc.tcl > dc.log
+icc_shell -f synth/CU_icc.tcl > icc.log
+iverilog -o ${PROJECT_NAME}_sim  post_pr_gatelevel_netlist/${PROJECT_NAME}.output.v verif/${PROJECT_NAME}_tb.v /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/verilog/tcbn45gsbwp_110b/tcbn45gsbwp.v
+vvp ${PROJECT_NAME}_sim > sim.log
+pt_shell -f synth/CU_pt.tcl > pt.log
+mv *.log log
+mv *.txt log
+mv *.svf log
+exit

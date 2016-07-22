@@ -11,4 +11,4 @@ Results of icc compiler are stored in icc_reports/
 Results of iverilog are stored in sim.log
 Results of primetime are stored in pt_reports/ 
 
-tianzhao@stanford.edu
+To run the simulation, first source the source.sh file in setup/. Then chmod +x flow.sh and run ./flow.sh

@@ -1,9 +1,32 @@
 ## set up synopsys requirements: 
 # source /cad/modules/tcl/init/bash
-export PATH="/cad/synopsys/dc_shell/latest/bin:$PATH"
-export PATH="/cad/synopsys/icc/J-2014.09-SP3/bin:$PATH"
-export PATH="/cad/synopsys/mw/G-2012.06-SP5-4/bin/AMD.64:$PATH"
+# license
 export SNPSLMD_LICENSE_FILE=27000@cadlic0.stanford.edu
+
+# for dc_shell
+export PATH="/cad/synopsys/dc_shell/latest/bin:$PATH"
+
+# for icc_shell
+export PATH="/cad/synopsys/icc/J-2014.09-SP3/bin:$PATH"
+
+# for vcs-mx
+export VCSVER="I-2014.03-2"
+export VCS_HOME="/cad/synopsys/vcs-mx/$VCSVER"
+export VIRSIMHOME="$VCS_HOME/gui/virsim"
+export PATH="$VCS_HOME/bin:$PATH"
+export PATH="$VCS_HOME/gui/dve/bin:$PATH"
+export PATH="$VIRSIMHOME/bin:$PATH"
+
+# for primetime shell
+export PTSVER="H-2012.12-SP2"
+export SYNOPSYS_PTS="/cad/synopsys/pts/$PTSVER" 
+export PATH="$SYNOPSYS_PTS/bin:$PATH"
+export PATH="$SYNOPSYS_PTS/amd64/syn/bin/:$PATH"
+
+# for milkyway
+export PATH="/cad/synopsys/mw/G-2012.06-SP5-4/bin/AMD.64:$PATH"
+
+
 export ICC_EG="/home/tianzhao/plasticine_power_area_estimate/ICC_tutorial/ICC-RM_J-2014.09"
 
 ## set up TSMC 45 library
