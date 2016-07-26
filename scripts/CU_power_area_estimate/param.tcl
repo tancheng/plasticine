@@ -1,6 +1,6 @@
 set PROJECT_NAME ComputeUnit
 set TSMC_45 /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/
-set PROJECT_PATH /home/tianzhao/CU_power_area_estimate
+set PROJECT_PATH [pwd] 
 set PRE_PR_NETLIST_PATH $PROJECT_PATH/pre_pr_gatelevel_netlist
 set POST_PR_NETLIST_PATH $PROJECT_PATH/post_pr_gatelevel_netlist
 set SRC_PATH $PROJECT_PATH/src

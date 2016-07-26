@@ -1,0 +1,58 @@
+Information: Propagating switching activity (high effort zero delay simulation). (PWR-6)
+Warning: There is no defined clock in the design. (PWR-80)
+Warning: Design has unannotated primary inputs. (PWR-414)
+Warning: Design has unannotated sequential cell outputs. (PWR-415)
+ 
+****************************************
+Report : power
+        -analysis_effort high
+Design : ComputeUnit
+Version: J-2014.09-SP3
+Date   : Tue Jul 26 14:38:50 2016
+****************************************
+
+
+Library(s) Used:
+
+    tcbn45gsbwpml (File: /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db)
+
+
+Operating Conditions: MLCOM   Library: tcbn45gsbwpml
+Wire Load Model Mode: segmented
+
+Design        Wire Load Model            Library
+------------------------------------------------
+ComputeUnit            ZeroWireload      tcbn45gsbwpml
+
+
+Global Operating Voltage = 0.99 
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =   9.4249 uW   (47%)
+  Net Switching Power  =  10.7166 uW   (53%)
+                         ---------
+Total Dynamic Power    =  20.1415 uW  (100%)
+
+Cell Leakage Power     = 410.2214 uW
+
+Information: report_power power group summary does not include estimated clock tree power. (PWR-789)
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+register           0.0000            0.0000            0.0000            0.0000  (   0.00%)
+sequential     4.3187e-03        2.6515e-04        4.4839e+04        4.9423e-02  (  11.48%)
+combinational  5.1062e-03        1.0451e-02        3.6538e+05            0.3809  (  88.52%)
+--------------------------------------------------------------------------------------------------
+Total          9.4249e-03 mW     1.0717e-02 mW     4.1022e+05 nW         0.4304 mW
+1

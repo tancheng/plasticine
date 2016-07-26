@@ -6,7 +6,6 @@ set link_library { * tcbn45gsbwpml.db dw_foundation.sldb}
 set target_library "tcbn45gsbwpml.db"
 
 set synthetic_library [list  dw_foundation.sldb]
-# set dw_lib     $SYN
 set sym_lib    $TSMC_45
 set target_lib $TSMC_45
 set search_path [list ./ $SRC_PATH $target_lib $sym_lib]
@@ -17,10 +16,6 @@ create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILK
 set_tlu_plus_files -max_tluplus $TLUPLUS_MAX -min_tluplus $TLUPLUS_MIN -tech2itf_map $TECH2ITF_MAP
 open_mw_lib $MILKYWAY_LIB_NAME 
 import_designs $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.v -format "verilog" -top $PROJECT_NAME -cel $PROJECT_NAME
-
-# import_designs /home/tianzhao/CU_power_area_estimate/src/gatelevel_netlist/example.mapped.v -format "verilog" \ -top "ComputeUnit" -cel "ComputeUnit" 
-
-# read_sdc /home/tianzhao/CU_power_area_estimate/src/gatelevel_netlist/example.mapped.sdc 
 read_sdc $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.sdc
 set power "VDD"
 set ground "VSS"
@@ -96,6 +91,8 @@ report_area
 redirect $PROJECT_PATH/icc_reports/icc_area_report { report_area }
 report_power
 redirect $PROJECT_PATH/icc_reports/icc_power_report { report_power -analysis_effort hi }
+# report_saif
+# redirct $PROJECT_PATH/icc_reports/icc_saif_report { report_saif }
 check_error
 redirect $PROJECT_PATH/icc_reports/icc_error_checking_report { check_error }
 

@@ -18,6 +18,14 @@ read_verilog $POST_PR_NETLIST_PATH/$PROJECT_NAME.output.v
 current_design $PROJECT_NAME
 link
 
+# Do static power analysis
+set power_analysis_mode "averaged"
+read_saif trace.saif -strip_path $SRC_PATH
+report_switching_activity -list_not_annotated
+read_parasitics -increment -format sbpf $POST_PR_NETLIST_PATH/$PROJECT_NAME.output.sbpf  
+report_power -verbose -hierarchy
+redirect $PROJECT_PATH/pt_reports/pt_averaged_power_report {report_power -verbose -hierarchy}
+
 # Do time-based power analysis
 set power_analysis_mode "time_based"
 read_vcd $PROJECT_PATH/trace.vcd 

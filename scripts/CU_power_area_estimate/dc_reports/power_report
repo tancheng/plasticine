@@ -1,0 +1,58 @@
+Information: Propagating switching activity (high effort zero delay simulation). (PWR-6)
+Warning: There is no defined clock in the design. (PWR-80)
+Warning: Design has unannotated primary inputs. (PWR-414)
+Warning: Design has unannotated sequential cell outputs. (PWR-415)
+ 
+****************************************
+Report : power
+        -analysis_effort high
+Design : ComputeUnit
+Version: I-2013.12-SP4
+Date   : Tue Jul 26 14:38:19 2016
+****************************************
+
+
+Library(s) Used:
+
+    tcbn45gsbwpml (File: /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db)
+
+
+Operating Conditions: MLCOM   Library: tcbn45gsbwpml
+Wire Load Model Mode: top
+
+Design        Wire Load Model            Library
+------------------------------------------------
+ComputeUnit            ZeroWireload      tcbn45gsbwpml
+
+
+Global Operating Voltage = 0.99 
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =  15.9797 uW   (63%)
+  Net Switching Power  =   9.3684 uW   (37%)
+                         ---------
+Total Dynamic Power    =  25.3481 uW  (100%)
+
+Cell Leakage Power     = 412.3735 uW
+
+Information: report_power power group summary does not include estimated clock tree power. (PWR-789)
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+register           0.0000            0.0000            0.0000            0.0000  (   0.00%)
+sequential     1.1448e-02        1.8182e-04        1.2736e+05            0.1390  (  31.75%)
+combinational  4.5321e-03        9.1866e-03        2.8501e+05            0.2987  (  68.25%)
+--------------------------------------------------------------------------------------------------
+Total          1.5980e-02 mW     9.3684e-03 mW     4.1237e+05 nW         0.4377 mW
+1
