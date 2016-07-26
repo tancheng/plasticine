@@ -6,7 +6,7 @@ Report : timing
         -max_paths 1
 Design : ComputeUnit
 Version: I-2013.12-SP4
-Date   : Tue Jul 26 14:38:19 2016
+Date   : Tue Jul 26 14:58:09 2016
 ****************************************
 
 Operating Conditions: MLCOM   Library: tcbn45gsbwpml

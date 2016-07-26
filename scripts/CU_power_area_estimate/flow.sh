@@ -37,7 +37,7 @@ echo "Generating saif file for averaged power analysis..."
 vcd2saif -input trace.vcd -output trace.saif
 echo "Running PrimeTime power estimator..."
 pt_shell -f synth/CU_pt.tcl > pt.log
-# mv *.log log
-# mv *.txt log
-# mv *.svf log
-# exit
+mv *.log log
+mv *.txt log
+mv *.svf log
+exit
