@@ -1,0 +1,45 @@
+****************************************
+Report : Time Based Power
+	-hierarchy
+	-verbose
+Design : ComputeUnit
+Version: H-2012.12-SP2
+Date   : Tue Jul 26 14:58:46 2016
+****************************************
+
+Sampling Interval: 1 ns
+
+Library(s) Used:
+
+    tcbn45gsbwpml (File: /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db)
+    dw_foundation.sldb (File: /cad/synopsys/dc_shell/latest/libraries/syn/dw_foundation.sldb)
+
+
+Operating Conditions: MLCOM   Library: tcbn45gsbwpml
+Wire Load Model Mode: segmented
+
+Cell               Design       Wire_model  Library       Selection_type
+--------------------------------------------------------------------------------
+                   ComputeUnit  ZeroWireload
+                                            tcbn45gsbwpml automatic-by-area
+
+Power-specific unit information :
+    Voltage Units = 1 V
+    Capacitance Units = 1 pf
+    Time Units = 1 ns
+    Dynamic Power Units = 1 W
+    Leakage Power Units = 1 W
+
+
+
+                                      Int      Switch   Leak      Total
+Hierarchy                             Power    Power    Power     Power    %
+--------------------------------------------------------------------------------
+ComputeUnit                              0.000    0.000    0.000     0.000   N/A
+
+
+                                      Peak     Peak            Glitch   X-tran
+Hierarchy                             Power    Time            Power    Power
+--------------------------------------------------------------------------------
+ComputeUnit                              0.000       0-1          0.000    0.000
+1

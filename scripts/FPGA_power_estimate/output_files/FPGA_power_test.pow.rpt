@@ -1,0 +1,607 @@
+PowerPlay Power Analyzer report for FPGA_power_test
+Mon Jul 25 13:40:14 2016
+Quartus II 64-Bit Version 13.1.0 Build 162 10/23/2013 SJ Full Version
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Parallel Compilation
+  3. PowerPlay Power Analyzer Summary
+  4. PowerPlay Power Analyzer Settings
+  5. Indeterminate Toggle Rates
+  6. PowerPlay Power Analyzer Simulation Files Read
+  7. Operating Conditions Used
+  8. Thermal Power Dissipation by Block
+  9. Thermal Power Dissipation by Block Type
+ 10. Thermal Power Dissipation by Hierarchy
+ 11. Core Dynamic Thermal Power Dissipation by Clock Domain
+ 12. Current Drawn from Voltage Supplies Summary
+ 13. VCCIO Supply Current Drawn by I/O Bank
+ 14. VCCIO Supply Current Drawn by Voltage
+ 15. VCCPD Supply Current Drawn by I/O Bank
+ 16. VCCPD Supply Current Drawn by Voltage
+ 17. Confidence Metric Details
+ 18. Signal Activities
+ 19. PowerPlay Power Analyzer Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 1991-2013 Altera Corporation
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, Altera MegaCore Function License 
+Agreement, or other applicable license agreement, including, 
+without limitation, that your use is for the sole purpose of 
+programming logic devices manufactured by Altera and sold by 
+Altera or its authorized distributors.  Please refer to the 
+applicable agreement for further details.
+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 48          ;
+; Maximum allowed            ; 16          ;
+;                            ;             ;
+; Average used               ; 1.00        ;
+; Maximum used               ; 16          ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
+;     Processors 2-16        ; < 0.1%      ;
+;     Processors 17-48       ;   0.0%      ;
++----------------------------+-------------+
+
+
++-------------------------------------------------------------------------------------------+
+; PowerPlay Power Analyzer Summary                                                          ;
++----------------------------------------+--------------------------------------------------+
+; PowerPlay Power Analyzer Status        ; Successful - Mon Jul 25 13:40:14 2016            ;
+; Quartus II 64-Bit Version              ; 13.1.0 Build 162 10/23/2013 SJ Full Version      ;
+; Revision Name                          ; FPGA_power_test                                  ;
+; Top-level Entity Name                  ; ComputeUnit                                      ;
+; Family                                 ; Stratix V                                        ;
+; Device                                 ; 5SGSMD4E3H29I4                                   ;
+; Power Models                           ; Final                                            ;
+; Total Thermal Power Dissipation        ; 645.61 mW                                        ;
+; Core Dynamic Thermal Power Dissipation ; 0.00 mW                                          ;
+; Core Static Thermal Power Dissipation  ; 634.34 mW                                        ;
+; I/O Thermal Power Dissipation          ; 11.27 mW                                         ;
+; Power Estimation Confidence            ; Low: user provided insufficient toggle rate data ;
++----------------------------------------+--------------------------------------------------+
+
+
++------------------------------------------------------------------------------------------------------------------------------------+
+; PowerPlay Power Analyzer Settings                                                                                                  ;
++----------------------------------------------------------------------------+---------------------------------------+---------------+
+; Option                                                                     ; Setting                               ; Default Value ;
++----------------------------------------------------------------------------+---------------------------------------+---------------+
+; Use smart compilation                                                      ; Off                                   ; Off           ;
+; Enable parallel Assembler and TimeQuest Timing Analyzer during compilation ; On                                    ; On            ;
+; Enable compact report table                                                ; Off                                   ; Off           ;
+; Default Power Input I/O Toggle Rate                                        ; 12.5%                                 ; 12.5%         ;
+; Use Input Files                                                            ; On                                    ; Off           ;
+; Power Analyzer Report Signal Activity                                      ; On                                    ; Off           ;
+; Power Analyzer Report Power Dissipation                                    ; On                                    ; Off           ;
+; Preset Cooling Solution                                                    ; 23 MM HEAT SINK WITH 200 LFPM AIRFLOW ;               ;
+; Board thermal model                                                        ; None (CONSERVATIVE)                   ;               ;
+; Default Power Toggle Rate                                                  ; 12.5%                                 ; 12.5%         ;
+; Use vectorless estimation                                                  ; On                                    ; On            ;
+; Filter Glitches in VCD File Reader                                         ; On                                    ; On            ;
+; Device Power Characteristics                                               ; TYPICAL                               ; TYPICAL       ;
+; Automatically Compute Junction Temperature                                 ; On                                    ; On            ;
+; Specified Junction Temperature                                             ; 25                                    ; 25            ;
+; Ambient Temperature                                                        ; 25                                    ; 25            ;
+; Use Custom Cooling Solution                                                ; Off                                   ; Off           ;
+; Board Temperature                                                          ; 25                                    ; 25            ;
++----------------------------------------------------------------------------+---------------------------------------+---------------+
+
+
++------------------------------------------------+
+; Indeterminate Toggle Rates                     ;
++------------------+-----------------------------+
+; Node             ; Reason                      ;
++------------------+-----------------------------+
+; clk~inputCLKENA0 ; No valid clock domain found ;
++------------------+-----------------------------+
+
+
++-------------------------------------------------------------------------------------------------------+
+; PowerPlay Power Analyzer Simulation Files Read                                                        ;
++---------+-----------+-----------+--------------+----------------+--------------+-----------+----------+
+; File ID ; File Name ; File Type ; Entity       ; VCD Start Time ; VCD End Time ; Unknown % ; Toggle % ;
++---------+-----------+-----------+--------------+----------------+--------------+-----------+----------+
+; f1      ; trace.vcd ; VCD       ; |ComputeUnit ; N/A            ; N/A          ; 1.2%      ; 15.5%    ;
++---------+-----------+-----------+--------------+----------------+--------------+-----------+----------+
+
+
++-------------------------------------------------------------------------+
+; Operating Conditions Used                                               ;
++---------------------------------------------+---------------------------+
+; Setting                                     ; Value                     ;
++---------------------------------------------+---------------------------+
+; Device power characteristics                ; Typical                   ;
+;                                             ;                           ;
+; Voltages                                    ;                           ;
+;     VCCP                                    ; 0.85 V                    ;
+;     VCCPT                                   ; 1.50 V                    ;
+;     VCCA_FPLL                               ; 2.50 V                    ;
+;     VCC                                     ; 0.85 V                    ;
+;     VCCL                                    ; 0.85 V                    ;
+;     VCCD_FPLL                               ; 1.50 V                    ;
+;     VCCPGM                                  ; 1.80 V                    ;
+;     VCCBAT                                  ; 3.00 V                    ;
+;     VCCHIP_L                                ; 0.00 V                    ;
+;     VCCT_GXBL                               ; 0.00 V                    ;
+;     VCCR_GXBL                               ; 0.00 V                    ;
+;     VCCHIP_R                                ; 0.00 V                    ;
+;     VCCT_GXBR                               ; 0.00 V                    ;
+;     VCCR_GXBR                               ; 0.00 V                    ;
+;     VCCA_GXBL                               ; 0.00 V                    ;
+;     VCCA_GXBR                               ; 0.00 V                    ;
+;     VCCH_GXBL                               ; 0.00 V                    ;
+;     VCCH_GXBR                               ; 0.00 V                    ;
+;     VCCAUX                                  ; 2.50 V                    ;
+;     VCCHSSI_L                               ; 0.00 V                    ;
+;     VCCHSSI_R                               ; 0.00 V                    ;
+;     2.5 V I/O Standard                      ; 2.5 V                     ;
+;     1.8 V I/O Standard                      ; 1.8 V                     ;
+;                                             ;                           ;
+; Auto computed junction temperature          ; 26.5 degrees Celsius      ;
+;     Ambient temperature                     ; 25.0 degrees Celsius      ;
+;     Junction-to-Case thermal resistance     ; 0.20 degrees Celsius/Watt ;
+;     Case-to-Heat Sink thermal resistance    ; 0.10 degrees Celsius/Watt ;
+;     Heat Sink-to-Ambient thermal resistance ; 2.10 degrees Celsius/Watt ;
+;                                             ;                           ;
+; Board model used                            ; None                      ;
++---------------------------------------------+---------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Thermal Power Dissipation by Block                                                                                                                                                                                        ;
++---------------------------------------------------------------------------------+--------------------+---------------------+-----------------------------+--------------------------------+-------------------------------+
+; Block Name                                                                      ; Block Type         ; Total Thermal Power ; Block Thermal Dynamic Power ; Block Thermal Static Power (1) ; Routing Thermal Dynamic Power ;
++---------------------------------------------------------------------------------+--------------------+---------------------+-----------------------------+--------------------------------+-------------------------------+
+; IntFU:IntFU|T15[0]                                                              ; DSP block          ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff[2]     ; Register cell      ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff[2]   ; Register cell      ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|T3                                                    ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; config_pipeStage_0_opB_regRemote                                                ; Register cell      ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; IntFU:IntFU|T6[0]~0                                                             ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff[0]     ; Register cell      ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; IntFU:IntFU|T6[1]~1                                                             ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff[1]     ; Register cell      ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; IntFU:IntFU|T6[2]~2                                                             ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; IntFU:IntFU|T6[3]~3                                                             ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; IntFU:IntFU|T6[4]~4                                                             ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; IntFU:IntFU|T6[5]~5                                                             ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; IntFU:IntFU|T6[6]~6                                                             ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff~0      ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff[6]~1   ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff[1]   ; Register cell      ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff[0]   ; Register cell      ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff~0    ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff[6]~1 ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; config_pipeStage_0_opB_regRemote~0                                              ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; MuxN:remoteMux1|Mux2:Mux2|io_out[0]~0                                           ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; MuxN:remoteMux1|Mux2:Mux2|io_out[1]~1                                           ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; MuxN:remoteMux1|Mux2:Mux2|io_out[2]~2                                           ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff~2      ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff~3      ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff~2    ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff~3    ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; io_done                                                                         ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_scalarOut[0]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_scalarOut[1]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_scalarOut[2]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_scalarOut[3]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_scalarOut[4]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_scalarOut[5]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_scalarOut[6]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_rmux0                                                                        ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_rmux1                                                                        ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opcode[0]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opcode[1]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opcode[2]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opcode[3]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opcode[4]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opcode[5]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opcode[6]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_isLocal                                                                  ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_local[0]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_local[1]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_local[2]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_local[3]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_local[4]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_local[5]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_local[6]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_remote[0]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_remote[1]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_remote[2]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_remote[3]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_remote[4]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_remote[5]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opA_remote[6]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_isLocal                                                                  ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_local[0]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_local[1]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_local[2]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_local[3]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_local[4]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_local[5]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_local[6]                                                                 ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_remote[0]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_remote[1]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_remote[2]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_remote[3]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_remote[4]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_remote[5]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_opB_remote[6]                                                                ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_result[0]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_result[1]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_result[2]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_result[3]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_result[4]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_result[5]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_result[6]                                                                    ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; reset                                                                           ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; clk                                                                             ; I/O                ; 0.02 mW             ; 0.00 mW                     ; 0.02 mW                        ; 0.00 mW                       ;
+; io_enable                                                                       ; I/O                ; 0.01 mW             ; 0.00 mW                     ; 0.01 mW                        ; 0.00 mW                       ;
+; io_config_enable                                                                ; I/O                ; 0.01 mW             ; 0.00 mW                     ; 0.01 mW                        ; 0.00 mW                       ;
+; ~QUARTUS_CREATED_GND~I                                                          ; Combinational cell ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
+; ~ALTERA_DATA0~                                                                  ; I/O                ; 0.01 mW             ; 0.00 mW                     ; 0.01 mW                        ; 0.00 mW                       ;
+; clk~inputCLKENA0                                                                ; Clock enable block ; 0.00 mW             ; 0.00 mW                     ; --                             ; 0.00 mW                       ;
++---------------------------------------------------------------------------------+--------------------+---------------------+-----------------------------+--------------------------------+-------------------------------+
+(1) The "Block Thermal Static Power" for all block types except Pins is part of the "Core Static Thermal Power Dissipation" value found on the PowerPlay Power Analyzer-->Summary report panel. The "Core Static Thermal Power Dissipation" also contains the thermal static power dissipated by the routing.
+
+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Thermal Power Dissipation by Block Type                                                                                                                                                                           ;
++--------------------+-----------------------------------+-----------------------------+--------------------------------+-------------------------------+-----------------------------------------------------------+
+; Block Type         ; Total Thermal Power by Block Type ; Block Thermal Dynamic Power ; Block Thermal Static Power (1) ; Routing Thermal Dynamic Power ; Block Average Toggle Rate (millions of transitions / sec) ;
++--------------------+-----------------------------------+-----------------------------+--------------------------------+-------------------------------+-----------------------------------------------------------+
+; DSP block          ; 0.00 mW                           ; 0.00 mW                     ; --                             ; 0.00 mW                       ;    0.000                                                  ;
+; Combinational cell ; 0.00 mW                           ; 0.00 mW                     ; --                             ; 0.00 mW                       ;    0.000                                                  ;
+; Clock enable block ; 0.00 mW                           ; 0.00 mW                     ; --                             ; 0.00 mW                       ;    0.000                                                  ;
+; Register cell      ; 0.00 mW                           ; 0.00 mW                     ; --                             ; 0.00 mW                       ;    0.000                                                  ;
+; I/O                ; 0.99 mW                           ; 0.00 mW                     ; 0.99 mW                        ; 0.00 mW                       ;    0.000                                                  ;
++--------------------+-----------------------------------+-----------------------------+--------------------------------+-------------------------------+-----------------------------------------------------------+
+(1) The "Block Thermal Static Power" for all block types except Pins and the Voltage Regulator, if one exists, is part of the "Core Static Thermal Power Dissipation" value found on the PowerPlay Power Analyzer-->Summary report panel. The "Core Static Thermal Power Dissipation" also contains the thermal static power dissipated by the routing.
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Thermal Power Dissipation by Hierarchy                                                                                                                                                                                                                                      ;
++-------------------------------------+--------------------------------------+---------------------------------+-----------------------------------+-----------------------------------+--------------------------------------------------------------------------------------+
+; Compilation Hierarchy Node          ; Total Thermal Power by Hierarchy (1) ; Block Thermal Dynamic Power (1) ; Block Thermal Static Power (1)(2) ; Routing Thermal Dynamic Power (1) ; Full Hierarchy Name                                                                  ;
++-------------------------------------+--------------------------------------+---------------------------------+-----------------------------------+-----------------------------------+--------------------------------------------------------------------------------------+
+; |ComputeUnit                        ; 0.99 mW (0.99 mW)                    ; 0.00 mW (0.00 mW)               ; 0.99 mW (0.99 mW)                 ; 0.00 mW (0.00 mW)                 ; |ComputeUnit                                                                         ;
+;     |IntFU:IntFU                    ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|IntFU:IntFU                                                             ;
+;     |RegisterBlock:RegisterBlock    ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock                                             ;
+;         |MuxN_1:readLocalAMux       ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock|MuxN_1:readLocalAMux                        ;
+;             |MuxN:MuxN              ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock|MuxN_1:readLocalAMux|MuxN:MuxN              ;
+;             |MuxN:MuxN_1            ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock|MuxN_1:readLocalAMux|MuxN:MuxN_1            ;
+;         |MuxN_1:readLocalBMux       ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock|MuxN_1:readLocalBMux                        ;
+;             |MuxN:MuxN              ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock|MuxN_1:readLocalBMux|MuxN:MuxN              ;
+;             |MuxN:MuxN_1            ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock|MuxN_1:readLocalBMux|MuxN:MuxN_1            ;
+;         |MuxN:readRemoteAMux        ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock|MuxN:readRemoteAMux                         ;
+;         |MuxN:readRemoteBMux        ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|RegisterBlock:RegisterBlock|MuxN:readRemoteBMux                         ;
+;     |hard_block:auto_generated_inst ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|hard_block:auto_generated_inst                                          ;
+;     |CounterChain:counterChain      ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|CounterChain:counterChain                                               ;
+;         |CounterRC:CounterRC        ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|CounterChain:counterChain|CounterRC:CounterRC                           ;
+;             |Counter:counter        ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|CounterChain:counterChain|CounterRC:CounterRC|Counter:counter           ;
+;                 |FF:reg_            ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_   ;
+;         |CounterRC:CounterRC_1      ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|CounterChain:counterChain|CounterRC:CounterRC_1                         ;
+;             |Counter:counter        ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter         ;
+;                 |FF:reg_            ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_ ;
+;     |MuxN:remoteMux0                ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|MuxN:remoteMux0                                                         ;
+;     |MuxN:remoteMux1                ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|MuxN:remoteMux1                                                         ;
+;         |Mux2:Mux2                  ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |ComputeUnit|MuxN:remoteMux1|Mux2:Mux2                                               ;
++-------------------------------------+--------------------------------------+---------------------------------+-----------------------------------+-----------------------------------+--------------------------------------------------------------------------------------+
+(1) Value in parentheses is the power consumed at that level of hierarchy. Value not in parentheses is the power consumed at that level of hierarchy plus the power consumed by all levels of hierarchy below it.
+
+(2) The "Block Thermal Static Power" for all levels of hierarchy except the top-level hierarchy is part of the "Core Static Thermal Power Dissipation" value found on the PowerPlay Power Analyzer-->Summary report panel. The "Core Static Thermal Power Dissipation" also contains the thermal static power dissipated by the routing.
+
+
++--------------------------------------------------------------------+
+; Core Dynamic Thermal Power Dissipation by Clock Domain             ;
++-----------------+-----------------------+--------------------------+
+; Clock Domain    ; Clock Frequency (MHz) ; Total Core Dynamic Power ;
++-----------------+-----------------------+--------------------------+
+; No clock domain ; 0.00                  ; 0.00                     ;
++-----------------+-----------------------+--------------------------+
+
+
++------------------------------------------------------------------------------------------------------------------------------------+
+; Current Drawn from Voltage Supplies Summary                                                                                        ;
++----------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; Voltage Supply ; Total Current Drawn (1) ; Dynamic Current Drawn (1) ; Static Current Drawn (1) ; Minimum Power Supply Current (2) ;
++----------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; VCC            ; 356.28 mA               ; 0.00 mA                   ; 356.28 mA                ; 356.28 mA                        ;
+; VCCP           ; 69.69 mA                ; 0.00 mA                   ; 69.69 mA                 ; 69.69 mA                         ;
+; VCCIO          ; 0.55 mA                 ; 0.00 mA                   ; 0.55 mA                  ; 0.55 mA                          ;
+; VCCPD          ; 3.88 mA                 ; 0.00 mA                   ; 3.88 mA                  ; 3.88 mA                          ;
+; VCCPT          ; 106.20 mA               ; 0.00 mA                   ; 106.20 mA                ; 106.20 mA                        ;
+; VCCA_FPLL      ; 9.86 mA                 ; 0.00 mA                   ; 9.86 mA                  ; 9.86 mA                          ;
+; VCCL           ; 286.58 mA               ; 0.00 mA                   ; 286.58 mA                ; 286.58 mA                        ;
+; VCCD_FPLL      ; 1.40 mA                 ; 0.00 mA                   ; 1.40 mA                  ; 1.40 mA                          ;
+; VCCPGM         ; 0.35 mA                 ; 0.00 mA                   ; 0.35 mA                  ; 0.35 mA                          ;
+; VCCBAT         ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCHIP_L       ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCT_GXBL      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCR_GXBL      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCHIP_R       ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCT_GXBR      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCR_GXBR      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCA_GXBL      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCA_GXBR      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCH_GXBL      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCH_GXBR      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCAUX         ; 58.00 mA                ; 0.00 mA                   ; 58.00 mA                 ; 58.00 mA                         ;
+; VCCHSSI_L      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
+; VCCHSSI_R      ; 0.00 mA                 ; 0.00 mA                   ; 0.00 mA                  ; 0.00 mA                          ;
++----------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+(1) Currents reported in columns "Total Current Drawn", "Dynamic Current Drawn", and "Static Current Drawn" are sufficient for user operation of the device.  
+(2) Currents reported in column "Minimum Power Supply Current" are sufficient for power-up, configuration, and user operation of the device.  
+(3) Note that Stratix V has a required power-up sequence, and the numbers are based on this sequence.  See Stratix V Device Handbook Volume 2: Device Interfaces and Integration Page 8-4(http://www.altera.com/literature/hb/stratix-v/stx5_51009.pdf).
+(4) VCC = VCCL + VCCP
+
+
++-----------------------------------------------------------------------------------------------+
+; VCCIO Supply Current Drawn by I/O Bank                                                        ;
++----------+---------------+---------------------+-----------------------+----------------------+
+; I/O Bank ; VCCIO Voltage ; Total Current Drawn ; Dynamic Current Drawn ; Static Current Drawn ;
++----------+---------------+---------------------+-----------------------+----------------------+
+; B1L      ; --            ; --                  ; --                    ; --                   ;
+; B0L      ; --            ; --                  ; --                    ; --                   ;
+; 3A       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
+; 3B       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
+; 3C       ; --            ; --                  ; --                    ; --                   ;
+; 3D       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
+; 4D       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
+; 4C       ; --            ; --                  ; --                    ; --                   ;
+; 4B       ; --            ; --                  ; --                    ; --                   ;
+; 4A       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
+; B0R      ; --            ; --                  ; --                    ; --                   ;
+; B1R      ; --            ; --                  ; --                    ; --                   ;
+; 7A       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
+; 7B       ; --            ; --                  ; --                    ; --                   ;
+; 7C       ; 2.5V          ; 0.06 mA             ; 0.00 mA               ; 0.06 mA              ;
+; 7D       ; 2.5V          ; 0.06 mA             ; 0.00 mA               ; 0.06 mA              ;
+; 8D       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
+; 8C       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
+; 8B       ; --            ; --                  ; --                    ; --                   ;
+; 8A       ; 2.5V          ; 0.05 mA             ; 0.00 mA               ; 0.05 mA              ;
++----------+---------------+---------------------+-----------------------+----------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------+
+; VCCIO Supply Current Drawn by Voltage                                                                                             ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; VCCIO Voltage ; Total Current Drawn (1) ; Dynamic Current Drawn (1) ; Static Current Drawn (1) ; Minimum Power Supply Current (2) ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; 2.5V          ; 0.55 mA                 ; 0.00 mA                   ; 0.55 mA                  ; 0.55 mA                          ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+(1) Currents reported in columns "Total Current Drawn", "Dynamic Current Drawn", and "Static Current Drawn" are sufficient for user operation of the device.  
+(2) Currents reported in column "Minimum Power Supply Current" are sufficient for power-up, configuration, and user operation of the device.  
+(3) Note that Stratix V has a required power-up sequence, and the numbers are based on this sequence.  See Stratix V Device Handbook Volume 2: Device Interfaces and Integration Page 8-4(http://www.altera.com/literature/hb/stratix-v/stx5_51009.pdf).
+(4) VCC = VCCL + VCCP
+
+
++-----------------------------------------------------------------------------------------------+
+; VCCPD Supply Current Drawn by I/O Bank                                                        ;
++----------+---------------+---------------------+-----------------------+----------------------+
+; I/O Bank ; VCCPD Voltage ; Total Current Drawn ; Dynamic Current Drawn ; Static Current Drawn ;
++----------+---------------+---------------------+-----------------------+----------------------+
+; B1L      ; --            ; --                  ; --                    ; --                   ;
+; B0L      ; --            ; --                  ; --                    ; --                   ;
+; 3A       ; 2.5V          ; 0.36 mA             ; 0.00 mA               ; 0.36 mA              ;
+; 3B       ; 2.5V          ; 0.35 mA             ; 0.00 mA               ; 0.35 mA              ;
+; 3C       ; 2.5V          ; 0.00 mA             ; 0.00 mA               ; 0.00 mA              ;
+; 3D       ; 2.5V          ; 0.34 mA             ; 0.00 mA               ; 0.34 mA              ;
+; 4D       ; 2.5V          ; 0.35 mA             ; 0.00 mA               ; 0.35 mA              ;
+; 4C       ; 2.5V          ; 0.00 mA             ; 0.00 mA               ; 0.00 mA              ;
+; 4B       ; 2.5V          ; 0.00 mA             ; 0.00 mA               ; 0.00 mA              ;
+; 4A       ; 2.5V          ; 0.34 mA             ; 0.00 mA               ; 0.34 mA              ;
+; B0R      ; --            ; --                  ; --                    ; --                   ;
+; B1R      ; --            ; --                  ; --                    ; --                   ;
+; 7A       ; 2.5V          ; 0.35 mA             ; 0.00 mA               ; 0.35 mA              ;
+; 7B       ; 2.5V          ; 0.00 mA             ; 0.00 mA               ; 0.00 mA              ;
+; 7C       ; 2.5V          ; 0.38 mA             ; 0.00 mA               ; 0.38 mA              ;
+; 7D       ; 2.5V          ; 0.37 mA             ; 0.00 mA               ; 0.37 mA              ;
+; 8D       ; 2.5V          ; 0.36 mA             ; 0.00 mA               ; 0.36 mA              ;
+; 8C       ; 2.5V          ; 0.35 mA             ; 0.00 mA               ; 0.35 mA              ;
+; 8B       ; 2.5V          ; 0.00 mA             ; 0.00 mA               ; 0.00 mA              ;
+; 8A       ; 2.5V          ; 0.34 mA             ; 0.00 mA               ; 0.34 mA              ;
++----------+---------------+---------------------+-----------------------+----------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------+
+; VCCPD Supply Current Drawn by Voltage                                                                                             ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; VCCPD Voltage ; Total Current Drawn (1) ; Dynamic Current Drawn (1) ; Static Current Drawn (1) ; Minimum Power Supply Current (2) ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; 2.5V          ; 3.88 mA                 ; 0.00 mA                   ; 3.88 mA                  ; 3.88 mA                          ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+(1) Currents reported in columns "Total Current Drawn", "Dynamic Current Drawn", and "Static Current Drawn" are sufficient for user operation of the device.  
+(2) Currents reported in column "Minimum Power Supply Current" are sufficient for power-up, configuration, and user operation of the device.  
+(3) Note that Stratix V has a required power-up sequence, and the numbers are based on this sequence.  See Stratix V Device Handbook Volume 2: Device Interfaces and Integration Page 8-4(http://www.altera.com/literature/hb/stratix-v/stx5_51009.pdf).
+(4) VCC = VCCL + VCCP
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------+
+; Confidence Metric Details                                                                                                                     ;
++----------------------------------------------------------------------------------------+------------+------------+------------+---------------+
+; Data Source                                                                            ; Total      ; Pin        ; Registered ; Combinational ;
++----------------------------------------------------------------------------------------+------------+------------+------------+---------------+
+; Simulation (from file)                                                                 ;            ;            ;            ;               ;
+;     -- Simulation time nodes in unknown state                                          ; 1.2%       ;            ;            ;               ;
+;     -- Number of signals with Toggle Rate from Simulation                              ; 58 (38.2%) ; 58 (98.3%) ; 0 (0.0%)   ; 0 (0.0%)      ;
+;     -- Number of signals with Zero toggle rate, from Simulation                        ; 49 (32.2%) ; 49 (83.1%) ; 0 (0.0%)   ; 0 (0.0%)      ;
+;     -- Number of signals with Static Probability from Simulation                       ; 58 (38.2%) ; 58 (98.3%) ; 0 (0.0%)   ; 0 (0.0%)      ;
+;                                                                                        ;            ;            ;            ;               ;
+; Node, entity or clock assignment                                                       ;            ;            ;            ;               ;
+;     -- Number of signals with Toggle Rate from Node, entity or clock assignment        ; 0 (0.0%)   ; 0 (0.0%)   ; 0 (0.0%)   ; 0 (0.0%)      ;
+;     -- Number of signals with Static Probability from Node, entity or clock assignment ; 0 (0.0%)   ; 0 (0.0%)   ; 0 (0.0%)   ; 0 (0.0%)      ;
+;                                                                                        ;            ;            ;            ;               ;
+; Vectorless estimation                                                                  ;            ;            ;            ;               ;
+;     -- Number of signals with Toggle Rate from Vectorless estimation                   ; 93 (61.2%) ; 0 (0.0%)   ; 7 (100.0%) ; 86 (100.0%)   ;
+;     -- Number of signals with Zero toggle rate, from Vectorless estimation             ; 45 (29.6%) ; 0 (0.0%)   ; 0 (0.0%)   ; 45 (52.3%)    ;
+;     -- Number of signals with Static Probability from Vectorless estimation            ; 93 (61.2%) ; 0 (0.0%)   ; 7 (100.0%) ; 86 (100.0%)   ;
+;                                                                                        ;            ;            ;            ;               ;
+; Default assignment                                                                     ;            ;            ;            ;               ;
+;     -- Number of signals with Toggle Rate from Default assignment                      ; 0 (0.0%)   ; 0 (0.0%)   ; 0 (0.0%)   ; 0 (0.0%)      ;
+;     -- Number of signals with Static Probability from Default assignment               ; 1 (0.7%)   ; 1 (1.7%)   ; 0 (0.0%)   ; 0 (0.0%)      ;
+;                                                                                        ;            ;            ;            ;               ;
+; Assumed 0                                                                              ;            ;            ;            ;               ;
+;     -- Number of signals with Toggle Rate assumed 0                                    ; 1 (0.7%)   ; 1 (1.7%)   ; 0 (0.0%)   ; 0 (0.0%)      ;
++----------------------------------------------------------------------------------------+------------+------------+------------+---------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Signal Activities                                                                                                                                                                                                                     ;
++---------------------------------------------------------------------------------+---------------+---------------------------------------------+-----------------------------+--------------------+------------------------------------+
+; Signal                                                                          ; Type          ; Toggle Rate (millions of transitions / sec) ; Toggle Rate Data Source (1) ; Static Probability ; Static Probability Data Source (1) ;
++---------------------------------------------------------------------------------+---------------+---------------------------------------------+-----------------------------+--------------------+------------------------------------+
+; clk                                                                             ; Input Pin     ;    0.000                                    ; Simulation (f1, f1)         ; 0.500              ; Simulation (f1, f1)                ;
+; clk~inputCLKENA0                                                                ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; config_pipeStage_0_opB_regRemote                                                ; Registered    ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; config_pipeStage_0_opB_regRemote~0                                              ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; io_config_enable                                                                ; Input Pin     ;    0.000                                    ; Simulation (f1, f1)         ; 1.000              ; Simulation (f1, f1)                ;
+; io_done                                                                         ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_enable                                                                       ; Input Pin     ;    0.000                                    ; Simulation (f1, f1)         ; 1.000              ; Simulation (f1, f1)                ;
+; io_opA_isLocal                                                                  ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_local[0]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_local[1]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_local[2]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_local[3]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_local[4]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_local[5]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_local[6]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_remote[0]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_remote[1]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_remote[2]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_remote[3]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_remote[4]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_remote[5]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opA_remote[6]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_isLocal                                                                  ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_local[0]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_local[1]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_local[2]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_local[3]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_local[4]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_local[5]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_local[6]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_remote[0]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.225              ; Simulation (f1, f1)                ;
+; io_opB_remote[1]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_remote[2]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_remote[3]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_remote[4]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_remote[5]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opB_remote[6]                                                                ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opcode[0]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opcode[1]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.225              ; Simulation (f1, f1)                ;
+; io_opcode[2]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opcode[3]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opcode[4]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opcode[5]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_opcode[6]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_result[0]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.225              ; Simulation (f1, f1)                ;
+; io_result[1]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_result[2]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_result[3]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_result[4]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_result[5]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_result[6]                                                                    ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_rmux0                                                                        ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_rmux1                                                                        ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.225              ; Simulation (f1, f1)                ;
+; io_scalarOut[0]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_scalarOut[1]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.353              ; Simulation (f1, f1)                ;
+; io_scalarOut[2]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.294              ; Simulation (f1, f1)                ;
+; io_scalarOut[3]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.175              ; Simulation (f1, f1)                ;
+; io_scalarOut[4]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_scalarOut[5]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; io_scalarOut[6]                                                                 ; Output Pin    ;    0.000                                    ; Simulation (f1, f1)         ; 0.000              ; Simulation (f1, f1)                ;
+; reset                                                                           ; Input Pin     ;    0.000                                    ; Simulation (f1, f1)         ; 0.200              ; Simulation (f1, f1)                ;
+; ~ALTERA_DATA0~                                                                  ; Input Pin     ;    0.000                                    ; Assumed 0                   ; 0.500              ; Default assignment                 ;
+; IntFU:IntFU|T6[0]~0                                                             ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T6[1]~1                                                             ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T6[2]~2                                                             ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T6[3]~3                                                             ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T6[4]~4                                                             ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T6[5]~5                                                             ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T6[6]~6                                                             ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T15[0]                                                              ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T15[1]                                                              ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T15[2]                                                              ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T15[3]                                                              ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T15[4]                                                              ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T15[5]                                                              ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; IntFU:IntFU|T15[6]                                                              ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|T3                                                    ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; MuxN:remoteMux1|Mux2:Mux2|io_out[0]~0                                           ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; MuxN:remoteMux1|Mux2:Mux2|io_out[1]~1                                           ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; MuxN:remoteMux1|Mux2:Mux2|io_out[2]~2                                           ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff[0]     ; Registered    ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff[1]     ; Registered    ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff[2]     ; Registered    ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff[6]~1   ; Combinational ;    0.000                                    ; Vectorless estimation       ; 1.000              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff~0      ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff~2      ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC|Counter:counter|FF:reg_|ff~3      ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff[0]   ; Registered    ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff[1]   ; Registered    ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff[2]   ; Registered    ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff[6]~1 ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff~0    ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff~2    ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
+; CounterChain:counterChain|CounterRC:CounterRC_1|Counter:counter|FF:reg_|ff~3    ; Combinational ;    0.000                                    ; Vectorless estimation       ; 0.500              ; Vectorless estimation              ;
++---------------------------------------------------------------------------------+---------------+---------------------------------------------+-----------------------------+--------------------+------------------------------------+
+(1) See the PowerPlay Power Analyzer Simulation Files Read report panel for detailed information for each simulation file identifier.
+
+
++-----------------------------------+
+; PowerPlay Power Analyzer Messages ;
++-----------------------------------+
+Info: *******************************************************************
+Info: Running Quartus II 64-Bit PowerPlay Power Analyzer
+    Info: Version 13.1.0 Build 162 10/23/2013 SJ Full Version
+    Info: Processing started: Mon Jul 25 13:40:03 2016
+Info: Command: quartus_pow --read_settings_files=on --write_settings_files=off FPGA_power_test -c FPGA_power_test
+Info (21077): Low junction temperature is 0 degrees C
+Info (21077): High junction temperature is 85 degrees C
+Info (222002): Starting scan of VCD file trace.vcd (0 ns to End of File) for signal static probabilities and transition densities
+Info (222003): Finished scan of VCD file trace.vcd (0 ns to End of File) for signal static probabilities and transition densities
+Critical Warning (332012): Synopsys Design Constraints File file not found: 'FPGA_power_test.sdc'. A Synopsys Design Constraints File is required by the TimeQuest Timing Analyzer to get proper timing constraints. Without it, the Compiler will not properly optimize the design.
+Warning (332060): Node: clk was determined to be a clock but was found without an associated clock assignment.
+Warning (332068): No clocks defined in design.
+Info (332143): No user constrained clock uncertainty found in the design. Calling "derive_clock_uncertainty"
+Info (332154): The derive_clock_uncertainty command did not apply clock uncertainty to any clock-to-clock transfers.
+Info (223000): Starting Vectorless Power Activity Estimation
+Warning (222013): Relative toggle rates could not be calculated because no clock domain could be identified for some nodes
+Info (223001): Completed Vectorless Power Activity Estimation
+Info (215037): Detailed signal activity file source information is not written to output Signal Activity File.
+Info (218000): Using Advanced I/O Power to simulate I/O buffers with the specified board trace model
+Info (334003): Started post-fitting delay annotation
+Info (334004): Delay annotation completed successfully
+Info (215049): Average toggle rate for this design is 0.000 millions of transitions / sec
+Info (215031): Total thermal power estimate for the design is 645.61 mW
+Info: Quartus II 64-Bit PowerPlay Power Analyzer was successful. 0 errors, 4 warnings
+    Info: Peak virtual memory: 1323 megabytes
+    Info: Processing ended: Mon Jul 25 13:40:14 2016
+    Info: Elapsed time: 00:00:11
+    Info: Total CPU time (on all processors): 00:00:11
+
+

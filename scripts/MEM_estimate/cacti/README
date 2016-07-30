@@ -1,0 +1,136 @@
+CACTI command line format:
+
+cacti C B A RWP ERP EWP NSER NBANKS TECH OUTPUT_WIDTH CUSTOM_TAG TAG_WIDTH
+ACCESS_MODE PLAIN_RAM DRAM OPT_DYN_ENERGY OPT_DYN_POWER OPT_LEAK_POWER OPT_RAND_CYCLE_TIME
+TEMPERATURE DATA_ARRAY_CELL_DEVICE_TYPE DATA_ARRAY_PERIPH_DEVICE_TYPE TAG_ARRAY_CELL_DEVICE_TYPE
+TAG_ARRAY_PERIPH_DEVICE_TYPE INTERCONNECT_PROJECTION_TYPE WIRE_TYPE_INSIDE_MAT
+WIRE_TYPE_OUTSIDE_MAT REPEATERS_IN_HTREE VERT_HTREE_WIRES_OVER_THE_ARRAY 
+BROADCAST_ADDR_DATA_OVER_VERT_HTREE MAX_AREA_CONSTRAINT MAX_ACC_TIME_CONSTRAINT 
+MAX_REPEATER_DELAY_CONSTRAINT PAGE_SIZE BURST_LENGTH INTERNAL_PREFETCH 
+
+
+where,
+
+C            = Capacity of cache or plain RAM (in bytes)
+B            = Block width (in bytes)
+A            = Associativity (Enter 0 for full associativity)
+RWP          = Number of read/write ports
+RP           = Number of read ports
+WP           = Number of write ports
+NSER         = Number of single-ended read ports
+NBANKS       = Number of banks
+TECH         = Technology-node (in nm)
+OUTPUT_WIDTH = Output width (in bits)
+CUSTOM_TAG   = Set to 1 in order to specify tag width or else set to 0
+TAG_WIDTH    = Desired tag width (in bits) if the tag width is being specified
+               or else set to 0 
+ACCESS_MODE  = Cache access mode. Set to 0 for normal access; set to 1 for 
+               sequential access; set to 2 for fast access
+CACHE        = Set to 1 to model a cache; set to 0 to to model plain scratchpad memory
+MAIN_MEM     = Set to 1 to model main memory chip else set this to 0
+OPT_DYN_ENERGY
+             = Set to 1 to optimize the solution (array partition) for dynamic
+               energy per read access; set to 0 to not optimize
+OPT_DYN_POWER 
+             = Set to 1 to optimize the solution for dynamic read power; set to
+               0 to not optimize
+OPT_LEAK_POWER
+             = Set to 1 to optimize the solution for leakage power; set to 0 to 
+               not optimize
+OPT_RAND_CYCLE_TIME
+             = Set to 1 to optimize the solution for random cycle time; set to 0
+               to not optimize
+TEMPERATURE  = Temperature (in degK) for leakage calculation. Specify between 
+               300 degK and 400 degK in steps of 10
+DATA_ARRAY_CELL_DEVICE_TYPE
+             = Memory cell device type in data array. Set to 0 for ITRS high 
+               performance device type; set to 1 for ITRS low standby power device 
+               type; set to 2 for ITRS low operating power device type; set to 3 for 
+               LP-DRAM cell; set to 4 for for COMM-DRAM cell
+DATA_ARRAY_PERIPH_DEVICE_TYPE
+             = Peripheral circuitry device type in data array. Set to 0 for ITRS high 
+               performance device type; Set to 0 for ITRS high performance device 
+               type; set to 1 for ITRS low standby power device type; set to 2 for
+               ITRS low operating power device type
+TAG_ARRAY_CELL_DEVICE_TYPE
+             = Memory cell device type in tag array. Set to 0 for ITRS high 
+               performance device type; set to 1 for ITRS low standby power device 
+               type; set to 2 for ITRS low operating power device type; set to 3 for 
+               LP-DRAM cell; set to 4 for for COMM-DRAM cell
+TAG_ARRAY_PERIPH_DEVICE_TYPE
+             = Peripheral circuitry device type in tag array. Set to 0 for ITRS high 
+               performance device type; Set to 0 for ITRS high performance device 
+               type; set to 1 for ITRS low standby power device type; set to 2 for
+               ITRS low operating power device type
+INTERCONNECT_PROJECTION_TYPE
+             = Inteconnect projection type. Set to 0 for aggressive interconnect
+               technology projections; set to 1 for conservative interconnect
+               technology projections
+WIRE_TYPE_INSIDE_MAT
+             = Type of wire inside of a mat. Set to 1 for 'semi-global' wire 
+               type; set to 2 for 'global' wire type
+WIRE_TYPE_OUTSIDE_MAT
+             =  Type of wire outside of a mat. Set to 1 for 'semi-global' wire
+               type; set to 2 for 'global' wire type
+REPEATERS_IN_HTREE
+             = Repeaters in the H-tree distribution network. Set to 1 to
+               incorporate repeaters in the horizontal and vertical Htree
+               segments within the array; set to 0 to not include repeaters - drivers 
+               will be placed only at the branches
+VERT_HTREE_WIRES_OVER_THE_ARRAY
+             = Set to 1 to assume that vertical Htree wires traverse over the 
+              array; set to 0 to assume they do not traverse over the array 
+              and instead occupy the area in between the mats
+BROADCAST_ADDR_DATA_OVER_VERT_HTREE
+             = Set to 1 to assume that address and datain are broadcast over
+               the vertical Htrees to all subbanks; set to 0 to assume that
+               address and datain are broadcast only to the subbank that
+               contains the data
+MAX_AREA_CONSTRAINT
+             = In percentage, this is how worse the area efficiency of the solution 
+               can be wrt the solution with best area efficiency
+MAX_ACC_TIME_CONSTRAINT
+             = In percentage, this is how worse the access time of the solution can
+               be wrt the solution with best access time(this constraint is applied 
+               after application of MAXAREACONSTRAINT)
+MAX_REPEATER_DELAY_CONSTRAINT
+             = In percentage, this is how worse the delay of the repeater solution can 
+               wrt the best delay repeater solution
+PAGE_SIZE    = Size of a page in a main memory chip in Kb
+BURST_LENGTH = Burst length of a main memory chip
+INTERNAL_PREFETCH 
+             = Internal prefetch of a main memory chip. (2 for DDR, 4 for DDR2, 
+               8 for DDR3....)
+
+
+
+
+-------------------------------------------------------------------------------
+
+Example invocations
+===================
+
+ Modeling 90nm SPARC L2 cache mentioned in CACTI 5 technical report:
+ cacti 4194304 32 4 1 0 0 0 1 90 256 1 34 2 0 0 0 0 0 1 360 0 0 0 0 1 1 1 1 0 0 50 10 10 0 1 1
+
+ Modeling 65nm Xeon L3 cache mentioned in CACTI 5 technical report:
+ cacti 16777216 64 16 1 0 0 0 2 65 512 0 0 0 1 0 0 0 0 1 360 0 0 0 0 1 1 1 1 0 0 50 10 10 0 1 1
+
+ Modeling 78nm 1Gb DDR3 main memory DRAM chip:
+ 134217728 64 1 1 0 0 0 8 78 8 0 0 0 0 1 0 0 0 1 360 4 1 1 1 1 1 1 1 0 0 10 10 10 8192 8 8
+
+-------------------------------------------------------------------------------
+
+Partial output data from CACTI is written into the out.csv file. Please modify
+output_data_csv function in io.c to suit your needs.
+
+
+-------------------------------------------------------------------------------
+By default, CACTI calls 4 worker threads to compute the area/power/delay of
+valid cache configurations.  If you would like to call more worker threads,
+make it with
+
+  make NTHREADS=N
+
+where N is the number of worker threads.
+

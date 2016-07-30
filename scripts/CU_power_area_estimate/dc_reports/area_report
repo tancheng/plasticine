@@ -1,0 +1,30 @@
+ 
+****************************************
+Report : area
+Design : ComputeUnit
+Version: I-2013.12-SP4
+Date   : Tue Jul 26 14:58:05 2016
+****************************************
+
+Library(s) Used:
+
+    tcbn45gsbwpml (File: /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db)
+
+Number of ports:                           58
+Number of nets:                           121
+Number of cells:                          117
+Number of combinational cells:             95
+Number of sequential cells:                22
+Number of macros/black boxes:               0
+Number of buf/inv:                         28
+Number of references:                      34
+
+Combinational area:                131.418002
+Buf/Inv area:                       36.338401
+Noncombinational area:              81.849603
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:                   213.267605
+Total area:                 undefined
+1

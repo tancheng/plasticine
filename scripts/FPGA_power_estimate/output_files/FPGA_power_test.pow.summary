@@ -1,0 +1,12 @@
+PowerPlay Power Analyzer Status : Successful - Mon Jul 25 13:40:14 2016
+Quartus II 64-Bit Version : 13.1.0 Build 162 10/23/2013 SJ Full Version
+Revision Name : FPGA_power_test
+Top-level Entity Name : ComputeUnit
+Family : Stratix V
+Device : 5SGSMD4E3H29I4
+Power Models : Final
+Total Thermal Power Dissipation : 645.61 mW
+Core Dynamic Thermal Power Dissipation : 0.00 mW
+Core Static Thermal Power Dissipation : 634.34 mW
+I/O Thermal Power Dissipation : 11.27 mW
+Power Estimation Confidence : Low: user provided insufficient toggle rate data

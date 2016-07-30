@@ -1,0 +1,48 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : ComputeUnit
+Version: I-2013.12-SP4
+Date   : Tue Jul 26 14:58:09 2016
+****************************************
+
+Operating Conditions: MLCOM   Library: tcbn45gsbwpml
+Wire Load Model Mode: top
+
+  Startpoint: config_remoteMux1_reg
+              (rising edge-triggered flip-flop)
+  Endpoint: io_scalarOut[4]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  ComputeUnit        ZeroWireload          tcbn45gsbwpml
+
+  Point                                    Incr       Path
+  -----------------------------------------------------------
+  config_remoteMux1_reg/CP (DFQD1BWP)    0.0000     0.0000 r
+  config_remoteMux1_reg/Q (DFQD1BWP)     0.0581     0.0581 f
+  U286/Z (BUFFD8BWP)                     0.0612     0.1193 f
+  U289/Z (MUX2D1BWP)                     0.0513     0.1706 r
+  U291/ZN (ND4D1BWP)                     0.0312     0.2018 f
+  U292/ZN (INVD1BWP)                     0.0178     0.2196 r
+  U293/ZN (AOI21D1BWP)                   0.0119     0.2315 f
+  U315/CO (FA1D1BWP)                     0.0418     0.2732 f
+  U316/ZN (INVD1BWP)                     0.0105     0.2838 r
+  U317/ZN (MAOI222D1BWP)                 0.0293     0.3130 f
+  U318/S (FA1D1BWP)                      0.0302     0.3433 r
+  U319/ZN (INVD1BWP)                     0.0059     0.3492 f
+  U284/Z (OR2XD1BWP)                     0.0328     0.3821 f
+  U320/ZN (INVD12BWP)                    0.0440     0.4261 r
+  io_scalarOut[4] (out)                  0.0000     0.4261 r
+  data arrival time                                 0.4261
+  -----------------------------------------------------------
+  (Path is unconstrained)
+
+
+1

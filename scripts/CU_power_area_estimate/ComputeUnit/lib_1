@@ -1,0 +1,32 @@
+/*****************************************************************************/
+/* Apollo technology file for TSMC N45 LOGIC SALICIDE (1P10MRDL)             */
+/*****************************************************************************/
+/* DESIGN RULE DOCUMENT: T-N45-CL-DR-002 V1.1                                */
+/* SPICE MODEL DOCUMENT: T-N45-CL-SP-011 V1.0_1P1                            */
+/* Resistor & Capacitor are referenced from spice model interconnect table.  */
+/* The index is "width=minWidth", "Space=Pitch".                             */
+/* Note :                                                                    */
+/*       1. Please use ICC2007.12-SP2 to support Technology section parameter*/
+/*          "maxStackLevelMode", and "cornerSpacingMode".                    */
+/*       2. Keyword "fatWireViaKeepoutParallelLengthThreshold",              */
+/*          and "fatWireViaKeepoutMaxSpacingThreshold" support               */
+/*          start from ICC2007.12-SP2 for rule VIAx.EN.3.1                   */
+/*          Please also specify following droute parameter                   */
+/*          set_parameter -module droute -name \                             */
+/*                        pinRectangleMerge -value 1                         */
+/*          Prior to ICC2007.12-SP2,                                         */
+/*          Please specify following droute parameter                        */
+/*          set_parameter -module droute -name \                             */
+/*                        M1FloatingParaLenForViaOffLimit -value 0.27        */
+/*          set_parameter -module droute -name \                             */
+/*                        M1FloatingSpaceForViaOffLimit -value 0.08          */
+/*          set_parameter -module droute -name \                             */
+/*                        pinRectangleMerge -value 1                         */
+/*       3. Keyword "endOfLineEncTblSize", "endOfLineEncSpacingTbl",         */
+/*          and "endOfLineEncTbl" support                                    */
+/*          start from ICC2007.12-SP1 for rule Mx.S.5.1                      */
+/*       4. Keyword "specialMinArea" and "minAreaEdgeThreshold" support      */
+/*          start from 2006.06-SP4 for rule M1(Mx).A.2                       */
+/*       5. Keyword "endOfLineSideKeepoutLength" support                     */
+/*          start from 2006.06-SP3 for rule M1.S.5                           */
+/*****************************************************************************/
