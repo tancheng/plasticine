@@ -8,8 +8,8 @@ import scala.collection.mutable.HashMap
 /**
  * CounterChain config register format
  */
-case class CounterChainOpcode(val w: Int) extends OpcodeT {
-  var chain = Bool(INPUT)
+case class CounterChainOpcode(val w: Int, config: Option[CounterChainConfig] = None) extends OpcodeT {
+  var chain = if (config.isDefined) Bool(config.get.chain > 0) else Bool()
 
   override def cloneType(): this.type = {
     new CounterChainOpcode(w).asInstanceOf[this.type]
@@ -28,6 +28,7 @@ case class CounterChainOpcode(val w: Int) extends OpcodeT {
 class CounterChain(val w: Int, inst: CounterChainConfig) extends ConfigurableModule[CounterChainOpcode] {
   val d = 2 // Counter chain depth
   val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
     val data = Vec.fill(d) { new Bundle {
         val max      = UInt(INPUT,  w)
         val stride   = UInt(INPUT,  w)
@@ -41,9 +42,16 @@ class CounterChain(val w: Int, inst: CounterChainConfig) extends ConfigurableMod
     }
   }
 
-  val configWires = CounterChainOpcode(w)
-  configWires.init(inst)
-  val config = RegInit(configWires)
+  val configType = CounterChainOpcode(w)
+  val configIn = CounterChainOpcode(w)
+  val configInit = CounterChainOpcode(w, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType
+  } .otherwise {
+    configIn := config
+  }
+
 
   val counterInsn = inst.counters
   val counters = (0 until d) map { i =>

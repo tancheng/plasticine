@@ -8,21 +8,14 @@ import scala.collection.mutable.HashMap
 /**
  * Counter config register format
  */
-case class CounterOpcode(val w: Int) extends OpcodeT {
-  var max = UInt(width = w)
-  var stride = UInt(width = w)
-  var maxConst = Bool()
-  var strideConst = Bool()
+case class CounterOpcode(val w: Int, config: Option[CounterRCConfig] = None) extends OpcodeT {
+  var max = if (config.isDefined) UInt(config.get.max, width=w) else UInt(width = w)
+  var stride = if (config.isDefined) UInt(config.get.stride, width=w) else UInt(width = w)
+  var maxConst = if (config.isDefined) Bool(config.get.maxConst > 0) else Bool()
+  var strideConst = if (config.isDefined) Bool(config.get.strideConst > 0) else Bool()
 
   override def cloneType(): this.type = {
-    new CounterOpcode(w).asInstanceOf[this.type]
-  }
-
-  def init(inst: CounterRCConfig) {
-    max = max.fromInt(inst.max)
-    stride = stride.fromInt(inst.stride)
-    maxConst = maxConst.fromInt(inst.maxConst)
-    strideConst = strideConst.fromInt(inst.strideConst)
+    new CounterOpcode(w, config).asInstanceOf[this.type]
   }
 }
 
@@ -30,8 +23,9 @@ case class CounterOpcode(val w: Int) extends OpcodeT {
  * CounterRC: Wrapper around counter module with reconfig muxes.
  * @param w: Word width
  */
-class CounterRC(val w: Int, inst: CounterRCConfig = null) extends ConfigurableModule[CounterOpcode] {
+class CounterRC(val w: Int, inst: CounterRCConfig) extends ConfigurableModule[CounterOpcode] {
   val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
     val data = new Bundle {
       val max      = UInt(INPUT,  w)
       val stride   = UInt(INPUT,  w)
@@ -45,9 +39,15 @@ class CounterRC(val w: Int, inst: CounterRCConfig = null) extends ConfigurableMo
     }
   }
 
-  val configWires = CounterOpcode(w)
-  configWires.init(inst)
-  val config = RegInit(configWires)
+  val configType = CounterOpcode(w)
+  val configIn = CounterOpcode(w)
+  val configInit = CounterOpcode(w, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType
+  } .otherwise {
+    configIn := config
+  }
 
   val counter = Module(new Counter(w))
 
