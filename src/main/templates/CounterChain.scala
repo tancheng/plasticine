@@ -2,7 +2,9 @@ package plasticine.templates
 
 import Chisel._
 
+import plasticine.pisa.ir._
 import scala.collection.mutable.HashMap
+
 /**
  * CounterChain config register format
  */
@@ -16,27 +18,6 @@ case class CounterChainOpcode(val w: Int) extends OpcodeT {
   def init(inst: CounterChainConfig) {
     chain = chain.fromInt(inst.chain)
   }
-}
-
-/**
- * CounterChain config information
- */
-class CounterChainConfig(config: HashMap[String, Any]) {
-  // To chain or not?
-  private var _chain: Int = 0
-  def chain() = _chain
-  def chain_=(x: Int) { _chain = x }
-
-  // Configuration for individual counters
-  private var _counters: Seq[CounterRCConfig] = Seq[CounterRCConfig]()
-  def counters() = _counters
-  def counters_=(x: Seq[CounterRCConfig]) { _counters = x }
-
-  // Construct class here
-  _chain = config("chain").asInstanceOf[Int]
-  _counters = config("counters")
-                .asInstanceOf[Seq[HashMap[String, Any]]]
-                .map { h => new CounterRCConfig(h) }
 }
 
 /**

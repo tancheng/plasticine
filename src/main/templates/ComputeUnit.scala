@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import Chisel._
+import plasticine.pisa.ir._
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
@@ -58,85 +59,6 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, val l: Int, val r: Int, con
 
   override def cloneType(): this.type = {
     new ComputeUnitOpcode(w, d, l, r, config).asInstanceOf[this.type]
-  }
-}
-
-/**
- * Parsed configuration information for ComputeUnit
- */
-class OperandConfig(config: HashMap[String, Any]) {
-  private var _isLocal = config("isLocal").asInstanceOf[Boolean]
-  def isLocal() = _isLocal
-  def isLocal_=(x: Boolean) { _isLocal = x }
-
-  private var _regLocal = config("regLocal").asInstanceOf[Int]
-  def regLocal() = _regLocal
-  def regLocal_=(x: Int) { _regLocal = x }
-
-  private var _regRemote = config("regRemote").asInstanceOf[Int]
-  def regRemote() = _regRemote
-  def regRemote_=(x: Int) { _regRemote = x }
-
-  override def toString = {
-    s"isLocal: $isLocal\n" +
-    s"regLocal: $regLocal\n" +
-    s"regRemote: $regRemote"
-  }
-}
-
-class PipeStageConfig(config: HashMap[String, Any]) {
-  private var _opA = new OperandConfig(config("opA").asInstanceOf[HashMap[String, Any]])
-  def opA() = _opA
-  def opA_=(x: OperandConfig) { _opA = x }
-
-  private var _opB = new OperandConfig(config("opB").asInstanceOf[HashMap[String, Any]])
-  def opB() = _opB
-  def opB_=(x: OperandConfig) { _opB = x }
-
-  private var _opcode = config("opcode").asInstanceOf[Int]
-  def opcode() = _opcode
-  def opcode_=(x: Int) { _opcode = x }
-
-  private var _result = config("result").asInstanceOf[Int]
-  def result() = _result
-  def result_=(x: Int) { _result = x }
-
-  override def toString = {
-    s"opA:\n ${opA.toString}" + "\n" +
-    s"opB:\n ${opB.toString}" + "\n" +
-    s"opcode: $opcode" + "\n" +
-    s"result: $result"
-  }
-}
-
-class ComputeUnitConfig(config: HashMap[String, Any]) {
-  /* CounterChain config */
-  private var _counterChain = new CounterChainConfig(config("counterChain").asInstanceOf[HashMap[String, Any]])
-  def counterChain() = _counterChain
-  def counterChain_=(x: CounterChainConfig) { _counterChain = x }
-
-  /* Remote mux configs */
-  private var _remoteMux0 = config("remoteMux0").asInstanceOf[Int]
-  def remoteMux0() = _remoteMux0
-  def remoteMux0_=(x: Int) { _remoteMux0 = x }
-
-  private var _remoteMux1 = config("remoteMux1").asInstanceOf[Int]
-  def remoteMux1() = _remoteMux1
-  def remoteMux1_=(x: Int) { _remoteMux1 = x }
-
-  /* Pipe stages config */
-  private var _pipeStage = config("pipeStage")
-                            .asInstanceOf[Seq[HashMap[String, Any]]]
-                            .map { h => new PipeStageConfig(h) }
-  def pipeStage() = _pipeStage
-  def pipeStage(i: Int) = _pipeStage(i)
-  def pipeStage_=(x: Seq[PipeStageConfig]) { _pipeStage = x }
-
-  override def toString = {
-    s"remoteMux0: $remoteMux0" + "\n" +
-    s"remoteMux1: $remoteMux1" + "\n" +
-    s"pipeStage:\n" +
-    pipeStage.map { _.toString }.reduce {_+_}
   }
 }
 
