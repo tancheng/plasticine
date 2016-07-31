@@ -4,6 +4,7 @@ import java.io.File
 import _root_.scala.util.parsing.json.JSON
 import scala.collection.immutable.Map
 import plasticine.pisa.parser._
+import plasticine.templates.Opcodes
 
 object Config {
   def apply(path: String) = Parser(path)
@@ -23,7 +24,10 @@ config: $config"""
 /**
  * Base class for all Config nodes
  */
-abstract class AbstractConfig
+abstract class AbstractConfig {
+  protected def encodeOneHot(x: Int) = 1 << x
+  protected def getRegNum(s: String) = s.drop(1).toInt
+}
 
 /**
  * Parsed config information for a single counter
@@ -81,16 +85,16 @@ case class CounterChainConfig(config: Map[Any, Any]) extends AbstractConfig {
 /**
  * Parsed configuration information for ComputeUnit
  */
-case class OperandConfig(config: Map[String, Any]) extends AbstractConfig {
-  private var _isLocal = config("isLocal").asInstanceOf[Boolean]
+case class OperandConfig(config: String) extends AbstractConfig {
+  private var _isLocal = if (config(0) == "l") true else false
   def isLocal() = _isLocal
   def isLocal_=(x: Boolean) { _isLocal = x }
 
-  private var _regLocal = config("regLocal").asInstanceOf[Int]
+  private var _regLocal = getRegNum(config)
   def regLocal() = _regLocal
   def regLocal_=(x: Int) { _regLocal = x }
 
-  private var _regRemote = config("regRemote").asInstanceOf[Int]
+  private var _regRemote = getRegNum(config)
   def regRemote() = _regRemote
   def regRemote_=(x: Int) { _regRemote = x }
 
@@ -101,20 +105,20 @@ case class OperandConfig(config: Map[String, Any]) extends AbstractConfig {
   }
 }
 
-case class PipeStageConfig(config: Map[String, Any]) extends AbstractConfig {
-  private var _opA = new OperandConfig(config("opA").asInstanceOf[Map[String, Any]])
+case class PipeStageConfig(config: Map[Any, Any]) extends AbstractConfig {
+  private var _opA = new OperandConfig(Parser.getFieldString(config, "opA"))
   def opA() = _opA
   def opA_=(x: OperandConfig) { _opA = x }
 
-  private var _opB = new OperandConfig(config("opB").asInstanceOf[Map[String, Any]])
+  private var _opB = new OperandConfig(Parser.getFieldString(config, "opB"))
   def opB() = _opB
   def opB_=(x: OperandConfig) { _opB = x }
 
-  private var _opcode = config("opcode").asInstanceOf[Int]
+  private var _opcode = Opcodes.getCode(Parser.getFieldString(config, "opcode"))
   def opcode() = _opcode
   def opcode_=(x: Int) { _opcode = x }
 
-  private var _result = config("result").asInstanceOf[Int]
+  private var _result = encodeOneHot(getRegNum(Parser.getFieldString(config, "result")))
   def result() = _result
   def result_=(x: Int) { _result = x }
 
@@ -126,28 +130,28 @@ case class PipeStageConfig(config: Map[String, Any]) extends AbstractConfig {
   }
 }
 
-case class ComputeUnitConfig(config: Map[String, Any]) extends AbstractConfig {
+case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
   /* CounterChain config */
-  private var _counterChain = new CounterChainConfig(config("counterChain").asInstanceOf[Map[Any, Any]])
+  private var _counterChain = new CounterChainConfig(
+    Parser.getFieldMap(config, "counterChain"))
   def counterChain() = _counterChain
   def counterChain_=(x: CounterChainConfig) { _counterChain = x }
 
   /* Remote mux configs */
-  private var _remoteMux0 = config("remoteMux0").asInstanceOf[Int]
+  private var _remoteMux0 = Parser.getFieldInt(config, "remoteMux0")
   def remoteMux0() = _remoteMux0
   def remoteMux0_=(x: Int) { _remoteMux0 = x }
 
-  private var _remoteMux1 = config("remoteMux1").asInstanceOf[Int]
+  private var _remoteMux1 = Parser.getFieldInt(config, "remoteMux1")
   def remoteMux1() = _remoteMux1
   def remoteMux1_=(x: Int) { _remoteMux1 = x }
 
   /* Pipe stages config */
-  private var _pipeStage = config("pipeStage")
-                            .asInstanceOf[Seq[Map[String, Any]]]
+  private var _pipeStage = Parser.getFieldListOfMaps(config, "pipeStage")
                             .map { h => new PipeStageConfig(h) }
   def pipeStage() = _pipeStage
   def pipeStage(i: Int) = _pipeStage(i)
-  def pipeStage_=(x: Seq[PipeStageConfig]) { _pipeStage = x }
+  def pipeStage_=(x: List[PipeStageConfig]) { _pipeStage = x }
 
   override def toString = {
     s"remoteMux0: $remoteMux0" + "\n" +

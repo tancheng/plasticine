@@ -44,11 +44,13 @@ object Parser {
         new Config(CounterRCConfig(config))
       case "counterChain" =>
         new Config(CounterChainConfig(config))
+      case "cu" =>
+        new Config(ComputeUnitConfig(config))
       case _ => throw new Exception("not handled yet")
     }
   }
 
-    def getFieldString(map: Map[Any, Any], field:String): String = {
+  def getFieldString(map: Map[Any, Any], field:String): String = {
     map.get(field) match {
       case Some(field) => field.asInstanceOf[String].trim
       case None => fieldNotFound(field, map)

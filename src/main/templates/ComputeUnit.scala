@@ -205,33 +205,33 @@ object ComputeUnitTest {
     val l = 2
     val r = 2
     // Counter chain
-    val chainInst = HashMap[String, Any]("chain" -> 0)
+    val chainInst = HashMap[Any, Any]("chain" -> 0)
     val countersInst = (0 until 2) map { i =>
-      HashMap[String, Int]("max" -> 5, "stride" -> 1, "maxConst" -> 1, "strideConst" -> 1)
+      Map[Any, Any]("max" -> 5, "stride" -> 1, "maxConst" -> 1, "strideConst" -> 1)
     }
     chainInst("counters") = countersInst
 
-    val cuConfig = HashMap[String, Any]("counterChain" -> chainInst)
+    val cuConfig = HashMap[Any, Any]("counterChain" -> chainInst.toMap)
 
     // Remote muxes
     cuConfig("remoteMux0") = 0
     cuConfig("remoteMux1") = 1
 
     // Pipeline stages
-    val pipeStage0 = HashMap[String, Any](
-      "opA" -> HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 0),
-      "opB" -> HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
-      "opcode" -> 2,
-      "result" -> 8 // One-hot encoded
+    val pipeStage0 = Map[Any, Any](
+      "opA" -> "r0", // HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 0),
+      "opB" -> "r1", // HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
+      "opcode" -> "*",
+      "result" -> "l3"
     )
-    val pipeStage1 = HashMap[String, Any](
-      "opA" -> HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
-      "opB" -> HashMap[String, Any]("isLocal" -> true, "regLocal" -> 1, "regRemote" -> 0),
-      "opcode" -> 0,
-      "result" -> 2
+    val pipeStage1 = Map[Any, Any](
+      "opA" -> "r1", // HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
+      "opB" -> "l1", // HashMap[String, Any]("isLocal" -> true, "regLocal" -> 1, "regRemote" -> 0),
+      "opcode" -> "+",
+      "result" -> "l1"
     )
 
-    cuConfig("pipeStage") = Seq(pipeStage0, pipeStage1)
+    cuConfig("pipeStage") = List(pipeStage0, pipeStage1)
 
     val config = new ComputeUnitConfig(cuConfig.toMap)
     println(s"config = $config")
