@@ -23,6 +23,8 @@ object Opcodes {
     ("passB" , (a,b) => b)
   )
 
+  def size = opcodes.size
+
   def getCode(op: String): Int = {
     opcodes.indexWhere (_._1 == op)
   }
