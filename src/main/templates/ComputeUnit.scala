@@ -200,42 +200,21 @@ class ComputeUnitTests(c: ComputeUnit) extends PlasticineTester(c) {
 object ComputeUnitTest {
   def main(args: Array[String]): Unit = {
 
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    if (appArgs.size != 1) {
+      println("Usage: bin/sadl ComputeUnitTest <pisa config>")
+      sys.exit(-1)
+    }
+
+    val pisaFile = appArgs(0)
+    val configObj = Config(pisaFile).asInstanceOf[Config[ComputeUnitConfig]]
+
     val bitwidth = 7
     val d = 2
     val l = 2
     val r = 2
-    // Counter chain
-    val chainInst = HashMap[Any, Any]("chain" -> 0)
-    val countersInst = (0 until 2) map { i =>
-      Map[Any, Any]("max" -> 5, "stride" -> 1, "maxConst" -> 1, "strideConst" -> 1)
-    }
-    chainInst("counters") = countersInst
-
-    val cuConfig = HashMap[Any, Any]("counterChain" -> chainInst.toMap)
-
-    // Remote muxes
-    cuConfig("remoteMux0") = 0
-    cuConfig("remoteMux1") = 1
-
-    // Pipeline stages
-    val pipeStage0 = Map[Any, Any](
-      "opA" -> "r0", // HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 0),
-      "opB" -> "r1", // HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
-      "opcode" -> "*",
-      "result" -> "l3"
-    )
-    val pipeStage1 = Map[Any, Any](
-      "opA" -> "r1", // HashMap[String, Any]("isLocal" -> false, "regLocal" -> 0, "regRemote" -> 1),
-      "opB" -> "l1", // HashMap[String, Any]("isLocal" -> true, "regLocal" -> 1, "regRemote" -> 0),
-      "opcode" -> "+",
-      "result" -> "l1"
-    )
-
-    cuConfig("pipeStage") = List(pipeStage0, pipeStage1)
-
-    val config = new ComputeUnitConfig(cuConfig.toMap)
-    println(s"config = $config")
-    chiselMainTest(args, () => Module(new ComputeUnit(bitwidth, d, l, r, config))) {
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, d, l, r, configObj.config))) {
       c => new ComputeUnitTests(c)
     }
   }

@@ -112,8 +112,8 @@ object CounterChainTest {
   def main(args: Array[String]): Unit = {
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-    if (appArgs.size != 1) {
-      println("Usage: bin/sadl CounterRCTest <pisa config>")
+    if (appArgs.size != 2) {
+      println("Usage: bin/sadl CounterChainTest <pisa config>")
       sys.exit(-1)
     }
 
