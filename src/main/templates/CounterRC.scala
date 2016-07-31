@@ -93,27 +93,20 @@ object CounterRCTest {
   def main(args: Array[String]): Unit = {
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-    println(s"""args= ${args.mkString(",")}""")
-    println(s"""chiselArgs = ${chiselArgs.mkString(",")}""")
-    println(s"""appArgs = ${appArgs.mkString(",")}""")
     if (appArgs.size != 1) {
       println("Usage: bin/sadl CounterRCTest <pisa config>")
       sys.exit(-1)
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Parser(pisaFile)
+    val configObj = Config(pisaFile).asInstanceOf[Config[CounterRCConfig]]
     val bitwidth = 7
 
     // Configuration passed to design as register initial values
     // When the design is reset, config is set
-    val inst = HashMap[String, Any]( "max" -> 16, "stride" -> 3, "maxConst" -> 1, "strideConst" -> 0)
-    println(s"inst: $inst")
     println(s"parsed configObj: $configObj")
-//    val config = new CounterRCConfig(inst.toMap.asInstanceOf[Map[Any,Any]])
-    val config = configObj.config.asInstanceOf[CounterRCConfig]
 
-    chiselMainTest(chiselArgs, () => Module(new CounterRC(bitwidth, config))) {
+    chiselMainTest(chiselArgs, () => Module(new CounterRC(bitwidth, configObj.config))) {
       c => new CounterRCTests(c)
     }
   }
