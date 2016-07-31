@@ -119,7 +119,7 @@ object CounterChainTest {
     }
     chainInst("counters") = countersInst
 
-    val config = new CounterChainConfig(chainInst)
+    val config = new CounterChainConfig(chainInst.toMap)
     chiselMainTest(args, () => Module(new CounterChain(bitwidth, config))) {
       c => new CounterChainTests(c)
     }

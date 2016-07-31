@@ -2,7 +2,9 @@ package plasticine.templates
 
 import Chisel._
 
+import plasticine.pisa.parser._
 import plasticine.pisa.ir._
+
 import scala.collection.mutable.HashMap
 
 /**
@@ -89,15 +91,29 @@ class CounterRCTests(c: CounterRC) extends PlasticineTester(c) {
 object CounterRCTest {
 
   def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
+    println(s"""args= ${args.mkString(",")}""")
+    println(s"""chiselArgs = ${chiselArgs.mkString(",")}""")
+    println(s"""appArgs = ${appArgs.mkString(",")}""")
+    if (appArgs.size != 1) {
+      println("Usage: bin/sadl CounterRCTest <pisa config>")
+      sys.exit(-1)
+    }
+
+    val pisaFile = appArgs(0)
+    val configObj = Parser(pisaFile)
     val bitwidth = 7
 
     // Configuration passed to design as register initial values
     // When the design is reset, config is set
     val inst = HashMap[String, Any]( "max" -> 16, "stride" -> 3, "maxConst" -> 1, "strideConst" -> 0)
-    val config = new CounterRCConfig(inst)
+    println(s"inst: $inst")
+    println(s"parsed configObj: $configObj")
+//    val config = new CounterRCConfig(inst.toMap.asInstanceOf[Map[Any,Any]])
+    val config = configObj.config.asInstanceOf[CounterRCConfig]
 
-    chiselMainTest(args, () => Module(new CounterRC(bitwidth, config))) {
+    chiselMainTest(chiselArgs, () => Module(new CounterRC(bitwidth, config))) {
       c => new CounterRCTests(c)
     }
   }

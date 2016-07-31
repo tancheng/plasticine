@@ -233,7 +233,7 @@ object ComputeUnitTest {
 
     cuConfig("pipeStage") = Seq(pipeStage0, pipeStage1)
 
-    val config = new ComputeUnitConfig(cuConfig)
+    val config = new ComputeUnitConfig(cuConfig.toMap)
     println(s"config = $config")
     chiselMainTest(args, () => Module(new ComputeUnit(bitwidth, d, l, r, config))) {
       c => new ComputeUnitTests(c)

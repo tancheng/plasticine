@@ -2,44 +2,65 @@ package plasticine.pisa.ir
 
 import java.io.File
 import _root_.scala.util.parsing.json.JSON
-import scala.collection.mutable.HashMap
+import scala.collection.immutable.Map
+import plasticine.pisa.parser._
+
+object Config {
+  def apply(path: String) = Parser(path)
+}
+
+class Config[T<:AbstractConfig](val config: T) {
+  private var _v: Double = 0
+  def v = _v
+  def v_=(x: Double) = { _v = x }
+
+  override def toString = {
+s"""PISA version: $v
+config: $config"""
+  }
+}
+
+/**
+ * Base class for all Config nodes
+ */
+abstract class AbstractConfig
 
 /**
  * Parsed config information for a single counter
  */
-class CounterRCConfig(config: HashMap[String, Any]) {
+case class CounterRCConfig(config: Map[Any, Any]) extends AbstractConfig {
   /** Counter max */
   private var _max: Int = 0
-  def max() = _max
+  def max = _max
   def max_=(x: Int) { _max = x }
 
   /** Counter stride */
   private var _stride: Int = 0
-  def stride() = _stride
+  def stride = _stride
   def stride_=(x: Int) { _stride = x }
 
   /** Is max const */
   private var _maxConst: Int = 0
-  def maxConst() = _maxConst
+  def maxConst = _maxConst
   def maxConst_=(x: Int) { _maxConst = x }
 
   /** Is stride const */
   private var _strideConst: Int = 0
-  def strideConst() = _strideConst
+  def strideConst = _strideConst
   def strideConst_=(x: Int) { _strideConst = x }
 
   // Construct the class here
-  _max = config("max").asInstanceOf[Int]
-  _stride = config("stride").asInstanceOf[Int]
-  _maxConst = config("maxConst").asInstanceOf[Int]
-  _strideConst = config("strideConst").asInstanceOf[Int]
+  max = Parser.getFieldInt(config, "max")
+  stride = Parser.getFieldInt(config, "stride")
+  maxConst = Parser.getFieldInt(config, "maxConst")
+  strideConst = Parser.getFieldInt(config, "strideConst")
 }
 
 
 /**
  * CounterChain config information
  */
-class CounterChainConfig(config: HashMap[String, Any]) {
+case class CounterChainConfig(config: Map[String, Any]) extends AbstractConfig {
   // To chain or not?
   private var _chain: Int = 0
   def chain() = _chain
@@ -53,7 +74,7 @@ class CounterChainConfig(config: HashMap[String, Any]) {
   // Construct class here
   _chain = config("chain").asInstanceOf[Int]
   _counters = config("counters")
-                .asInstanceOf[Seq[HashMap[String, Any]]]
+                .asInstanceOf[Seq[Map[Any, Any]]]
                 .map { h => new CounterRCConfig(h) }
 }
 
@@ -61,7 +82,7 @@ class CounterChainConfig(config: HashMap[String, Any]) {
 /**
  * Parsed configuration information for ComputeUnit
  */
-class OperandConfig(config: HashMap[String, Any]) {
+case class OperandConfig(config: Map[String, Any]) extends AbstractConfig {
   private var _isLocal = config("isLocal").asInstanceOf[Boolean]
   def isLocal() = _isLocal
   def isLocal_=(x: Boolean) { _isLocal = x }
@@ -81,12 +102,12 @@ class OperandConfig(config: HashMap[String, Any]) {
   }
 }
 
-class PipeStageConfig(config: HashMap[String, Any]) {
-  private var _opA = new OperandConfig(config("opA").asInstanceOf[HashMap[String, Any]])
+case class PipeStageConfig(config: Map[String, Any]) extends AbstractConfig {
+  private var _opA = new OperandConfig(config("opA").asInstanceOf[Map[String, Any]])
   def opA() = _opA
   def opA_=(x: OperandConfig) { _opA = x }
 
-  private var _opB = new OperandConfig(config("opB").asInstanceOf[HashMap[String, Any]])
+  private var _opB = new OperandConfig(config("opB").asInstanceOf[Map[String, Any]])
   def opB() = _opB
   def opB_=(x: OperandConfig) { _opB = x }
 
@@ -106,9 +127,9 @@ class PipeStageConfig(config: HashMap[String, Any]) {
   }
 }
 
-class ComputeUnitConfig(config: HashMap[String, Any]) {
+case class ComputeUnitConfig(config: Map[String, Any]) extends AbstractConfig {
   /* CounterChain config */
-  private var _counterChain = new CounterChainConfig(config("counterChain").asInstanceOf[HashMap[String, Any]])
+  private var _counterChain = new CounterChainConfig(config("counterChain").asInstanceOf[Map[String, Any]])
   def counterChain() = _counterChain
   def counterChain_=(x: CounterChainConfig) { _counterChain = x }
 
@@ -123,7 +144,7 @@ class ComputeUnitConfig(config: HashMap[String, Any]) {
 
   /* Pipe stages config */
   private var _pipeStage = config("pipeStage")
-                            .asInstanceOf[Seq[HashMap[String, Any]]]
+                            .asInstanceOf[Seq[Map[String, Any]]]
                             .map { h => new PipeStageConfig(h) }
   def pipeStage() = _pipeStage
   def pipeStage(i: Int) = _pipeStage(i)
