@@ -5,6 +5,12 @@
   "config" : {
     "remoteMux0" : 0,
     "remoteMux1" : 1,
+    "mem0wa" : 0,
+    "mem0wd" : 0,
+    "mem0ra" : 0,
+    "mem1wa" : 0,
+    "mem1wd" : 0,
+    "mem1ra" : 0,
     "counterChain" : {
       "chain" : 0,
       "counters" : [

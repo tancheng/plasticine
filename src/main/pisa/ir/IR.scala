@@ -146,6 +146,30 @@ case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
   def remoteMux1() = _remoteMux1
   def remoteMux1_=(x: Int) { _remoteMux1 = x }
 
+  private var _mem0wa = Parser.getFieldInt(config, "mem0wa")
+  def mem0wa() = _mem0wa
+  def mem0wa_=(x: Int) { _mem0wa = x }
+
+  private var _mem0wd = Parser.getFieldInt(config, "mem0wd")
+  def mem0wd() = _mem0wd
+  def mem0wd_=(x: Int) { _mem0wd = x }
+
+  private var _mem0ra = Parser.getFieldInt(config, "mem0ra")
+  def mem0ra() = _mem0ra
+  def mem0ra_=(x: Int) { _mem0ra = x }
+
+  private var _mem1wa = Parser.getFieldInt(config, "mem1wa")
+  def mem1wa() = _mem1wa
+  def mem1wa_=(x: Int) { _mem1wa = x }
+
+  private var _mem1wd = Parser.getFieldInt(config, "mem1wd")
+  def mem1wd() = _mem1wd
+  def mem1wd_=(x: Int) { _mem1wd = x }
+
+  private var _mem1ra = Parser.getFieldInt(config, "mem1ra")
+  def mem1ra() = _mem1ra
+  def mem1ra_=(x: Int) { _mem1ra = x }
+
   /* Pipe stages config */
   private var _pipeStage = Parser.getFieldListOfMaps(config, "pipeStage")
                             .map { h => new PipeStageConfig(h) }
