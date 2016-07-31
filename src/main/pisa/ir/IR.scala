@@ -60,21 +60,20 @@ case class CounterRCConfig(config: Map[Any, Any]) extends AbstractConfig {
 /**
  * CounterChain config information
  */
-case class CounterChainConfig(config: Map[String, Any]) extends AbstractConfig {
+case class CounterChainConfig(config: Map[Any, Any]) extends AbstractConfig {
   // To chain or not?
   private var _chain: Int = 0
-  def chain() = _chain
+  def chain = _chain
   def chain_=(x: Int) { _chain = x }
 
   // Configuration for individual counters
   private var _counters: Seq[CounterRCConfig] = Seq[CounterRCConfig]()
-  def counters() = _counters
+  def counters = _counters
   def counters_=(x: Seq[CounterRCConfig]) { _counters = x }
 
   // Construct class here
-  _chain = config("chain").asInstanceOf[Int]
-  _counters = config("counters")
-                .asInstanceOf[Seq[Map[Any, Any]]]
+  chain = Parser.getFieldInt(config, "chain")
+  counters = Parser.getFieldListOfMaps(config, "counters")
                 .map { h => new CounterRCConfig(h) }
 }
 
@@ -129,7 +128,7 @@ case class PipeStageConfig(config: Map[String, Any]) extends AbstractConfig {
 
 case class ComputeUnitConfig(config: Map[String, Any]) extends AbstractConfig {
   /* CounterChain config */
-  private var _counterChain = new CounterChainConfig(config("counterChain").asInstanceOf[Map[String, Any]])
+  private var _counterChain = new CounterChainConfig(config("counterChain").asInstanceOf[Map[Any, Any]])
   def counterChain() = _counterChain
   def counterChain_=(x: CounterChainConfig) { _counterChain = x }
 

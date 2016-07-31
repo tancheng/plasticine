@@ -42,7 +42,8 @@ object Parser {
     t match {
       case "counter" =>
         new Config(CounterRCConfig(config))
-      case "counterChain" => new Config(CounterChainConfig(config.asInstanceOf[Map[String,Any]]))
+      case "counterChain" =>
+        new Config(CounterChainConfig(config))
       case _ => throw new Exception("not handled yet")
     }
   }
@@ -75,10 +76,20 @@ object Parser {
   def getFieldList(map: Map[Any, Any], field: String): List[Any] = {
     map.get(field) match {
       case Some(field) => field match {
-        case list: List[Any] => list
+        case list: Seq[Any] => list.toList
         case err@_ => listNotFound(err)
       }
       case None => fieldNotFound(field, map)
+    }
+  }
+
+  def getFieldListOfMaps(map: Map[Any, Any], field: String): List[Map[Any,Any]] = {
+    val l = getFieldList(map, field)
+    l.map { m => m match {
+        case map: Map[Any,Any] => map
+        case hmap: HashMap[Any, Any] => hmap.toMap
+        case err@_ => listNotFound(err)
+      }
     }
   }
 

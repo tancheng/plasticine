@@ -102,7 +102,7 @@ class CounterChainTests(c: CounterChain) extends PlasticineTester(c) {
   val done = peek(c.io.control)
   for (i <- 0 until 50) {
     step(1)
-    val count = peek(c.io.data)
+    c.io.data foreach { d => peek(d.out) }
     val done = peek(c.io.control)
   }
 }
@@ -110,17 +110,18 @@ class CounterChainTests(c: CounterChain) extends PlasticineTester(c) {
 object CounterChainTest {
 
   def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
+    if (appArgs.size != 1) {
+      println("Usage: bin/sadl CounterRCTest <pisa config>")
+      sys.exit(-1)
+    }
+
+    val pisaFile = appArgs(0)
+    val configObj = Config(pisaFile).asInstanceOf[Config[CounterChainConfig]]
     val bitwidth = 7
 
-    val chainInst = HashMap[String, Any]("chain" -> 1)
-    val countersInst = (0 until 2) map { i =>
-      HashMap[String, Int]("max" -> 5, "stride" -> 1, "maxConst" -> 1, "strideConst" -> 1)
-    }
-    chainInst("counters") = countersInst
-
-    val config = new CounterChainConfig(chainInst.toMap)
-    chiselMainTest(args, () => Module(new CounterChain(bitwidth, config))) {
+    chiselMainTest(args, () => Module(new CounterChain(bitwidth, configObj.config))) {
       c => new CounterChainTests(c)
     }
   }
