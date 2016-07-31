@@ -3,16 +3,17 @@ package plasticine.templates
 import Chisel._
 
 class SRAM(val w: Int, val d: Int) extends Module {
+  val addrWidth = log2Up(d)
   val io = new Bundle {
-    val raddr = UInt(INPUT, width = w)
+    val raddr = UInt(INPUT, width = addrWidth)
     val wen = Bool(INPUT)
-    val waddr = UInt(INPUT, width = w)
+    val waddr = UInt(INPUT, width = addrWidth)
     val wdata = Bits(INPUT, width = w)
     val rdata = Bits(OUTPUT, width = w)
   }
   val mem = Mem(Bits(width = w), d, seqRead = true)
   io.rdata := Bits(0)
-  val raddr_reg = Reg(Bits(width = w))
+  val raddr_reg = Reg(Bits(width = addrWidth))
   when (io.wen) {
     mem(io.waddr) := io.wdata
   } .otherwise  {
