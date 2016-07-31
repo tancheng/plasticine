@@ -26,7 +26,7 @@ config: $config"""
  */
 abstract class AbstractConfig {
   protected def encodeOneHot(x: Int) = 1 << x
-  protected def getRegNum(s: String) = s.drop(1).toInt
+  protected def getRegNum(s: String) = if (s.size <= 1) 0 else s.drop(1).toInt
 }
 
 /**
@@ -86,22 +86,24 @@ case class CounterChainConfig(config: Map[Any, Any]) extends AbstractConfig {
  * Parsed configuration information for ComputeUnit
  */
 case class OperandConfig(config: String) extends AbstractConfig {
-  private var _isLocal = if (config(0) == "l") true else false
-  def isLocal() = _isLocal
-  def isLocal_=(x: Boolean) { _isLocal = x }
+  private def getDataSrc = config(0) match {
+    case 'l' => 0 // Local register
+    case 'r' => 1 // Remote register
+    case 'c' => 2 // Constant
+    case 'm' => 3 // Memory
+    case _ => throw new Exception(s"Unknown data source '${config(0)}'. Must be l, r, c, or m")
+  }
+  private var _dataSrc = getDataSrc
+  def dataSrc() = _dataSrc
+  def dataSrc_=(x: Int) { _dataSrc = x }
 
-  private var _regLocal = getRegNum(config)
-  def regLocal() = _regLocal
-  def regLocal_=(x: Int) { _regLocal = x }
-
-  private var _regRemote = getRegNum(config)
-  def regRemote() = _regRemote
-  def regRemote_=(x: Int) { _regRemote = x }
+  private var _value = getRegNum(config)
+  def value() = _value
+  def value_=(x: Int) { _value = x }
 
   override def toString = {
-    s"isLocal: $isLocal\n" +
-    s"regLocal: $regLocal\n" +
-    s"regRemote: $regRemote"
+    s"dataSrc: $dataSrc\n" +
+    s"value: $value\n"
   }
 }
 

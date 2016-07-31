@@ -10,14 +10,14 @@ import scala.collection.mutable.ListBuffer
  * Bundle to specify operand information to functional units
  * @param l: Number of local registers
  * @param r: Number of remote registers
+ * @param w: Word width
  */
-class OperandBundle(l: Int, r: Int, config: Option[OperandConfig] = None) extends Bundle {
-  var isLocal = if (config.isDefined) Bool(config.get.isLocal) else Bool()
-  var regLocal = if (config.isDefined) UInt(config.get.regLocal, width=log2Up(l+r)) else UInt(width=log2Up(l+r))
-  var regRemote = if (config.isDefined) UInt(config.get.regRemote, width=log2Up(r)) else UInt(width=log2Up(r))
+class OperandBundle(l: Int, r: Int, w: Int, config: Option[OperandConfig] = None) extends Bundle {
+  var dataSrc = if (config.isDefined) UInt(config.get.dataSrc, width=2) else UInt(width=2)
+  var value = if (config.isDefined) UInt(config.get.value, width=log2Up(w)) else UInt(width=log2Up(w))
 
   override def cloneType(): this.type = {
-    new OperandBundle(l, r).asInstanceOf[this.type]
+    new OperandBundle(l, r, w).asInstanceOf[this.type]
   }
 }
 
@@ -26,15 +26,16 @@ class OperandBundle(l: Int, r: Int, config: Option[OperandConfig] = None) extend
  * one pipeline stage in the CU
  * @param l: Number of local registers
  * @param r: Number of remote registers
+ * @param w: Word width
  */
-class PipeStageBundle(l: Int, r: Int, config: Option[PipeStageConfig] = None) extends Bundle {
-  var opA = if (config.isDefined) new OperandBundle(l, r, Some(config.get.opA)) else new OperandBundle(l, r)
-  var opB = if (config.isDefined) new OperandBundle(l, r, Some(config.get.opB)) else new OperandBundle(l, r)
-  var opcode = if (config.isDefined) UInt(config.get.opcode, width=4) else UInt(width=4) // TODO: Remove hardcoded number!
+class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = None) extends Bundle {
+  var opA = if (config.isDefined) new OperandBundle(l, r, w, Some(config.get.opA)) else new OperandBundle(l, r, w)
+  var opB = if (config.isDefined) new OperandBundle(l, r, w, Some(config.get.opB)) else new OperandBundle(l, r, w)
+  var opcode = if (config.isDefined) UInt(config.get.opcode, width=log2Up(Opcodes.size)) else UInt(width=log2Up(Opcodes.size))
   var result = if (config.isDefined) UInt(config.get.result, width=l+r) else UInt(width=l+r) // One-hot encoded
 
   override def cloneType(): this.type = {
-    new PipeStageBundle(l,r).asInstanceOf[this.type]
+    new PipeStageBundle(l,r,w).asInstanceOf[this.type]
   }
 }
 
@@ -62,9 +63,9 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
 
   var pipeStage = Vec.tabulate(d) { i =>
     if (config.isDefined) {
-      new PipeStageBundle(l, r, Some(config.get.pipeStage(i)))
+      new PipeStageBundle(l, r, w, Some(config.get.pipeStage(i)))
     } else {
-      new PipeStageBundle(l, r)
+      new PipeStageBundle(l, r, w)
     }
   }
 
@@ -96,15 +97,13 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: In
     val config_enable = Bool(INPUT)
 
     // Temporary for debugging
-    val rmux0 = UInt(OUTPUT, 1)
-    val rmux1 = UInt(OUTPUT, 1)
+    val rmux0 = UInt(OUTPUT, 2)
+    val rmux1 = UInt(OUTPUT, 2)
     val opcode = UInt(OUTPUT, w)
-    val opA_isLocal = UInt(OUTPUT, 1)
-    val opA_local = UInt(OUTPUT, w)
-    val opA_remote = UInt(OUTPUT, w)
-    val opB_isLocal = UInt(OUTPUT, 1)
-    val opB_local = UInt(OUTPUT, w)
-    val opB_remote = UInt(OUTPUT, w)
+    val opA_dataSrc = UInt(OUTPUT, 2)
+    val opA_value = UInt(OUTPUT, w)
+    val opB_dataSrc = UInt(OUTPUT, 1)
+    val opB_value = UInt(OUTPUT, w)
     val result = UInt(OUTPUT, w)
   }
 
@@ -182,8 +181,17 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: In
     val localA = regblock.io.readLocalA
     val localB = regblock.io.readLocalB
 
-    val inA = Mux(config.pipeStage(i).opA.isLocal, localA, rA)
-    val inB = Mux(config.pipeStage(i).opB.isLocal, localB, rB)
+    val dataSrcA = if (i < rwStages) Vec(localA, rA, config.pipeStage(i).opA.value, mem0.io.rdata) else Vec(localA, rA, config.pipeStage(i).opA.value)
+    val dataSrcAMux = Module(new MuxN(dataSrcA.size, w))
+    dataSrcAMux.io.ins := dataSrcA
+    dataSrcAMux.io.sel := config.pipeStage(i).opA.dataSrc
+    val inA = dataSrcAMux.io.out
+
+    val dataSrcB = if (i < rwStages) Vec(localB, rB, config.pipeStage(i).opB.value, mem1.io.rdata) else Vec(localB, rB, config.pipeStage(i).opB.value)
+    val dataSrcBMux = Module(new MuxN(dataSrcB.size, w))
+    dataSrcBMux.io.ins := dataSrcB
+    dataSrcBMux.io.sel := config.pipeStage(i).opB.dataSrc
+    val inB = dataSrcBMux.io.out
     fu.io.a := inA
     fu.io.b := inB
     fu.io.opcode := config.pipeStage(i).opcode
@@ -191,11 +199,11 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: In
     val passData = if (i == 0) passDataIn else pipeRegs.last.io.passDataOut
     regblock.io.passData := passData
     regblock.io.writeSel := config.pipeStage(i).result
-    regblock.io.readLocalASel := config.pipeStage(i).opA.regLocal
-    regblock.io.readLocalBSel := config.pipeStage(i).opB.regLocal
+    regblock.io.readLocalASel := config.pipeStage(i).opA.value
+    regblock.io.readLocalBSel := config.pipeStage(i).opB.value
     if (i > 0) {
-      pipeRegs.last.io.readRemoteASel := config.pipeStage(i).opA.regRemote
-      pipeRegs.last.io.readRemoteBSel := config.pipeStage(i).opB.regRemote
+      pipeRegs.last.io.readRemoteASel := config.pipeStage(i).opA.value
+      pipeRegs.last.io.readRemoteBSel := config.pipeStage(i).opB.value
     }
     fus.append(fu)
     pipeRegs.append(regblock)
@@ -218,12 +226,10 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: In
   io.rmux0       := config.remoteMux0
   io.rmux1       := config.remoteMux1
   io.opcode      := config.pipeStage(0).opcode
-  io.opA_isLocal := config.pipeStage(0).opA.isLocal
-  io.opA_local   := config.pipeStage(0).opA.regLocal
-  io.opA_remote  := config.pipeStage(0).opA.regRemote
-  io.opB_isLocal := config.pipeStage(0).opB.isLocal
-  io.opB_local   := config.pipeStage(0).opB.regLocal
-  io.opB_remote  := config.pipeStage(0).opB.regRemote
+  io.opA_dataSrc := config.pipeStage(0).opA.dataSrc
+  io.opA_value   := config.pipeStage(0).opA.value
+  io.opB_dataSrc := config.pipeStage(0).opB.dataSrc
+  io.opB_value   := config.pipeStage(0).opB.value
   io.result      := config.pipeStage(0).result
 }
 
