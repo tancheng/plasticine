@@ -7,7 +7,7 @@ function cleanup {
 	rm ComputeUnit_sim
 	rm -rf ComputeUnit
 	rm -rf log
-	rm -rf alib-52 
+	rm -rf alib-52
 	rm -rf icc_reports
 	rm -rf dc_reports
 	rm -rf pt_reports
@@ -19,7 +19,7 @@ while read cmd var val
 do
 #	echo $cmd $var $val
 	if $cmd == "set"
-	then 
+	then
 		echo "export $var=$val"
 		eval "export $var=$val"
 	fi

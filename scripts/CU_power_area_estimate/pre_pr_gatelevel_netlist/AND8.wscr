@@ -1,6 +1,6 @@
 ###################################################################
 
-# Created by write_script -format dctcl on Tue Jul 26 14:58:09 2016
+# Created by write_script -format dctcl on Mon Aug  1 17:16:59 2016
 
 ###################################################################
 
@@ -129,6 +129,12 @@ set_max_transition 0.1 [get_ports {io_result[2]}]
 set_max_transition 0.1 [get_ports {io_result[1]}]
 set_max_transition 0.1 [get_ports {io_result[0]}]
 set_register_merging [get_cells config_pipeStage_0_opcode_reg_1_] 17
+set_register_merging [get_cells RegisterBlock_FF_2_ff_reg_0_] 17
+set_register_merging [get_cells RegisterBlock_FF_2_ff_reg_1_] 17
+set_register_merging [get_cells RegisterBlock_FF_2_ff_reg_2_] 17
+set_register_merging [get_cells RegisterBlock_FF_3_ff_reg_1_] 17
+set_register_merging [get_cells RegisterBlock_FF_3_ff_reg_0_] 17
+set_register_merging [get_cells RegisterBlock_FF_3_ff_reg_2_] 17
 set_register_merging [get_cells config_pipeStage_0_result_reg_0_] 17
 set_register_merging [get_cells config_pipeStage_0_opB_regRemote_reg] 17
 set_register_merging [get_cells counterChain_CounterRC_counter_reg__ff_reg_1_] \
@@ -144,30 +150,25 @@ counterChain_CounterRC_1_counter_reg__ff_reg_0_] 17
 set_register_merging [get_cells config_remoteMux1_reg] 17
 set_register_merging [get_cells                                                \
 counterChain_CounterRC_1_counter_reg__ff_reg_2_] 17
+set_register_merging [get_cells RegisterBlock_FF_ff_reg_3_] 17
 set_register_merging [get_cells RegisterBlock_FF_ff_reg_5_] 17
 set_register_merging [get_cells RegisterBlock_FF_ff_reg_4_] 17
-set_register_merging [get_cells RegisterBlock_FF_ff_reg_3_] 17
 set_register_merging [get_cells RegisterBlock_FF_ff_reg_2_] 17
 set_register_merging [get_cells RegisterBlock_FF_ff_reg_0_] 17
 set_register_merging [get_cells RegisterBlock_FF_ff_reg_1_] 17
-set_register_merging [get_cells RegisterBlock_FF_3_ff_reg_0_] 17
-set_register_merging [get_cells RegisterBlock_FF_2_ff_reg_0_] 17
-set_register_merging [get_cells RegisterBlock_FF_3_ff_reg_2_] 17
-set_register_merging [get_cells RegisterBlock_FF_2_ff_reg_2_] 17
-set_register_merging [get_cells RegisterBlock_FF_3_ff_reg_1_] 17
-set_register_merging [get_cells RegisterBlock_FF_2_ff_reg_1_] 17
-set_switching_activity -period 1 -toggle_rate 0.000198364 -static_probability  \
-0.00480652 [get_pins RegisterBlock_FF_3_ff_reg_0_/Q]
-set_switching_activity -period 1 -toggle_rate 0.00979614 -static_probability   \
-0.139961 [get_pins RegisterBlock_FF_2_ff_reg_0_/Q]
-set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
-[get_pins RegisterBlock_FF_3_ff_reg_2_/Q]
-set_switching_activity -period 1 -toggle_rate 0.000350952 -static_probability  \
-0.00547028 [get_pins RegisterBlock_FF_2_ff_reg_2_/Q]
-set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
-[get_pins RegisterBlock_FF_3_ff_reg_1_/Q]
-set_switching_activity -period 1 -toggle_rate 0.00331116 -static_probability   \
-0.0617447 [get_pins RegisterBlock_FF_2_ff_reg_1_/Q]
+set_switching_activity -period 1 -toggle_rate 0.211548 -static_probability     \
+0.153267 [get_pins RegisterBlock_FF_2_ff_reg_0_/Q]
+set_switching_activity -period 1 -toggle_rate 0.104126 -static_probability     \
+0.14254 [get_pins RegisterBlock_FF_2_ff_reg_1_/Q]
+set_switching_activity -period 1 -toggle_rate 0.0771332 -static_probability    \
+0.0565186 [get_pins RegisterBlock_FF_2_ff_reg_2_/Q]
+set_switching_activity -period 1 -toggle_rate 0.0167694 -static_probability    \
+0.0672531 [get_pins RegisterBlock_FF_3_ff_reg_1_/Q]
+set_switching_activity -period 1 -toggle_rate 0.0441132 -static_probability    \
+0.122993 [get_pins RegisterBlock_FF_3_ff_reg_0_/Q]
+set_switching_activity -period 1 -toggle_rate 0.00346375 -static_probability   \
+0.00980377 [get_pins RegisterBlock_FF_3_ff_reg_2_/Q]
+create_clock [get_ports clk]  -name ideal_clock1  -period 1  -waveform {0 0.5}
 set_max_delay 0.2  -from [list [get_ports clk] [get_ports reset] [get_ports    \
 io_enable] [get_ports io_config_enable]]  -to [list [get_ports io_done]        \
 [get_ports {io_scalarOut[6]}] [get_ports {io_scalarOut[5]}] [get_ports         \

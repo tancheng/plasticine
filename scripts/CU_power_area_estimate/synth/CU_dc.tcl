@@ -59,8 +59,9 @@ set wire_load_mode top
 
 # enable power calculation
 saif_map -start
+# define clock
+create_clock clk -name ideal_clock1 -period 1
 compile_ultra
-# compile
 
 ###################################################
 # Analyze Design
@@ -86,5 +87,5 @@ write_sdf $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.sdf
 write_sdc -nosplit $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.sdc
 
 # save scripts
-write_script -hier -format dctcl -o $PRE_PR_NETLIST_PATH/AND8.wscr 
+write_script -hier -format dctcl -o $PRE_PR_NETLIST_PATH/AND8.wscr
 exit
