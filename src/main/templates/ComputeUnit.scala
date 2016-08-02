@@ -143,7 +143,7 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: In
   mem1.io.wen   := Bool(true)  // Temporary as we have no control flow
 
   // CounterChain
-  val counterChain = Module(new CounterChain(w, inst.counterChain))
+  val counterChain = Module(new CounterChain(w, 2, inst.counterChain))
   // TODO: Getting this info from config temporarily
   counterChain.io.data.foreach { d =>
     d.max := UInt(0, w)

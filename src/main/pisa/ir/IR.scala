@@ -66,19 +66,18 @@ case class CounterRCConfig(config: Map[Any, Any]) extends AbstractConfig {
  */
 case class CounterChainConfig(config: Map[Any, Any]) extends AbstractConfig {
   // To chain or not?
-  private var _chain: Int = 0
+  private var _chain: List[Int] = Parser.getFieldList(config, "chain")
+                                        .asInstanceOf[List[Double]]
+                                        .map { i => i.toInt }
+
   def chain = _chain
-  def chain_=(x: Int) { _chain = x }
+  def chain_=(x: List[Int]) { _chain = x }
 
   // Configuration for individual counters
-  private var _counters: Seq[CounterRCConfig] = Seq[CounterRCConfig]()
+  private var _counters: Seq[CounterRCConfig] = Parser.getFieldListOfMaps(config, "counters")
+                                                      .map { h => new CounterRCConfig(h) }
   def counters = _counters
   def counters_=(x: Seq[CounterRCConfig]) { _counters = x }
-
-  // Construct class here
-  chain = Parser.getFieldInt(config, "chain")
-  counters = Parser.getFieldListOfMaps(config, "counters")
-                .map { h => new CounterRCConfig(h) }
 }
 
 
