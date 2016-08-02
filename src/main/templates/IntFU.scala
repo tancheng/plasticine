@@ -1,5 +1,6 @@
 package plasticine.templates
 
+import scala.collection.immutable.Map
 import Chisel._
 
 /**
@@ -8,34 +9,50 @@ import Chisel._
  * All operations are designed to take a single cycle.
  * @param w: Word width
  */
+
+object Opcodes {
+  val opcodes = List[(String, (UInt, UInt) => UInt)](
+    ("+" , (a,b) => a+b),
+    ("-" , (a,b) => a-b),
+    ("*" , (a,b) => a*b),
+    ("/" , (a,b) => a/b),
+    ("&" , (a,b) => a&b),
+    ("|" , (a,b) => a|b),
+    ("==" , (a,b) => a===b),
+    ("passA" , (a,b) => a),
+    ("passB" , (a,b) => b)
+  )
+
+  def size = opcodes.size
+
+  def getCode(op: String): Int = {
+    opcodes.indexWhere (_._1 == op)
+  }
+
+  def getOp(i: Int, a: UInt, b: UInt): UInt = {
+    opcodes(i)._2(a, b)
+  }
+}
+
 class IntFU(val w: Int) extends Module {
   val io = new Bundle {
     val a      = UInt(INPUT,  w)
     val b      = UInt(INPUT,  w)
-    val opcode = UInt(INPUT,  4)
+    val opcode = UInt(INPUT,  log2Up(Opcodes.opcodes.size))
     val out = UInt(OUTPUT, w)
   }
   io.out := UInt(0) // <-- Required because otherwise Chisel thinks no one writes to io.out
 
-  when (io.opcode === UInt(0)) {
-    io.out := io.a + io.b // ADD
-  } .elsewhen (io.opcode === UInt(1)) {
-    io.out := io.a - io.b // SUB
-  } .elsewhen (io.opcode === UInt(2)) {
-    io.out := io.a * io.b // MUL
-  } .elsewhen (io.opcode === UInt(3)) {
-    io.out := io.a / io.b // DIV
-  } .elsewhen (io.opcode === UInt(4)) {
-    io.out := io.a & io.b
-  } .elsewhen (io.opcode === UInt(5)) {
-    io.out := io.a | io.b
-  } .elsewhen (io.opcode === UInt(6)) {
-    io.out := io.a === io.b
-  } .elsewhen (io.opcode === UInt(7)) {
-    io.out := io.a  	     // PASS A
-  } .otherwise {
-    io.out := io.b         // PASS B
+  val ins = Vec.tabulate(Opcodes.opcodes.size) { i =>
+    Opcodes.getOp(i, io.a, io.b)
   }
+
+  val m = Module(new MuxN(Opcodes.opcodes.size, w))
+  m.io.ins.zip(ins).foreach { case (in, i) =>
+    in := i
+  }
+  m.io.sel := io.opcode
+  io.out := m.io.out
 }
 
 /**
@@ -66,6 +83,7 @@ class IntFUTests(c: IntFU) extends Tester(c) {
     } else {
       output = b
     }
+    println(s"$output = $a ${Opcodes.opcodes(opcode)._1} $b")
     poke(c.io.a, a)
     poke(c.io.b, b)
     poke(c.io.opcode, opcode)

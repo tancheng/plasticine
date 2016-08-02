@@ -1,0 +1,48 @@
+{"PISA":{
+"version"     : 0.1,
+"topconfig" : {
+  "type" : "cu",
+  "config" : {
+    "remoteMux0" : 0,
+    "remoteMux1" : 1,
+    "mem0wa" : 0,
+    "mem0wd" : 0,
+    "mem0ra" : 0,
+    "mem1wa" : 0,
+    "mem1wd" : 0,
+    "mem1ra" : 0,
+    "counterChain" : {
+      "chain" : 0,
+      "counters" : [
+        {
+          "max"         : 5,
+          "stride"      : 1,
+          "maxConst"    : 1,
+          "strideConst" : 1
+        },
+        {
+          "max"         : 5,
+          "stride"      : 1,
+          "maxConst"    : 1,
+          "strideConst" : 1
+        }
+      ]
+    },
+    "pipeStage" : [
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3"
+      },
+      {
+        "opA" : "r1",
+        "opB" : "l1",
+        "opcode" : "+",
+        "result" : "l1"
+      }
+    ]
+  }
+}
+}
+}

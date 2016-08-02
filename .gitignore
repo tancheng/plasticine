@@ -2,7 +2,8 @@
 *.vcd
 *.swp
 *.tags
-.out
+.o
+.alib
 build/
 generated/
 lib_managed/

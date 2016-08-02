@@ -1,0 +1,24 @@
+{"PISA":{
+"version"     : 0.1,
+"topconfig" : {
+  "type" : "counterChain",
+  "config" : {
+    "chain" : 1,
+    "counters" : [
+    {
+      "max"         : 5,
+      "stride"      : 1,
+      "maxConst"    : 1,
+      "strideConst" : 1
+    },
+    {
+      "max"         : 5,
+      "stride"      : 1,
+      "maxConst"    : 1,
+      "strideConst" : 1
+    }
+  ]
+}
+}
+}
+}

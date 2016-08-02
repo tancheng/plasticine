@@ -2,12 +2,14 @@ package plasticine.templates
 
 import Chisel._
 
+import plasticine.pisa.ir._
 import scala.collection.mutable.HashMap
+
 /**
  * CounterChain config register format
  */
-case class CounterChainOpcode(val w: Int) extends OpcodeT {
-  var chain = Bool(INPUT)
+case class CounterChainOpcode(val w: Int, config: Option[CounterChainConfig] = None) extends OpcodeT {
+  var chain = if (config.isDefined) Bool(config.get.chain > 0) else Bool()
 
   override def cloneType(): this.type = {
     new CounterChainOpcode(w).asInstanceOf[this.type]
@@ -19,27 +21,6 @@ case class CounterChainOpcode(val w: Int) extends OpcodeT {
 }
 
 /**
- * CounterChain config information
- */
-class CounterChainConfig(config: HashMap[String, Any]) {
-  // To chain or not?
-  private var _chain: Int = 0
-  def chain() = _chain
-  def chain_=(x: Int) { _chain = x }
-
-  // Configuration for individual counters
-  private var _counters: Seq[CounterRCConfig] = Seq[CounterRCConfig]()
-  def counters() = _counters
-  def counters_=(x: Seq[CounterRCConfig]) { _counters = x }
-
-  // Construct class here
-  _chain = config("chain").asInstanceOf[Int]
-  _counters = config("counters")
-                .asInstanceOf[Seq[HashMap[String, Any]]]
-                .map { h => new CounterRCConfig(h) }
-}
-
-/**
  * CounterChain: Chain of perfectly nested counters.
  * @param w: Word width
  * @param d: Counter chain depth
@@ -47,6 +28,7 @@ class CounterChainConfig(config: HashMap[String, Any]) {
 class CounterChain(val w: Int, inst: CounterChainConfig) extends ConfigurableModule[CounterChainOpcode] {
   val d = 2 // Counter chain depth
   val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
     val data = Vec.fill(d) { new Bundle {
         val max      = UInt(INPUT,  w)
         val stride   = UInt(INPUT,  w)
@@ -60,9 +42,16 @@ class CounterChain(val w: Int, inst: CounterChainConfig) extends ConfigurableMod
     }
   }
 
-  val configWires = CounterChainOpcode(w)
-  configWires.init(inst)
-  val config = RegInit(configWires)
+  val configType = CounterChainOpcode(w)
+  val configIn = CounterChainOpcode(w)
+  val configInit = CounterChainOpcode(w, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType
+  } .otherwise {
+    configIn := config
+  }
+
 
   val counterInsn = inst.counters
   val counters = (0 until d) map { i =>
@@ -113,7 +102,7 @@ class CounterChainTests(c: CounterChain) extends PlasticineTester(c) {
   val done = peek(c.io.control)
   for (i <- 0 until 50) {
     step(1)
-    val count = peek(c.io.data)
+    c.io.data foreach { d => peek(d.out) }
     val done = peek(c.io.control)
   }
 }
@@ -121,17 +110,18 @@ class CounterChainTests(c: CounterChain) extends PlasticineTester(c) {
 object CounterChainTest {
 
   def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
+    if (appArgs.size != 2) {
+      println("Usage: bin/sadl CounterChainTest <pisa config>")
+      sys.exit(-1)
+    }
+
+    val pisaFile = appArgs(0)
+    val configObj = Config(pisaFile).asInstanceOf[Config[CounterChainConfig]]
     val bitwidth = 7
 
-    val chainInst = HashMap[String, Any]("chain" -> 1)
-    val countersInst = (0 until 2) map { i =>
-      HashMap[String, Int]("max" -> 5, "stride" -> 1, "maxConst" -> 1, "strideConst" -> 1)
-    }
-    chainInst("counters") = countersInst
-
-    val config = new CounterChainConfig(chainInst)
-    chiselMainTest(args, () => Module(new CounterChain(bitwidth, config))) {
+    chiselMainTest(args, () => Module(new CounterChain(bitwidth, configObj.config))) {
       c => new CounterChainTests(c)
     }
   }
