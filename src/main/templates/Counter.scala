@@ -38,7 +38,7 @@ class Counter(val w: Int) extends Module {
   }
 
   io.data.out := count
-  io.control.done := isMax
+  io.control.done := io.control.enable & isMax
 }
 
 /**

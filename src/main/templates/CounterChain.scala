@@ -68,17 +68,12 @@ class CounterChain(val w: Int, inst: CounterChainConfig) extends ConfigurableMod
   (0 until d) foreach { i: Int =>
     if (i == 0) {
       counters(i).io.control.enable := io.control(i).enable
-      io.control(i).done := counters(i).io.control.done
     } else {
       counters(i).io.control.enable := Mux(config.chain,
         io.control(i).enable & counters(i-1).io.control.done,
         io.control(i).enable)
-        val doneSignals = (0 to i) map { k => counters(k).io.control.done }
-        val andTree = doneSignals.reduce {_ & _}
-      io.control(i).done := Mux(config.chain,
-        andTree,
-        counters(i).io.control.done)
     }
+    io.control(i).done := counters(i).io.control.done
   }
 }
 
@@ -112,7 +107,7 @@ object CounterChainTest {
   def main(args: Array[String]): Unit = {
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-    if (appArgs.size != 2) {
+    if (appArgs.size != 1) {
       println("Usage: bin/sadl CounterChainTest <pisa config>")
       sys.exit(-1)
     }
