@@ -2,7 +2,7 @@
 ****************************************
 check_design summary:
 Version:     I-2013.12-SP4
-Date:        Tue Jul 26 14:58:05 2016
+Date:        Mon Aug  1 17:16:55 2016
 ****************************************
 
                    Name                                            Total
@@ -15,12 +15,12 @@ Cells                                                               6
     Cells do not drive (LINT-1)                                     6
 --------------------------------------------------------------------------------
 
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_2/ff_reg[1]' does not drive any nets. (LINT-1)
+Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_3/ff_reg[2]' does not drive any nets. (LINT-1)
+Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_3/ff_reg[0]' does not drive any nets. (LINT-1)
 Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_3/ff_reg[1]' does not drive any nets. (LINT-1)
 Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_2/ff_reg[2]' does not drive any nets. (LINT-1)
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_3/ff_reg[2]' does not drive any nets. (LINT-1)
+Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_2/ff_reg[1]' does not drive any nets. (LINT-1)
 Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_2/ff_reg[0]' does not drive any nets. (LINT-1)
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_3/ff_reg[0]' does not drive any nets. (LINT-1)
 Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[6]'. (LINT-31)
 Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[5]'. (LINT-31)
 Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[4]'. (LINT-31)

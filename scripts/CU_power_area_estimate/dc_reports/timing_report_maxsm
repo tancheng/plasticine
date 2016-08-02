@@ -6,43 +6,55 @@ Report : timing
         -max_paths 1
 Design : ComputeUnit
 Version: I-2013.12-SP4
-Date   : Tue Jul 26 14:58:09 2016
+Date   : Mon Aug  1 17:16:59 2016
 ****************************************
 
 Operating Conditions: MLCOM   Library: tcbn45gsbwpml
 Wire Load Model Mode: top
 
   Startpoint: config_remoteMux1_reg
-              (rising edge-triggered flip-flop)
-  Endpoint: io_scalarOut[4]
-            (output port)
-  Path Group: (none)
+              (rising edge-triggered flip-flop clocked by ideal_clock1)
+  Endpoint: RegisterBlock/FF/ff_reg[4]
+            (rising edge-triggered flip-flop clocked by ideal_clock1)
+  Path Group: ideal_clock1
   Path Type: max
 
   Des/Clust/Port     Wire Load Model       Library
   ------------------------------------------------
   ComputeUnit        ZeroWireload          tcbn45gsbwpml
 
-  Point                                    Incr       Path
-  -----------------------------------------------------------
-  config_remoteMux1_reg/CP (DFQD1BWP)    0.0000     0.0000 r
-  config_remoteMux1_reg/Q (DFQD1BWP)     0.0581     0.0581 f
-  U286/Z (BUFFD8BWP)                     0.0612     0.1193 f
-  U289/Z (MUX2D1BWP)                     0.0513     0.1706 r
-  U291/ZN (ND4D1BWP)                     0.0312     0.2018 f
-  U292/ZN (INVD1BWP)                     0.0178     0.2196 r
-  U293/ZN (AOI21D1BWP)                   0.0119     0.2315 f
-  U315/CO (FA1D1BWP)                     0.0418     0.2732 f
-  U316/ZN (INVD1BWP)                     0.0105     0.2838 r
-  U317/ZN (MAOI222D1BWP)                 0.0293     0.3130 f
-  U318/S (FA1D1BWP)                      0.0302     0.3433 r
-  U319/ZN (INVD1BWP)                     0.0059     0.3492 f
-  U284/Z (OR2XD1BWP)                     0.0328     0.3821 f
-  U320/ZN (INVD12BWP)                    0.0440     0.4261 r
-  io_scalarOut[4] (out)                  0.0000     0.4261 r
-  data arrival time                                 0.4261
-  -----------------------------------------------------------
-  (Path is unconstrained)
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock ideal_clock1 (rise edge)                        0.0000     0.0000
+  clock network delay (ideal)                           0.0000     0.0000
+  config_remoteMux1_reg/CP (DFQD1BWP)                   0.0000     0.0000 r
+  config_remoteMux1_reg/Q (DFQD1BWP)                    0.0446     0.0446 f
+  U280/Z (BUFFD8BWP)                                    0.0612     0.1058 f
+  U293/Z (MUX2D1BWP)                                    0.0512     0.1570 r
+  U294/ZN (ND4D1BWP)                                    0.0308     0.1878 f
+  U302/ZN (CKND1BWP)                                    0.0199     0.2076 r
+  U303/ZN (AOI21D1BWP)                                  0.0121     0.2197 f
+  U319/CO (FA1D1BWP)                                    0.0417     0.2614 f
+  U311/ZN (CKND1BWP)                                    0.0125     0.2739 r
+  U282/ZN (MAOI222D1BWP)                                0.0250     0.2989 f
+  U283/Z (XOR3D1BWP)                                    0.0327     0.3315 r
+  U312/ZN (CKND1BWP)                                    0.0064     0.3379 f
+  U279/Z (OR2XD1BWP)                                    0.0271     0.3650 f
+  U278/ZN (INVD8BWP)                                    0.0595     0.4245 r
+  U313/Z (AO22D1BWP)                                    0.0271     0.4516 r
+  RegisterBlock/FF/ff_reg[4]/D (DFQD1BWP)               0.0000     0.4516 r
+  data arrival time                                                0.4516
+
+  clock ideal_clock1 (rise edge)                        1.0000     1.0000
+  clock network delay (ideal)                           0.0000     1.0000
+  RegisterBlock/FF/ff_reg[4]/CP (DFQD1BWP)              0.0000     1.0000 r
+  library setup time                                   -0.0078     0.9922
+  data required time                                               0.9922
+  --------------------------------------------------------------------------
+  data required time                                               0.9922
+  data arrival time                                               -0.4516
+  --------------------------------------------------------------------------
+  slack (MET)                                                      0.5406
 
 
 1

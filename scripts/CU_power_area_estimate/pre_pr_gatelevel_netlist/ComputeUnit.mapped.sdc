@@ -1,6 +1,6 @@
 ###################################################################
 
-# Created by write_sdc on Tue Jul 26 14:58:09 2016
+# Created by write_sdc on Mon Aug 1 17:16:59 2016
 
 ###################################################################
 set sdc_version 2.0
@@ -120,4 +120,5 @@ set_max_transition 0.1 [get_ports {io_result[3]}]
 set_max_transition 0.1 [get_ports {io_result[2]}]
 set_max_transition 0.1 [get_ports {io_result[1]}]
 set_max_transition 0.1 [get_ports {io_result[0]}]
+create_clock [get_ports clk]  -name ideal_clock1  -period 1  -waveform {0 0.5}
 set_max_delay 0.2  -from [list [get_ports clk] [get_ports reset] [get_ports io_enable] [get_ports io_config_enable]]  -to [list [get_ports io_done] [get_ports {io_scalarOut[6]}] [get_ports {io_scalarOut[5]}] [get_ports {io_scalarOut[4]}] [get_ports {io_scalarOut[3]}] [get_ports {io_scalarOut[2]}] [get_ports {io_scalarOut[1]}] [get_ports {io_scalarOut[0]}] [get_ports io_rmux0] [get_ports io_rmux1] [get_ports {io_opcode[6]}] [get_ports {io_opcode[5]}] [get_ports {io_opcode[4]}] [get_ports {io_opcode[3]}] [get_ports {io_opcode[2]}] [get_ports {io_opcode[1]}] [get_ports {io_opcode[0]}] [get_ports io_opA_isLocal] [get_ports {io_opA_local[6]}] [get_ports {io_opA_local[5]}] [get_ports {io_opA_local[4]}] [get_ports {io_opA_local[3]}] [get_ports {io_opA_local[2]}] [get_ports {io_opA_local[1]}] [get_ports {io_opA_local[0]}] [get_ports {io_opA_remote[6]}] [get_ports {io_opA_remote[5]}] [get_ports {io_opA_remote[4]}] [get_ports {io_opA_remote[3]}] [get_ports {io_opA_remote[2]}] [get_ports {io_opA_remote[1]}] [get_ports {io_opA_remote[0]}] [get_ports io_opB_isLocal] [get_ports {io_opB_local[6]}] [get_ports {io_opB_local[5]}] [get_ports {io_opB_local[4]}] [get_ports {io_opB_local[3]}] [get_ports {io_opB_local[2]}] [get_ports {io_opB_local[1]}] [get_ports {io_opB_local[0]}] [get_ports {io_opB_remote[6]}] [get_ports {io_opB_remote[5]}] [get_ports {io_opB_remote[4]}] [get_ports {io_opB_remote[3]}] [get_ports {io_opB_remote[2]}] [get_ports {io_opB_remote[1]}] [get_ports {io_opB_remote[0]}] [get_ports {io_result[6]}] [get_ports {io_result[5]}] [get_ports {io_result[4]}] [get_ports {io_result[3]}] [get_ports {io_result[2]}] [get_ports {io_result[1]}] [get_ports {io_result[0]}]]
