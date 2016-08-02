@@ -7,8 +7,8 @@ import Chisel._
  */
 class Pulser() extends Module {
   val io = new Bundle {
-    val in = Bool(INPUT)
-    val out = Bool(OUTPUT)
+    val in = UInt(INPUT, width=1)
+    val out = UInt(OUTPUT, width=1)
   }
 
   val commandReg = Reg(Bits(1), io.in, UInt(0))
