@@ -46,18 +46,26 @@ class LUT(val w: Int, val config: List[Int]) extends Module {
   val size = config.size
   val numSelectBits = log2Up(config.size)
   val io = new Bundle {
-    val sel = Bits(INPUT,  numSelectBits)
+    val ins = Vec.fill(numSelectBits) { UInt(INPUT, width=1) }
     val out = Bits(OUTPUT, width = w)
   }
 
+  val sel = io.ins.reduce{Cat(_,_)}
   val lut = Vec.tabulate(size) { i => UInt(config(i), width=w) }
-  io.out := lut(io.sel)
+  io.out := lut(sel)
 }
 
 class LUTTests(c: LUT) extends Tester(c) {
-    (0 until c.size) foreach { sel =>
-      poke(c.io.sel, sel)
-      val out = c.config(sel)
+    def getBitsFor(num: Int, nbits: Int) = {
+      Array.tabulate(nbits) { i =>
+        BigInt((num & (1 << nbits-i-1)) >> (nbits-i-1))
+      }
+    }
+
+    (0 until c.size) foreach { in =>
+      val inbits = getBitsFor(in, c.numSelectBits)
+      poke(c.io.ins, getBitsFor(in, c.numSelectBits))
+      val out = c.config(in)
       expect(c.io.out, out) // Combinational LUT
       step(1)
     }
