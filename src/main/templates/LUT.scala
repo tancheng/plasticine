@@ -2,7 +2,8 @@ package plasticine.templates
 
 import plasticine.misc.Utils
 import Chisel._
-
+import scala.reflect.runtime.universe._
+import scala.tools.reflect.ToolBox
 
 object LUT {
 
@@ -36,6 +37,12 @@ object LUT {
  * https://chisel.eecs.berkeley.edu/2.2.0/chisel-tutorial.pdf
  */
 class LUT(val w: Int, val config: List[Int]) extends Module {
+
+  val tree = q"val x = 3; println(x)"
+  val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
+  val code = tb.compile(tree)
+  code()
+
   val size = config.size
   val numSelectBits = log2Up(config.size)
   val io = new Bundle {
