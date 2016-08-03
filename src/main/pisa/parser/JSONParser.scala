@@ -44,9 +44,11 @@ object Parser {
         new Config(CounterRCConfig(config))
       case "counterChain" =>
         new Config(CounterChainConfig(config))
+      case "crossbar" =>
+        new Config(CrossbarConfig(config))
       case "cu" =>
         new Config(ComputeUnitConfig(config))
-      case _ => throw new Exception("not handled yet")
+      case _ => throw new Exception(s"not handled yet: $t")
     }
   }
 

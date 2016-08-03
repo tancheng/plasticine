@@ -185,3 +185,34 @@ case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
     pipeStage.map { _.toString }.reduce {_+_}
   }
 }
+
+/**
+ * CUControlBox config information
+ */
+case class CUControlBoxConfig(config: Map[Any, Any]) extends AbstractConfig {
+  private var _tokenOutLUT: List[List[Int]] = Parser.getFieldList(config, "tokenOutLUT")
+                                        .asInstanceOf[List[List[Double]]]
+                                        .map { l => l map {_.toInt} }
+
+  def tokenOutLUT = _tokenOutLUT
+  def tokenOutLUT_=(x: List[List[Int]]) { _tokenOutLUT = x }
+
+  private var _udcInit: List[Int] = Parser.getFieldList(config, "udcInit")
+                                        .asInstanceOf[List[Double]]
+                                        .map { _.toInt }
+
+  def udcInit = _udcInit
+  def udcInit_=(x: List[Int]) { _udcInit = x }
+}
+
+/**
+ * CUControlBox config information
+ */
+case class CrossbarConfig(config: Map[Any, Any]) extends AbstractConfig {
+  private var _outSelect: List[Int] = Parser.getFieldList(config, "outSelect")
+                                        .asInstanceOf[List[Double]]
+                                        .map { _.toInt }
+
+  def outSelect = _outSelect
+  def outSelect_=(x: List[Int]) { _outSelect = x }
+}
