@@ -46,6 +46,8 @@ object Parser {
         new Config(CounterChainConfig(config))
       case "crossbar" =>
         new Config(CrossbarConfig(config))
+      case "lut" =>
+        new Config(LUTConfig(config))
       case "cu" =>
         new Config(ComputeUnitConfig(config))
       case _ => throw new Exception(s"not handled yet: $t")

@@ -2,8 +2,26 @@ package plasticine.templates
 
 import plasticine.misc.Utils
 import Chisel._
-import scala.reflect.runtime.universe._
-import scala.tools.reflect.ToolBox
+
+import plasticine.pisa.ir._
+
+/**
+ * LUT config register format
+ */
+case class LUTOpcode(val w: Int, val size: Int, config: Option[LUTConfig] = None) extends OpcodeT {
+
+  val table = Vec.tabulate(size) { i =>
+    if (config.isDefined) {
+      UInt(config.get.table(i), width=w) // TODO: Remove hardcoded '4' !
+    } else {
+      UInt(width=w)
+    }
+  }
+
+  override def cloneType(): this.type = {
+    new LUTOpcode(w, size, config).asInstanceOf[this.type]
+  }
+}
 
 object LUT {
 
@@ -15,16 +33,16 @@ object LUT {
   //                        List(1, 1)
   //                    )
   def getInputs(n: Int) = {
-    val numInputs = 1 << n
-    List.tabulate(numInputs)  { i =>
+    val size = 1 << n
+    List.tabulate(size)  { i =>
       List.tabulate(n) { ii =>
         (i & (1 << ii)) >> ii
       }.reverse
     }
   }
 
-  def getConfig(numInputs: Int, f: List[Int] => Int): List[Int] = {
-    val inputs = getInputs(numInputs).toList
+  def getConfig(size: Int, f: List[Int] => Int): List[Int] = {
+    val inputs = getInputs(size).toList
     inputs.map { i =>
       f(i)
     }
@@ -36,26 +54,34 @@ object LUT {
  * Chisel automatically converts them to ROM types.
  * https://chisel.eecs.berkeley.edu/2.2.0/chisel-tutorial.pdf
  */
-class LUT(val w: Int, val config: List[Int]) extends Module {
+class LUT(val w: Int, val size: Int, val inst: LUTConfig) extends ConfigurableModule[LUTOpcode]  {
 
-  val tree = q"val x = 3; println(x)"
-  val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
-  val code = tb.compile(tree)
-  code()
-
-  val size = config.size
-  val numSelectBits = log2Up(config.size)
-  val io = new Bundle {
+  if (!isPow2(size)) {
+    throw new Exception(s"Invalid LUT size $size: LUT sizes must be powers of two")
+  }
+  val numSelectBits = log2Up(size)
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
     val ins = Vec.fill(numSelectBits) { UInt(INPUT, width=1) }
     val out = Bits(OUTPUT, width = w)
   }
 
+  val configType = LUTOpcode(w, size)
+  val configIn = LUTOpcode(w, size)
+  val configInit = LUTOpcode(w, size, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType
+  } .otherwise {
+    configIn := config
+  }
+
   val sel = io.ins.reduce{Cat(_,_)}
-  val lut = Vec.tabulate(size) { i => UInt(config(i), width=w) }
+  val lut = config.table
   io.out := lut(sel)
 }
 
-class LUTTests(c: LUT) extends Tester(c) {
+class LUTTests(c: LUT) extends PlasticineTester(c) {
     def getBitsFor(num: Int, nbits: Int) = {
       Array.tabulate(nbits) { i =>
         BigInt((num & (1 << nbits-i-1)) >> (nbits-i-1))
@@ -65,7 +91,7 @@ class LUTTests(c: LUT) extends Tester(c) {
     (0 until c.size) foreach { in =>
       val inbits = getBitsFor(in, c.numSelectBits)
       poke(c.io.ins, getBitsFor(in, c.numSelectBits))
-      val out = c.config(in)
+      val out = c.inst.table(in)
       expect(c.io.out, out) // Combinational LUT
       step(1)
     }
@@ -73,13 +99,21 @@ class LUTTests(c: LUT) extends Tester(c) {
 
 object LUTTest {
   def main(args: Array[String]): Unit = {
-    val wordSize = 1
-    val size = 16
-    val config = List.tabulate(size) { i =>
-      math.abs(scala.util.Random.nextInt % (1 << wordSize))
+
+   val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    if (appArgs.size != 1) {
+      println("Usage: bin/sadl LUTTest <pisa config>")
+      sys.exit(-1)
     }
 
-    chiselMainTest(args, () => Module(new LUT(wordSize, config))) {
+    val pisaFile = appArgs(0)
+    val configObj = Config(pisaFile).asInstanceOf[Config[LUTConfig]]
+
+    val wordSize = 1
+    val size = 8
+
+    chiselMainTest(args, () => Module(new LUT(wordSize, size, configObj.config))) {
       c => new LUTTests(c)
     }
   }

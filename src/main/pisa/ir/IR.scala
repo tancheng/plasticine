@@ -193,20 +193,25 @@ case class CUControlBoxConfig(config: Map[Any, Any]) extends AbstractConfig {
   private var _tokenOutLUT: List[List[Int]] = Parser.getFieldList(config, "tokenOutLUT")
                                         .asInstanceOf[List[List[Double]]]
                                         .map { l => l map {_.toInt} }
-
   def tokenOutLUT = _tokenOutLUT
   def tokenOutLUT_=(x: List[List[Int]]) { _tokenOutLUT = x }
+
+  private var _enableLUT: List[List[Int]] = Parser.getFieldList(config, "enableLUT")
+                                        .asInstanceOf[List[List[Double]]]
+                                        .map { l => l map {_.toInt} }
+  def enableLUT = _enableLUT
+  def enableLUT_=(x: List[List[Int]]) { _enableLUT = x }
+
 
   private var _udcInit: List[Int] = Parser.getFieldList(config, "udcInit")
                                         .asInstanceOf[List[Double]]
                                         .map { _.toInt }
-
   def udcInit = _udcInit
   def udcInit_=(x: List[Int]) { _udcInit = x }
 }
 
 /**
- * CUControlBox config information
+ * Crossbar config information
  */
 case class CrossbarConfig(config: Map[Any, Any]) extends AbstractConfig {
   private var _outSelect: List[Int] = Parser.getFieldList(config, "outSelect")
@@ -215,4 +220,16 @@ case class CrossbarConfig(config: Map[Any, Any]) extends AbstractConfig {
 
   def outSelect = _outSelect
   def outSelect_=(x: List[Int]) { _outSelect = x }
+}
+
+/**
+ * LUT config information
+ */
+case class LUTConfig(config: Map[Any, Any]) extends AbstractConfig {
+  private var _table: List[Int] = Parser.getFieldList(config, "table")
+                                        .asInstanceOf[List[Double]]
+                                        .map { _.toInt }
+
+  def table = _table
+  def table_=(x: List[Int]) { _table = x }
 }
