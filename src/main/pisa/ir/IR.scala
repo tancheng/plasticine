@@ -178,6 +178,11 @@ case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
   def pipeStage(i: Int) = _pipeStage(i)
   def pipeStage_=(x: List[PipeStageConfig]) { _pipeStage = x }
 
+  private var _control = CUControlBoxConfig(Parser.getFieldMap(config, "control"))
+  def control() = _control
+  def control_=(x: CUControlBoxConfig) { _control = x }
+
+
   override def toString = {
     s"remoteMux0: $remoteMux0" + "\n" +
     s"remoteMux1: $remoteMux1" + "\n" +

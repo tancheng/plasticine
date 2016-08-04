@@ -80,11 +80,12 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
  * @param d: Pipeline depth
  * @param rwStages: Read-write stages (at the beginning)
  * @param wStages: Write stages (at the end)
+ * @param numTokens: Number of input (and output) tokens
  * @param l: Number of local pipeline registers
  * @param r: Number of remote pipeline registers
  * @param m: Scratchpad size in words
  */
-class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
+class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
 
   // Sanity check parameters for validity
   Predef.assert(d >= (rwStages+wStages),
@@ -94,7 +95,11 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: In
     val enable      = Bool(INPUT)
     val done        = Bool(OUTPUT)
     val scalarOut   = UInt(OUTPUT, w)
-    val config_enable = Bool(INPUT)
+
+    val config_enable = Bool(INPUT) // Reconfiguration interface
+
+    val tokenIns = Vec.fill(numTokens) { Bool(INPUT) } // Control inputs
+    val tokenOuts = Vec.fill(numTokens) { Bool(OUTPUT) } // Control outputs
 
     // Temporary for debugging
     val rmux0 = UInt(OUTPUT, 2)
@@ -143,16 +148,25 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: In
   mem1.io.wen   := Bool(true)  // Temporary as we have no control flow
 
   // CounterChain
-  val counterChain = Module(new CounterChain(w, 2, inst.counterChain))
+  val counterChain = Module(new CounterChain(w, 2, inst.counterChain)) // TODO: Hardcoded constant!
   // TODO: Getting this info from config temporarily
   counterChain.io.data.foreach { d =>
     d.max := UInt(0, w)
     d.stride := UInt(0,w)
   }
-  counterChain.io.control.foreach { c =>
-   c.enable := io.enable
+  val counterEnables = Vec.fill(2) { Bool() } // TODO: Hardcoded constant!
+  counterChain.io.control.zipWithIndex.foreach { case (c,i) =>
+   c.enable := counterEnables(i)
   }
   val counters = counterChain.io.data map { _.out }
+
+  // Control block
+  val controlBlock = Module(new CUControlBox(w, 2, inst.control)) // TODO: Hardcoded const!
+  controlBlock.io.config_enable := io.config_enable
+  controlBlock.io.tokenIns := io.tokenIns
+  controlBlock.io.done := counterChain.io.control map { _.done}
+  counterEnables := controlBlock.io.enable
+  io.tokenOuts := controlBlock.io.tokenOuts
 
   // Remote MUXes to feed the two inputs
   val remotes0List =  counters ++ List(mem0.io.rdata)
@@ -220,7 +234,7 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: In
   mem1wdMux.io.ins := Vec (rwStagesOut ++ wStagesOut)
 
   io.scalarOut := fus.last.io.out
-  io.done := counterChain.io.control(1).done
+  io.done := counterChain.io.control(0).done
 
   // Temporary, for debugging
   io.rmux0       := config.remoteMux0
@@ -242,7 +256,7 @@ class ComputeUnitTests(c: ComputeUnit) extends PlasticineTester(c) {
   poke(c.io.enable, 1)
 
   var done = peek(c.io.done)
-  while (done != 1) {
+  while (done != 1 && numCycles < 100) {
     step(1)
     numCycles += 1
     done = peek(c.io.done)
@@ -283,8 +297,9 @@ object ComputeUnitTest {
     val r = 4
     val rwStages = 1
     val wStages = 1
+    val numTokens = 2
     val m = 16
-    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, d, rwStages, wStages, l, r, m, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, d, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
       c => new ComputeUnitTests(c)
     }
   }
