@@ -48,6 +48,8 @@ object Parser {
         new Config(CrossbarConfig(config))
       case "lut" =>
         new Config(LUTConfig(config))
+      case "cuControl" =>
+        new Config(CUControlBoxConfig(config))
       case "cu" =>
         new Config(ComputeUnitConfig(config))
       case _ => throw new Exception(s"not handled yet: $t")

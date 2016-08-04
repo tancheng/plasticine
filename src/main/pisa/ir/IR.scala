@@ -190,24 +190,29 @@ case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
  * CUControlBox config information
  */
 case class CUControlBoxConfig(config: Map[Any, Any]) extends AbstractConfig {
-  private var _tokenOutLUT: List[List[Int]] = Parser.getFieldList(config, "tokenOutLUT")
-                                        .asInstanceOf[List[List[Double]]]
-                                        .map { l => l map {_.toInt} }
+  private var _tokenOutLUT: List[LUTConfig] = Parser.getFieldListOfMaps(config, "tokenOutLUT")
+                                                    .map { LUTConfig(_) }
   def tokenOutLUT = _tokenOutLUT
-  def tokenOutLUT_=(x: List[List[Int]]) { _tokenOutLUT = x }
+  def tokenOutLUT_=(x: List[LUTConfig]) { _tokenOutLUT = x }
 
-  private var _enableLUT: List[List[Int]] = Parser.getFieldList(config, "enableLUT")
-                                        .asInstanceOf[List[List[Double]]]
-                                        .map { l => l map {_.toInt} }
+  private var _enableLUT: List[LUTConfig] = Parser.getFieldListOfMaps(config, "enableLUT")
+                                                    .map { LUTConfig(_) }
   def enableLUT = _enableLUT
-  def enableLUT_=(x: List[List[Int]]) { _enableLUT = x }
-
+  def enableLUT_=(x: List[LUTConfig]) { _enableLUT = x }
 
   private var _udcInit: List[Int] = Parser.getFieldList(config, "udcInit")
                                         .asInstanceOf[List[Double]]
                                         .map { _.toInt }
   def udcInit = _udcInit
   def udcInit_=(x: List[Int]) { _udcInit = x }
+
+  private var _decXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "decXbar"))
+  def decXbar = _decXbar
+  def decXbar_=(x: CrossbarConfig) { _decXbar = x }
+
+  private var _incXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "incXbar"))
+  def incXbar = _incXbar
+  def incXbar_=(x: CrossbarConfig) { _incXbar = x }
 }
 
 /**
