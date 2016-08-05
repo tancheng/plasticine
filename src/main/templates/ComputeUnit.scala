@@ -78,6 +78,7 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
  * Compute Unit module
  * @param w: Word width
  * @param d: Pipeline depth
+ * @param v: Vector length
  * @param rwStages: Read-write stages (at the beginning)
  * @param wStages: Write stages (at the end)
  * @param numTokens: Number of input (and output) tokens
@@ -85,31 +86,23 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
  * @param r: Number of remote pipeline registers
  * @param m: Scratchpad size in words
  */
-class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
+class ComputeUnit(val w: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
 
   // Sanity check parameters for validity
   Predef.assert(d >= (rwStages+wStages),
     s"""#stages $d < read-write stages ($rwStages) + write stages ($wStages)!""")
 
   val io = new ConfigInterface {
-    val enable      = Bool(INPUT)
-    val done        = Bool(OUTPUT)
-    val scalarOut   = UInt(OUTPUT, w)
-
     val config_enable = Bool(INPUT) // Reconfiguration interface
 
-    val tokenIns = Vec.fill(numTokens) { Bool(INPUT) } // Control inputs
-    val tokenOuts = Vec.fill(numTokens) { Bool(OUTPUT) } // Control outputs
+    /* Control interface */
+    val tokenIns = Vec.fill(numTokens) { Bool(INPUT) }
+    val tokenOuts = Vec.fill(numTokens) { Bool(OUTPUT) }
+    val scalarOut   = UInt(OUTPUT, w)
 
-    // Temporary for debugging
-    val rmux0 = UInt(OUTPUT, 2)
-    val rmux1 = UInt(OUTPUT, 2)
-    val opcode = UInt(OUTPUT, w)
-    val opA_dataSrc = UInt(OUTPUT, 2)
-    val opA_value = UInt(OUTPUT, w)
-    val opB_dataSrc = UInt(OUTPUT, 1)
-    val opB_value = UInt(OUTPUT, w)
-    val result = UInt(OUTPUT, w)
+    /* Data interface */
+   val dataIn = Vec.fill(v) { UInt(INPUT, w)}
+   val dataOut = Vec.fill(v) { UInt(OUTPUT, w)}
   }
 
   val configType = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m)
@@ -173,7 +166,6 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val numTo
   val remoteMux0 = Module(new MuxN(remotes0List.size, w))
   remoteMux0.io.ins := Vec(remotes0List)
   remoteMux0.io.sel := config.remoteMux0
-
   val remotes1List =  counters ++ List(mem1.io.rdata)
   val remoteMux1 = Module(new MuxN(remotes1List.size, w))
   remoteMux1.io.ins := Vec(remotes1List)
@@ -234,17 +226,6 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val numTo
   mem1wdMux.io.ins := Vec (rwStagesOut ++ wStagesOut)
 
   io.scalarOut := fus.last.io.out
-  io.done := counterChain.io.control(0).done
-
-  // Temporary, for debugging
-  io.rmux0       := config.remoteMux0
-  io.rmux1       := config.remoteMux1
-  io.opcode      := config.pipeStage(0).opcode
-  io.opA_dataSrc := config.pipeStage(0).opA.dataSrc
-  io.opA_value   := config.pipeStage(0).opA.value
-  io.opB_dataSrc := config.pipeStage(0).opB.dataSrc
-  io.opB_value   := config.pipeStage(0).opB.value
-  io.result      := config.pipeStage(0).result
 }
 
 /**
@@ -253,26 +234,10 @@ class ComputeUnit(val w: Int, val d: Int, rwStages: Int, wStages: Int, val numTo
 class ComputeUnitTests(c: ComputeUnit) extends PlasticineTester(c) {
   var numCycles = 0
 
-  poke(c.io.enable, 1)
-
-  var done = peek(c.io.done)
-  while (done != 1 && numCycles < 100) {
+  while (numCycles < 100) {
     step(1)
     numCycles += 1
-    done = peek(c.io.done)
-//    peek(c.io.rmux0      )
-//    peek(c.io.rmux1      )
-//    peek(c.io.opcode     )
-//    peek(c.io.opA_isLocal)
-//    peek(c.io.opA_local  )
-//    peek(c.io.opA_remote )
-//    peek(c.io.opB_isLocal)
-//    peek(c.io.opB_local  )
-//    peek(c.io.opB_remote )
-//    peek(c.io.result     )
-    peek(c.io.scalarOut)
   }
-  poke(c.io.enable, 0)
 
   println(s"Done, design ran for $numCycles cycles")
 }
@@ -293,13 +258,14 @@ object ComputeUnitTest {
 
     val bitwidth = 7
     val d = 2
+    val v = 1
     val l = 2
     val r = 4
     val rwStages = 1
     val wStages = 1
     val numTokens = 2
     val m = 16
-    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, d, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
       c => new ComputeUnitTests(c)
     }
   }
