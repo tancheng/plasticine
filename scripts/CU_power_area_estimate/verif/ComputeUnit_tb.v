@@ -1,4 +1,4 @@
-module ComputeUnit_tb; 
+module ComputeUnit_tb;
 	reg clk, reset, io_enable, io_config_enable;
 	wire io_done;
 	wire [6:0] io_scalarOut;
@@ -38,19 +38,17 @@ module ComputeUnit_tb;
 		#20 reset = 0;
 	end
 
-	always 
-		#5 clk = !clk; 
-	
+	always
+		#5 clk = !clk;
 	initial begin
 		$dumpfile ("trace.vcd");
 		$dumpvars;
 	end
-	
-	initial begin 
+	initial begin
 		$display("time, \t clk, \t reset, \t io_enable, \t io_config_enable, \t io_result");
 		$monitor("%d,\t%b, \t%b, \t%b, \t%b", $time, clk, reset, io_enable, io_config_enable, io_result);
 	end
 
-	initial 
+	initial
 		#100 $finish;
 endmodule
