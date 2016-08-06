@@ -4,57 +4,44 @@ Report : timing
         -path full
         -delay max
         -max_paths 1
-Design : ComputeUnit
+Design : Plasticine
 Version: I-2013.12-SP4
-Date   : Mon Aug  1 17:16:59 2016
+Date   : Fri Aug  5 17:18:08 2016
 ****************************************
 
 Operating Conditions: MLCOM   Library: tcbn45gsbwpml
 Wire Load Model Mode: top
 
-  Startpoint: config_remoteMux1_reg
+  Startpoint: cu1/RegisterBlock/FF_5/ff_reg[0]
               (rising edge-triggered flip-flop clocked by ideal_clock1)
-  Endpoint: RegisterBlock/FF/ff_reg[4]
+  Endpoint: cu0/RegisterBlock_1/FF_4/ff_reg[0]
             (rising edge-triggered flip-flop clocked by ideal_clock1)
   Path Group: ideal_clock1
   Path Type: max
 
   Des/Clust/Port     Wire Load Model       Library
   ------------------------------------------------
-  ComputeUnit        ZeroWireload          tcbn45gsbwpml
+  Plasticine         ZeroWireload          tcbn45gsbwpml
 
   Point                                                   Incr       Path
   --------------------------------------------------------------------------
   clock ideal_clock1 (rise edge)                        0.0000     0.0000
   clock network delay (ideal)                           0.0000     0.0000
-  config_remoteMux1_reg/CP (DFQD1BWP)                   0.0000     0.0000 r
-  config_remoteMux1_reg/Q (DFQD1BWP)                    0.0446     0.0446 f
-  U280/Z (BUFFD8BWP)                                    0.0612     0.1058 f
-  U293/Z (MUX2D1BWP)                                    0.0512     0.1570 r
-  U294/ZN (ND4D1BWP)                                    0.0308     0.1878 f
-  U302/ZN (CKND1BWP)                                    0.0199     0.2076 r
-  U303/ZN (AOI21D1BWP)                                  0.0121     0.2197 f
-  U319/CO (FA1D1BWP)                                    0.0417     0.2614 f
-  U311/ZN (CKND1BWP)                                    0.0125     0.2739 r
-  U282/ZN (MAOI222D1BWP)                                0.0250     0.2989 f
-  U283/Z (XOR3D1BWP)                                    0.0327     0.3315 r
-  U312/ZN (CKND1BWP)                                    0.0064     0.3379 f
-  U279/Z (OR2XD1BWP)                                    0.0271     0.3650 f
-  U278/ZN (INVD8BWP)                                    0.0595     0.4245 r
-  U313/Z (AO22D1BWP)                                    0.0271     0.4516 r
-  RegisterBlock/FF/ff_reg[4]/D (DFQD1BWP)               0.0000     0.4516 r
-  data arrival time                                                0.4516
+  cu1/RegisterBlock/FF_5/ff_reg[0]/CP (DFQD1BWP)        0.0000     0.0000 r
+  cu1/RegisterBlock/FF_5/ff_reg[0]/Q (DFQD1BWP)         0.0851     0.0851 r
+  cu0/RegisterBlock_1/FF_4/ff_reg[0]/D (DFKCNQD1BWP)    0.0000     0.0851 r
+  data arrival time                                                0.0851
 
   clock ideal_clock1 (rise edge)                        1.0000     1.0000
   clock network delay (ideal)                           0.0000     1.0000
-  RegisterBlock/FF/ff_reg[4]/CP (DFQD1BWP)              0.0000     1.0000 r
-  library setup time                                   -0.0078     0.9922
-  data required time                                               0.9922
+  cu0/RegisterBlock_1/FF_4/ff_reg[0]/CP (DFKCNQD1BWP)   0.0000     1.0000 r
+  library setup time                                   -0.0302     0.9698
+  data required time                                               0.9698
   --------------------------------------------------------------------------
-  data required time                                               0.9922
-  data arrival time                                               -0.4516
+  data required time                                               0.9698
+  data arrival time                                               -0.0851
   --------------------------------------------------------------------------
-  slack (MET)                                                      0.5406
+  slack (MET)                                                      0.8847
 
 
 1

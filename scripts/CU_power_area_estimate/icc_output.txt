@@ -1,0 +1,161 @@
+source param.tcl
+/cad/synopsys_EDK2/TSMCHOME/digital/Back_End/milkyway/tcbn45gsbwp_110a/techfiles/tluplus/star.map_10M
+file mkdir $PROJECT_PATH/icc_reports
+file mkdir $PROJECT_PATH/post_pr_gatelevel_netlist
+set link_library { * tcbn45gsbwpml.db dw_foundation.sldb}
+ * tcbn45gsbwpml.db dw_foundation.sldb
+set target_library "tcbn45gsbwpml.db"
+tcbn45gsbwpml.db
+set synthetic_library [list  dw_foundation.sldb]
+dw_foundation.sldb
+set sym_lib    $TSMC_45
+/cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/
+set target_lib $TSMC_45
+/cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/
+set search_path [list ./ $SRC_PATH $target_lib $sym_lib]
+./ /local/ssd/home/tianzhao/power_estimate_eg/plasticine/scripts/CU_power_area_estimate/src /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/ /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/
+set hdlin_auto_save_templates true
+true
+# create milkyway library
+create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
+Error: Library 'Plasticine' already exists. (MWUI-004)
+0
+set_tlu_plus_files -max_tluplus $TLUPLUS_MAX -min_tluplus $TLUPLUS_MIN -tech2itf_map $TECH2ITF_MAP
+1
+open_mw_lib $MILKYWAY_LIB_NAME
+{Plasticine}
+import_designs $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.v -format "verilog" -top $PROJECT_NAME -cel $PROJECT_NAME
+Loading db file '/cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db'
+Warning: Unit conflict found: Milkyway technology file resistance unit is Ohm; main library resistance unit is kOhm. (IFS-007)
+Warning: Unit conflict found: Milkyway technology file power unit is mW; main library power unit is nW. (IFS-007)
+Type of creating bus for undefined cells : 0
+Warning: /cad/synopsys_EDK2/TSMCHOME/digital/Back_End/milkyway/tcbn45gsbwp_110a/frame_only_HVH_0d5_0/tcbn45gsbwp: bus naming style _<%d> is not consistent with main lib. (MWNL-111)
+
+*****  Verilog HDL translation! *****
+
+*****    Start Pass 1 *****
+Loading db file '/cad/synopsys/icc/J-2014.09-SP3/libraries/syn/dw_foundation.sldb'
+
+*****  Pass 1 Complete *****
+Elapsed =    0:00:00, CPU =    0:00:00
+
+*****  Verilog HDL translation! *****
+
+*****    Start Pass 2 *****
+Error: Module '**SEQGEN**' is not defined.  (MWNL-297)
+Error: Verilog parser cannot parse the /local/ssd/home/tianzhao/power_estimate_eg/plasticine/scripts/CU_power_area_estimate/pre_pr_gatelevel_netlist/Plasticine.mapped.v source file. (MWNL-047)
+Error: Current design is not defined. (UID-4)
+0
+read_sdc $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.sdc
+0
+set power "VDD"
+VDD
+set ground "VSS"
+VSS
+set powerPort "VDD"
+VDD
+set groundPort "VSS"
+VSS
+foreach net {VDD} {derive_pg_connection -power_net $net -create_ports top}
+foreach net {VSS} {derive_pg_connection -ground_net $net -create_ports top}
+derive_pg_connection -tie
+0
+# create_floorplan
+create_floorplan        -control_type aspect_ratio     -core_aspect_ratio 1     -core_utilization 0.7     -left_io2core 30     -bottom_io2core 30     -right_io2core 30     -top_io2core 30     -start_first_row
+Error: Current design is not defined. (UID-4)
+# create power rings
+create_rectangular_rings     -nets  {VDD VSS}   -left_offset 0.2        -left_segment_width 1   -right_offset 0.2       -right_segment_width 1  -bottom_offset 0.2      -bottom_segment_width 1         -top_offset 0.2         -top_segment_width 1
+Error: Current design is not defined. (UID-4)
+# place design
+place_opt
+Error: Current design is not defined. (UID-4)
+0
+# connect power rails
+preroute_standard_cells -nets {VDD VSS} -connect horizontal -extend_to_boundaries_and_generate_pins
+Error: Current design is not defined. (UID-4)
+# clock tree synthesis
+clock_opt
+Error: Current design is not defined. (UID-4)
+0
+# check timing
+report_clock_tree
+Error: Current design is not defined. (UID-4)
+0
+report_timing
+Error: Current design is not defined. (UID-4)
+0
+# routing
+route_opt -effort high
+Error: Current design is not defined. (UID-4)
+Error: Current design is not defined. (UID-4)
+0
+# fix DRC errors
+route_search_repair -rerun_drc -loop "10"
+Error: Current design is not defined. (UID-4)
+# check/fix LVS errors
+route_zrt_eco -max_detail_route_iterations 5 verify_lvs -check_open_locator -check_short_locator
+Error: extra positional option 'verify_lvs' (CMD-012)
+Error: unknown option '-check_open_locator' (CMD-010)
+Error: unknown option '-check_short_locator' (CMD-010)
+# adding filler cells
+insert_stdcell_filler    -cell_without_metal "SHFILL128_RVT SHFILL64_RVT SHFILL3_RVT SHFILL2_RVT SHFILL1_RVT"    -connect_to_power {VDD}
+Can not get cellId for current design
+-connect_to_ground {VSS}
+Error: unknown command '-connect_to_ground' (CMD-005)
+foreach net {VDD} {derive_pg_connection -power_net $net -power_pin $net -create_ports top}
+foreach net {VSS} {derive_pg_connection -ground_net $net -ground_pin $net -create_ports top}
+# last check for drc and lvs error check
+verify_drc
+Error: unknown command 'verify_drc' (CMD-005)
+verify_lvs
+Error: Current design is not defined. (UID-4)
+# TODO: generate the post place-and-route gatelevel_netlist, the constraint files, and parasitic files
+###################################################
+# Analyze Design
+###################################################
+report_area
+Error: Current design is not defined. (UID-4)
+0
+redirect $PROJECT_PATH/icc_reports/icc_area_report { report_area }
+report_power
+Error: Current design is not defined. (UID-4)
+0
+redirect $PROJECT_PATH/icc_reports/icc_power_report { report_power -analysis_effort hi }
+# report_saif
+# redirct $PROJECT_PATH/icc_reports/icc_saif_report { report_saif }
+check_error
+1
+redirect $PROJECT_PATH/icc_reports/icc_error_checking_report { check_error }
+###################################################
+# Save the design database
+###################################################
+change_names -rules verilog -hierarchy
+Error: Current design is not defined. (UID-4)
+0
+write_verilog $POST_PR_NETLIST_PATH/$PROJECT_NAME.output.v
+Error: Current design is not defined. (UID-4)
+Current design is not set
+0
+write_sdf $POST_PR_NETLIST_PATH/$PROJECT_NAME.output.sdf
+Error: Current design is not defined. (UID-4)
+0
+write_sdc $POST_PR_NETLIST_PATH/$PROJECT_NAME.output.sdc
+Error: Current design is not defined. (UID-4)
+0
+extract_rc -coupling_cap
+Error: Current design is not defined. (UID-4)
+0
+write_parasitics -format SBPF -output $POST_PR_NETLIST_PATH/$PROJECT_NAME.output.sbpf
+Information: design not extracted; do extract_rc or read_parasitics before write_parasitics.
+Error: Writing parasitics file failed. (RCEX-036)
+0
+save_mw_cel
+Error: Cannot get cellId for the current design. (UIG-2)
+0
+close_mw_cel
+Error: Current Milkyway design is not defined. (MWUI-225)
+0
+exit
+
+Thank you...
+

@@ -1,19 +1,20 @@
 Information: Propagating switching activity (high effort zero delay simulation). (PWR-6)
 Warning: Design has unannotated primary inputs. (PWR-414)
 Warning: Design has unannotated sequential cell outputs. (PWR-415)
+Warning: Design has unannotated black box outputs. (PWR-428)
  
 ****************************************
 Report : power
         -analysis_effort high
-Design : ComputeUnit
+Design : Plasticine
 Version: I-2013.12-SP4
-Date   : Mon Aug  1 17:16:59 2016
+Date   : Fri Aug  5 19:58:20 2016
 ****************************************
 
 
 Library(s) Used:
 
-    tcbn45gsbwpml (File: /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db)
+    gtech (File: /cad/synopsys/dc_shell/latest/libraries/syn/gtech.db)
 
 
 Operating Conditions: MLCOM   Library: tcbn45gsbwpml
@@ -21,7 +22,7 @@ Wire Load Model Mode: top
 
 Design        Wire Load Model            Library
 ------------------------------------------------
-ComputeUnit            ZeroWireload      tcbn45gsbwpml
+Plasticine             ZeroWireload      tcbn45gsbwpml
 
 
 Global Operating Voltage = 0.99 
@@ -33,24 +34,24 @@ Power-specific unit information :
     Leakage Power Units = 1nW
 
 
-  Cell Internal Power  = 155.4365 uW   (68%)
-  Net Switching Power  =  71.9559 uW   (32%)
+  Cell Internal Power  =   0.0000 mW        
+  Net Switching Power  =   0.0000 mW        
                          ---------
-Total Dynamic Power    = 227.3924 uW  (100%)
+Total Dynamic Power    =   0.0000 mW        
 
-Cell Leakage Power     = 365.2168 uW
+Cell Leakage Power     =   0.0000 nW
 
 
                  Internal         Switching           Leakage            Total
 Power Group      Power            Power               Power              Power   (   %    )  Attrs
 --------------------------------------------------------------------------------------------------
-io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
-memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
-black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
-clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
-register           0.1297        2.7467e-03        9.8656e+04            0.2311  (  39.00%)
-sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
-combinational  2.5709e-02        6.9209e-02        2.6656e+05            0.3615  (  61.00%)
+io_pad             0.0000            0.0000            0.0000            0.0000  (     N/A)
+memory             0.0000            0.0000            0.0000            0.0000  (     N/A)
+black_box          0.0000            0.0000            0.0000            0.0000  (     N/A)
+clock_network      0.0000            0.0000            0.0000            0.0000  (     N/A)
+register           0.0000            0.0000            0.0000            0.0000  (     N/A)
+sequential         0.0000            0.0000            0.0000            0.0000  (     N/A)
+combinational      0.0000            0.0000            0.0000            0.0000  (     N/A)
 --------------------------------------------------------------------------------------------------
-Total              0.1554 mW     7.1956e-02 mW     3.6522e+05 nW         0.5926 mW
+Total              0.0000 mW         0.0000 mW         0.0000 nW         0.0000 mW
 1

@@ -1,20 +1,16 @@
  
 ****************************************
 Report : design
-Design : ComputeUnit
+Design : Plasticine
 Version: I-2013.12-SP4
-Date   : Mon Aug  1 17:16:55 2016
+Date   : Fri Aug  5 19:58:18 2016
 ****************************************
 
 Design allows ideal nets on clock nets.
 
 Library(s) Used:
 
-    tcbn45gsbwpml (File: /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db)
-
-Local Link Library:
-
-    {tcbn45gsbwpml.db}
+    gtech (File: /cad/synopsys/dc_shell/latest/libraries/syn/gtech.db)
 
 Flip-Flop Types:
 
@@ -36,7 +32,7 @@ Operating Conditions:
 
 Wire Loading Model:
 
-    Selected automatically from the total cell area.
+    Selected from the default (area not fully known).
 
 Name           :   ZeroWireload
 Location       :   tcbn45gsbwpml
@@ -89,9 +85,11 @@ Disabled Timing Arcs:
 
 Required Licenses:
 
-    DesignWare
+    None Required
 
 Design Parameters:
 
     None specified.
+
+Information: This design contains unmapped logic. (RPT-7)
 1

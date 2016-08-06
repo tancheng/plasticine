@@ -2,107 +2,1079 @@
 ****************************************
 check_design summary:
 Version:     I-2013.12-SP4
-Date:        Mon Aug  1 17:16:55 2016
+Date:        Fri Aug  5 19:58:18 2016
 ****************************************
 
                    Name                                            Total
 --------------------------------------------------------------------------------
-Inputs/Outputs                                                     84
-    Shorted outputs (LINT-31)                                      41
-    Constant outputs (LINT-52)                                     43
+Inputs/Outputs                                                     40
+    Unconnected ports (LINT-28)                                     8
+    Feedthrough (LINT-29)                                          16
+    Shorted outputs (LINT-31)                                      16
 
-Cells                                                               6
-    Cells do not drive (LINT-1)                                     6
+Cells                                                             566
+    Connected to power or ground (LINT-32)                        402
+    Nets connected to multiple pins on same cell (LINT-33)         50
+    Leaf pins connected to undriven nets (LINT-58)                 80
+    Cells have undriven hier pins (LINT-59)                        34
 --------------------------------------------------------------------------------
 
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_3/ff_reg[2]' does not drive any nets. (LINT-1)
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_3/ff_reg[0]' does not drive any nets. (LINT-1)
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_3/ff_reg[1]' does not drive any nets. (LINT-1)
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_2/ff_reg[2]' does not drive any nets. (LINT-1)
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_2/ff_reg[1]' does not drive any nets. (LINT-1)
-Warning: In design 'ComputeUnit', cell 'RegisterBlock/FF_2/ff_reg[0]' does not drive any nets. (LINT-1)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[6]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[5]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[4]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_local[6]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_local[5]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_local[4]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_local[3]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_local[2]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_remote[6]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_remote[5]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_remote[4]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_remote[3]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_remote[2]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_remote[1]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_local[6]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_local[5]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_local[4]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_local[3]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_local[2]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_remote[6]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_remote[5]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_remote[4]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_remote[3]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_remote[2]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_remote[1]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_result[6]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_result[5]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_result[4]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_remote[0]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_isLocal'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_isLocal'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[0]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[2]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opcode[3]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_result[1]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_result[2]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_result[3]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_local[0]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opA_local[1]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_local[0]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to output port 'io_opB_local[1]'. (LINT-31)
-Warning: In design 'ComputeUnit', output port 'io_scalarOut[6]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_rmux0' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opcode[6]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opcode[5]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opcode[4]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opcode[3]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opcode[2]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opcode[0]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_isLocal' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_local[6]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_local[5]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_local[4]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_local[3]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_local[2]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_local[1]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_local[0]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_remote[6]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_remote[5]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_remote[4]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_remote[3]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_remote[2]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_remote[1]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opA_remote[0]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_isLocal' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_local[6]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_local[5]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_local[4]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_local[3]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_local[2]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_local[1]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_local[0]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_remote[6]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_remote[5]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_remote[4]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_remote[3]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_remote[2]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_opB_remote[1]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_result[6]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_result[5]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_result[4]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_result[3]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_result[2]' is connected directly to 'logic 0'. (LINT-52)
-Warning: In design 'ComputeUnit', output port 'io_result[1]' is connected directly to 'logic 0'. (LINT-52)
+Warning: In design 'MuxVec_2_3', port 'io_sel' is not connected to any nets. (LINT-28)
+Warning: In design 'CUControlBox_1', port 'io_tokenIns_1' is not connected to any nets. (LINT-28)
+Warning: In design 'CUControlBox_1', port 'io_tokenIns_0' is not connected to any nets. (LINT-28)
+Warning: In design 'MuxVec_2_0', port 'io_sel' is not connected to any nets. (LINT-28)
+Warning: In design 'MuxVec_2_1', port 'io_sel' is not connected to any nets. (LINT-28)
+Warning: In design 'MuxVec_2_2', port 'io_sel' is not connected to any nets. (LINT-28)
+Warning: In design 'CUControlBox_0', port 'io_tokenIns_1' is not connected to any nets. (LINT-28)
+Warning: In design 'CUControlBox_0', port 'io_tokenIns_0' is not connected to any nets. (LINT-28)
+Warning: In design 'MuxVec_2_3', input port 'io_ins_0_0[3]' is connected directly to output port 'io_out_0[3]'. (LINT-29)
+Warning: In design 'MuxVec_2_3', input port 'io_ins_0_0[2]' is connected directly to output port 'io_out_0[2]'. (LINT-29)
+Warning: In design 'MuxVec_2_3', input port 'io_ins_0_0[1]' is connected directly to output port 'io_out_0[1]'. (LINT-29)
+Warning: In design 'MuxVec_2_3', input port 'io_ins_0_0[0]' is connected directly to output port 'io_out_0[0]'. (LINT-29)
+Warning: In design 'MuxVec_2_0', input port 'io_ins_0_0[3]' is connected directly to output port 'io_out_0[3]'. (LINT-29)
+Warning: In design 'MuxVec_2_0', input port 'io_ins_0_0[2]' is connected directly to output port 'io_out_0[2]'. (LINT-29)
+Warning: In design 'MuxVec_2_0', input port 'io_ins_0_0[1]' is connected directly to output port 'io_out_0[1]'. (LINT-29)
+Warning: In design 'MuxVec_2_0', input port 'io_ins_0_0[0]' is connected directly to output port 'io_out_0[0]'. (LINT-29)
+Warning: In design 'MuxVec_2_1', input port 'io_ins_0_0[3]' is connected directly to output port 'io_out_0[3]'. (LINT-29)
+Warning: In design 'MuxVec_2_1', input port 'io_ins_0_0[2]' is connected directly to output port 'io_out_0[2]'. (LINT-29)
+Warning: In design 'MuxVec_2_1', input port 'io_ins_0_0[1]' is connected directly to output port 'io_out_0[1]'. (LINT-29)
+Warning: In design 'MuxVec_2_1', input port 'io_ins_0_0[0]' is connected directly to output port 'io_out_0[0]'. (LINT-29)
+Warning: In design 'MuxVec_2_2', input port 'io_ins_0_0[3]' is connected directly to output port 'io_out_0[3]'. (LINT-29)
+Warning: In design 'MuxVec_2_2', input port 'io_ins_0_0[2]' is connected directly to output port 'io_out_0[2]'. (LINT-29)
+Warning: In design 'MuxVec_2_2', input port 'io_ins_0_0[1]' is connected directly to output port 'io_out_0[1]'. (LINT-29)
+Warning: In design 'MuxVec_2_2', input port 'io_ins_0_0[0]' is connected directly to output port 'io_out_0[0]'. (LINT-29)
+Warning: In design 'ComputeUnit_1', output port 'io_scalarOut[7]' is connected directly to output port 'io_dataOut_0[7]'. (LINT-31)
+Warning: In design 'ComputeUnit_1', output port 'io_scalarOut[6]' is connected directly to output port 'io_dataOut_0[6]'. (LINT-31)
+Warning: In design 'ComputeUnit_1', output port 'io_scalarOut[5]' is connected directly to output port 'io_dataOut_0[5]'. (LINT-31)
+Warning: In design 'ComputeUnit_1', output port 'io_scalarOut[4]' is connected directly to output port 'io_dataOut_0[4]'. (LINT-31)
+Warning: In design 'ComputeUnit_1', output port 'io_scalarOut[3]' is connected directly to output port 'io_dataOut_0[3]'. (LINT-31)
+Warning: In design 'ComputeUnit_1', output port 'io_scalarOut[2]' is connected directly to output port 'io_dataOut_0[2]'. (LINT-31)
+Warning: In design 'ComputeUnit_1', output port 'io_scalarOut[1]' is connected directly to output port 'io_dataOut_0[1]'. (LINT-31)
+Warning: In design 'ComputeUnit_1', output port 'io_scalarOut[0]' is connected directly to output port 'io_dataOut_0[0]'. (LINT-31)
+Warning: In design 'ComputeUnit_0', output port 'io_scalarOut[7]' is connected directly to output port 'io_dataOut_0[7]'. (LINT-31)
+Warning: In design 'ComputeUnit_0', output port 'io_scalarOut[6]' is connected directly to output port 'io_dataOut_0[6]'. (LINT-31)
+Warning: In design 'ComputeUnit_0', output port 'io_scalarOut[5]' is connected directly to output port 'io_dataOut_0[5]'. (LINT-31)
+Warning: In design 'ComputeUnit_0', output port 'io_scalarOut[4]' is connected directly to output port 'io_dataOut_0[4]'. (LINT-31)
+Warning: In design 'ComputeUnit_0', output port 'io_scalarOut[3]' is connected directly to output port 'io_dataOut_0[3]'. (LINT-31)
+Warning: In design 'ComputeUnit_0', output port 'io_scalarOut[2]' is connected directly to output port 'io_dataOut_0[2]'. (LINT-31)
+Warning: In design 'ComputeUnit_0', output port 'io_scalarOut[1]' is connected directly to output port 'io_dataOut_0[1]'. (LINT-31)
+Warning: In design 'ComputeUnit_0', output port 'io_scalarOut[0]' is connected directly to output port 'io_dataOut_0[0]'. (LINT-31)
+Warning: In design 'Plasticine', a pin on submodule 'cu0' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_tokenIns_1' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'mem0' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_wen' is connected to logic 1. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'mem1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_wen' is connected to logic 1. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[2]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[1]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[2]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[1]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[2]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[1]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[2]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[1]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[3]' is connected to logic 0. 
+Warning: In design 'Depulser', a pin on submodule 'r' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init' is connected to logic 0. 
+Warning: In design 'CounterChain_1', a pin on submodule 'CounterRC' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_reset' is connected to logic 0. 
+Warning: In design 'CounterChain_1', a pin on submodule 'CounterRC' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_saturate' is connected to logic 0. 
+Warning: In design 'CounterChain_1', a pin on submodule 'CounterRC_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_reset' is connected to logic 0. 
+Warning: In design 'CounterChain_1', a pin on submodule 'CounterRC_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_saturate' is connected to logic 0. 
+Warning: In design 'IntFU_3', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[7]' is connected to logic 0. 
+Warning: In design 'IntFU_3', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[6]' is connected to logic 0. 
+Warning: In design 'IntFU_3', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[5]' is connected to logic 0. 
+Warning: In design 'IntFU_3', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[4]' is connected to logic 0. 
+Warning: In design 'IntFU_3', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[3]' is connected to logic 0. 
+Warning: In design 'IntFU_3', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[2]' is connected to logic 0. 
+Warning: In design 'IntFU_3', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_3', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'UpDownCtr_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'Counter_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'Counter_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'Counter_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'Counter_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'Counter_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'Counter_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'Counter_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'Counter_3', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'mem0' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_wen' is connected to logic 1. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'mem1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_wen' is connected to logic 1. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[2]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[1]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_max[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[2]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[1]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_1_stride[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[2]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[1]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_max[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[2]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[1]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'counterChain' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_0_stride[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[3]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[7]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[6]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[5]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[4]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_0', a pin on submodule 'MuxN_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_2[3]' is connected to logic 0. 
+Warning: In design 'CounterChain_0', a pin on submodule 'CounterRC' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_reset' is connected to logic 0. 
+Warning: In design 'CounterChain_0', a pin on submodule 'CounterRC' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_saturate' is connected to logic 0. 
+Warning: In design 'CounterChain_0', a pin on submodule 'CounterRC_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_reset' is connected to logic 0. 
+Warning: In design 'CounterChain_0', a pin on submodule 'CounterRC_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_saturate' is connected to logic 0. 
+Warning: In design 'IntFU_0', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[7]' is connected to logic 0. 
+Warning: In design 'IntFU_0', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[6]' is connected to logic 0. 
+Warning: In design 'IntFU_0', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[5]' is connected to logic 0. 
+Warning: In design 'IntFU_0', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[4]' is connected to logic 0. 
+Warning: In design 'IntFU_0', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[3]' is connected to logic 0. 
+Warning: In design 'IntFU_0', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[2]' is connected to logic 0. 
+Warning: In design 'IntFU_0', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[1]' is connected to logic 0. 
+Warning: In design 'IntFU_1', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[7]' is connected to logic 0. 
+Warning: In design 'IntFU_1', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[6]' is connected to logic 0. 
+Warning: In design 'IntFU_1', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[5]' is connected to logic 0. 
+Warning: In design 'IntFU_1', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[4]' is connected to logic 0. 
+Warning: In design 'IntFU_1', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[3]' is connected to logic 0. 
+Warning: In design 'IntFU_1', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[2]' is connected to logic 0. 
+Warning: In design 'IntFU_1', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[1]' is connected to logic 0. 
+Warning: In design 'IntFU_2', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[7]' is connected to logic 0. 
+Warning: In design 'IntFU_2', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[6]' is connected to logic 0. 
+Warning: In design 'IntFU_2', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[5]' is connected to logic 0. 
+Warning: In design 'IntFU_2', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[4]' is connected to logic 0. 
+Warning: In design 'IntFU_2', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[3]' is connected to logic 0. 
+Warning: In design 'IntFU_2', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[2]' is connected to logic 0. 
+Warning: In design 'IntFU_2', a pin on submodule 'm' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_ins_6[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_0', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_1', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_1' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_2' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_3' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_4' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'RegisterBlock_2', a pin on submodule 'FF_5' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_control_enable' is connected to logic 1. 
+Warning: In design 'UpDownCtr_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'UpDownCtr_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'Counter_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'Counter_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'Counter_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'Counter_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'Counter_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'Counter_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'Counter_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'Counter_0', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'Counter_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'Counter_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'Counter_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'Counter_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'Counter_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'Counter_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'Counter_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'Counter_1', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'Counter_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[7]' is connected to logic 0. 
+Warning: In design 'Counter_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[6]' is connected to logic 0. 
+Warning: In design 'Counter_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[5]' is connected to logic 0. 
+Warning: In design 'Counter_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[4]' is connected to logic 0. 
+Warning: In design 'Counter_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[3]' is connected to logic 0. 
+Warning: In design 'Counter_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[2]' is connected to logic 0. 
+Warning: In design 'Counter_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[1]' is connected to logic 0. 
+Warning: In design 'Counter_2', a pin on submodule 'reg_' is connected to logic 1 or logic 0. (LINT-32)
+   Pin 'io_data_init[0]' is connected to logic 0. 
+Warning: In design 'ComputeUnit_1', the same net is connected to more than one pin on submodule 'counterChain'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_1_max[7]', 'io_data_1_max[6]'', 'io_data_1_max[5]', 'io_data_1_max[4]', 'io_data_1_max[3]', 'io_data_1_max[2]', 'io_data_1_max[1]', 'io_data_1_max[0]', 'io_data_1_stride[7]', 'io_data_1_stride[6]', 'io_data_1_stride[5]', 'io_data_1_stride[4]', 'io_data_1_stride[3]', 'io_data_1_stride[2]', 'io_data_1_stride[1]', 'io_data_1_stride[0]', 'io_data_0_max[7]', 'io_data_0_max[6]', 'io_data_0_max[5]', 'io_data_0_max[4]', 'io_data_0_max[3]', 'io_data_0_max[2]', 'io_data_0_max[1]', 'io_data_0_max[0]', 'io_data_0_stride[7]', 'io_data_0_stride[6]', 'io_data_0_stride[5]', 'io_data_0_stride[4]', 'io_data_0_stride[3]', 'io_data_0_stride[2]', 'io_data_0_stride[1]', 'io_data_0_stride[0]'.
+Warning: In design 'ComputeUnit_1', the same net is connected to more than one pin on submodule 'MuxN'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_2[7]', 'io_ins_2[6]'', 'io_ins_2[5]', 'io_ins_2[4]', 'io_ins_2[3]'.
+Warning: In design 'ComputeUnit_1', the same net is connected to more than one pin on submodule 'MuxN_1'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_2[7]', 'io_ins_2[6]'', 'io_ins_2[5]', 'io_ins_2[4]', 'io_ins_2[3]'.
+Warning: In design 'ComputeUnit_1', the same net is connected to more than one pin on submodule 'MuxN_2'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_2[7]', 'io_ins_2[6]'', 'io_ins_2[5]', 'io_ins_2[4]', 'io_ins_2[3]'.
+Warning: In design 'ComputeUnit_1', the same net is connected to more than one pin on submodule 'MuxN_3'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_2[7]', 'io_ins_2[6]'', 'io_ins_2[5]', 'io_ins_2[4]', 'io_ins_2[3]'.
+Warning: In design 'CounterChain_1', the same net is connected to more than one pin on submodule 'CounterRC'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_control_reset', 'io_control_saturate''.
+Warning: In design 'CounterChain_1', the same net is connected to more than one pin on submodule 'CounterRC_1'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_control_reset', 'io_control_saturate''.
+Warning: In design 'IntFU_3', the same net is connected to more than one pin on submodule 'm'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_6[7]', 'io_ins_6[6]'', 'io_ins_6[5]', 'io_ins_6[4]', 'io_ins_6[3]', 'io_ins_6[2]', 'io_ins_6[1]'.
+Warning: In design 'RegisterBlock_3', the same net is connected to more than one pin on submodule 'FF'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_3', the same net is connected to more than one pin on submodule 'FF_1'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_3', the same net is connected to more than one pin on submodule 'FF_2'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_3', the same net is connected to more than one pin on submodule 'FF_3'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_3', the same net is connected to more than one pin on submodule 'FF_4'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_3', the same net is connected to more than one pin on submodule 'FF_5'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'UpDownCtr_3', the same net is connected to more than one pin on submodule 'reg_'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[3]', 'io_data_init[2]'', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'Counter_3', the same net is connected to more than one pin on submodule 'reg_'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'ComputeUnit_0', the same net is connected to more than one pin on submodule 'counterChain'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_1_max[7]', 'io_data_1_max[6]'', 'io_data_1_max[5]', 'io_data_1_max[4]', 'io_data_1_max[3]', 'io_data_1_max[2]', 'io_data_1_max[1]', 'io_data_1_max[0]', 'io_data_1_stride[7]', 'io_data_1_stride[6]', 'io_data_1_stride[5]', 'io_data_1_stride[4]', 'io_data_1_stride[3]', 'io_data_1_stride[2]', 'io_data_1_stride[1]', 'io_data_1_stride[0]', 'io_data_0_max[7]', 'io_data_0_max[6]', 'io_data_0_max[5]', 'io_data_0_max[4]', 'io_data_0_max[3]', 'io_data_0_max[2]', 'io_data_0_max[1]', 'io_data_0_max[0]', 'io_data_0_stride[7]', 'io_data_0_stride[6]', 'io_data_0_stride[5]', 'io_data_0_stride[4]', 'io_data_0_stride[3]', 'io_data_0_stride[2]', 'io_data_0_stride[1]', 'io_data_0_stride[0]'.
+Warning: In design 'ComputeUnit_0', the same net is connected to more than one pin on submodule 'MuxN'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_2[7]', 'io_ins_2[6]'', 'io_ins_2[5]', 'io_ins_2[4]', 'io_ins_2[3]'.
+Warning: In design 'ComputeUnit_0', the same net is connected to more than one pin on submodule 'MuxN_1'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_2[7]', 'io_ins_2[6]'', 'io_ins_2[5]', 'io_ins_2[4]', 'io_ins_2[3]'.
+Warning: In design 'ComputeUnit_0', the same net is connected to more than one pin on submodule 'MuxN_2'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_2[7]', 'io_ins_2[6]'', 'io_ins_2[5]', 'io_ins_2[4]', 'io_ins_2[3]'.
+Warning: In design 'ComputeUnit_0', the same net is connected to more than one pin on submodule 'MuxN_3'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_2[7]', 'io_ins_2[6]'', 'io_ins_2[5]', 'io_ins_2[4]', 'io_ins_2[3]'.
+Warning: In design 'CounterChain_0', the same net is connected to more than one pin on submodule 'CounterRC'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_control_reset', 'io_control_saturate''.
+Warning: In design 'CounterChain_0', the same net is connected to more than one pin on submodule 'CounterRC_1'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_control_reset', 'io_control_saturate''.
+Warning: In design 'IntFU_0', the same net is connected to more than one pin on submodule 'm'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_6[7]', 'io_ins_6[6]'', 'io_ins_6[5]', 'io_ins_6[4]', 'io_ins_6[3]', 'io_ins_6[2]', 'io_ins_6[1]'.
+Warning: In design 'IntFU_1', the same net is connected to more than one pin on submodule 'm'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_6[7]', 'io_ins_6[6]'', 'io_ins_6[5]', 'io_ins_6[4]', 'io_ins_6[3]', 'io_ins_6[2]', 'io_ins_6[1]'.
+Warning: In design 'IntFU_2', the same net is connected to more than one pin on submodule 'm'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_ins_6[7]', 'io_ins_6[6]'', 'io_ins_6[5]', 'io_ins_6[4]', 'io_ins_6[3]', 'io_ins_6[2]', 'io_ins_6[1]'.
+Warning: In design 'RegisterBlock_0', the same net is connected to more than one pin on submodule 'FF'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_0', the same net is connected to more than one pin on submodule 'FF_1'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_0', the same net is connected to more than one pin on submodule 'FF_2'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_0', the same net is connected to more than one pin on submodule 'FF_3'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_0', the same net is connected to more than one pin on submodule 'FF_4'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_0', the same net is connected to more than one pin on submodule 'FF_5'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_1', the same net is connected to more than one pin on submodule 'FF'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_1', the same net is connected to more than one pin on submodule 'FF_1'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_1', the same net is connected to more than one pin on submodule 'FF_2'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_1', the same net is connected to more than one pin on submodule 'FF_3'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_1', the same net is connected to more than one pin on submodule 'FF_4'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_1', the same net is connected to more than one pin on submodule 'FF_5'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_2', the same net is connected to more than one pin on submodule 'FF'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_2', the same net is connected to more than one pin on submodule 'FF_1'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_2', the same net is connected to more than one pin on submodule 'FF_2'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_2', the same net is connected to more than one pin on submodule 'FF_3'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_2', the same net is connected to more than one pin on submodule 'FF_4'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'RegisterBlock_2', the same net is connected to more than one pin on submodule 'FF_5'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'UpDownCtr_0', the same net is connected to more than one pin on submodule 'reg_'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[3]', 'io_data_init[2]'', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'UpDownCtr_1', the same net is connected to more than one pin on submodule 'reg_'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[3]', 'io_data_init[2]'', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'UpDownCtr_2', the same net is connected to more than one pin on submodule 'reg_'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[3]', 'io_data_init[2]'', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'Counter_0', the same net is connected to more than one pin on submodule 'reg_'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'Counter_1', the same net is connected to more than one pin on submodule 'reg_'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'Counter_2', the same net is connected to more than one pin on submodule 'reg_'. (LINT-33)
+   Net '*Logic0*' is connected to pins 'io_data_init[7]', 'io_data_init[6]'', 'io_data_init[5]', 'io_data_init[4]', 'io_data_init[3]', 'io_data_init[2]', 'io_data_init[1]', 'io_data_init[0]'.
+Warning: In design 'CounterChain_1', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterChain_1', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterRC_3', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterRC_3', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_7', input pin 'A' of leaf cell 'B_4' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_7', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'MuxN_4_11', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_11', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_11', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'CounterChain_0', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterChain_0', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'MuxN_0_0', input pin 'A' of leaf cell 'B_0' is connected to undriven net 'io_sel[1]'.  (LINT-58)
+Warning: In design 'MuxN_0_0', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_sel[0]'.  (LINT-58)
+Warning: In design 'MuxN_0_0', input pin 'A' of leaf cell 'I_0' is connected to undriven net 'io_sel[1]'.  (LINT-58)
+Warning: In design 'MuxN_0_0', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_sel[0]'.  (LINT-58)
+Warning: In design 'MuxN_0_1', input pin 'A' of leaf cell 'B_0' is connected to undriven net 'io_sel[1]'.  (LINT-58)
+Warning: In design 'MuxN_0_1', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_sel[0]'.  (LINT-58)
+Warning: In design 'MuxN_0_1', input pin 'A' of leaf cell 'I_0' is connected to undriven net 'io_sel[1]'.  (LINT-58)
+Warning: In design 'MuxN_0_1', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_sel[0]'.  (LINT-58)
+Warning: In design 'MuxN_0_4', input pin 'A' of leaf cell 'B_0' is connected to undriven net 'io_sel[1]'.  (LINT-58)
+Warning: In design 'MuxN_0_4', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_sel[0]'.  (LINT-58)
+Warning: In design 'MuxN_0_4', input pin 'A' of leaf cell 'I_0' is connected to undriven net 'io_sel[1]'.  (LINT-58)
+Warning: In design 'MuxN_0_4', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_sel[0]'.  (LINT-58)
+Warning: In design 'MuxN_0_5', input pin 'A' of leaf cell 'B_0' is connected to undriven net 'io_sel[1]'.  (LINT-58)
+Warning: In design 'MuxN_0_5', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_sel[0]'.  (LINT-58)
+Warning: In design 'MuxN_0_5', input pin 'A' of leaf cell 'I_0' is connected to undriven net 'io_sel[1]'.  (LINT-58)
+Warning: In design 'MuxN_0_5', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_sel[0]'.  (LINT-58)
+Warning: In design 'CounterRC_0', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterRC_0', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterRC_1', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterRC_1', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterRC_2', input pin 'A' of leaf cell 'B_2' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'CounterRC_2', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_0', input pin 'A' of leaf cell 'B_4' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_0', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_1', input pin 'A' of leaf cell 'B_4' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_1', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_2', input pin 'A' of leaf cell 'B_4' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_2', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_3', input pin 'A' of leaf cell 'B_4' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_3', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_4', input pin 'A' of leaf cell 'B_4' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_4', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_5', input pin 'A' of leaf cell 'B_4' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_5', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_6', input pin 'A' of leaf cell 'B_4' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'LUT_6', input pin 'A' of leaf cell 'I_1' is connected to undriven net 'io_config_enable'.  (LINT-58)
+Warning: In design 'MuxN_4_0', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_0', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_0', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_1', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_1', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_1', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_2', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_2', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_2', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_3', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_3', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_3', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_4', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_4', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_4', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_5', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_5', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_5', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_6', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_6', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_6', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_7', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_7', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_7', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_8', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_8', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_8', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_9', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_9', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_9', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'MuxN_4_10', input pin 'DATA1_0' of leaf cell 'C17' is connected to undriven net 'io_ins_2'.  (LINT-58)
+Warning: In design 'MuxN_4_10', input pin 'DATA1_0' of leaf cell 'C18' is connected to undriven net 'io_ins_1'.  (LINT-58)
+Warning: In design 'MuxN_4_10', input pin 'DATA2_0' of leaf cell 'C18' is connected to undriven net 'io_ins_0'.  (LINT-58)
+Warning: In design 'ComputeUnit_1', input pin 'io_config_enable' of hierarchical cell 'counterChain' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_1', input pin 'io_readRemoteASel[1]' of hierarchical cell 'RegisterBlock_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_1', input pin 'io_readRemoteASel[0]' of hierarchical cell 'RegisterBlock_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_1', input pin 'io_readRemoteBSel[1]' of hierarchical cell 'RegisterBlock_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_1', input pin 'io_readRemoteBSel[0]' of hierarchical cell 'RegisterBlock_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CounterChain_1', input pin 'io_config_enable' of hierarchical cell 'CounterRC' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CounterChain_1', input pin 'io_config_enable' of hierarchical cell 'CounterRC_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_config_enable' of hierarchical cell 'LUT' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_config_enable' of hierarchical cell 'LUT_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_ins_2' of hierarchical cell 'decXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_ins_1' of hierarchical cell 'decXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_ins_0' of hierarchical cell 'decXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_ins_2' of hierarchical cell 'incXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_ins_1' of hierarchical cell 'incXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_ins_0' of hierarchical cell 'incXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_config_enable' of hierarchical cell 'LUT_2' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_1', input pin 'io_config_enable' of hierarchical cell 'LUT_3' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_0', input pin 'io_config_enable' of hierarchical cell 'counterChain' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_0', input pin 'io_readRemoteASel[1]' of hierarchical cell 'RegisterBlock_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_0', input pin 'io_readRemoteASel[0]' of hierarchical cell 'RegisterBlock_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_0', input pin 'io_readRemoteBSel[1]' of hierarchical cell 'RegisterBlock_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'ComputeUnit_0', input pin 'io_readRemoteBSel[0]' of hierarchical cell 'RegisterBlock_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CounterChain_0', input pin 'io_config_enable' of hierarchical cell 'CounterRC' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CounterChain_0', input pin 'io_config_enable' of hierarchical cell 'CounterRC_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_config_enable' of hierarchical cell 'LUT' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_config_enable' of hierarchical cell 'LUT_1' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_ins_2' of hierarchical cell 'decXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_ins_1' of hierarchical cell 'decXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_ins_0' of hierarchical cell 'decXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_ins_2' of hierarchical cell 'incXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_ins_1' of hierarchical cell 'incXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_ins_0' of hierarchical cell 'incXbar' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_config_enable' of hierarchical cell 'LUT_2' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
+Warning: In design 'CUControlBox_0', input pin 'io_config_enable' of hierarchical cell 'LUT_3' has one or more internal loads, but is not connected to any nets. 'Logic 0' is assumed. (LINT-59)
 1

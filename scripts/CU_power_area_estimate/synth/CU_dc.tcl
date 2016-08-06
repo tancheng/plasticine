@@ -25,12 +25,9 @@ set compile_delete_unloaded_sequential_cells false
 
 # read in verilog
 read_verilog -rtl $VERILOG_LIST
-
-elaborate ComputeUnit
 # set top level design
-current_design ComputeUnit
-# link it to resolve references
-link
+current_design $PROJECT_NAME
+elaborate $PROJECT_NAME
 
 # Build separate instance for multiply-instantiated sub-modules
 uniquify

@@ -1,0 +1,13 @@
+(DELAYFILE
+(SDFVERSION "OVI 2.1")
+(DESIGN "Plasticine")
+(DATE "Fri Aug  5 17:18:54 2016")
+(VENDOR "tcbn45gsbwpml")
+(PROGRAM "Synopsys Design Compiler cmos")
+(VERSION "J-2014.09-SP3")
+(DIVIDER /)
+(VOLTAGE 0.99:0.99:0.99)
+(PROCESS "MLCOM")
+(TEMPERATURE 125.00:125.00:125.00)
+(TIMESCALE 1ns)
+)

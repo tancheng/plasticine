@@ -1,0 +1,2865 @@
+###################################################################
+
+# Created by write_script -format dctcl on Fri Aug  5 19:58:21 2016
+
+###################################################################
+
+# Set the current_design #
+current_design Plasticine
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+set_wire_load_mode top
+set_wire_load_model -name ZeroWireload -library tcbn45gsbwpml
+set_driving_cell -lib_cell INVD0BWP -library tcbn45gsbwpml -pin ZN [get_ports  \
+clk]
+set_driving_cell -lib_cell INVD0BWP -library tcbn45gsbwpml -pin ZN [get_ports  \
+reset]
+set_driving_cell -lib_cell INVD0BWP -library tcbn45gsbwpml -pin ZN [get_ports  \
+io_config_enable]
+set_driving_cell -lib_cell INVD0BWP -library tcbn45gsbwpml -pin ZN [get_ports  \
+io_command]
+set_load -pin_load 0.19856 [get_ports io_status]
+set_max_transition 0.1 [get_ports io_status]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__mem0wa_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__mem0wd_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__mem0ra_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__mem1wa_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__mem1wd_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__mem1ra_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__remoteMux0_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__remoteMux0_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__remoteMux1_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__remoteMux1_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opcode_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_0_opcode_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opcode_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opcode_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_result_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_result_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_result_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_0_result_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_result_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_result_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opA_value_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opA_value_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opA_value_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_0_opA_dataSrc_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opA_dataSrc_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_0_opB_value_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opB_value_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opB_value_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_0_opB_dataSrc_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_0_opB_dataSrc_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opcode_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opcode_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opcode_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opcode_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_result_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_1_result_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_result_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_result_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_result_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_result_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_1_opA_value_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opA_value_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opA_value_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_1_opA_dataSrc_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opA_dataSrc_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/config__pipeStage_1_opB_value_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opB_value_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opB_value_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opB_dataSrc_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/config__pipeStage_1_opB_dataSrc_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0820618 -static_probability    \
+0.769798 [get_pins cu1/RegisterBlock_1/FF_5/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0821838 -static_probability    \
+0.77018 [get_pins cu1/RegisterBlock_1/FF_5/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0829468 -static_probability    \
+0.771545 [get_pins cu1/RegisterBlock_1/FF_5/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0837097 -static_probability    \
+0.774353 [get_pins cu1/RegisterBlock_1/FF_5/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0834198 -static_probability    \
+0.770859 [get_pins cu1/RegisterBlock_1/FF_5/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.083374 -static_probability     \
+0.769249 [get_pins cu1/RegisterBlock_1/FF_5/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0835266 -static_probability    \
+0.772812 [get_pins cu1/RegisterBlock_1/FF_5/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0823975 -static_probability    \
+0.769905 [get_pins cu1/RegisterBlock_1/FF_5/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0851288 -static_probability    \
+0.766258 [get_pins cu1/RegisterBlock_1/FF_4/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0824127 -static_probability    \
+0.771408 [get_pins cu1/RegisterBlock_1/FF_4/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.082016 -static_probability     \
+0.773148 [get_pins cu1/RegisterBlock_1/FF_4/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0842133 -static_probability    \
+0.777634 [get_pins cu1/RegisterBlock_1/FF_4/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0826263 -static_probability    \
+0.772453 [get_pins cu1/RegisterBlock_1/FF_4/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.085022 -static_probability     \
+0.767815 [get_pins cu1/RegisterBlock_1/FF_4/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.083252 -static_probability     \
+0.770691 [get_pins cu1/RegisterBlock_1/FF_4/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0831146 -static_probability    \
+0.768875 [get_pins cu1/RegisterBlock_1/FF_4/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_3/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_3/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_3/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_3/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_3/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_3/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_3/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_3/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_2/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_2/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_2/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_2/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_2/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_2/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_2/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_2/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_1/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_1/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_1/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_1/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_1/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_1/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_1/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF_1/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock_1/FF/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0903168 -static_probability    \
+0.74614 [get_pins cu1/RegisterBlock/FF_5/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0899506 -static_probability    \
+0.746712 [get_pins cu1/RegisterBlock/FF_5/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0916443 -static_probability    \
+0.747009 [get_pins cu1/RegisterBlock/FF_5/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0919189 -static_probability    \
+0.750534 [get_pins cu1/RegisterBlock/FF_5/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0924683 -static_probability    \
+0.745567 [get_pins cu1/RegisterBlock/FF_5/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0914764 -static_probability    \
+0.744736 [get_pins cu1/RegisterBlock/FF_5/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0924835 -static_probability    \
+0.748093 [get_pins cu1/RegisterBlock/FF_5/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0908051 -static_probability    \
+0.74588 [get_pins cu1/RegisterBlock/FF_5/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0934296 -static_probability    \
+0.741333 [get_pins cu1/RegisterBlock/FF_4/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.090332 -static_probability     \
+0.747459 [get_pins cu1/RegisterBlock/FF_4/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0900726 -static_probability    \
+0.749107 [get_pins cu1/RegisterBlock/FF_4/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0929108 -static_probability    \
+0.753616 [get_pins cu1/RegisterBlock/FF_4/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0906677 -static_probability    \
+0.749313 [get_pins cu1/RegisterBlock/FF_4/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0932007 -static_probability    \
+0.743324 [get_pins cu1/RegisterBlock/FF_4/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0921478 -static_probability    \
+0.746124 [get_pins cu1/RegisterBlock/FF_4/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0917511 -static_probability    \
+0.745033 [get_pins cu1/RegisterBlock/FF_4/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_3/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_3/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_3/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_3/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_3/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_3/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_3/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_3/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_2/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_2/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_2/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_2/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_2/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_2/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_2/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_2/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_1/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_1/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_1/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_1/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_1/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_1/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_1/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF_1/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/RegisterBlock/FF/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/controlBlock/config__udcInit_0_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/controlBlock/config__udcInit_0_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/config__udcInit_0_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/config__udcInit_0_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/config__udcInit_1_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/config__udcInit_1_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/config__udcInit_1_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/config__udcInit_1_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_3/config__table_3_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_3/config__table_2_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_3/config__table_1_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_3/config__table_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_2/config__table_3_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_2/config__table_2_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_2/config__table_1_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_2/config__table_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/UpDownCtr_1/reg_/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/UpDownCtr_1/reg_/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/UpDownCtr_1/reg_/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/UpDownCtr_1/reg_/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/UpDownCtr/reg_/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/UpDownCtr/reg_/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/UpDownCtr/reg_/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/UpDownCtr/reg_/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/controlBlock/incXbar/config__outSelect_0_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/controlBlock/incXbar/config__outSelect_0_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/controlBlock/incXbar/config__outSelect_1_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/incXbar/config__outSelect_1_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/incXbar/config__outSelect_2_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/incXbar/config__outSelect_2_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/incXbar/config__outSelect_3_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/controlBlock/incXbar/config__outSelect_3_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/controlBlock/decXbar/config__outSelect_0_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/decXbar/config__outSelect_0_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu1/controlBlock/decXbar/config__outSelect_1_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/decXbar/config__outSelect_1_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_1/config__table_3_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_1/config__table_2_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_1/config__table_1_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT_1/config__table_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT/config__table_3_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT/config__table_2_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT/config__table_1_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/controlBlock/LUT/config__table_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/config__chain_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC_1/config__maxConst_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC_1/config__max_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__max_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC_1/config__max_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__max_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__max_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__max_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__max_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__max_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC_1/config__strideConst_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC_1/config__stride_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__stride_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__stride_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__stride_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__stride_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__stride_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__stride_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/config__stride_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/counter/reg_/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/counter/reg_/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/counter/reg_/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/counter/reg_/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/counter/reg_/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/counter/reg_/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/counter/reg_/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC_1/counter/reg_/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC/config__maxConst_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC/config__max_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__max_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC/config__max_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__max_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__max_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__max_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__max_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__max_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC/config__strideConst_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu1/counterChain/CounterRC/config__stride_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__stride_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__stride_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__stride_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__stride_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__stride_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__stride_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/config__stride_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/counter/reg_/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/counter/reg_/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/counter/reg_/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/counter/reg_/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/counter/reg_/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/counter/reg_/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/counter/reg_/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/counterChain/CounterRC/counter/reg_/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/raddr_reg_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/raddr_reg_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/raddr_reg_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/raddr_reg_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem1/mem_reg_0__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem1/mem_reg_0__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem1/mem_reg_0__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem1/mem_reg_0__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem1/mem_reg_0__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem1/mem_reg_0__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem1/mem_reg_0__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem1/mem_reg_0__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_1__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_1__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_1__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_1__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_1__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_1__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_1__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_1__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_2__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_2__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_2__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_2__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_2__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_2__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_2__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_2__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_3__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_3__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_3__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_3__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_3__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_3__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_3__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_3__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_4__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_4__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_4__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_4__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_4__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_4__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_4__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_4__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_5__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_5__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_5__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_5__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_5__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_5__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_5__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_5__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_6__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_6__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_6__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_6__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_6__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_6__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_6__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_6__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_7__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_7__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_7__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_7__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_7__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_7__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_7__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_7__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_8__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_8__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_8__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_8__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_8__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_8__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_8__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_8__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_9__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_9__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_9__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_9__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_9__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_9__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_9__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_9__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_10__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_10__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_10__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_10__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_10__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_10__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_10__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_10__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_11__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_11__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_11__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_11__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_11__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_11__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_11__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_11__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_12__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_12__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_12__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_12__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_12__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_12__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_12__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_12__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_13__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_13__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_13__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_13__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_13__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_13__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_13__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_13__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_14__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_14__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_14__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_14__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_14__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_14__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_14__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_14__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_15__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_15__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_15__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_15__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_15__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_15__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_15__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem1/mem_reg_15__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/raddr_reg_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/raddr_reg_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/raddr_reg_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/raddr_reg_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem0/mem_reg_0__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem0/mem_reg_0__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem0/mem_reg_0__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem0/mem_reg_0__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem0/mem_reg_0__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem0/mem_reg_0__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem0/mem_reg_0__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu1/mem0/mem_reg_0__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_1__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_1__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_1__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_1__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_1__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_1__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_1__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_1__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_2__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_2__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_2__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_2__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_2__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_2__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_2__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_2__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_3__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_3__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_3__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_3__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_3__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_3__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_3__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_3__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_4__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_4__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_4__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_4__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_4__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_4__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_4__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_4__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_5__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_5__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_5__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_5__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_5__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_5__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_5__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_5__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_6__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_6__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_6__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_6__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_6__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_6__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_6__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_6__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_7__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_7__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_7__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_7__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_7__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_7__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_7__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_7__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_8__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_8__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_8__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_8__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_8__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_8__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_8__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_8__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_9__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_9__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_9__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_9__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_9__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_9__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_9__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_9__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_10__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_10__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_10__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_10__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_10__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_10__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_10__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_10__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_11__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_11__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_11__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_11__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_11__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_11__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_11__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_11__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_12__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_12__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_12__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_12__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_12__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_12__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_12__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_12__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_13__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_13__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_13__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_13__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_13__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_13__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_13__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_13__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_14__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_14__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_14__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_14__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_14__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_14__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_14__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_14__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_15__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_15__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_15__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_15__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_15__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_15__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_15__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu1/mem0/mem_reg_15__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__mem0wa_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__mem0wd_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__mem0ra_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__mem1wa_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__mem1wd_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__mem1ra_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__remoteMux0_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__remoteMux0_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__remoteMux1_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__remoteMux1_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opcode_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_0_opcode_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opcode_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opcode_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_result_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_result_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_result_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_0_result_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_result_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_result_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opA_value_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opA_value_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opA_value_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_0_opA_dataSrc_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opA_dataSrc_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_0_opB_value_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opB_value_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opB_value_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_0_opB_dataSrc_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_0_opB_dataSrc_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opcode_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opcode_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opcode_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opcode_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_result_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_1_result_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_result_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_result_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_result_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_result_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_1_opA_value_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opA_value_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opA_value_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_1_opA_dataSrc_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opA_dataSrc_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/config__pipeStage_1_opB_value_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opB_value_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opB_value_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opB_dataSrc_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/config__pipeStage_1_opB_dataSrc_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0820007 -static_probability    \
+0.773399 [get_pins cu0/RegisterBlock_1/FF_5/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0839081 -static_probability    \
+0.770882 [get_pins cu0/RegisterBlock_1/FF_5/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0825958 -static_probability    \
+0.776642 [get_pins cu0/RegisterBlock_1/FF_5/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0855255 -static_probability    \
+0.768776 [get_pins cu0/RegisterBlock_1/FF_5/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0826416 -static_probability    \
+0.768501 [get_pins cu0/RegisterBlock_1/FF_5/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0821838 -static_probability    \
+0.771179 [get_pins cu0/RegisterBlock_1/FF_5/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0823669 -static_probability    \
+0.777023 [get_pins cu0/RegisterBlock_1/FF_5/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0799103 -static_probability    \
+0.771477 [get_pins cu0/RegisterBlock_1/FF_5/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0818787 -static_probability    \
+0.770668 [get_pins cu0/RegisterBlock_1/FF_4/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0821838 -static_probability    \
+0.771736 [get_pins cu0/RegisterBlock_1/FF_4/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0814514 -static_probability    \
+0.771187 [get_pins cu0/RegisterBlock_1/FF_4/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0828705 -static_probability    \
+0.773857 [get_pins cu0/RegisterBlock_1/FF_4/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0828705 -static_probability    \
+0.773499 [get_pins cu0/RegisterBlock_1/FF_4/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.082489 -static_probability     \
+0.767975 [get_pins cu0/RegisterBlock_1/FF_4/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0818024 -static_probability    \
+0.776474 [get_pins cu0/RegisterBlock_1/FF_4/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0818176 -static_probability    \
+0.770996 [get_pins cu0/RegisterBlock_1/FF_4/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_3/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_3/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_3/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_3/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_3/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_3/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_3/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_3/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_2/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_2/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_2/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_2/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_2/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_2/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_2/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_2/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_1/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_1/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_1/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_1/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_1/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_1/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_1/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF_1/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock_1/FF/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0903015 -static_probability    \
+0.749641 [get_pins cu0/RegisterBlock/FF_5/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.091629 -static_probability     \
+0.746811 [get_pins cu0/RegisterBlock/FF_5/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.091156 -static_probability     \
+0.75251 [get_pins cu0/RegisterBlock/FF_5/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.093399 -static_probability     \
+0.744576 [get_pins cu0/RegisterBlock/FF_5/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.091217 -static_probability     \
+0.744133 [get_pins cu0/RegisterBlock/FF_5/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0910187 -static_probability    \
+0.746712 [get_pins cu0/RegisterBlock/FF_5/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0904083 -static_probability    \
+0.753883 [get_pins cu0/RegisterBlock/FF_5/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0879669 -static_probability    \
+0.748146 [get_pins cu0/RegisterBlock/FF_5/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0903625 -static_probability    \
+0.747169 [get_pins cu0/RegisterBlock/FF_4/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.091217 -static_probability     \
+0.747696 [get_pins cu0/RegisterBlock/FF_4/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0898895 -static_probability    \
+0.747452 [get_pins cu0/RegisterBlock/FF_4/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0908508 -static_probability    \
+0.750198 [get_pins cu0/RegisterBlock/FF_4/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0904846 -static_probability    \
+0.750633 [get_pins cu0/RegisterBlock/FF_4/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0908966 -static_probability    \
+0.743484 [get_pins cu0/RegisterBlock/FF_4/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0900879 -static_probability    \
+0.752373 [get_pins cu0/RegisterBlock/FF_4/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0908813 -static_probability    \
+0.746834 [get_pins cu0/RegisterBlock/FF_4/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_3/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_3/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_3/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_3/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_3/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_3/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_3/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_3/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_2/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_2/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_2/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_2/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_2/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_2/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_2/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_2/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_1/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_1/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_1/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_1/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_1/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_1/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_1/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF_1/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/RegisterBlock/FF/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/controlBlock/config__udcInit_0_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/controlBlock/config__udcInit_0_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/config__udcInit_0_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/config__udcInit_0_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/config__udcInit_1_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/config__udcInit_1_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/config__udcInit_1_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/config__udcInit_1_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_3/config__table_3_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_3/config__table_2_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_3/config__table_1_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_3/config__table_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_2/config__table_3_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_2/config__table_2_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_2/config__table_1_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_2/config__table_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/UpDownCtr_1/reg_/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/UpDownCtr_1/reg_/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/UpDownCtr_1/reg_/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/UpDownCtr_1/reg_/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/UpDownCtr/reg_/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/UpDownCtr/reg_/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/UpDownCtr/reg_/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/UpDownCtr/reg_/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/controlBlock/incXbar/config__outSelect_0_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/controlBlock/incXbar/config__outSelect_0_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/controlBlock/incXbar/config__outSelect_1_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/incXbar/config__outSelect_1_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/incXbar/config__outSelect_2_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/incXbar/config__outSelect_2_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/incXbar/config__outSelect_3_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/controlBlock/incXbar/config__outSelect_3_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/controlBlock/decXbar/config__outSelect_0_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/decXbar/config__outSelect_0_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.0717163 -static_probability    \
+0.373207 [get_pins cu0/controlBlock/decXbar/config__outSelect_1_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/decXbar/config__outSelect_1_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_1/config__table_3_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_1/config__table_2_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_1/config__table_1_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT_1/config__table_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT/config__table_3_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT/config__table_2_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT/config__table_1_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/controlBlock/LUT/config__table_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/config__chain_0_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC_1/config__maxConst_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC_1/config__max_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__max_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC_1/config__max_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__max_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__max_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__max_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__max_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__max_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC_1/config__strideConst_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC_1/config__stride_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__stride_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__stride_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__stride_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__stride_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__stride_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__stride_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/config__stride_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/counter/reg_/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/counter/reg_/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/counter/reg_/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/counter/reg_/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/counter/reg_/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/counter/reg_/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/counter/reg_/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC_1/counter/reg_/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC/config__maxConst_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC/config__max_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__max_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC/config__max_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__max_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__max_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__max_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__max_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__max_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC/config__strideConst_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000396729 -static_probability  \
+0.00192261 [get_pins cu0/counterChain/CounterRC/config__stride_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__stride_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__stride_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__stride_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__stride_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__stride_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__stride_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/config__stride_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/counter/reg_/ff_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/counter/reg_/ff_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/counter/reg_/ff_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/counter/reg_/ff_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/counter/reg_/ff_reg_4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/counter/reg_/ff_reg_5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/counter/reg_/ff_reg_6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/counterChain/CounterRC/counter/reg_/ff_reg_7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/raddr_reg_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/raddr_reg_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/raddr_reg_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/raddr_reg_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem1/mem_reg_0__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem1/mem_reg_0__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem1/mem_reg_0__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem1/mem_reg_0__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem1/mem_reg_0__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem1/mem_reg_0__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem1/mem_reg_0__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem1/mem_reg_0__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_1__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_1__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_1__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_1__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_1__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_1__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_1__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_1__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_2__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_2__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_2__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_2__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_2__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_2__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_2__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_2__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_3__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_3__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_3__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_3__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_3__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_3__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_3__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_3__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_4__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_4__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_4__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_4__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_4__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_4__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_4__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_4__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_5__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_5__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_5__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_5__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_5__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_5__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_5__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_5__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_6__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_6__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_6__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_6__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_6__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_6__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_6__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_6__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_7__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_7__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_7__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_7__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_7__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_7__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_7__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_7__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_8__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_8__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_8__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_8__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_8__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_8__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_8__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_8__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_9__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_9__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_9__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_9__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_9__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_9__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_9__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_9__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_10__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_10__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_10__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_10__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_10__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_10__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_10__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_10__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_11__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_11__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_11__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_11__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_11__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_11__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_11__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_11__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_12__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_12__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_12__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_12__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_12__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_12__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_12__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_12__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_13__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_13__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_13__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_13__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_13__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_13__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_13__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_13__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_14__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_14__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_14__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_14__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_14__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_14__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_14__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_14__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_15__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_15__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_15__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_15__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_15__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_15__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_15__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem1/mem_reg_15__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/raddr_reg_reg_0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/raddr_reg_reg_1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/raddr_reg_reg_2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/raddr_reg_reg_3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem0/mem_reg_0__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem0/mem_reg_0__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem0/mem_reg_0__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem0/mem_reg_0__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem0/mem_reg_0__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem0/mem_reg_0__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem0/mem_reg_0__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins cu0/mem0/mem_reg_0__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_1__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_1__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_1__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_1__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_1__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_1__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_1__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_1__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_2__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_2__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_2__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_2__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_2__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_2__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_2__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_2__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_3__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_3__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_3__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_3__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_3__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_3__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_3__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_3__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_4__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_4__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_4__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_4__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_4__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_4__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_4__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_4__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_5__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_5__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_5__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_5__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_5__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_5__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_5__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_5__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_6__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_6__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_6__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_6__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_6__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_6__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_6__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_6__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_7__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_7__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_7__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_7__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_7__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_7__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_7__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_7__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_8__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_8__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_8__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_8__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_8__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_8__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_8__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_8__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_9__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_9__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_9__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_9__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_9__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_9__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_9__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_9__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_10__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_10__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_10__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_10__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_10__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_10__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_10__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_10__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_11__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_11__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_11__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_11__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_11__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_11__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_11__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_11__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_12__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_12__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_12__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_12__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_12__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_12__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_12__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_12__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_13__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_13__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_13__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_13__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_13__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_13__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_13__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_13__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_14__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_14__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_14__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_14__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_14__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_14__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_14__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_14__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_15__0_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_15__1_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_15__2_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_15__3_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_15__4_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_15__5_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_15__6_/QN]
+set_switching_activity -period 1 -toggle_rate 0 -static_probability 0          \
+[get_pins cu0/mem0/mem_reg_15__7_/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins controlBox/statusReg_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.0909119 -static_probability    \
+0.747986 [get_pins controlBox/commandReg_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.000488281 -static_probability  \
+0.999878 [get_pins controlBox/depulser/r/ff_reg/QN]
+set_switching_activity -period 1 -toggle_rate 0.0832977 -static_probability    \
+0.771912 [get_pins controlBox/pulser/commandReg_reg/QN]
+create_clock [get_ports clk]  -name ideal_clock1  -period 1  -waveform {0 0.5}
+set_max_delay 0.2  -from [list [get_ports clk] [get_ports reset] [get_ports    \
+io_config_enable] [get_ports io_command]]  -to [get_ports io_status]
+
+# Set the current_design #
+current_design ComputeUnit_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_1_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_1_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design RegisterBlock_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_3_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_3_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_15
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_14
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_13
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_12
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_11
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_10
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design RegisterBlock_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_3_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_3_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_9
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_8
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_7
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_6
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_5
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_4
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design IntFU_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_2_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design IntFU_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_2_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_11
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_10
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_9
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_8
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design CUControlBox_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design UpDownCtr_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_2_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design UpDownCtr_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_2_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Crossbar_1_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Crossbar_0_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_5
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_4
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design LUT_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design LUT_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design LUT_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design LUT_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design CounterChain_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design CounterRC_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Counter_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design CounterRC_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Counter_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_2_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_2_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_1_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_1_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_0_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_0_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design SRAM_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design SRAM_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design ComputeUnit_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_1_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design RegisterBlock_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_3_5
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_3_4
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_21
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_20
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_19
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_18
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_17
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_16
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_5
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_4
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design IntFU_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_2_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_14
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_13
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_12
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_2_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_1_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_0_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design SRAM_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_1_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design RegisterBlock_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_3_6
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_26
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_25
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_24
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_23
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_22
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_7
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_6
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_3_7
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_27
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design IntFU_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_2_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_0_15
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design CUControlBox_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design UpDownCtr_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_2_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design LUT_6
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design LUT_5
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design LUT_4
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design UpDownCtr_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_2_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Crossbar_1_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_9
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_8
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_7
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_6
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Crossbar_0_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_10
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxN_4_11
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design LUT_7
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design CounterChain_1
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design CounterRC_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Counter_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_2
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design CounterRC_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Counter_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_1_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_2_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_1_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MuxVec_0_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design SRAM_3
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design MainControlBox
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Depulser
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design FF_0
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model
+
+# Set the current_design #
+current_design Pulser
+
+set_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA
+remove_wire_load_model

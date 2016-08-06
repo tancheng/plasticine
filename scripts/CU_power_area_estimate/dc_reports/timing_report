@@ -1,0 +1,56 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : Plasticine
+Version: I-2013.12-SP4
+Date   : Fri Aug  5 19:58:20 2016
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: MLCOM   Library: tcbn45gsbwpml
+Wire Load Model Mode: top
+
+  Startpoint: controlBox/depulser/r/ff_reg
+              (rising edge-triggered flip-flop clocked by ideal_clock1)
+  Endpoint: controlBox/depulser/r/ff_reg
+            (rising edge-triggered flip-flop clocked by ideal_clock1)
+  Path Group: ideal_clock1
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  Plasticine         ZeroWireload          tcbn45gsbwpml
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock ideal_clock1 (rise edge)                        0.0000     0.0000
+  clock network delay (ideal)                           0.0000     0.0000
+  controlBox/depulser/r/ff_reg/clocked_on (**SEQGEN**)
+                                                        0.0000 #   0.0000 r
+  controlBox/depulser/r/ff_reg/Q (**SEQGEN**)           0.0000     0.0000 r
+  controlBox/depulser/r/C23/Z_0 (*SELECT_OP_2.1_2.1_1)
+                                                        0.0000     0.0000 r
+  controlBox/depulser/r/C24/Z_0 (*SELECT_OP_2.1_2.1_1)
+                                                        0.0000     0.0000 r
+  controlBox/depulser/r/ff_reg/next_state (**SEQGEN**)
+                                                        0.0000     0.0000 r
+  data arrival time                                                0.0000
+
+  clock ideal_clock1 (rise edge)                        1.0000     1.0000
+  clock network delay (ideal)                           0.0000     1.0000
+  controlBox/depulser/r/ff_reg/clocked_on (**SEQGEN**)
+                                                        0.0000     1.0000 r
+  library setup time                                    0.0000     1.0000
+  data required time                                               1.0000
+  --------------------------------------------------------------------------
+  data required time                                               1.0000
+  data arrival time                                                0.0000
+  --------------------------------------------------------------------------
+  slack (MET)                                                      1.0000
+
+
+1
