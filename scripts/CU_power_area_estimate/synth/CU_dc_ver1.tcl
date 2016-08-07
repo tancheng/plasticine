@@ -64,7 +64,8 @@ set input_delay 0
 saif_map -start
 
 # define clock
-create_clock clk -name ideal_clock1 -period 1
+# create_clock clk -name ideal_clock1 -period 1
+create_clock clk -name ideal_clock4ghz -period $CLK_PERIOD
 compile_ultra -gate_clock
 
 ###################################################

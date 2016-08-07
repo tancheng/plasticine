@@ -1,6 +1,6 @@
 ###################################################################
 
-# Created by write_sdc on Sat Aug 6 17:55:20 2016
+# Created by write_sdc on Sat Aug 6 18:20:22 2016
 
 ###################################################################
 set sdc_version 2.0
@@ -14,5 +14,5 @@ set_driving_cell -lib_cell INVD0BWP -library tcbn45gsbwpml -pin ZN [get_ports io
 set_driving_cell -lib_cell INVD0BWP -library tcbn45gsbwpml -pin ZN [get_ports io_command]
 set_load -pin_load 0.19856 [get_ports io_status]
 set_max_transition 0.1 [get_ports io_status]
-create_clock [get_ports clk]  -name ideal_clock1  -period 1  -waveform {0 0.5}
+create_clock [get_ports clk]  -name ideal_clock4ghz  -period 0.3  -waveform {0 0.15}
 set_max_delay 0.2  -from [list [get_ports clk] [get_ports reset] [get_ports io_config_enable] [get_ports io_command]]  -to [get_ports io_status]

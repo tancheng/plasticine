@@ -7,7 +7,7 @@ Report : power
         -analysis_effort high
 Design : Plasticine
 Version: J-2014.09-SP3
-Date   : Sat Aug  6 17:56:01 2016
+Date   : Sat Aug  6 18:03:37 2016
 ****************************************
 
 
@@ -33,12 +33,12 @@ Power-specific unit information :
     Leakage Power Units = 1nW
 
 
-  Cell Internal Power  = 444.5216 uW   (85%)
-  Net Switching Power  =  75.9577 uW   (15%)
+  Cell Internal Power  = 873.6103 uW   (85%)
+  Net Switching Power  = 148.6359 uW   (15%)
                          ---------
-Total Dynamic Power    = 520.4793 uW  (100%)
+Total Dynamic Power    =   1.0222 mW  (100%)
 
-Cell Leakage Power     = 526.5126 uW
+Cell Leakage Power     = 534.0971 uW
 
 
                  Internal         Switching           Leakage            Total
@@ -47,10 +47,10 @@ Power Group      Power            Power               Power              Power  
 io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
-clock_network      0.3722        7.0147e-02        1.9690e+05            0.6392  (  61.05%)
-register       6.6932e-02        1.5190e-03        9.4121e+04            0.1626  (  15.53%)
+clock_network      0.7313            0.1381        1.9383e+05            1.0631  (  68.31%)
+register           0.1327        2.1914e-03        9.3630e+04            0.2285  (  14.68%)
 sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
-combinational  5.4070e-03        4.2912e-03        2.3549e+05            0.2452  (  23.42%)
+combinational  9.6432e-03        8.3933e-03        2.4664e+05            0.2647  (  17.01%)
 --------------------------------------------------------------------------------------------------
-Total              0.4445 mW     7.5958e-02 mW     5.2651e+05 nW         1.0470 mW
+Total              0.8736 mW         0.1486 mW     5.3410e+05 nW         1.5563 mW
 1

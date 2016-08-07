@@ -1,3 +1,4 @@
+set CLK_PERIOD 0.3
 set PROJECT_NAME Plasticine
 set TSMC_45 /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/
 set PROJECT_PATH [pwd]
