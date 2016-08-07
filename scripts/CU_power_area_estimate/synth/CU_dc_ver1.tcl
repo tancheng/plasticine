@@ -71,17 +71,17 @@ compile_ultra -gate_clock
 # Analyze Design
 ###################################################
 report_design
-redirect $PROJECT_PATH/dc_reports/design_report { report_design }
+redirect $PROJECT_PATH/dc_reports/dc_design_report { report_design }
 check_design
-redirect $PROJECT_PATH/dc_reports/design_check {check_design }
+redirect $PROJECT_PATH/dc_reports/dc_design_check {check_design }
 report_area
-redirect $PROJECT_PATH/dc_reports/area_report { report_area }
+redirect $PROJECT_PATH/dc_reports/dc_area_report { report_area }
 report_power
-redirect $PROJECT_PATH/dc_reports/power_report { report_power -analysis_effort hi }
+redirect $PROJECT_PATH/dc_reports/dc_power_report { report_power -analysis_effort hi }
 report_timing
-redirect $PROJECT_PATH/dc_reports/timing_report { report_timing -significant_digits 4 }
+redirect $PROJECT_PATH/dc_reports/dc_timing_report { report_timing -significant_digits 4 }
 check_error
-redirect $PROJECT_PATH/dc_reports/error_checking_report { check_error }
+redirect $PROJECT_PATH/dc_reports/dc_error_checking_report { check_error }
 
 change_names -rules verilog -hierarchy
 

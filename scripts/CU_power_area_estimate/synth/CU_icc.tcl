@@ -79,10 +79,7 @@ foreach net {VDD} {derive_pg_connection -power_net $net -power_pin $net -create_
 foreach net {VSS} {derive_pg_connection -ground_net $net -ground_pin $net -create_ports top}
 
 # last check for drc and lvs error check
-verify_drc
 verify_lvs
-
-# TODO: generate the post place-and-route gatelevel_netlist, the constraint files, and parasitic files
 
 ###################################################
 # Analyze Design
