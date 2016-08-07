@@ -1,0 +1,15 @@
+Now using two CUs with interconnects
+This simulation takes four steps:
+1. Gatelevel netlist synthesis using design compiler
+2. Place-and-Route using ic compiler
+3. Gatelevel netlist simulation using iverilog and standard cell model
+4. Time-based power analysis using primetime
+
+All the dependencies are set in the param.tcl file under the project directory.
+The testbenches can be accessed under verif/ folder.
+Results of design compiler are stored in dc_reports/
+Results of icc compiler are stored in icc_reports/
+Results of iverilog are stored in sim.log
+Results of primetime are stored in pt_reports/
+
+To run the simulation, first source the source.sh file in setup/. Then chmod +x flow.sh and run ./flow.sh

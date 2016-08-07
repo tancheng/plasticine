@@ -1,0 +1,5 @@
+The standard cell model verilog file is located at: 
+  /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/verilog/tcbn45gsbwp_110b/tcbn45gsbwp.v
+
+To run vcs, the full64 option needs to be enabled on the london machine. For example: 
+vcs -full64 -help
