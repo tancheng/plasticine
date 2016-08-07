@@ -6,7 +6,7 @@ Report : timing
         -max_paths 1
 Design : Plasticine
 Version: I-2013.12-SP4
-Date   : Sat Aug  6 18:20:22 2016
+Date   : Sat Aug  6 19:54:10 2016
 ****************************************
 
 Operating Conditions: MLCOM   Library: tcbn45gsbwpml
@@ -14,7 +14,7 @@ Wire Load Model Mode: top
 
   Startpoint: cu0/config__pipeStage_1_opB_value_reg[0]
               (rising edge-triggered flip-flop clocked by ideal_clock4ghz)
-  Endpoint: cu1/RegisterBlock/FF_1/ff_reg[5]
+  Endpoint: cu1/RegisterBlock_1/FF/ff_reg[7]
             (rising edge-triggered flip-flop clocked by ideal_clock4ghz)
   Path Group: ideal_clock4ghz
   Path Type: max
@@ -27,32 +27,35 @@ Wire Load Model Mode: top
   --------------------------------------------------------------------------
   clock ideal_clock4ghz (rise edge)                     0.0000     0.0000
   clock network delay (ideal)                           0.0000     0.0000
-  cu0/config__pipeStage_1_opB_value_reg[0]/CP (DFD4BWP)
+  cu0/config__pipeStage_1_opB_value_reg[0]/CP (DFQD4BWP)
                                                         0.0000     0.0000 r
-  cu0/config__pipeStage_1_opB_value_reg[0]/Q (DFD4BWP)
-                                                        0.0524     0.0524 r
-  U1520/ZN (INR2XD1BWP)                                 0.0099     0.0623 f
-  U1521/ZN (CKND2BWP)                                   0.0068     0.0691 r
-  U991/ZN (ND2D1BWP)                                    0.0141     0.0833 f
-  U975/ZN (INVD1BWP)                                    0.0173     0.1006 r
-  U1633/ZN (NR2D1BWP)                                   0.0083     0.1089 f
-  U1023/Z (XOR3D1BWP)                                   0.0580     0.1670 r
-  U1024/Z (XOR3D1BWP)                                   0.0485     0.2154 r
-  U1069/Z (XOR3D1BWP)                                   0.0486     0.2641 r
-  U1043/Z (AO22D1BWP)                                   0.0254     0.2894 r
-  cu1/RegisterBlock/FF_1/ff_reg[5]/D (DFQD4BWP)         0.0000     0.2894 r
-  data arrival time                                                0.2894
+  cu0/config__pipeStage_1_opB_value_reg[0]/Q (DFQD4BWP)
+                                                        0.0394     0.0394 r
+  U511/Z (BUFFD2BWP)                                    0.0273     0.0667 r
+  U498/ZN (IOA21D1BWP)                                  0.0266     0.0933 r
+  U500/ZN (CKND2D1BWP)                                  0.0127     0.1060 f
+  U555/ZN (MOAI22D1BWP)                                 0.0112     0.1172 r
+  U566/CON (FICOND1BWP)                                 0.0324     0.1496 f
+  U446/ZN (MAOI222D1BWP)                                0.0219     0.1715 r
+  U572/CON (FICOND2BWP)                                 0.0313     0.2028 f
+  U469/ZN (MAOI222D1BWP)                                0.0220     0.2248 r
+  U503/ZN (AOI31D1BWP)                                  0.0183     0.2431 f
+  U384/ZN (XNR2D1BWP)                                   0.0316     0.2748 r
+  U685/ZN (CKND2BWP)                                    0.0058     0.2806 f
+  U686/ZN (NR2D2BWP)                                    0.0083     0.2889 r
+  cu1/RegisterBlock_1/FF/ff_reg[7]/D (DFQD1BWP)         0.0000     0.2889 r
+  data arrival time                                                0.2889
 
   clock ideal_clock4ghz (rise edge)                     0.3000     0.3000
   clock network delay (ideal)                           0.0000     0.3000
-  cu1/RegisterBlock/FF_1/ff_reg[5]/CP (DFQD4BWP)        0.0000     0.3000 r
-  library setup time                                   -0.0091     0.2909
-  data required time                                               0.2909
+  cu1/RegisterBlock_1/FF/ff_reg[7]/CP (DFQD1BWP)        0.0000     0.3000 r
+  library setup time                                   -0.0101     0.2899
+  data required time                                               0.2899
   --------------------------------------------------------------------------
-  data required time                                               0.2909
-  data arrival time                                               -0.2894
+  data required time                                               0.2899
+  data arrival time                                               -0.2889
   --------------------------------------------------------------------------
-  slack (MET)                                                      0.0015
+  slack (MET)                                                      0.0010
 
 
 1

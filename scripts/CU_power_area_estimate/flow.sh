@@ -4,8 +4,8 @@ function cleanup {
 	rm *.txt
 	rm *.svf
 	rm *.vcd
-	rm Plasticine_sim
-	rm -rf Plasticine
+	rm $PROJECT_NAME+"_sim"
+	rm -rf $PROJECT_NAME
 	rm -rf log
 	rm -rf alib-52
 	rm -rf icc_reports

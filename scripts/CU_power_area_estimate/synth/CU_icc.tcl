@@ -12,7 +12,7 @@ set search_path [list ./ $SRC_PATH $target_lib $sym_lib]
 set hdlin_auto_save_templates true
 
 # create milkyway library
-create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
+# create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
 set_tlu_plus_files -max_tluplus $TLUPLUS_MAX -min_tluplus $TLUPLUS_MIN -tech2itf_map $TECH2ITF_MAP
 open_mw_lib $MILKYWAY_LIB_NAME
 import_designs $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.v -format "verilog" -top $PROJECT_NAME -cel $PROJECT_NAME

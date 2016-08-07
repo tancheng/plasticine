@@ -1,3 +1,47 @@
+module Plasticine(input clk, input reset,
+    input  io_config_enable,
+    input  io_command,
+    output io_status
+);
+
+  wire controlBox_io_startTokenOut;
+  wire controlBox_io_statusOut;
+  wire cu0_io_tokenOuts_1;
+  wire cu0_io_tokenOuts_0;
+  wire[7:0] cu0_io_dataOut_0;
+  wire cu1_io_tokenOuts_0;
+  wire[7:0] cu1_io_dataOut_0;
+
+
+  assign io_status = controlBox_io_statusOut;
+  MainControlBox controlBox(.clk(clk), .reset(reset),
+       .io_command( io_command ),
+       .io_doneTokenIn( cu1_io_tokenOuts_0 ),
+       .io_startTokenOut( controlBox_io_startTokenOut ),
+       .io_statusOut( controlBox_io_statusOut )
+  );
+  ComputeUnit cu0(.clk(clk), .reset(reset),
+       .io_config_enable( io_config_enable ),
+       .io_tokenIns_1( 1'h0 ),
+       .io_tokenIns_0( controlBox_io_startTokenOut ),
+       .io_tokenOuts_1( cu0_io_tokenOuts_1 ),
+       .io_tokenOuts_0( cu0_io_tokenOuts_0 ),
+       //.io_scalarOut(  )
+       .io_dataIn_0( cu1_io_dataOut_0 ),
+       .io_dataOut_0( cu0_io_dataOut_0 )
+  );
+  ComputeUnit cu1(.clk(clk), .reset(reset),
+       .io_config_enable( io_config_enable ),
+       .io_tokenIns_1( cu0_io_tokenOuts_1 ),
+       .io_tokenIns_0( cu0_io_tokenOuts_0 ),
+       //.io_tokenOuts_1(  )
+       .io_tokenOuts_0( cu1_io_tokenOuts_0 ),
+       //.io_scalarOut(  )
+       .io_dataIn_0( cu0_io_dataOut_0 ),
+       .io_dataOut_0( cu1_io_dataOut_0 )
+  );
+endmodule
+
 module Pulser(input clk, input reset,
     input  io_in,
     output io_out
@@ -1972,47 +2016,4 @@ module ComputeUnit(input clk, input reset,
   end
 endmodule
 
-module Plasticine(input clk, input reset,
-    input  io_config_enable,
-    input  io_command,
-    output io_status
-);
-
-  wire controlBox_io_startTokenOut;
-  wire controlBox_io_statusOut;
-  wire cu0_io_tokenOuts_1;
-  wire cu0_io_tokenOuts_0;
-  wire[7:0] cu0_io_dataOut_0;
-  wire cu1_io_tokenOuts_0;
-  wire[7:0] cu1_io_dataOut_0;
-
-
-  assign io_status = controlBox_io_statusOut;
-  MainControlBox controlBox(.clk(clk), .reset(reset),
-       .io_command( io_command ),
-       .io_doneTokenIn( cu1_io_tokenOuts_0 ),
-       .io_startTokenOut( controlBox_io_startTokenOut ),
-       .io_statusOut( controlBox_io_statusOut )
-  );
-  ComputeUnit cu0(.clk(clk), .reset(reset),
-       .io_config_enable( io_config_enable ),
-       .io_tokenIns_1( 1'h0 ),
-       .io_tokenIns_0( controlBox_io_startTokenOut ),
-       .io_tokenOuts_1( cu0_io_tokenOuts_1 ),
-       .io_tokenOuts_0( cu0_io_tokenOuts_0 ),
-       //.io_scalarOut(  )
-       .io_dataIn_0( cu1_io_dataOut_0 ),
-       .io_dataOut_0( cu0_io_dataOut_0 )
-  );
-  ComputeUnit cu1(.clk(clk), .reset(reset),
-       .io_config_enable( io_config_enable ),
-       .io_tokenIns_1( cu0_io_tokenOuts_1 ),
-       .io_tokenIns_0( cu0_io_tokenOuts_0 ),
-       //.io_tokenOuts_1(  )
-       .io_tokenOuts_0( cu1_io_tokenOuts_0 ),
-       //.io_scalarOut(  )
-       .io_dataIn_0( cu0_io_dataOut_0 ),
-       .io_dataOut_0( cu1_io_dataOut_0 )
-  );
-endmodule
 

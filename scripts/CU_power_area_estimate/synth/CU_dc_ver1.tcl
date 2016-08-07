@@ -17,9 +17,7 @@ set target_lib $TSMC_45
 set search_path [list $DC_SOURCE_PATH $dw_lib $target_lib $sym_lib]
 
 # milkyway lib creation
-if {!file exists $PROJECT_NAME} {
-	create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
-}
+create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
 
 open_mw_lib $MILKYWAY_LIB_NAME
 check_library
@@ -33,9 +31,13 @@ set compile_delete_unloaded_sequential_cells false
 # read in verilog using analyze, elaborate, link and check design
 read_verilog -rtl $VERILOG_LIST
 analyze -format verilog $VERILOG_LIST
+# remove SRAM as we don't need to elaborate the interface
+remove_design [list SRAM]
+list_designs
 # set top level design
 current_design $PROJECT_NAME
 elaborate $PROJECT_NAME
+
 link
 check_design
 # Build separate instance for multiply-instantiated sub-modules
