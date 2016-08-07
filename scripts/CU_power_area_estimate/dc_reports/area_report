@@ -3,31 +3,28 @@
 Report : area
 Design : Plasticine
 Version: I-2013.12-SP4
-Date   : Fri Aug  5 19:58:19 2016
+Date   : Sat Aug  6 16:45:29 2016
 ****************************************
 
 Library(s) Used:
 
-    gtech (File: /cad/synopsys/dc_shell/latest/libraries/syn/gtech.db)
+    tcbn45gsbwpml (File: /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db)
 
 Number of ports:                            5
-Number of nets:                            26
-Number of cells:                            3
-Number of combinational cells:              0
-Number of sequential cells:                 0
+Number of nets:                           961
+Number of cells:                          986
+Number of combinational cells:            336
+Number of sequential cells:               618
 Number of macros/black boxes:               0
-Number of buf/inv:                          0
-Number of references:                       3
+Number of buf/inv:                         54
+Number of references:                      70
 
-Combinational area:                  0.000000
-Buf/Inv area:                        0.000000
-Noncombinational area:               0.000000
+Combinational area:                385.610406
+Buf/Inv area:                       28.753201
+Noncombinational area:            2480.889612
 Macro/Black Box area:                0.000000
 Net Interconnect area:      undefined  (Wire load has zero net area)
 
-Total cell area:                     0.000000
+Total cell area:                  2866.500018
 Total area:                 undefined
-
-Information: This design contains unmapped logic. (RPT-7)
-Information: This design contains black box (unknown) components. (RPT-8)
 1

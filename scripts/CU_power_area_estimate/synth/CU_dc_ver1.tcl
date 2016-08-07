@@ -17,11 +17,12 @@ set target_lib $TSMC_45
 set search_path [list $DC_SOURCE_PATH $dw_lib $target_lib $sym_lib]
 
 # milkyway lib creation
-create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
+if {!file exists $PROJECT_NAME} {
+	create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
+}
+
 open_mw_lib $MILKYWAY_LIB_NAME
 check_library
-set_tlu_plus_files -max_tluplus $TLUPLUS_MAX -min_tluplus $TLUPLUS_MIN -tech2itf_map $TECH2ITF_MAP
-check_tlu_plus_files
 define_design_lib WORK -path ./work
 
 # preserve sequential logics
@@ -30,6 +31,7 @@ set hdlin_preserve_sequential true
 set compile_delete_unloaded_sequential_cells false
 
 # read in verilog using analyze, elaborate, link and check design
+read_verilog -rtl $VERILOG_LIST
 analyze -format verilog $VERILOG_LIST
 # set top level design
 current_design $PROJECT_NAME
@@ -63,7 +65,7 @@ saif_map -start
 
 # define clock
 create_clock clk -name ideal_clock1 -period 1
-compile_ultra -gate_clock -no_autogroup
+compile_ultra -gate_clock
 
 ###################################################
 # Analyze Design
