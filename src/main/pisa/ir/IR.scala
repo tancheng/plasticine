@@ -93,8 +93,9 @@ case class OperandConfig(config: String) extends AbstractConfig {
     case 'l' => 0 // Local register
     case 'r' => 1 // Remote register
     case 'c' => 2 // Constant
-    case 'm' => 3 // Memory
-    case _ => throw new Exception(s"Unknown data source '${config(0)}'. Must be l, r, c, or m")
+    case 'i' => 3 // Iterator / counter
+    case 'm' => 4 // Memory
+    case _ => throw new Exception(s"Unknown data source '${config(0)}'. Must be l, r, c, i, or m")
   }
   private var _dataSrc = getDataSrc
   def dataSrc() = _dataSrc
@@ -127,6 +128,25 @@ case class PipeStageConfig(config: Map[Any, Any]) extends AbstractConfig {
   def result() = _result
   def result_=(x: Int) { _result = x }
 
+  // TODO: Remove hardcoded constant!
+  val r = 4
+  private var _fwd: List[Int] = {
+    val m = Parser.getFieldMap(config, "fwd")
+    List.tabulate(r) { i =>
+      val regName = s"r$i"
+      if (m.contains(regName)) {
+        m(regName) match {
+          case "counter" => 1
+          case "memory" => 1
+          case _ => throw new Exception(s"Unknown forward source location ${m(regName)}. It must either be 'counter' or 'memory'")
+        }
+      } else 0
+    }
+  }
+  def fwd = _fwd
+  def fwd_=(x: List[Int]) { _fwd = x }
+
+
   override def toString = {
     s"opA:\n ${opA.toString}" + "\n" +
     s"opB:\n ${opB.toString}" + "\n" +
@@ -141,15 +161,6 @@ case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
     Parser.getFieldMap(config, "counterChain"))
   def counterChain() = _counterChain
   def counterChain_=(x: CounterChainConfig) { _counterChain = x }
-
-  /* Remote mux configs */
-  private var _remoteMux0 = Parser.getFieldInt(config, "remoteMux0")
-  def remoteMux0() = _remoteMux0
-  def remoteMux0_=(x: Int) { _remoteMux0 = x }
-
-  private var _remoteMux1 = Parser.getFieldInt(config, "remoteMux1")
-  def remoteMux1() = _remoteMux1
-  def remoteMux1_=(x: Int) { _remoteMux1 = x }
 
   private var _mem0wa = Parser.getFieldInt(config, "mem0wa")
   def mem0wa() = _mem0wa
@@ -188,8 +199,6 @@ case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
 
 
   override def toString = {
-    s"remoteMux0: $remoteMux0" + "\n" +
-    s"remoteMux1: $remoteMux1" + "\n" +
     s"pipeStage:\n" +
     pipeStage.map { _.toString }.reduce {_+_}
   }

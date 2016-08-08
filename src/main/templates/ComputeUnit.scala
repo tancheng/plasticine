@@ -33,6 +33,11 @@ class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = 
   var opB = if (config.isDefined) new OperandBundle(l, r, w, Some(config.get.opB)) else new OperandBundle(l, r, w)
   var opcode = if (config.isDefined) UInt(config.get.opcode, width=log2Up(Opcodes.size)) else UInt(width=log2Up(Opcodes.size))
   var result = if (config.isDefined) UInt(config.get.result, width=l+r) else UInt(width=l+r) // One-hot encoded
+  var fwd = if (config.isDefined) {
+      Vec.tabulate(r) { i => UInt(config.get.fwd(i), width=log2Up(r)) }
+    } else {
+      Vec.tabulate(r) { i => UInt(width=log2Up(r)) }
+    }
 
   override def cloneType(): this.type = {
     new PipeStageBundle(l,r,w).asInstanceOf[this.type]
@@ -50,8 +55,6 @@ class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = 
  * @param m: Scratchpad size in words
  */
 case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: Int, val r: Int, val m: Int, config: Option[ComputeUnitConfig] = None) extends OpcodeT {
-  var remoteMux0 = if (config.isDefined) UInt(config.get.remoteMux0, width=2) else UInt(width=2)
-  var remoteMux1 = if (config.isDefined) UInt(config.get.remoteMux1, width=2) else UInt(width=2)
 
   var mem0wa = if (config.isDefined) UInt(config.get.mem0wa, width=1) else UInt(width=1)
   var mem0wd = if (config.isDefined) UInt(config.get.mem0wd, width=1) else UInt(width=1)
@@ -90,9 +93,18 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
  */
 class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
 
+  // Currently, numCounters == numTokens
+  val numCounters = numTokens
+
+  val numScratchpads = 2 // TODO: Remove hardcoded number!
+
   // Sanity check parameters for validity
   Predef.assert(d >= (rwStages+wStages),
     s"""#stages $d < read-write stages ($rwStages) + write stages ($wStages)!""")
+
+  // #remoteRegs == numCounters + v in current impl
+  Predef.assert(r > (numCounters+v),
+    s"""#Unsupported number of remote registers $r; $r must be >= $numCounters (numCounters) + $v (vector width)""")
 
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT) // Reconfiguration interface
@@ -141,44 +153,49 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   mem1.io.wdata := mem1wdMux.io.out(0)
   mem1.io.raddr := mem1raMux.io.out(0)
   mem1.io.wen   := Bool(true)  // Temporary as we have no control flow
+  val rdata = List(mem0.io.rdata, mem1.io.rdata)
 
   // CounterChain
-  val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, 2, inst.counterChain)) // TODO: Hardcoded constant!
+  val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain)) // TODO: Hardcoded constant!
   // TODO: Getting this info from config temporarily
   counterChain.io.data.foreach { d =>
     d.max := UInt(0, w)
     d.stride := UInt(0,w)
   }
-  val counterEnables = Vec.fill(2) { Bool() } // TODO: Hardcoded constant!
+  val counterEnables = Vec.fill(numCounters) { Bool() } // TODO: Hardcoded constant!
   counterChain.io.control.zipWithIndex.foreach { case (c,i) =>
    c.enable := counterEnables(i)
   }
   val counters = counterChain.io.data map { _.out }
 
   // Control block
-  val controlBlock = Module(new CUControlBox(w, 2, inst.control)) // TODO: Hardcoded const!
+  val controlBlock = Module(new CUControlBox(w, numCounters, inst.control)) // TODO: Hardcoded const!
   controlBlock.io.config_enable := io.config_enable
   controlBlock.io.tokenIns := io.tokenIns
   controlBlock.io.done := counterChain.io.control map { _.done}
   counterEnables := controlBlock.io.enable
   io.tokenOuts := controlBlock.io.tokenOuts
 
-  // Remote MUXes to feed the two inputs
-  val remotesList =  counters ++ List(mem0.io.rdata, mem1.io.rdata)
-  val remoteMux0 = Module(new MuxN(remotesList.size, w))
-  remoteMux0.io.ins := Vec(remotesList)
-  remoteMux0.io.sel := config.remoteMux0
-  val remoteMux1 = Module(new MuxN(remotesList.size, w))
-  remoteMux1.io.ins := Vec(remotesList)
-  remoteMux1.io.sel := config.remoteMux1
-
-  // Values written to the first set of remote registers
-  // Order is fixed by the list
-  val passDataIn = remotesList
+  // Values passed in - Currently it is counters ++ all values from input bus
+  val remotesList =  counters ++ io.dataIn
+  // Initial register blocks for each lane
+  val initRegblocks = List.fill(v) {
+    val regBlock = Module(new RegisterBlock(w, 0 /*local*/,  r /*remote*/))
+    regBlock.io.writeData := UInt(0) // Not connected to any ALU output
+    regBlock.io.readLocalASel := UInt(0) // No local reads
+    regBlock.io.readLocalBSel := UInt(0) // No local reads
+    regBlock.io.passData.zipWithIndex.foreach { case (in, i) =>
+      val input = if (i < remotesList.size) remotesList(i)
+                  else UInt(0)
+      in := input
+    }
+    regBlock
+  }
 
   // Pipeline generation
   val pipeStages = ListBuffer[List[IntFU]]()
   val pipeRegs = ListBuffer[List[RegisterBlock]]()
+  pipeRegs.append(initRegblocks)
   for (i <- 0 until d) {
     val stage = List.fill(v) { Module(new IntFU(w)) }
     val regblockStage = List.fill(v) { Module(new RegisterBlock(w, l, r)) }
@@ -186,37 +203,71 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     (0 until v) foreach { ii =>
       val fu = stage(ii)
       val regblock = regblockStage(ii)
-      val rA = if (i == 0) remoteMux0.io.out else pipeRegs.last(ii).io.readRemoteA
-      val rB = if (i == 0) remoteMux1.io.out else pipeRegs.last(ii).io.readRemoteB
-      val localA = regblock.io.readLocalA
-      val localB = regblock.io.readLocalB
 
-      val dataSrcA = if (i < rwStages) Vec(localA, rA, stageConfig.opA.value, mem0.io.rdata)
-                     else Vec(localA, rA, stageConfig.opA.value)
+      // Local and remote (previous pipe stage) registers
+      val localA = regblock.io.readLocalA
+      val rA = pipeRegs.last(ii).io.readRemoteA
+
+      val dataSrcA = if (i <= rwStages) {
+        // Forwarded memories
+        val memAMux = Module(new MuxN(numScratchpads, w))
+        memAMux.io.ins := Vec(rdata)
+        memAMux.io.sel := stageConfig.opA.value
+
+        if (i == rwStages) {
+          Vec(localA, rA, stageConfig.opA.value, UInt(0, width=w), memAMux.io.out)
+        } else {
+          // Forwarded counters
+          val counterAMux = Module(new MuxN(numCounters, w))
+          counterAMux.io.ins := Vec(counters)
+          counterAMux.io.sel := stageConfig.opA.value
+          Vec(localA, rA, stageConfig.opA.value, counterAMux.io.out, memAMux.io.out)
+        }
+      } else {
+        Vec(localA, rA, stageConfig.opA.value)
+      }
+      val rB = pipeRegs.last(ii).io.readRemoteB
+      val localB = regblock.io.readLocalB
+      val dataSrcB = if (i <= rwStages) {
+        // Forwarded memories
+        val memBMux = Module(new MuxN(numScratchpads, w))
+        memBMux.io.ins := Vec(rdata)
+        memBMux.io.sel := stageConfig.opB.value
+
+        if (i == rwStages) {
+          Vec(localB, rB, stageConfig.opB.value, UInt(0, width=w), memBMux.io.out)
+        } else {
+          // Forwarded counters
+          val counterBMux = Module(new MuxN(numCounters, w))
+          counterBMux.io.ins := Vec(counters)
+          counterBMux.io.sel := stageConfig.opB.value
+          Vec(localB, rB, stageConfig.opB.value, counterBMux.io.out, memBMux.io.out)
+        }
+      } else {
+        Vec(localB, rB, stageConfig.opB.value)
+      }
+
       val dataSrcAMux = Module(new MuxN(dataSrcA.size, w))
       dataSrcAMux.io.ins := dataSrcA
       dataSrcAMux.io.sel := stageConfig.opA.dataSrc
-      val inA = dataSrcAMux.io.out
-
-      val dataSrcB = if (i < rwStages) Vec(localB, rB, stageConfig.opB.value, mem1.io.rdata)
-                     else Vec(localB, rB, stageConfig.opB.value)
       val dataSrcBMux = Module(new MuxN(dataSrcB.size, w))
       dataSrcBMux.io.ins := dataSrcB
       dataSrcBMux.io.sel := stageConfig.opB.dataSrc
+
+      val inA = dataSrcAMux.io.out
       val inB = dataSrcBMux.io.out
       fu.io.a := inA
       fu.io.b := inB
       fu.io.opcode := stageConfig.opcode
       regblock.io.writeData := fu.io.out
-      val passData = if (i == 0) passDataIn else pipeRegs.last(ii).io.passDataOut
+
+      val passData = pipeRegs.last(ii).io.passDataOut
       regblock.io.passData := passData
       regblock.io.writeSel := stageConfig.result
       regblock.io.readLocalASel := stageConfig.opA.value
       regblock.io.readLocalBSel := stageConfig.opB.value
-      if (i > 0) {
-        pipeRegs.last(ii).io.readRemoteASel := stageConfig.opA.value
-        pipeRegs.last(ii).io.readRemoteBSel := stageConfig.opB.value
-      }
+      pipeRegs.last(ii).io.readRemoteASel := stageConfig.opA.value
+      pipeRegs.last(ii).io.readRemoteBSel := stageConfig.opB.value
     }
     pipeStages.append(stage)
     pipeRegs.append(regblockStage)
@@ -280,7 +331,7 @@ object ComputeUnitTest {
     val endDelayWidth = 4
     val d = 2
     val v = 1
-    val l = 2
+    val l = 1
     val r = 4
     val rwStages = 1
     val wStages = 1

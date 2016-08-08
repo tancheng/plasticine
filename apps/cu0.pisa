@@ -3,8 +3,6 @@
 "topconfig" : {
   "type" : "cu",
   "config" : {
-    "remoteMux0" : 0,
-    "remoteMux1" : 1,
     "mem0wa" : 0,
     "mem0wd" : 0,
     "mem0ra" : 0,
@@ -18,13 +16,17 @@
           "max"         : 5,
           "stride"      : 1,
           "maxConst"    : 1,
-          "strideConst" : 1
+          "strideConst" : 1,
+          "startDelay" :  0,
+          "endDelay" : 0
         },
         {
           "max"         : 5,
           "stride"      : 1,
           "maxConst"    : 1,
-          "strideConst" : 1
+          "strideConst" : 1,
+          "startDelay" :  0,
+          "endDelay" : 0
         }
       ]
     },
@@ -33,13 +35,15 @@
         "opA" : "r0",
         "opB" : "r1",
         "opcode" : "*",
-        "result" : "l3"
+        "result" : "l3",
+        "fwd"   : {"r0" : "counter", "r2" : "memory" }
       },
       {
         "opA" : "r1",
         "opB" : "l1",
         "opcode" : "+",
-        "result" : "l1"
+        "result" : "l1",
+        "fwd"   : { }
       }
     ],
    "control" : {
