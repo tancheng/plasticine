@@ -1,3 +1,2 @@
-1. CU_power_area_estimate and FPGA_power_estimate contain the necessary tools for running all the needed power / area estimate. 
-2. The MEM_estimates folder contains all the tools for estimating power consumption of memories (SRAM, DRAM). Please refer to the README inside of DRAMSim and cacti for more information.
-3. Please go to the london server to run these scripts.
+Files moved to the "synth" branch. README on the "synth" branch contains more
+details about scripts and how to run them.
