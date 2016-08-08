@@ -77,6 +77,8 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
 /**
  * Compute Unit module
  * @param w: Word width
+ * @param startDelayWidth: Start delay width
+ * @param endDelayWidth: End delay width
  * @param d: Pipeline depth
  * @param v: Vector length
  * @param rwStages: Read-write stages (at the beginning)
@@ -86,7 +88,7 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
  * @param r: Number of remote pipeline registers
  * @param m: Scratchpad size in words
  */
-class ComputeUnit(val w: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
+class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
 
   // Sanity check parameters for validity
   Predef.assert(d >= (rwStages+wStages),
@@ -141,7 +143,7 @@ class ComputeUnit(val w: Int, val d: Int, val v: Int, rwStages: Int, wStages: In
   mem1.io.wen   := Bool(true)  // Temporary as we have no control flow
 
   // CounterChain
-  val counterChain = Module(new CounterChain(w, 2, inst.counterChain)) // TODO: Hardcoded constant!
+  val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, 2, inst.counterChain)) // TODO: Hardcoded constant!
   // TODO: Getting this info from config temporarily
   counterChain.io.data.foreach { d =>
     d.max := UInt(0, w)
@@ -274,6 +276,8 @@ object ComputeUnitTest {
     val configObj = Config(pisaFile).asInstanceOf[Config[ComputeUnitConfig]]
 
     val bitwidth = 7
+    val startDelayWidth = 4
+    val endDelayWidth = 4
     val d = 2
     val v = 1
     val l = 2
@@ -282,7 +286,7 @@ object ComputeUnitTest {
     val wStages = 1
     val numTokens = 2
     val m = 16
-    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
       c => new ComputeUnitTests(c)
     }
   }

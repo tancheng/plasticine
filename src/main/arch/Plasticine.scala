@@ -9,6 +9,8 @@ import scala.collection.mutable.ListBuffer
 /**
  * Plasticine Top
  * @param w: Word width
+ * @param startDelayWidth: Start delay width
+ * @param endDelayWidth: End delay width
  * @param d: Pipeline depth
  * @param v: Vector length
  * @param rwStages: Read-write stages (at the beginning)
@@ -18,7 +20,7 @@ import scala.collection.mutable.ListBuffer
  * @param r: Number of remote pipeline registers
  * @param m: Scratchpad size in words
  */
-class Plasticine(val w: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: PlasticineConfig) extends Module {
+class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: PlasticineConfig) extends Module {
 
   val io = new Bundle {
     val config_enable = Bool(INPUT) // Reconfiguration interface
@@ -34,8 +36,8 @@ class Plasticine(val w: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int
   io.status := controlBox.io.statusOut
 
   // Compute Units
-  val cu0 = Module(new ComputeUnit(w, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(0)))
-  val cu1 = Module(new ComputeUnit(w, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(1)))
+  val cu0 = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(0)))
+  val cu1 = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(1)))
   cu0.io.config_enable := io.config_enable
   cu0.io.tokenIns.zipWithIndex.foreach { case(in, i) =>
     if (i == 0) {
@@ -81,6 +83,8 @@ object PlasticineTest {
     val configObj = Config(pisaFile).asInstanceOf[Config[PlasticineConfig]]
 
     val bitwidth = 8
+    val startDelayWidth = 4
+    val endDelayWidth = 4
     val d = 2
     val v = 1
     val l = 2
@@ -89,7 +93,7 @@ object PlasticineTest {
     val wStages = 1
     val numTokens = 2
     val m = 16
-    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
       c => new PlasticineTests(c)
     }
   }

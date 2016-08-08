@@ -23,9 +23,11 @@ case class CounterChainOpcode(val w: Int, val numCounters: Int, config: Option[C
 /**
  * CounterChain: Chain of perfectly nested counters.
  * @param w: Word width
+ * @param startDelayWidth: Width of start delay counters
+ * @param endDelayWidth: Width of end delay counters
  * @param numCounters: Number of counters
  */
-class CounterChain(val w: Int, val numCounters: Int, inst: CounterChainConfig) extends ConfigurableModule[CounterChainOpcode] {
+class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val numCounters: Int, inst: CounterChainConfig) extends ConfigurableModule[CounterChainOpcode] {
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
     val data = Vec.fill(numCounters) { new Bundle {
@@ -54,23 +56,31 @@ class CounterChain(val w: Int, val numCounters: Int, inst: CounterChainConfig) e
 
   val counterInsn = inst.counters
   val counters = (0 until numCounters) map { i =>
-    val c = Module(new CounterRC(w, counterInsn(i)))
+    val c = Module(new CounterRC(w, startDelayWidth, endDelayWidth, counterInsn(i)))
     c.io.data.max := io.data(i).max
     c.io.data.stride := io.data(i).stride
     io.data(i).out := c.io.data.out
-    c.io.control.reset := Bool(false)
-    c.io.control.saturate := Bool(false)
     c
   }
 
   // Create chain reconfiguration logic
   (0 until numCounters) foreach { i: Int =>
+    // Enable-done chain
     if (i == 0) {
       counters(i).io.control.enable := io.control(i).enable
     } else {
       counters(i).io.control.enable := Mux(config.chain(i-1),
         io.control(i).enable & counters(i-1).io.control.done,
         io.control(i).enable)
+    }
+
+    // waitIn - waitOut chain
+    if (i == numCounters-1) {
+      counters(i).io.control.waitIn := Bool(false)
+    } else {
+      counters(i).io.control.waitIn := Mux(config.chain(i),
+                                      counters(i+1).io.control.waitOut,
+                                      Bool(false))
     }
     io.control(i).done := counters(i).io.control.done
   }
@@ -114,9 +124,11 @@ object CounterChainTest {
     val pisaFile = appArgs(0)
     val configObj = Config(pisaFile).asInstanceOf[Config[CounterChainConfig]]
     val bitwidth = 8
-    val numCounters = 3
+    val numCounters = 4
+    val startDelayWidth = 4
+    val endDelayWidth = 4
 
-    chiselMainTest(args, () => Module(new CounterChain(bitwidth, numCounters, configObj.config))) {
+    chiselMainTest(args, () => Module(new CounterChain(bitwidth, startDelayWidth, endDelayWidth, numCounters, configObj.config))) {
       c => new CounterChainTests(c)
     }
   }

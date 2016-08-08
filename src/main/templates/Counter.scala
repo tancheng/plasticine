@@ -25,7 +25,7 @@ class Counter(val w: Int) extends Module {
   val reg = Module(new FF(w))
   val init = UInt(0, width = w)
   reg.io.data.init := init
-  reg.io.control.enable := io.control.enable
+  reg.io.control.enable := io.control.reset | io.control.enable
 
   val count = Cat(UInt(0, width=1), reg.io.data.out)
   val newval = count + io.data.stride

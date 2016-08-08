@@ -34,30 +34,34 @@ abstract class AbstractConfig {
  */
 case class CounterRCConfig(config: Map[Any, Any]) extends AbstractConfig {
   /** Counter max */
-  private var _max: Int = 0
+  private var _max: Int = Parser.getFieldInt(config, "max")
   def max = _max
   def max_=(x: Int) { _max = x }
 
   /** Counter stride */
-  private var _stride: Int = 0
+  private var _stride: Int = Parser.getFieldInt(config, "stride")
   def stride = _stride
   def stride_=(x: Int) { _stride = x }
 
   /** Is max const */
-  private var _maxConst: Int = 0
+  private var _maxConst: Int = Parser.getFieldInt(config, "maxConst")
   def maxConst = _maxConst
   def maxConst_=(x: Int) { _maxConst = x }
 
   /** Is stride const */
-  private var _strideConst: Int = 0
+  private var _strideConst: Int = Parser.getFieldInt(config, "strideConst")
   def strideConst = _strideConst
   def strideConst_=(x: Int) { _strideConst = x }
 
-  // Construct the class here
-  max = Parser.getFieldInt(config, "max")
-  stride = Parser.getFieldInt(config, "stride")
-  maxConst = Parser.getFieldInt(config, "maxConst")
-  strideConst = Parser.getFieldInt(config, "strideConst")
+  /** Delay the start of counter */
+  private var _startDelay: Int = 1 + Parser.getFieldInt(config, "startDelay")
+  def startDelay = _startDelay
+  def startDelay_=(x: Int) { _startDelay = x }
+
+  /** Delay raising the counter 'done' signal */
+  private var _endDelay: Int = 1 + Parser.getFieldInt(config, "endDelay")
+  def endDelay = _endDelay
+  def endDelay_=(x: Int) { _endDelay = x }
 }
 
 
