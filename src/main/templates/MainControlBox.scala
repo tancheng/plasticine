@@ -8,12 +8,12 @@ import Chisel._
  */
 class MainControlBox() extends Module {
   val io = new Bundle {
-    val configEnable = UInt(INPUT, width=1)
+//    val configEnable = UInt(INPUT, width=1)
     val command = UInt(INPUT, width=1)
     val doneTokenIn = Bool(INPUT)
     val startTokenOut = Bool(OUTPUT)
     val statusOut = UInt(OUTPUT, width=1)
-    val configEnableOut = UInt(OUTPUT, width=1)
+//    val configEnableOut = UInt(OUTPUT, width=1)
   }
 
   val commandReg = Reg(UInt(1), io.command, UInt(0))
@@ -27,7 +27,7 @@ class MainControlBox() extends Module {
 
   val statusReg = Reg(Bits(1), depulser.io.out, UInt(0))
   io.statusOut := statusReg
-  io.configEnableOut := io.configEnable
+//  io.configEnableOut := io.configEnable
 }
 
 /**

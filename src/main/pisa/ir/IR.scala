@@ -243,3 +243,14 @@ case class LUTConfig(config: Map[Any, Any]) extends AbstractConfig {
   def table = _table
   def table_=(x: List[Int]) { _table = x }
 }
+
+/**
+ * Plasticine config information
+ */
+case class PlasticineConfig(config: Map[Any, Any]) extends AbstractConfig {
+  private var _cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(config, "cu")
+                                        .map { ComputeUnitConfig(_) }
+
+  def cu = _cu
+  def cu_=(x: List[ComputeUnitConfig]) { _cu = x }
+}

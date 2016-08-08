@@ -117,27 +117,27 @@ class ComputeUnit(val w: Int, val d: Int, val v: Int, rwStages: Int, wStages: In
 
   // Scratchpads
   val mem0 = Module(new SRAM(w, m))
-  val mem0waMux = Module(new MuxN(rwStages+wStages, log2Up(m)))
-  val mem0wdMux = Module(new MuxN(rwStages+wStages, w))
-  val mem0raMux = Module(new MuxN(rwStages, log2Up(m)))
+  val mem0waMux = Module(new MuxVec(rwStages+wStages, v, log2Up(m)))
+  val mem0wdMux = Module(new MuxVec(2, v, w))
+  val mem0raMux = Module(new MuxVec(rwStages, v, log2Up(m)))
   mem0waMux.io.sel := config.mem0wa
   mem0wdMux.io.sel := config.mem0wd
   mem0raMux.io.sel := config.mem0ra
-  mem0.io.waddr := mem0waMux.io.out
-  mem0.io.wdata := mem0wdMux.io.out
-  mem0.io.raddr := mem0raMux.io.out
+  mem0.io.waddr := mem0waMux.io.out(0)
+  mem0.io.wdata := mem0wdMux.io.out(0)
+  mem0.io.raddr := mem0raMux.io.out(0)
   mem0.io.wen   := Bool(true)  // Temporary as we have no control flow
 
   val mem1 = Module(new SRAM(w, m))
-  val mem1waMux = Module(new MuxN(rwStages+wStages, log2Up(m)))
-  val mem1wdMux = Module(new MuxN(rwStages+wStages, w))
-  val mem1raMux = Module(new MuxN(rwStages, log2Up(m)))
+  val mem1waMux = Module(new MuxVec(rwStages+wStages, v, log2Up(m)))
+  val mem1wdMux = Module(new MuxVec(2, v, w))
+  val mem1raMux = Module(new MuxVec(rwStages, v, log2Up(m)))
   mem1waMux.io.sel := config.mem1wa
   mem1wdMux.io.sel := config.mem1wd
   mem1raMux.io.sel := config.mem1ra
-  mem1.io.waddr := mem1waMux.io.out
-  mem1.io.wdata := mem1wdMux.io.out
-  mem1.io.raddr := mem1raMux.io.out
+  mem1.io.waddr := mem1waMux.io.out(0)
+  mem1.io.wdata := mem1wdMux.io.out(0)
+  mem1.io.raddr := mem1raMux.io.out(0)
   mem1.io.wen   := Bool(true)  // Temporary as we have no control flow
 
   // CounterChain
@@ -162,70 +162,87 @@ class ComputeUnit(val w: Int, val d: Int, val v: Int, rwStages: Int, wStages: In
   io.tokenOuts := controlBlock.io.tokenOuts
 
   // Remote MUXes to feed the two inputs
-  val remotes0List =  counters ++ List(mem0.io.rdata)
-  val remoteMux0 = Module(new MuxN(remotes0List.size, w))
-  remoteMux0.io.ins := Vec(remotes0List)
+  val remotesList =  counters ++ List(mem0.io.rdata, mem1.io.rdata)
+  val remoteMux0 = Module(new MuxN(remotesList.size, w))
+  remoteMux0.io.ins := Vec(remotesList)
   remoteMux0.io.sel := config.remoteMux0
-  val remotes1List =  counters ++ List(mem1.io.rdata)
-  val remoteMux1 = Module(new MuxN(remotes1List.size, w))
-  remoteMux1.io.ins := Vec(remotes1List)
+  val remoteMux1 = Module(new MuxN(remotesList.size, w))
+  remoteMux1.io.ins := Vec(remotesList)
   remoteMux1.io.sel := config.remoteMux1
 
   // Values written to the first set of remote registers
   // Order is fixed by the list
-  val passDataIn = counters ++ List(mem0.io.rdata, mem1.io.rdata)
+  val passDataIn = remotesList
 
   // Pipeline generation
-  val fus = ListBuffer[IntFU]()
-  val pipeRegs = ListBuffer[RegisterBlock]()
+  val pipeStages = ListBuffer[List[IntFU]]()
+  val pipeRegs = ListBuffer[List[RegisterBlock]]()
   for (i <- 0 until d) {
-    val fu = Module(new IntFU(w))
-    val regblock = Module(new RegisterBlock(w, l, r))
+    val stage = List.fill(v) { Module(new IntFU(w)) }
+    val regblockStage = List.fill(v) { Module(new RegisterBlock(w, l, r)) }
+    val stageConfig = config.pipeStage(i)
+    (0 until v) foreach { ii =>
+      val fu = stage(ii)
+      val regblock = regblockStage(ii)
+      val rA = if (i == 0) remoteMux0.io.out else pipeRegs.last(ii).io.readRemoteA
+      val rB = if (i == 0) remoteMux1.io.out else pipeRegs.last(ii).io.readRemoteB
+      val localA = regblock.io.readLocalA
+      val localB = regblock.io.readLocalB
 
-    val rA = if (i == 0) remoteMux0.io.out else pipeRegs.last.io.readRemoteA
-    val rB = if (i == 0) remoteMux1.io.out else pipeRegs.last.io.readRemoteB
-    val localA = regblock.io.readLocalA
-    val localB = regblock.io.readLocalB
+      val dataSrcA = if (i < rwStages) Vec(localA, rA, stageConfig.opA.value, mem0.io.rdata)
+                     else Vec(localA, rA, stageConfig.opA.value)
+      val dataSrcAMux = Module(new MuxN(dataSrcA.size, w))
+      dataSrcAMux.io.ins := dataSrcA
+      dataSrcAMux.io.sel := stageConfig.opA.dataSrc
+      val inA = dataSrcAMux.io.out
 
-    val dataSrcA = if (i < rwStages) Vec(localA, rA, config.pipeStage(i).opA.value, mem0.io.rdata) else Vec(localA, rA, config.pipeStage(i).opA.value)
-    val dataSrcAMux = Module(new MuxN(dataSrcA.size, w))
-    dataSrcAMux.io.ins := dataSrcA
-    dataSrcAMux.io.sel := config.pipeStage(i).opA.dataSrc
-    val inA = dataSrcAMux.io.out
-
-    val dataSrcB = if (i < rwStages) Vec(localB, rB, config.pipeStage(i).opB.value, mem1.io.rdata) else Vec(localB, rB, config.pipeStage(i).opB.value)
-    val dataSrcBMux = Module(new MuxN(dataSrcB.size, w))
-    dataSrcBMux.io.ins := dataSrcB
-    dataSrcBMux.io.sel := config.pipeStage(i).opB.dataSrc
-    val inB = dataSrcBMux.io.out
-    fu.io.a := inA
-    fu.io.b := inB
-    fu.io.opcode := config.pipeStage(i).opcode
-    regblock.io.writeData := fu.io.out
-    val passData = if (i == 0) passDataIn else pipeRegs.last.io.passDataOut
-    regblock.io.passData := passData
-    regblock.io.writeSel := config.pipeStage(i).result
-    regblock.io.readLocalASel := config.pipeStage(i).opA.value
-    regblock.io.readLocalBSel := config.pipeStage(i).opB.value
-    if (i > 0) {
-      pipeRegs.last.io.readRemoteASel := config.pipeStage(i).opA.value
-      pipeRegs.last.io.readRemoteBSel := config.pipeStage(i).opB.value
+      val dataSrcB = if (i < rwStages) Vec(localB, rB, stageConfig.opB.value, mem1.io.rdata)
+                     else Vec(localB, rB, stageConfig.opB.value)
+      val dataSrcBMux = Module(new MuxN(dataSrcB.size, w))
+      dataSrcBMux.io.ins := dataSrcB
+      dataSrcBMux.io.sel := stageConfig.opB.dataSrc
+      val inB = dataSrcBMux.io.out
+      fu.io.a := inA
+      fu.io.b := inB
+      fu.io.opcode := stageConfig.opcode
+      regblock.io.writeData := fu.io.out
+      val passData = if (i == 0) passDataIn else pipeRegs.last(ii).io.passDataOut
+      regblock.io.passData := passData
+      regblock.io.writeSel := stageConfig.result
+      regblock.io.readLocalASel := stageConfig.opA.value
+      regblock.io.readLocalBSel := stageConfig.opB.value
+      if (i > 0) {
+        pipeRegs.last(ii).io.readRemoteASel := stageConfig.opA.value
+        pipeRegs.last(ii).io.readRemoteBSel := stageConfig.opB.value
+      }
     }
-    fus.append(fu)
-    pipeRegs.append(regblock)
+    pipeStages.append(stage)
+    pipeRegs.append(regblockStage)
   }
 
+  def getStageOut(stage: List[IntFU]): Vec[Bits]  = {
+    Vec.tabulate(v) { i => stage(i).io.out }
+  }
+  def getStageOut(i: Int) : Vec[Bits] = {
+    getStageOut(pipeStages(i))
+  }
+
+  val dataIn = Vec.tabulate(v) { i => io.dataIn(i) }
+
   // Connect scratchpad raddr, waddr, wdata ports
-  val rwStagesOut = fus.take(rwStages) map { _.io.out }
-  val wStagesOut = fus.takeRight(wStages) map { _.io.out }
+  val rwStagesOut = pipeStages.take(rwStages) map { getStageOut(_) }
+  val wStagesOut = pipeStages.takeRight(wStages) map { getStageOut(_) }
   mem0raMux.io.ins := Vec (rwStagesOut)
   mem0waMux.io.ins := Vec (rwStagesOut ++ wStagesOut)
-  mem0wdMux.io.ins := Vec (rwStagesOut ++ wStagesOut)
+  mem0wdMux.io.ins(0) := getStageOut(pipeStages.last)
+  mem0wdMux.io.ins(1) := io.dataIn
   mem1raMux.io.ins := Vec (rwStagesOut)
   mem1waMux.io.ins := Vec (rwStagesOut ++ wStagesOut)
-  mem1wdMux.io.ins := Vec (rwStagesOut ++ wStagesOut)
+  mem1wdMux.io.ins(0) := getStageOut(pipeStages.last)
+  mem1wdMux.io.ins(1) := io.dataIn
 
-  io.scalarOut := fus.last.io.out
+  io.scalarOut := getStageOut(pipeStages.last)(0)
+  io.dataOut := getStageOut(pipeStages.last)
 }
 
 /**

@@ -52,6 +52,8 @@ object Parser {
         new Config(CUControlBoxConfig(config))
       case "cu" =>
         new Config(ComputeUnitConfig(config))
+      case "plasticine" =>
+        new Config(PlasticineConfig(config))
       case _ => throw new Exception(s"not handled yet: $t")
     }
   }

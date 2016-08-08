@@ -1,31 +1,96 @@
 package plasticine.templates
 
 import Chisel._
+import plasticine.pisa.ir._
 
-//class Plasticine(val w: Int) extends Module {
-//
-//  private def floorMod(x: Int, divisor: Int) = {
-//    val res = x % divisor
-//    if (res < 0) res + divisor else res
-//  }
-//
-//  // Instantiate two Compute units
-//  val c00 = Module(new Compute(w))
-//  val c01 = Module(new Compute(w))
-//  val s00 = Module(new SwitchBox8(w))
-//  val s01 = Module(new SwitchBox8(w))
-//  val s02 = Module(new SwitchBox8(w))
-//  val s10 = Module(new SwitchBox8(w))
-//  val s11 = Module(new SwitchBox8(w))
-//  val s12 = Module(new SwitchBox8(w))
-//
-//  // Wire up switches
-//  s00.io.in := s10.io.os
-//  s00.io.inw :=
-//  s00.io.iw :=
-//  s00.io.isw :=
-//  s00.io.is :=
-//  s00.io.ise :=
-//  s00.io.ie :=
-//  s00.io.ine :=
-//}
+import scala.collection.mutable.HashMap
+import scala.collection.mutable.ListBuffer
+
+/**
+ * Plasticine Top
+ * @param w: Word width
+ * @param d: Pipeline depth
+ * @param v: Vector length
+ * @param rwStages: Read-write stages (at the beginning)
+ * @param wStages: Write stages (at the end)
+ * @param numTokens: Number of input (and output) tokens
+ * @param l: Number of local pipeline registers
+ * @param r: Number of remote pipeline registers
+ * @param m: Scratchpad size in words
+ */
+class Plasticine(val w: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: PlasticineConfig) extends Module {
+
+  val io = new Bundle {
+    val config_enable = Bool(INPUT) // Reconfiguration interface
+
+    /* Control interface */
+    val command = { Bool(INPUT) }
+    val status =  { Bool(OUTPUT) }
+  }
+
+  // Main control with command and status
+  val controlBox = Module(new MainControlBox())
+  controlBox.io.command := io.command
+  io.status := controlBox.io.statusOut
+
+  // Compute Units
+  val cu0 = Module(new ComputeUnit(w, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(0)))
+  val cu1 = Module(new ComputeUnit(w, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(1)))
+  cu0.io.config_enable := io.config_enable
+  cu0.io.tokenIns.zipWithIndex.foreach { case(in, i) =>
+    if (i == 0) {
+      in := controlBox.io.startTokenOut  // Route the 'begin' token to the first CU
+    } else {
+      in := Bool(false)
+    }
+  }
+  cu0.io.dataIn := cu1.io.dataOut
+
+  cu1.io.config_enable := io.config_enable
+  cu1.io.tokenIns := cu0.io.tokenOuts
+  controlBox.io.doneTokenIn := cu1.io.tokenOuts(0)
+  cu1.io.dataIn := cu0.io.dataOut
+}
+
+/**
+ * ComputeUnit test harness
+ */
+class PlasticineTests(c: Plasticine) extends Tester(c) {
+  var numCycles = 0
+
+  while (numCycles < 100) {
+    step(1)
+    numCycles += 1
+  }
+
+  println(s"Done, design ran for $numCycles cycles")
+}
+
+
+object PlasticineTest {
+  def main(args: Array[String]): Unit = {
+
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    if (appArgs.size != 1) {
+      println("Usage: bin/sadl PlasticineTest <pisa config>")
+      sys.exit(-1)
+    }
+
+    val pisaFile = appArgs(0)
+    val configObj = Config(pisaFile).asInstanceOf[Config[PlasticineConfig]]
+
+    val bitwidth = 8
+    val d = 2
+    val v = 1
+    val l = 2
+    val r = 4
+    val rwStages = 1
+    val wStages = 1
+    val numTokens = 2
+    val m = 16
+    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
+      c => new PlasticineTests(c)
+    }
+  }
+}
