@@ -1,3 +1,0 @@
-1. To enable running with Stratix family, the 64-bit version needs to be enabled. To do so, run quartus as: quartus --64 <$PROJECT.qpf>
-2. Since there is no exact match for the FPGA we are using, right now the FPGA board type is set to Stratix V 5SGSMD4E3H29I4.
-3. To initiate the power estimate, first set the top module. Then run synthesis and set the toggle rates. The trace file can be obtaiend by using a vcd file.
