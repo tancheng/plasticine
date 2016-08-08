@@ -12,9 +12,9 @@ set search_path [list ./ $SRC_PATH $target_lib $sym_lib]
 set hdlin_auto_save_templates true
 
 # create milkyway library
-create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
+# create_mw_lib -technology $MILKYWAY_TF -mw_reference_library $MILKYWAY_REF $MILKYWAY_LIB_NAME
 set_tlu_plus_files -max_tluplus $TLUPLUS_MAX -min_tluplus $TLUPLUS_MIN -tech2itf_map $TECH2ITF_MAP
-open_mw_lib $MILKYWAY_LIB_NAME 
+open_mw_lib $MILKYWAY_LIB_NAME
 import_designs $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.v -format "verilog" -top $PROJECT_NAME -cel $PROJECT_NAME
 read_sdc $PRE_PR_NETLIST_PATH/$PROJECT_NAME.mapped.sdc
 set power "VDD"
@@ -34,7 +34,7 @@ create_floorplan \
     -bottom_io2core 30 \
     -right_io2core 30 \
     -top_io2core 30 \
-    -start_first_row  
+    -start_first_row
 
 # create power rings
 create_rectangular_rings \
@@ -70,7 +70,7 @@ route_search_repair -rerun_drc -loop "10"
 route_zrt_eco -max_detail_route_iterations 5 verify_lvs -check_open_locator -check_short_locator
 
 # adding filler cells
-insert_stdcell_filler\ 
+insert_stdcell_filler\
     -cell_without_metal "SHFILL128_RVT SHFILL64_RVT SHFILL3_RVT SHFILL2_RVT SHFILL1_RVT"\
     -connect_to_power {VDD}
     -connect_to_ground {VSS}
@@ -79,10 +79,7 @@ foreach net {VDD} {derive_pg_connection -power_net $net -power_pin $net -create_
 foreach net {VSS} {derive_pg_connection -ground_net $net -ground_pin $net -create_ports top}
 
 # last check for drc and lvs error check
-verify_drc
 verify_lvs
-
-# TODO: generate the post place-and-route gatelevel_netlist, the constraint files, and parasitic files
 
 ###################################################
 # Analyze Design

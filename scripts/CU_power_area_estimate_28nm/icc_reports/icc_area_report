@@ -1,0 +1,30 @@
+ 
+****************************************
+Report : area
+Design : Plasticine
+Version: J-2014.09-SP3
+Date   : Sat Aug  6 17:56:01 2016
+****************************************
+
+Library(s) Used:
+
+    tcbn45gsbwpml (File: /cad/synopsys_EDK2/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn45gsbwp_110a/tcbn45gsbwpml.db)
+
+Number of ports:                            7
+Number of nets:                           201
+Number of cells:                          218
+Number of combinational cells:            165
+Number of sequential cells:                21
+Number of macros/black boxes:               0
+Number of buf/inv:                         31
+Number of references:                      63
+
+Combinational area:                181.515603
+Buf/Inv area:                       26.283601
+Noncombinational area:             189.806399
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:                   371.322002
+Total area:                 undefined
+1
