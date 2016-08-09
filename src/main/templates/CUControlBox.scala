@@ -54,21 +54,21 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   // Token out LUTs
   val tokenOutLUTs = List.tabulate(numTokens) { i =>
     val lut = Module(new LUT(1, 1 << io.done.size, inst.tokenOutLUT(i)))
-    lut.io.ins := io.done
+    lut.io.ins := io.done.reverse  // MSB must be in position 0
     io.tokenOuts(i) := lut.io.out
   }
   // Decrement signal crossbar. Inputs is numTokens+1 because there is a constant
   // "zero" input which can also be chosen
   val decXbar = Module(new Crossbar(1, numTokens+1, numTokens, inst.decXbar))
   decXbar.io.config_enable := io.config_enable
-  decXbar.io.ins.zipWithIndex.foreach { case (in, i) => if (i == 0) UInt(0, width=1) else io.done(i-1) }
+  decXbar.io.ins.zipWithIndex.foreach { case (in, i) => if (i == 0) in := UInt(0, width=1) else in := io.done(i-1) }
   val decs = decXbar.io.outs
 
   // Increment signal crossbar. Inputs is numTokens+1 because there is a constant
   // "zero" input which can also be chosen
   val incXbar = Module(new Crossbar(1, numTokens+1, 2*numTokens, inst.incXbar))
   incXbar.io.config_enable := io.config_enable
-  incXbar.io.ins.zipWithIndex.foreach { case (in, i) => if (i == 0) UInt(0, width=1) else io.tokenIns(i-1) }
+  incXbar.io.ins.zipWithIndex.foreach { case (in, i) => if (i == 0) in := UInt(0, width=1) else in := io.tokenIns(i-1) }
   val incs = incXbar.io.outs.take(numTokens)
   val inits = incXbar.io.outs.takeRight(numTokens)
 
@@ -86,7 +86,7 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
 
   val enableLUTs = List.tabulate(numTokens) { i =>
     val lut = Module(new LUT(1, 1 << gtzs.size, inst.enableLUT(i)))
-    lut.io.ins := gtzs
+    lut.io.ins := gtzs.reverse // MSB must be in position 0
     io.enable(i) := lut.io.out
   }
 }
