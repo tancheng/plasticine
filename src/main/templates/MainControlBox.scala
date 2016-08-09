@@ -11,7 +11,7 @@ class MainControlBox() extends Module {
 //    val configEnable = UInt(INPUT, width=1)
     val command = UInt(INPUT, width=1)
     val doneTokenIn = Bool(INPUT)
-    val startTokenOut = Bool(OUTPUT)
+    val startTokenOut = UInt(OUTPUT, width=1)
     val statusOut = UInt(OUTPUT, width=1)
 //    val configEnableOut = UInt(OUTPUT, width=1)
   }
