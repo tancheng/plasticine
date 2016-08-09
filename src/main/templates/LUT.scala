@@ -76,6 +76,8 @@ class LUT(val w: Int, val size: Int, val inst: LUTConfig) extends ConfigurableMo
     configIn := config
   }
 
+  // NOTE: io.ins is a scala collection where MSB is in position 0
+  // Users of LUTs must ensure that MSB of inputs must be in position 0
   val sel = io.ins.reduce{Cat(_,_)}
   val lut = config.table
   io.out := lut(sel)
