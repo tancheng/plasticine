@@ -7,13 +7,34 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
 /**
+ * Scratchpad config bundle
+ * @param w: Word width
+ * @param m: Memory size
+ * @param v: Vector length
+ * @param numCounters: Number of counters
+ * @param d: Pipeline depth
+ */
+class ScratchpadBundle(w: Int, m: Int, v: Int, numCounters: Int, d: Int, config: Option[ScratchpadConfig] = None) extends Bundle {
+  var raSrc = if (config.isDefined) UInt(config.get.ra.src, width=1) else UInt(width=1)
+  var raValue = if (config.isDefined) UInt(config.get.ra.value, width=log2Up(math.max(numCounters, d))) else UInt(width=log2Up(math.max(numCounters, d)))
+  var waSrc = if (config.isDefined) UInt(config.get.wa.src, width=2) else UInt(width=2)
+  var waValue = if (config.isDefined) UInt(config.get.wa.value, width=log2Up(math.max(numCounters, d))) else UInt(width=log2Up(math.max(numCounters, d)))
+  var wdSrc = if (config.isDefined) UInt(config.get.wd, width=1) else UInt(width=1)
+  var wen = if (config.isDefined) UInt(config.get.wen, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
+
+  override def cloneType(): this.type = {
+    new ScratchpadBundle(w, m, v, numCounters, d, config).asInstanceOf[this.type]
+  }
+}
+
+/**
  * Bundle to specify operand information to functional units
  * @param l: Number of local registers
  * @param r: Number of remote registers
  * @param w: Word width
  */
 class OperandBundle(l: Int, r: Int, w: Int, config: Option[OperandConfig] = None) extends Bundle {
-  var dataSrc = if (config.isDefined) UInt(config.get.dataSrc, width=2) else UInt(width=2)
+  var dataSrc = if (config.isDefined) UInt(config.get.dataSrc, width=3) else UInt(width=3)
   var value = if (config.isDefined) UInt(config.get.value, width=log2Up(w)) else UInt(width=log2Up(w))
 
   override def cloneType(): this.type = {
@@ -53,17 +74,19 @@ class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = 
  * @param l: Number of local registers
  * @param r: Number of remote registers
  * @param m: Scratchpad size in words
+ * @param v: Vector length
+ * @param numCounters: Number of counters
+ * @param numScratchpads: Number of scratchpads
  */
-case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: Int, val r: Int, val m: Int, config: Option[ComputeUnitConfig] = None) extends OpcodeT {
+case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: Int, val r: Int, val m: Int, val v: Int, val numCounters: Int, val numScratchpads: Int, config: Option[ComputeUnitConfig] = None) extends OpcodeT {
 
-  var mem0wa = if (config.isDefined) UInt(config.get.mem0wa, width=1) else UInt(width=1)
-  var mem0wd = if (config.isDefined) UInt(config.get.mem0wd, width=1) else UInt(width=1)
-  var mem0ra = if (config.isDefined) UInt(config.get.mem0ra, width=1) else UInt(width=1)
-
-  var mem1wa = if (config.isDefined) UInt(config.get.mem1wa, width=1) else UInt(width=1)
-  var mem1wd = if (config.isDefined) UInt(config.get.mem1wd, width=1) else UInt(width=1)
-  var mem1ra = if (config.isDefined) UInt(config.get.mem1ra, width=1) else UInt(width=1)
-
+  val scratchpads = Vec.tabulate(numScratchpads) { i =>
+    if (config.isDefined) {
+      new ScratchpadBundle(w, m, v, numCounters, d, Some(config.get.scratchpads(i)))
+    } else {
+      new ScratchpadBundle(w, m, v, numCounters, d, None)
+    }
+  }
   var pipeStage = Vec.tabulate(d) { i =>
     if (config.isDefined) {
       new PipeStageBundle(l, r, w, Some(config.get.pipeStage(i)))
@@ -73,7 +96,7 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
   }
 
   override def cloneType(): this.type = {
-    new ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, config).asInstanceOf[this.type]
+    new ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, v, numCounters, numScratchpads, config).asInstanceOf[this.type]
   }
 }
 
@@ -119,9 +142,9 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
    val dataOut = Vec.fill(v) { UInt(OUTPUT, w)}
   }
 
-  val configType = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m)
-  val configIn = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m)
-  val configInit = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, Some(inst))
+  val configType = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, v, numCounters, numScratchpads)
+  val configIn = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, v, numCounters, numScratchpads)
+  val configInit = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, v, numCounters, numScratchpads, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
     configIn := configType
@@ -131,38 +154,76 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
 
   // Scratchpads
   val mem0 = Module(new SRAM(w, m))
-  val mem0waMux = Module(new MuxVec(rwStages+wStages, v, log2Up(m)))
-  val mem0wdMux = Module(new MuxVec(2, v, w))
-  val mem0raMux = Module(new MuxVec(rwStages, v, log2Up(m)))
-  mem0waMux.io.sel := config.mem0wa
-  mem0wdMux.io.sel := config.mem0wd
-  mem0raMux.io.sel := config.mem0ra
-  mem0.io.waddr := mem0waMux.io.out(0)
+  val (mem0waStagesMux, mem0waCountersMux, mem0waSrcMux) = (
+                                              Module(new MuxVec(rwStages, v, log2Up(m))),
+                                              Module(new MuxVec(numCounters, v, log2Up(m))),
+                                              Module(new MuxVec(3, v, log2Up(m)))
+                                            )
+  mem0waStagesMux.io.sel := config.scratchpads(0).waValue
+  mem0waCountersMux.io.sel := config.scratchpads(0).waValue
+  mem0waSrcMux.io.sel := config.scratchpads(0).waSrc
+
+//  val mem0waMux = Module(new MuxVec(rwStages+1+numCounters, v, log2Up(m)))
+  val (mem0raStagesMux, mem0raCountersMux, mem0raSrcMux) = (
+      Module(new MuxVec(rwStages, v, log2Up(m))),
+      Module(new MuxVec(numCounters, v, log2Up(m))),
+      Module(new MuxVec(2, v, log2Up(m)))
+    )
+  mem0raStagesMux.io.sel := config.scratchpads(0).raValue
+  mem0raCountersMux.io.sel := config.scratchpads(0).raValue
+  mem0raSrcMux.io.sel := config.scratchpads(0).raSrc
+
+//  val mem0raMux = Module(new MuxVec(rwStages+numCounters, v, log2Up(m)))
+  val mem0wdMux = Module(new MuxVec(2, v, w)) // TODO: Number of dataIns must be equal to scratchpads
+  mem0wdMux.io.sel := config.scratchpads(0).wdSrc
+  val mem0wenMux = Module(new MuxN(numCounters+1, 1))
+  mem0wenMux.io.sel := config.scratchpads(0).wen
+
+  mem0.io.waddr := mem0waSrcMux.io.out(0)
   mem0.io.wdata := mem0wdMux.io.out(0)
-  mem0.io.raddr := mem0raMux.io.out(0)
-  mem0.io.wen   := Bool(true)  // Temporary as we have no control flow
+  mem0.io.raddr := mem0raSrcMux.io.out(0)
+  mem0.io.wen   := mem0wenMux.io.out  // TODO: 'wen' should be driven by a counter enable
 
   val mem1 = Module(new SRAM(w, m))
-  val mem1waMux = Module(new MuxVec(rwStages+wStages, v, log2Up(m)))
-  val mem1wdMux = Module(new MuxVec(2, v, w))
-  val mem1raMux = Module(new MuxVec(rwStages, v, log2Up(m)))
-  mem1waMux.io.sel := config.mem1wa
-  mem1wdMux.io.sel := config.mem1wd
-  mem1raMux.io.sel := config.mem1ra
-  mem1.io.waddr := mem1waMux.io.out(0)
+  val (mem1waStagesMux, mem1waCountersMux, mem1waSrcMux) = (
+                                              Module(new MuxVec(rwStages, v, log2Up(m))),
+                                              Module(new MuxVec(numCounters, v, log2Up(m))),
+                                              Module(new MuxVec(3, v, log2Up(m)))
+                                            )
+  mem1waStagesMux.io.sel := config.scratchpads(0).waValue
+  mem1waCountersMux.io.sel := config.scratchpads(0).waValue
+  mem1waSrcMux.io.sel := config.scratchpads(0).waSrc
+
+//  val mem1waMux = Module(new MuxVec(rwStages+1+numCounters, v, log2Up(m)))
+  val (mem1raStagesMux, mem1raCountersMux, mem1raSrcMux) = (
+      Module(new MuxVec(rwStages, v, log2Up(m))),
+      Module(new MuxVec(numCounters, v, log2Up(m))),
+      Module(new MuxVec(2, v, log2Up(m)))
+    )
+  mem1raStagesMux.io.sel := config.scratchpads(0).raValue
+  mem1raCountersMux.io.sel := config.scratchpads(0).raValue
+  mem1raSrcMux.io.sel := config.scratchpads(0).raSrc
+
+//  val mem1raMux = Module(new MuxVec(rwStages+numCounters, v, log2Up(m)))
+  val mem1wdMux = Module(new MuxVec(2, v, w)) // TODO: Number of dataIns must be equal to scratchpads
+  mem1wdMux.io.sel := config.scratchpads(0).wdSrc
+  val mem1wenMux = Module(new MuxN(numCounters+1, 1))
+  mem1wenMux.io.sel := config.scratchpads(1).wen
+
+  mem1.io.waddr := mem1waSrcMux.io.out(0)
   mem1.io.wdata := mem1wdMux.io.out(0)
-  mem1.io.raddr := mem1raMux.io.out(0)
-  mem1.io.wen   := Bool(true)  // Temporary as we have no control flow
+  mem1.io.raddr := mem1raSrcMux.io.out(0)
+  mem1.io.wen   := mem1wenMux.io.out
   val rdata = List(mem0.io.rdata, mem1.io.rdata)
 
   // CounterChain
-  val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain)) // TODO: Hardcoded constant!
+  val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain))
   // TODO: Getting this info from config temporarily
   counterChain.io.data.foreach { d =>
     d.max := UInt(0, w)
     d.stride := UInt(0,w)
   }
-  val counterEnables = Vec.fill(numCounters) { Bool() } // TODO: Hardcoded constant!
+  val counterEnables = Vec.fill(numCounters) { Bool() }
   counterChain.io.control.zipWithIndex.foreach { case (c,i) =>
    c.enable := counterEnables(i)
   }
@@ -280,22 +341,43 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     getStageOut(pipeStages(i))
   }
 
-  val dataIn = Vec.tabulate(v) { i => io.dataIn(i) }
 
   // Connect scratchpad raddr, waddr, wdata ports
   val rwStagesOut = pipeStages.take(rwStages) map { getStageOut(_) }
   val wStagesOut = pipeStages.takeRight(wStages) map { getStageOut(_) }
-  mem0raMux.io.ins := Vec (rwStagesOut)
-  mem0waMux.io.ins := Vec (rwStagesOut ++ wStagesOut)
-  mem0wdMux.io.ins(0) := getStageOut(pipeStages.last)
+  val lastStageWaddr = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(0) }  // r0 in last stage is local waddr
+  val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(1) }  // r1 in last stage in local wdata
+  val countersAsVecs = counters map { Vec(_) }  // TODO: Fix when vectorization is enabled
+
+  mem0raStagesMux.io.ins := Vec (rwStagesOut)
+  mem0raCountersMux.io.ins := Vec (countersAsVecs)
+  mem0raSrcMux.io.ins := Vec(mem0raStagesMux.io.out, mem0raCountersMux.io.out)
+  mem0waStagesMux.io.ins := Vec(rwStagesOut)
+  mem0waCountersMux.io.ins := Vec(countersAsVecs)
+  mem0waSrcMux.io.ins := Vec(mem0waStagesMux.io.out, mem0waCountersMux.io.out, lastStageWaddr)
+  mem0wdMux.io.ins(0) := lastStageWdata
   mem0wdMux.io.ins(1) := io.dataIn
-  mem1raMux.io.ins := Vec (rwStagesOut)
-  mem1waMux.io.ins := Vec (rwStagesOut ++ wStagesOut)
-  mem1wdMux.io.ins(0) := getStageOut(pipeStages.last)
+  mem0wenMux.io.ins.zipWithIndex.foreach { case(in, i) =>
+    if (i == 0) in := UInt(0, width=1)
+    else in := counterEnables(i-1)
+  }
+
+  mem1raStagesMux.io.ins := Vec (rwStagesOut)
+  mem1raCountersMux.io.ins := Vec (countersAsVecs)
+  mem1raSrcMux.io.ins := Vec(mem1raStagesMux.io.out, mem1raCountersMux.io.out)
+  mem1waStagesMux.io.ins := Vec(rwStagesOut)
+  mem1waCountersMux.io.ins := Vec(countersAsVecs)
+  mem1waSrcMux.io.ins := Vec(mem1waStagesMux.io.out, mem1waCountersMux.io.out, lastStageWaddr)
+  mem1wdMux.io.ins(0) := lastStageWdata
   mem1wdMux.io.ins(1) := io.dataIn
+  mem1wenMux.io.ins.zipWithIndex.foreach { case(in, i) =>
+    if (i == 0) in := UInt(0, width=1)
+    else in := counterEnables(i-1)
+  }
+
 
   io.scalarOut := getStageOut(pipeStages.last)(0)
-  io.dataOut := getStageOut(pipeStages.last)
+  io.dataOut := lastStageWdata
 }
 
 /**
@@ -326,7 +408,7 @@ object ComputeUnitTest {
     val pisaFile = appArgs(0)
     val configObj = Config(pisaFile).asInstanceOf[Config[ComputeUnitConfig]]
 
-    val bitwidth = 7
+    val bitwidth = 16
     val startDelayWidth = 4
     val endDelayWidth = 4
     val d = 2
@@ -336,7 +418,7 @@ object ComputeUnitTest {
     val rwStages = 1
     val wStages = 1
     val numTokens = 2
-    val m = 16
+    val m = 64
     chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
       c => new ComputeUnitTests(c)
     }

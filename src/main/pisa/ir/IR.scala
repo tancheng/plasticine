@@ -155,6 +155,51 @@ case class PipeStageConfig(config: Map[Any, Any]) extends AbstractConfig {
   }
 }
 
+/**
+ * Simple container to hold two ints: src and value. Used
+ * to hold scratchpad config info.
+ * TODO: Use this to hold operand info as well
+ */
+case class SrcValueTuple(val src: Int, val value: Int)
+
+case class ScratchpadConfig(config: Map[Any, Any]) extends AbstractConfig {
+  // Banking stride
+  private def parseAddrSource(x: String) = {
+    val src = x(0) match {
+      case 'x' => 0  // Don't care
+      case 's' => 0  // Stage
+      case 'i' => 1  // Iterator
+      case 'l' => 2  // Last stage - only for write addr. TODO: Error out for reads
+      case _ => throw new Exception(s"Unknwon address source ${x(0)}; must be one of s, i, or l")
+   }
+   SrcValueTuple(src, if (x == "x") 0 else x.drop(1).toInt)
+  }
+
+  private var _wa = parseAddrSource(Parser.getFieldString(config, "wa"))
+  def wa = _wa
+  def wa_=(x: SrcValueTuple) { _wa = x }
+
+  private var _ra = parseAddrSource(Parser.getFieldString(config, "ra"))
+  def ra = _ra
+  def ra_=(x: SrcValueTuple) { _ra = x }
+
+  private var _wd = Parser.getFieldString(config, "wd") match {
+    case "x" => 0 // Don't care
+    case "local" => 0
+    case "remote" => 1
+    case _ => throw new Exception(s"Unknown write data source; must be either local or remote")
+  }
+  def wd = _wd
+  def wd_=(x: Int) { _wd = x }
+
+  private var _wen = Parser.getFieldString(config, "wen") match {
+    case "x" => 0
+    case n@_ => n.drop(1).toInt + 1
+  }
+  def wen = _wen
+  def wen_=(x: Int) { _wen = x }
+}
+
 case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
   /* CounterChain config */
   private var _counterChain = new CounterChainConfig(
@@ -162,39 +207,20 @@ case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
   def counterChain() = _counterChain
   def counterChain_=(x: CounterChainConfig) { _counterChain = x }
 
-  private var _mem0wa = Parser.getFieldInt(config, "mem0wa")
-  def mem0wa() = _mem0wa
-  def mem0wa_=(x: Int) { _mem0wa = x }
 
-  private var _mem0wd = Parser.getFieldInt(config, "mem0wd")
-  def mem0wd() = _mem0wd
-  def mem0wd_=(x: Int) { _mem0wd = x }
-
-  private var _mem0ra = Parser.getFieldInt(config, "mem0ra")
-  def mem0ra() = _mem0ra
-  def mem0ra_=(x: Int) { _mem0ra = x }
-
-  private var _mem1wa = Parser.getFieldInt(config, "mem1wa")
-  def mem1wa() = _mem1wa
-  def mem1wa_=(x: Int) { _mem1wa = x }
-
-  private var _mem1wd = Parser.getFieldInt(config, "mem1wd")
-  def mem1wd() = _mem1wd
-  def mem1wd_=(x: Int) { _mem1wd = x }
-
-  private var _mem1ra = Parser.getFieldInt(config, "mem1ra")
-  def mem1ra() = _mem1ra
-  def mem1ra_=(x: Int) { _mem1ra = x }
+  private var _scratchpads =  Parser.getFieldListOfMaps(config, "scratchpads")
+                                    .map { ScratchpadConfig(_) }
+  def scratchpads = _scratchpads
+  def scratchpads_=(x: List[ScratchpadConfig]) { _scratchpads = x }
 
   /* Pipe stages config */
   private var _pipeStage = Parser.getFieldListOfMaps(config, "pipeStage")
                             .map { h => new PipeStageConfig(h) }
-  def pipeStage() = _pipeStage
-  def pipeStage(i: Int) = _pipeStage(i)
+  def pipeStage = _pipeStage
   def pipeStage_=(x: List[PipeStageConfig]) { _pipeStage = x }
 
   private var _control = CUControlBoxConfig(Parser.getFieldMap(config, "control"))
-  def control() = _control
+  def control = _control
   def control_=(x: CUControlBoxConfig) { _control = x }
 
 
