@@ -26,8 +26,8 @@ class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, v
     val config_enable = Bool(INPUT) // Reconfiguration interface
 
     /* Control interface */
-    val command = { Bool(INPUT) }
-    val status =  { Bool(OUTPUT) }
+    val command = Bool(INPUT)
+    val status =  Bool(OUTPUT)
   }
 
   // Main control with command and status
@@ -37,7 +37,6 @@ class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, v
 
   // Compute Units
   val cu0 = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(0)))
-  val cu1 = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(1)))
   cu0.io.config_enable := io.config_enable
   cu0.io.tokenIns.zipWithIndex.foreach { case(in, i) =>
     if (i == 0) {
@@ -46,25 +45,41 @@ class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, v
       in := Bool(false)
     }
   }
+
+  val cu1 = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(1)))
+  cu1.io.config_enable := io.config_enable
+  cu1.io.tokenIns.zipWithIndex.foreach { case(in, i) =>
+    if (i == 0) {
+      in := controlBox.io.startTokenOut  // Route begin signal to second CU (for write) as well
+    } else {
+      in := cu0.io.tokenOuts(i)
+    }
+  }
+
+  cu1.io.dataIn := cu0.io.dataOut
   cu0.io.dataIn := cu1.io.dataOut
 
-  cu1.io.config_enable := io.config_enable
-  cu1.io.tokenIns := cu0.io.tokenOuts
-  controlBox.io.doneTokenIn := cu1.io.tokenOuts(0)
-  cu1.io.dataIn := cu0.io.dataOut
+  controlBox.io.doneTokenIn := cu0.io.tokenOuts(0)
 }
 
 /**
  * ComputeUnit test harness
  */
-class PlasticineTests(c: Plasticine) extends Tester(c) {
+class PlasticineTests(c: Plasticine) extends PlasticineTester(c) {
   var numCycles = 0
 
+  val a = Array.tabulate(c.m) { i => i}
+  val b = Array.tabulate(c.m) { i => i*2}
+  val res = Array.tabulate(c.m) { i => a(i) * b(i)}
+  setMem(c.cu0.mem0, a)
+  setMem(c.cu0.mem1, b)
+  poke(c.io.command, 1)
   while (numCycles < 100) {
     step(1)
     numCycles += 1
   }
 
+  expectMem(c.cu1.mem0, res)
   println(s"Done, design ran for $numCycles cycles")
 }
 
@@ -82,17 +97,17 @@ object PlasticineTest {
     val pisaFile = appArgs(0)
     val configObj = Config(pisaFile).asInstanceOf[Config[PlasticineConfig]]
 
-    val bitwidth = 8
+    val bitwidth = 16
     val startDelayWidth = 4
     val endDelayWidth = 4
     val d = 2
     val v = 1
-    val l = 2
+    val l = 1
     val r = 4
     val rwStages = 1
     val wStages = 1
     val numTokens = 2
-    val m = 16
+    val m = 64
     chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
       c => new PlasticineTests(c)
     }
