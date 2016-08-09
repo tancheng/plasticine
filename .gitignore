@@ -1,7 +1,9 @@
 *.log
 *.vcd
 *.swp
-.out
+*.tags
+.o
+.alib
 build/
 generated/
 lib_managed/

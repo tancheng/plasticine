@@ -1,0 +1,15 @@
+{"PISA":{
+"version"     : 0.1,
+"topconfig" : {
+  "type" : "counter",
+  "config" : {
+    "max"         : 16,
+    "stride"      : 1,
+    "maxConst"    : 1,
+    "strideConst" : 1,
+    "startDelay"  : 1,
+    "endDelay"  : 1
+  }
+}
+}
+}
