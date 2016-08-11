@@ -21,6 +21,35 @@ case class CrossbarOpcode(val w: Int, val numInputs: Int, val numOutputs: Int, c
 
 
 /**
+ * Crossbar of Vecs that connects every input to every output
+ */
+class CrossbarVec(val w: Int, val v: Int, val numInputs: Int, val numOutputs: Int, val inst: CrossbarConfig) extends ConfigurableModule[CrossbarOpcode] {
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
+    val ins = Vec.fill(numInputs) { Vec.fill(v) { Bits(INPUT,  width = w) } }
+    val outs = Vec.fill(numOutputs) { Vec.fill(v) { Bits(OUTPUT,  width = w) } }
+  }
+
+  val configType = CrossbarOpcode(w, numInputs, numOutputs)
+  val configIn = CrossbarOpcode(w, numInputs, numOutputs)
+  val configInit = CrossbarOpcode(w, numInputs, numOutputs, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType
+  } .otherwise {
+    configIn := config
+  }
+
+  io.outs.zipWithIndex.foreach { case(out,i) =>
+    val outMux = Module(new MuxVec(numInputs, v, w))
+    outMux.io.ins := io.ins
+    outMux.io.sel := config.outSelect(i)
+    out := outMux.io.out
+  }
+}
+
+
+/**
  * Crossbar that connects every input to every output
  */
 class Crossbar(val w: Int, val numInputs: Int, val numOutputs: Int, val inst: CrossbarConfig) extends ConfigurableModule[CrossbarOpcode] {
