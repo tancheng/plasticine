@@ -55,7 +55,7 @@ class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = 
   var opcode = if (config.isDefined) UInt(config.get.opcode, width=log2Up(Opcodes.size)) else UInt(width=log2Up(Opcodes.size))
   var result = if (config.isDefined) UInt(config.get.result, width=l+r) else UInt(width=l+r) // One-hot encoded
   var fwd = if (config.isDefined) {
-      Vec.tabulate(r) { i => UInt(config.get.fwd(i), width=log2Up(r)) }
+      Vec.tabulate(r) { i => UInt(config.get.fwd.getOrElse(i, 0), width=log2Up(r)) }
     } else {
       Vec.tabulate(r) { i => UInt(width=log2Up(r)) }
     }
@@ -126,8 +126,8 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     s"""#stages $d < read-write stages ($rwStages) + write stages ($wStages)!""")
 
   // #remoteRegs == numCounters + v in current impl
-  Predef.assert(r > (numCounters+v),
-    s"""#Unsupported number of remote registers $r; $r must be >= $numCounters (numCounters) + $v (vector width)""")
+  Predef.assert(r > (numCounters+numScratchpads),
+    s"""#Unsupported number of remote registers $r; $r must be >= $numCounters + $numScratchpads (numCounters + numScratchpads))""")
 
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT) // Reconfiguration interface
@@ -135,10 +135,9 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     /* Control interface */
     val tokenIns = Vec.fill(numTokens) { Bool(INPUT) }
     val tokenOuts = Vec.fill(numTokens) { Bool(OUTPUT) }
-    val scalarOut   = UInt(OUTPUT, w)
 
-    /* Data interface */
-   val dataIn = Vec.fill(v) { UInt(INPUT, w)}
+    /* Data interface: Vector of buses in, one bus out */
+   val dataIn = Vec.fill(numScratchpads) { Vec.fill(v) { UInt(INPUT, w)} }
    val dataOut = Vec.fill(v) { UInt(OUTPUT, w)}
   }
 
@@ -152,7 +151,12 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     configIn := config
   }
 
-  // Scratchpads
+  // Crossbar across input buses
+  val inputXbar = Module(new CrossbarVec(w, v, numScratchpads, numScratchpads, inst.dataInXbar))
+  inputXbar.io.ins := io.dataIn
+  val remoteWriteData = inputXbar.io.outs
+
+  // Scratchpads. TODO: Replace hardcoded logic with numScratchpads
   val mem0 = Module(new SRAM(w, m))
   val (mem0waStagesMux, mem0waCountersMux, mem0waSrcMux) = (
                                               Module(new MuxVec(rwStages, v, log2Up(m))),
@@ -173,7 +177,6 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   mem0raCountersMux.io.sel := config.scratchpads(0).raValue
   mem0raSrcMux.io.sel := config.scratchpads(0).raSrc
 
-//  val mem0raMux = Module(new MuxVec(rwStages+numCounters, v, log2Up(m)))
   val mem0wdMux = Module(new MuxVec(2, v, w)) // TODO: Number of dataIns must be equal to scratchpads
   mem0wdMux.io.sel := config.scratchpads(0).wdSrc
   val mem0wenMux = Module(new MuxN(numCounters+1, 1))
@@ -194,7 +197,6 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   mem1waCountersMux.io.sel := config.scratchpads(0).waValue
   mem1waSrcMux.io.sel := config.scratchpads(0).waSrc
 
-//  val mem1waMux = Module(new MuxVec(rwStages+1+numCounters, v, log2Up(m)))
   val (mem1raStagesMux, mem1raCountersMux, mem1raSrcMux) = (
       Module(new MuxVec(rwStages, v, log2Up(m))),
       Module(new MuxVec(numCounters, v, log2Up(m))),
@@ -204,7 +206,6 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   mem1raCountersMux.io.sel := config.scratchpads(0).raValue
   mem1raSrcMux.io.sel := config.scratchpads(0).raSrc
 
-//  val mem1raMux = Module(new MuxVec(rwStages+numCounters, v, log2Up(m)))
   val mem1wdMux = Module(new MuxVec(2, v, w)) // TODO: Number of dataIns must be equal to scratchpads
   mem1wdMux.io.sel := config.scratchpads(0).wdSrc
   val mem1wenMux = Module(new MuxN(numCounters+1, 1))
@@ -218,11 +219,6 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
 
   // CounterChain
   val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain))
-  // TODO: Getting this info from config temporarily
-  counterChain.io.data.foreach { d =>
-    d.max := UInt(0, w)
-    d.stride := UInt(0,w)
-  }
   val counterEnables = Vec.fill(numCounters) { Bool() }
   counterChain.io.control.zipWithIndex.foreach { case (c,i) =>
    c.enable := counterEnables(i)
@@ -237,9 +233,9 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   counterEnables := controlBlock.io.enable
   io.tokenOuts := controlBlock.io.tokenOuts
 
-  // Values passed in - Currently it is counters ++ all values from input bus
-  val remotesList =  counters ++ io.dataIn
-  // Initial register blocks for each lane
+  // Empty pipe stage generation for each lane
+  // Values passed in - Currently it is counters ++ first element of all dataIn buses
+  val remotesList =  counters ++ io.dataIn.map { _(0) }
   val initRegblocks = List.fill(v) {
     val regBlock = Module(new RegisterBlock(w, 0 /*local*/,  r /*remote*/))
     regBlock.io.writeData := UInt(0) // Not connected to any ALU output
@@ -253,7 +249,13 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     regBlock
   }
 
-  // Pipeline generation
+  // TODO: Get this from the first lane's empty stage
+  counterChain.io.data.zipWithIndex.foreach { case (c, i) =>
+    c.max    := UInt(0, w)
+    c.stride := UInt(0,w)
+  }
+
+  // Pipe stages generation
   val pipeStages = ListBuffer[List[IntFU]]()
   val pipeRegs = ListBuffer[List[RegisterBlock]]()
   pipeRegs.append(initRegblocks)
@@ -347,7 +349,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   val wStagesOut = pipeStages.takeRight(wStages) map { getStageOut(_) }
   val lastStageWaddr = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(0) }  // r0 in last stage is local waddr
   val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(1) }  // r1 in last stage in local wdata
-  val countersAsVecs = counters map { Vec(_) }  // TODO: Fix when vectorization is enabled
+  val countersAsVecs = counters map { c => Vec.fill(v) {c} }  // TODO: Fix when vectorization is enabled
 
   mem0raStagesMux.io.ins := Vec (rwStagesOut)
   mem0raCountersMux.io.ins := Vec (countersAsVecs)
@@ -356,7 +358,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   mem0waCountersMux.io.ins := Vec(countersAsVecs)
   mem0waSrcMux.io.ins := Vec(mem0waStagesMux.io.out, mem0waCountersMux.io.out, lastStageWaddr)
   mem0wdMux.io.ins(0) := lastStageWdata
-  mem0wdMux.io.ins(1) := io.dataIn
+  mem0wdMux.io.ins(1) := remoteWriteData(0)
   mem0wenMux.io.ins.zipWithIndex.foreach { case(in, i) =>
     if (i == 0) in := UInt(0, width=1)
     else in := counterEnables(i-1)
@@ -369,14 +371,12 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   mem1waCountersMux.io.ins := Vec(countersAsVecs)
   mem1waSrcMux.io.ins := Vec(mem1waStagesMux.io.out, mem1waCountersMux.io.out, lastStageWaddr)
   mem1wdMux.io.ins(0) := lastStageWdata
-  mem1wdMux.io.ins(1) := io.dataIn
+  mem1wdMux.io.ins(1) := remoteWriteData(1)
   mem1wenMux.io.ins.zipWithIndex.foreach { case(in, i) =>
     if (i == 0) in := UInt(0, width=1)
     else in := counterEnables(i-1)
   }
 
-
-  io.scalarOut := getStageOut(pipeStages.last)(0)
   io.dataOut := lastStageWdata
 }
 
@@ -408,16 +408,16 @@ object ComputeUnitTest {
     val pisaFile = appArgs(0)
     val configObj = Config(pisaFile).asInstanceOf[Config[ComputeUnitConfig]]
 
-    val bitwidth = 16
+    val bitwidth = 32
     val startDelayWidth = 4
     val endDelayWidth = 4
-    val d = 2
-    val v = 1
-    val l = 1
-    val r = 4
-    val rwStages = 1
+    val d = 10
+    val v = 16
+    val l = 0
+    val r = 16
+    val rwStages = 3
     val wStages = 1
-    val numTokens = 2
+    val numTokens = 4
     val m = 64
     chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
       c => new ComputeUnitTests(c)
