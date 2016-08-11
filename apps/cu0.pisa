@@ -3,14 +3,16 @@
 "topconfig" : {
   "type" : "cu",
   "config" : {
-    "mem0wa" : 0,
-    "mem0wd" : 0,
-    "mem0ra" : 0,
-    "mem1wa" : 0,
-    "mem1wd" : 0,
-    "mem1ra" : 0,
+
+   "scratchpads" : [
+      {"ra" : "i0", "wa": "x", "wd" : "x", "wen" : "x"},
+      {"ra" : "i0", "wa": "x", "wd" : "x", "wen" : "x"}
+    ],
+
+    "dataInXbar" : {"outSelect": [1,1,0]},
+
     "counterChain" : {
-      "chain" : [0],
+      "chain" : [0, 0, 0, 0],
       "counters" : [
         {
           "max"         : 5,
@@ -21,10 +23,26 @@
           "endDelay" : 0
         },
         {
-          "max"         : 5,
-          "stride"      : 1,
-          "maxConst"    : 1,
-          "strideConst" : 1,
+          "max"         : 0,
+          "stride"      : 0,
+          "maxConst"    : 0,
+          "strideConst" : 0,
+          "startDelay" :  0,
+          "endDelay" : 0
+        },
+        {
+          "max"         : 0,
+          "stride"      : 0,
+          "maxConst"    : 0,
+          "strideConst" : 0,
+          "startDelay" :  0,
+          "endDelay" : 0
+        },
+        {
+          "max"         : 0,
+          "stride"      : 0,
+          "maxConst"    : 0,
+          "strideConst" : 0,
           "startDelay" :  0,
           "endDelay" : 0
         }
@@ -39,25 +57,83 @@
         "fwd"   : {"r0" : "counter", "r2" : "memory" }
       },
       {
-        "opA" : "r1",
-        "opB" : "l1",
-        "opcode" : "+",
-        "result" : "l1",
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
+        "fwd"   : {"r0" : "counter", "r2" : "memory" }
+      },
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
+        "fwd"   : {"r0" : "counter", "r2" : "memory" }
+      },
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
         "fwd"   : { }
+      },
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
+        "fwd"   : { }
+      },
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
+        "fwd"   : { }
+      },
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
+        "fwd"   : { }
+      },
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
+        "fwd"   :{}
+      },
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
+        "fwd"   : { }
+      },
+      {
+        "opA" : "r0",
+        "opB" : "r1",
+        "opcode" : "*",
+        "result" : "l3",
+        "fwd"   :{ }
       }
     ],
    "control" : {
-    "tokenOutLUT" : [ {"table" : [0,0,0,0,0,1,0,1]},
-                      {"table" : [0,0,0,0,1,0,1,0]},
-                      {"table" : [0,0,0,0,0,0,0,0]}],
+    "tokenOutLUT" : [ {"table" : [0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0]},
+                      {"table" : [0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0]},
+                      {"table" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
+                      {"table" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}],
 
-    "incXbar" : {"outSelect": [3,1,0,2,0,0]},
-    "decXbar" : {"outSelect": [1,1,0]},
-    "udcInit" : [3,0,0],
+    "incXbar" : {"outSelect": [3,1,0,0,2,0,0,0]},
+    "decXbar" : {"outSelect": [1,1,0,0]},
+    "udcInit" : [3,0,0,0],
 
-    "enableLUT" : [   {"table" : [0,0,0,0,0,0,1,1]},
-                      {"table" : [0,0,0,0,0,0,0,0]},
-                      {"table" : [0,0,0,0,0,0,0,0]}]
+    "enableLUT" : [   {"table" : [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0]},
+                      {"table" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
+                      {"table" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
+                      {"table" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}]
   }
   }
 }
