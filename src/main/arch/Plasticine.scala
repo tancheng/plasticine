@@ -35,6 +35,9 @@ class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, v
   controlBox.io.command := io.command
   io.status := controlBox.io.statusOut
 
+  // Interconnect - matrix of Switches, where each switch is a 4x4 crossbar
+
+
   // Compute Units
   val cu0 = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, inst.cu(0)))
   cu0.io.config_enable := io.config_enable
@@ -101,7 +104,7 @@ object PlasticineTest {
     val startDelayWidth = 4
     val endDelayWidth = 4
     val d = 2
-    val v = 1
+    val v = 16
     val l = 1
     val r = 4
     val rwStages = 1

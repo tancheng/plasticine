@@ -91,7 +91,7 @@ case class CounterChainConfig(config: Map[Any, Any]) extends AbstractConfig {
 case class OperandConfig(config: String) extends AbstractConfig {
   private def getDataSrc = config(0) match {
     case 'l' => 0 // Local register
-    case 'r' => 1 // Remote register
+    case 'r' => 1 // Previous pipe stage register
     case 'c' => 2 // Constant
     case 'i' => 3 // Iterator / counter
     case 'm' => 4 // Memory
