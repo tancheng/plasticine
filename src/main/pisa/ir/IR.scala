@@ -5,6 +5,7 @@ import _root_.scala.util.parsing.json.JSON
 import scala.collection.immutable.Map
 import plasticine.pisa.parser._
 import plasticine.templates.Opcodes
+import scala.collection.mutable.HashMap
 
 object Config {
   def apply(path: String) = Parser(path)
@@ -130,22 +131,23 @@ case class PipeStageConfig(config: Map[Any, Any]) extends AbstractConfig {
 
   // TODO: Remove hardcoded constant!
   val r = 4
-  private var _fwd: List[Int] = {
-    val m = Parser.getFieldMap(config, "fwd")
-    List.tabulate(r) { i =>
-      val regName = s"r$i"
-      if (m.contains(regName)) {
-        m(regName) match {
-          case "counter" => 1
-          case "memory" => 1
-          case _ => throw new Exception(s"Unknown forward source location ${m(regName)}. It must either be 'counter' or 'memory'")
-        }
-      } else 0
+  // Map (regNum -> muxconfig)
+  private var _fwd: Map[Int, Int] = {
+    val fwdMap = Parser.getFieldMap(config, "fwd")
+    val t = HashMap[Int, Int]()
+    fwdMap.keys.foreach { reg =>
+      val source = fwdMap(reg)
+      val regNum = Integer.parseInt(reg.toString.drop(1))
+      t(regNum) = source match {
+        case "counter" => 1
+        case "memory" => 1
+        case _ => 0
+      }
     }
+    t.toMap
   }
   def fwd = _fwd
-  def fwd_=(x: List[Int]) { _fwd = x }
-
+  def fwd_=(x: Map[Int, Int]) { _fwd = x }
 
   override def toString = {
     s"opA:\n ${opA.toString}" + "\n" +
@@ -223,6 +225,9 @@ case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
   def control = _control
   def control_=(x: CUControlBoxConfig) { _control = x }
 
+  private var _dataInXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "dataInXbar"))
+  def dataInXbar = _dataInXbar
+  def dataInXbar_=(x: CrossbarConfig) { _dataInXbar = x }
 
   override def toString = {
     s"pipeStage:\n" +
