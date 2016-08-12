@@ -167,7 +167,6 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   mem0waCountersMux.io.sel := config.scratchpads(0).waValue
   mem0waSrcMux.io.sel := config.scratchpads(0).waSrc
 
-//  val mem0waMux = Module(new MuxVec(rwStages+1+numCounters, v, log2Up(m)))
   val (mem0raStagesMux, mem0raCountersMux, mem0raSrcMux) = (
       Module(new MuxVec(rwStages, v, log2Up(m))),
       Module(new MuxVec(numCounters, v, log2Up(m))),
