@@ -154,65 +154,57 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   inputXbar.io.ins := io.dataIn
   val remoteWriteData = inputXbar.io.outs
 
-  // Scratchpads. TODO: Replace hardcoded logic with numScratchpads
-  val mem0 = Module(new SRAM(w, m))
-  val (mem0waStagesMux, mem0waCountersMux, mem0waSrcMux) = (
-                                              Module(new MuxVec(rwStages, v, log2Up(m))),
-                                              Module(new MuxVec(numCounters, v, log2Up(m))),
-                                              Module(new MuxVec(3, v, log2Up(m)))
-                                            )
-  mem0waStagesMux.io.sel := config.scratchpads(0).waValue
-  mem0waCountersMux.io.sel := config.scratchpads(0).waValue
-  mem0waSrcMux.io.sel := config.scratchpads(0).waSrc
-
-  val (mem0raStagesMux, mem0raCountersMux, mem0raSrcMux) = (
-      Module(new MuxVec(rwStages, v, log2Up(m))),
-      Module(new MuxVec(numCounters, v, log2Up(m))),
-      Module(new MuxVec(2, v, log2Up(m)))
-    )
-  mem0raStagesMux.io.sel := config.scratchpads(0).raValue
-  mem0raCountersMux.io.sel := config.scratchpads(0).raValue
-  mem0raSrcMux.io.sel := config.scratchpads(0).raSrc
-
-  val mem0wdMux = Module(new MuxVec(2, v, w)) // TODO: Number of dataIns must be equal to scratchpads
-  mem0wdMux.io.sel := config.scratchpads(0).wdSrc
-  val mem0wenMux = Module(new MuxN(numCounters+1, 1))
-  mem0wenMux.io.sel := config.scratchpads(0).wen
-
-  mem0.io.waddr := mem0waSrcMux.io.out(0)
-  mem0.io.wdata := mem0wdMux.io.out(0)
-  mem0.io.raddr := mem0raSrcMux.io.out(0)
-  mem0.io.wen   := mem0wenMux.io.out  // TODO: 'wen' should be driven by a counter enable
-
-  val mem1 = Module(new SRAM(w, m))
-  val (mem1waStagesMux, mem1waCountersMux, mem1waSrcMux) = (
-                                              Module(new MuxVec(rwStages, v, log2Up(m))),
-                                              Module(new MuxVec(numCounters, v, log2Up(m))),
-                                              Module(new MuxVec(3, v, log2Up(m)))
-                                            )
-  mem1waStagesMux.io.sel := config.scratchpads(0).waValue
-  mem1waCountersMux.io.sel := config.scratchpads(0).waValue
-  mem1waSrcMux.io.sel := config.scratchpads(0).waSrc
-
-  val (mem1raStagesMux, mem1raCountersMux, mem1raSrcMux) = (
-      Module(new MuxVec(rwStages, v, log2Up(m))),
-      Module(new MuxVec(numCounters, v, log2Up(m))),
-      Module(new MuxVec(2, v, log2Up(m)))
-    )
-  mem1raStagesMux.io.sel := config.scratchpads(0).raValue
-  mem1raCountersMux.io.sel := config.scratchpads(0).raValue
-  mem1raSrcMux.io.sel := config.scratchpads(0).raSrc
-
-  val mem1wdMux = Module(new MuxVec(2, v, w)) // TODO: Number of dataIns must be equal to scratchpads
-  mem1wdMux.io.sel := config.scratchpads(0).wdSrc
-  val mem1wenMux = Module(new MuxN(numCounters+1, 1))
-  mem1wenMux.io.sel := config.scratchpads(1).wen
-
-  mem1.io.waddr := mem1waSrcMux.io.out(0)
-  mem1.io.wdata := mem1wdMux.io.out(0)
-  mem1.io.raddr := mem1raSrcMux.io.out(0)
-  mem1.io.wen   := mem1wenMux.io.out
-  val rdata = List(mem0.io.rdata, mem1.io.rdata)
+  // Scratchpads
+  val scratchpads = List.tabulate(numScratchpads) { i =>
+    Module(new SRAM(w, m))
+  }
+  val waStagesMux = List.tabulate(numScratchpads) { i =>
+    val mux = Module(new MuxVec(rwStages, v, log2Up(m)))
+    mux.io.sel := config.scratchpads(i).waValue
+    mux
+  }
+  val waCountersMux = List.tabulate(numScratchpads) { i =>
+    val mux = Module(new MuxVec(numCounters, v, log2Up(m)))
+    mux.io.sel := config.scratchpads(i).waValue
+    mux
+  }
+  val waSrcMux = List.tabulate(numScratchpads) { i =>
+    val mux = Module(new MuxVec(3, v, log2Up(m)))
+    mux.io.sel := config.scratchpads(i).waSrc
+    mux
+  }
+  val raStagesMux = List.tabulate(numScratchpads) { i =>
+    val mux = Module(new MuxVec(rwStages, v, log2Up(m)))
+    mux.io.sel := config.scratchpads(i).raValue
+    mux
+  }
+  val raCountersMux = List.tabulate(numScratchpads) { i =>
+    val mux = Module(new MuxVec(numCounters, v, log2Up(m)))
+    mux.io.sel := config.scratchpads(i).raValue
+    mux
+  }
+  val raSrcMux = List.tabulate(numScratchpads) { i =>
+    val mux = Module(new MuxVec(2, v, log2Up(m)))
+    mux.io.sel := config.scratchpads(i).raSrc
+    mux
+  }
+  val wdMux = List.tabulate(numScratchpads) { i =>
+    val mux = Module(new MuxVec(2,v,w))
+    mux.io.sel := config.scratchpads(i).wdSrc
+    mux
+  }
+  val wenMux = List.tabulate(numScratchpads) { i =>
+    val mux = Module(new MuxN(numCounters+1, 1))
+    mux.io.sel := config.scratchpads(i).wen
+    mux
+  }
+  scratchpads.zipWithIndex.foreach { case (s, i) =>
+    s.io.waddr := waSrcMux(i).io.out(0)
+    s.io.wdata := wdMux(i).io.out(0)
+    s.io.raddr := raSrcMux(i).io.out(0)
+    s.io.wen   := wenMux(i).io.out
+  }
+  val rdata = scratchpads.map { _.io.rdata }
 
   // CounterChain
   val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain))
@@ -223,7 +215,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   val counters = counterChain.io.data map { _.out }
 
   // Control block
-  val controlBlock = Module(new CUControlBox(w, numCounters, inst.control)) // TODO: Hardcoded const!
+  val controlBlock = Module(new CUControlBox(w, numCounters, inst.control))
   controlBlock.io.config_enable := io.config_enable
   controlBlock.io.tokenIns := io.tokenIns
   controlBlock.io.done := counterChain.io.control map { _.done}
@@ -246,7 +238,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     regBlock
   }
 
-  // TODO: Get this from the first lane's empty stage
+  // TODO: Get counter maxs and strides from the first lane's empty stage
   counterChain.io.data.zipWithIndex.foreach { case (c, i) =>
     c.max    := UInt(0, w)
     c.stride := UInt(0,w)
@@ -348,30 +340,20 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(1) }  // r1 in last stage in local wdata
   val countersAsVecs = counters map { c => Vec.fill(v) {c} }  // TODO: Fix when vectorization is enabled
 
-  mem0raStagesMux.io.ins := Vec (rwStagesOut)
-  mem0raCountersMux.io.ins := Vec (countersAsVecs)
-  mem0raSrcMux.io.ins := Vec(mem0raStagesMux.io.out, mem0raCountersMux.io.out)
-  mem0waStagesMux.io.ins := Vec(rwStagesOut)
-  mem0waCountersMux.io.ins := Vec(countersAsVecs)
-  mem0waSrcMux.io.ins := Vec(mem0waStagesMux.io.out, mem0waCountersMux.io.out, lastStageWaddr)
-  mem0wdMux.io.ins(0) := lastStageWdata
-  mem0wdMux.io.ins(1) := remoteWriteData(0)
-  mem0wenMux.io.ins.zipWithIndex.foreach { case(in, i) =>
-    if (i == 0) in := UInt(0, width=1)
-    else in := counterEnables(i-1)
-  }
-
-  mem1raStagesMux.io.ins := Vec (rwStagesOut)
-  mem1raCountersMux.io.ins := Vec (countersAsVecs)
-  mem1raSrcMux.io.ins := Vec(mem1raStagesMux.io.out, mem1raCountersMux.io.out)
-  mem1waStagesMux.io.ins := Vec(rwStagesOut)
-  mem1waCountersMux.io.ins := Vec(countersAsVecs)
-  mem1waSrcMux.io.ins := Vec(mem1waStagesMux.io.out, mem1waCountersMux.io.out, lastStageWaddr)
-  mem1wdMux.io.ins(0) := lastStageWdata
-  mem1wdMux.io.ins(1) := remoteWriteData(1)
-  mem1wenMux.io.ins.zipWithIndex.foreach { case(in, i) =>
-    if (i == 0) in := UInt(0, width=1)
-    else in := counterEnables(i-1)
+  // Wire stage outputs into scratchpad address and data
+  (0 until numScratchpads) foreach { i =>
+    raStagesMux(i).io.ins := Vec (rwStagesOut)
+    raCountersMux(i).io.ins := Vec (countersAsVecs)
+    raSrcMux(i).io.ins := Vec(raStagesMux(i).io.out, raCountersMux(i).io.out)
+    waStagesMux(i).io.ins := Vec(rwStagesOut)
+    waCountersMux(i).io.ins := Vec(countersAsVecs)
+    waSrcMux(i).io.ins := Vec(waStagesMux(i).io.out, waCountersMux(i).io.out, lastStageWaddr)
+    wdMux(i).io.ins(0) := lastStageWdata // local write data
+    wdMux(i).io.ins(1) := remoteWriteData(0) // remote write data - currently pick only the first bus
+    wenMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
+      if (ii == 0) in := UInt(0, width=1)
+      else in := counterEnables(ii-1)
+    }
   }
 
   io.dataOut := lastStageWdata

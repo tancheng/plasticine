@@ -73,15 +73,15 @@ class PlasticineTests(c: Plasticine) extends PlasticineTester(c) {
   val a = Array.tabulate(c.m) { i => i}
   val b = Array.tabulate(c.m) { i => i*2}
   val res = Array.tabulate(c.m) { i => a(i) * b(i)}
-  setMem(c.cu0.mem0, a)
-  setMem(c.cu0.mem1, b)
+  setMem(c.cu0.scratchpads(0), a)
+  setMem(c.cu0.scratchpads(1), b)
   poke(c.io.command, 1)
   while (numCycles < 100) {
     step(1)
     numCycles += 1
   }
 
-  expectMem(c.cu1.mem0, res)
+  expectMem(c.cu1.scratchpads(0), res)
   println(s"Done, design ran for $numCycles cycles")
 }
 
