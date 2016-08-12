@@ -70,7 +70,6 @@ class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = 
  * @param w: Word width
  * @param d: Pipeline depth
  * @param rwStages: Read-write stages (at the beginning)
- * @param wStages: Write stages (at the end)
  * @param l: Number of local registers
  * @param r: Number of remote registers
  * @param m: Scratchpad size in words
@@ -78,7 +77,7 @@ class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = 
  * @param numCounters: Number of counters
  * @param numScratchpads: Number of scratchpads
  */
-case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int, val l: Int, val r: Int, val m: Int, val v: Int, val numCounters: Int, val numScratchpads: Int, config: Option[ComputeUnitConfig] = None) extends OpcodeT {
+case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, val l: Int, val r: Int, val m: Int, val v: Int, val numCounters: Int, val numScratchpads: Int, config: Option[ComputeUnitConfig] = None) extends OpcodeT {
 
   val scratchpads = Vec.tabulate(numScratchpads) { i =>
     if (config.isDefined) {
@@ -96,7 +95,7 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
   }
 
   override def cloneType(): this.type = {
-    new ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, v, numCounters, numScratchpads, config).asInstanceOf[this.type]
+    new ComputeUnitOpcode(w, d, rwStages, l, r, m, v, numCounters, numScratchpads, config).asInstanceOf[this.type]
   }
 }
 
@@ -108,13 +107,12 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, wStages: Int
  * @param d: Pipeline depth
  * @param v: Vector length
  * @param rwStages: Read-write stages (at the beginning)
- * @param wStages: Write stages (at the end)
  * @param numTokens: Number of input (and output) tokens
  * @param l: Number of local pipeline registers
  * @param r: Number of remote pipeline registers
  * @param m: Scratchpad size in words
  */
-class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val d: Int, val v: Int, rwStages: Int, wStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
+class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val d: Int, val v: Int, rwStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
 
   // Currently, numCounters == numTokens
   val numCounters = numTokens
@@ -122,8 +120,8 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   val numScratchpads = 2 // TODO: Remove hardcoded number!
 
   // Sanity check parameters for validity
-  Predef.assert(d >= (rwStages+wStages),
-    s"""#stages $d < read-write stages ($rwStages) + write stages ($wStages)!""")
+  Predef.assert(d >= (rwStages),
+    s"""#stages $d < read-write stages ($rwStages)!""")
 
   // #remoteRegs == numCounters + v in current impl
   Predef.assert(r > (numCounters+numScratchpads),
@@ -141,9 +139,9 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
    val dataOut = Vec.fill(v) { UInt(OUTPUT, w)}
   }
 
-  val configType = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, v, numCounters, numScratchpads)
-  val configIn = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, v, numCounters, numScratchpads)
-  val configInit = ComputeUnitOpcode(w, d, rwStages, wStages, l, r, m, v, numCounters, numScratchpads, Some(inst))
+  val configType = ComputeUnitOpcode(w, d, rwStages, l, r, m, v, numCounters, numScratchpads)
+  val configIn = ComputeUnitOpcode(w, d, rwStages, l, r, m, v, numCounters, numScratchpads)
+  val configInit = ComputeUnitOpcode(w, d, rwStages, l, r, m, v, numCounters, numScratchpads, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
     configIn := configType
@@ -345,7 +343,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
 
   // Connect scratchpad raddr, waddr, wdata ports
   val rwStagesOut = pipeStages.take(rwStages) map { getStageOut(_) }
-  val wStagesOut = pipeStages.takeRight(wStages) map { getStageOut(_) }
+  val wStagesOut = getStageOut(pipeStages.last)
   val lastStageWaddr = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(0) }  // r0 in last stage is local waddr
   val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(1) }  // r1 in last stage in local wdata
   val countersAsVecs = counters map { c => Vec.fill(v) {c} }  // TODO: Fix when vectorization is enabled
@@ -415,10 +413,9 @@ object ComputeUnitTest {
     val l = 0
     val r = 16
     val rwStages = 3
-    val wStages = 1
     val numTokens = 4
     val m = 64
-    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, wStages, numTokens, l, r, m, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj.config))) {
       c => new ComputeUnitTests(c)
     }
   }
