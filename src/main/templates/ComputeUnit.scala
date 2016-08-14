@@ -145,7 +145,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   val configInit = ComputeUnitOpcode(w, d, rwStages, l, r, m, v, numCounters, numScratchpads, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
-    configIn := configType
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, reset))
   } .otherwise {
     configIn := config
   }

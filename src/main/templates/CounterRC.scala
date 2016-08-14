@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
  * Counter config register format
  */
 case class CounterOpcode(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, config: Option[CounterRCConfig] = None) extends OpcodeT {
-  var max = if (config.isDefined) UInt(config.get.max, width=w) else UInt(width = w)
+  var max = if (config.isDefined) UInt(config.get.max, width=w) else UInt(width = w )
   var stride = if (config.isDefined) UInt(config.get.stride, width=w) else UInt(width = w)
   var maxConst = if (config.isDefined) Bool(config.get.maxConst > 0) else Bool()
   var strideConst = if (config.isDefined) Bool(config.get.strideConst > 0) else Bool()
@@ -50,7 +50,7 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
   val configInit = CounterOpcode(w, startDelayWidth, endDelayWidth, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
-    configIn := configType
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, reset))
   } .otherwise {
     configIn := config
   }
