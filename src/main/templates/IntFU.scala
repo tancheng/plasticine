@@ -3,6 +3,7 @@ import plasticine.Globals
 
 import scala.collection.immutable.Map
 import Chisel._
+import plasticine.templates.hardfloat._
 
 /**
  * Integer Functional Unit module. Represents the basic workhorse
@@ -12,17 +13,25 @@ import Chisel._
  */
 
 object Opcodes {
-  val opcodes = List[(String, (UInt, UInt) => UInt)](
-    ("+" , (a,b) => a+b),
-    ("-" , (a,b) => a-b),
-    ("*" , (a,b) => a*b),
-    ("/" , (a,b) => a/b),
-    ("&" , (a,b) => a&b),
-    ("|" , (a,b) => a|b),
-    ("==" , (a,b) => a===b),
+  // HACK: Duplicated with IntFU. Need to refactor this into
+  // a separate Decode table
+  private var _opcodes = List[(String, (UInt, UInt) => UInt)](
+    ("+" , (a,b)    => a+b),
+    ("-" , (a,b)    => a-b),
+    ("*" , (a,b)    => a*b),
+    ("/" , (a,b)    => a/b),
+    ("&" , (a,b)    => a&b),
+    ("|" , (a,b)    => a|b),
+    ("==" , (a,b)   => a===b),
+    ("f<" , (a,b)   => UInt(0)),
+    ("f==" , (a,b)  => UInt(0)),
+    ("f>" , (a,b) => UInt(0)),
+    ("f*" , (a,b) => UInt(0)),
     ("passA" , (a,b) => a),
     ("passB" , (a,b) => b)
   )
+  def opcodes = _opcodes
+  def opcodes_=(x: List[(String, (UInt, UInt) => UInt)]) { _opcodes = x }
 
   def size = opcodes.size
 
@@ -44,11 +53,39 @@ class IntFU(val w: Int) extends Module {
   }
   io.out := UInt(0) // <-- Required because otherwise Chisel thinks no one writes to io.out
 
+  // Instantiate floating point units:
+  // Comparator
+  val fpComparator = Module(new CompareRecFN(8, 24))
+  fpComparator.io.a := io.a
+  fpComparator.io.b := io.b
+
+  // FMA
+  val fma = Module(new MulAddRecFN(8, 24))
+  fma.io.a := io.a
+  fma.io.b := io.b
+  fma.io.c := io.b
+
+  // Populate opcode table
+  Opcodes.opcodes = List[(String, (UInt, UInt) => UInt)](
+    ("+" , (a,b)    => a+b),
+    ("-" , (a,b)    => a-b),
+    ("*" , (a,b)    => a*b),
+    ("/" , (a,b)    => a/b),
+    ("&" , (a,b)    => a&b),
+    ("|" , (a,b)    => a|b),
+    ("==" , (a,b)   => a===b),
+    ("f<" , (a,b)   => UInt(fpComparator.io.lt, width=w)),
+    ("f==" , (a,b)  => UInt(fpComparator.io.eq, width=w)),
+    ("f>" , (a,b) => UInt(fpComparator.io.gt, width=w)),
+    ("f*" , (a,b) => fma.io.out),
+    ("passA" , (a,b) => a),
+    ("passB" , (a,b) => b)
+  )
+
+  // Instantiate result mux
   val ins = Vec.tabulate(Opcodes.opcodes.size) { i =>
     Opcodes.getOp(i, io.a, io.b)
   }
-
-//  val m = Module(new MuxN(Opcodes.opcodes.size, w))
   val m = if (Globals.noModule) new MuxNL(Opcodes.opcodes.size, w) else Module(new MuxN(Opcodes.opcodes.size, w))
   m.io.ins.zip(ins).foreach { case (in, i) =>
     in := i
