@@ -35,13 +35,18 @@ def stage(app, params, opts):
     sbt_opts = ""
 
     build_dir = opts.build_dir + os.sep + "generated" + os.sep + app + os.sep
+    static_dir = os.getenv("PWD") + os.sep + "static"
+
+    print("Clearing build directory %s..." %(build_dir))
+    os.system("rm -rf %s" %(build_dir))
+
     sbt_opts = sbt_opts + " --targetDir " + build_dir
     if (opts.sim == True | opts.hex == True | opts.verilog == True):
         sbt_opts = sbt_opts + " --genHarness"
     if opts.dot == True:
         sbt_opts = sbt_opts + " --backend dot"
     if opts.sim == True:
-        sbt_opts = sbt_opts + " --compile --test --backend c"
+        sbt_opts = sbt_opts + " --debug --backend c" #--compile --test
     if opts.verilog == True:
         sbt_opts = sbt_opts + " --backend v"
     if opts.hex == True:
@@ -53,6 +58,21 @@ def stage(app, params, opts):
     app_prefix = "plasticine.templates"
     app_args_end = "end"
     sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s %s\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, sbt_opts)
+    print sbt_cmd
+    print("Invoking Chisel...")
+    ecode = os.system(sbt_cmd)
+    if ecode != 0:
+        err("SADL compilation failed")
+
+    print("Performing Split C++ compilation...")
+    os.system("cp %s/* %s" %(static_dir, build_dir))
+    ecode = os.system("pushd %s && time ./splitMethods.sh && time make -j16 && popd" %(build_dir))
+    #ecode = os.system("pushd %s && time make && popd" %(build_dir))
+    if (ecode != 0):
+        err("SADL compilation failed")
+
+    print("Running test...")
+    sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
     print sbt_cmd
     ecode = os.system(sbt_cmd)
     if ecode != 0:
