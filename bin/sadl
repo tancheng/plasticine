@@ -64,19 +64,19 @@ def stage(app, params, opts):
     if ecode != 0:
         err("SADL compilation failed")
 
-    print("Performing Split C++ compilation...")
-    os.system("cp %s/* %s" %(static_dir, build_dir))
-    ecode = os.system("pushd %s && time ./splitMethods.sh && time make -j16 && popd" %(build_dir))
-    #ecode = os.system("pushd %s && time make && popd" %(build_dir))
-    if (ecode != 0):
-        err("SADL compilation failed")
+    if opts.sim == True:
+        print("Performing Split C++ compilation...")
+        os.system("cp %s/* %s" %(static_dir, build_dir))
+        ecode = os.system("pushd %s && time ./splitMethods.sh && time make -j16 && popd" %(build_dir))
+        if (ecode != 0):
+            err("SADL compilation failed")
 
-    print("Running test...")
-    sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
-    print sbt_cmd
-    ecode = os.system(sbt_cmd)
-    if ecode != 0:
-        err("SADL compilation failed")
+        print("Running test...")
+        sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
+        print sbt_cmd
+        ecode = os.system(sbt_cmd)
+        if ecode != 0:
+            err("SADL compilation failed")
 
 if __name__ == "__main__":
     main()
