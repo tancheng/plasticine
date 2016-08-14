@@ -57,7 +57,7 @@ sed -n "$(expr $initStart + 2),$(expr $initEnd - 1)p" ${FILE} > init.txt
 foo=$(expr $initStart + 1)
 ## Delete chopped up lines from file
 sed -i "${foo}i\//splitter" ${FILECPY}
-sed -i -e "$(expr $initStart + 2), $(expr $initEnd)d" ${FILECPY}
+sed -i -e "$(expr $initStart + 3), $(expr $initEnd)d" ${FILECPY}
 
 ## Chop up file into several pieces
 split -l ${NUM} --additional-suffix="init.cpp" --numeric-suffixes init.txt
@@ -84,10 +84,10 @@ sed -i "/\/\/splitter/r ${METHODS}" ${FILECPY}
 #
 clockLoStart=`grep -n "void ${EXE}_t::clock_lo" ${FILE} | cut -f1 -d':'`
 clockLoEnd=`grep -n "^}$" ${FILE} | cut -f1 -d':' | sort -n | awk -v threshold="$clockLoStart" '$1 > threshold' | head -n1`
-sed -n $(expr $clockLoStart + 1),$(expr $clockLoEnd - 1)p ${FILE} > clockLo.txt
 
 ## Extract body into separate file, add a placeholder to append stuff in
-sed -n "$(expr $clockLoStart + 2),$(expr $clockLoEnd - 1)p" ${FILE} >clockLo.txt
+sed -n $(expr $clockLoStart + 1),$(expr $clockLoEnd - 1)p ${FILE} > clockLo.txt
+
 foo=$(expr $clockLoStart + 1)
 sed -i "${foo}i\//clockLoSplitter" ${FILECPY}
 
@@ -143,9 +143,9 @@ sed -i "/\/\/clockLoSplitter/r ${METHODS}" ${FILECPY}
 dumpInitStart=`grep -n "void ${EXE}_t::dump_init" ${FILE} | cut -f1 -d':'`
 dumpInitEnd=`grep -n "^}$" ${FILE} | cut -f1 -d':' | sort -n | awk -v threshold="$dumpInitStart" '$1 > threshold' | head -n1`
 
-if [ $(expr $dumpInitStart + 2) -lt $(expr $dumpInitEnd) ]; then
+if [ $(expr $dumpInitStart + 1) -lt $(expr $dumpInitEnd) ]; then
   ## Extract body into separate file, add a placeholder to append stuff in
-  sed -n "$(expr $dumpInitStart + 2),$(expr $dumpInitEnd - 1)p" ${FILE} > dumpInit.txt
+  sed -n "$(expr $dumpInitStart + 1),$(expr $dumpInitEnd - 1)p" ${FILE} > dumpInit.txt
 
   foo=$(expr $dumpInitStart + 1)
   ## Delete chopped up lines from file
