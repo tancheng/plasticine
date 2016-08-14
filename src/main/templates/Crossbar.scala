@@ -3,6 +3,7 @@ package plasticine.templates
 import Chisel._
 
 import plasticine.pisa.ir._
+import plasticine.Globals
 
 /**
  * Crossbar config register format
@@ -70,7 +71,8 @@ class Crossbar(val w: Int, val numInputs: Int, val numOutputs: Int, val inst: Cr
   }
 
   io.outs.zipWithIndex.foreach { case(out,i) =>
-    val outMux = Module(new MuxN(numInputs, w))
+//    val outMux = Module(new MuxN(numInputs, w))
+    val outMux = if (Globals.noModule) new MuxNL(numInputs, w) else Module(new MuxN(numInputs, w))
     outMux.io.ins := io.ins
     outMux.io.sel := config.outSelect(i)
     out := outMux.io.out

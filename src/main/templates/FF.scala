@@ -29,6 +29,28 @@ class FF(val w: Int) extends Module {
   io.data.out := ff
 }
 
+class FFL(val w1: Int) extends FF(w1) {
+  override val io = new Bundle {
+    val data = new Bundle {
+      val in   = UInt(INPUT,  w)
+      val init = UInt(INPUT,  w)
+      val out  = UInt(OUTPUT, w)
+    }
+    val control = new Bundle {
+      val enable = Bool(INPUT)
+    }
+  }
+
+  override val d = UInt(width = w)
+  override val ff = Reg(Bits(w), d, io.data.init)
+  when (io.control.enable) {
+    d := io.data.in
+  } .otherwise {
+    d := ff
+  }
+  io.data.out := ff
+}
+
 /**
  * FF test harness
  */

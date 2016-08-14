@@ -1,4 +1,5 @@
 package plasticine.templates
+import plasticine.Globals
 
 import Chisel._
 
@@ -16,7 +17,8 @@ class UpDownCtr(val w: Int) extends Module {
     val gtz      = Bool(OUTPUT)  // greater-than-zero
   }
 
-  val reg = Module(new FF(w))
+//  val reg = Module(new FF(w))
+  val reg = if (Globals.noModule) new FFL(w) else Module(new FF(w))
   val init = UInt(0, width = w)
   reg.io.data.init := init
 

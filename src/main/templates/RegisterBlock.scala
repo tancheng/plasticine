@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import Chisel._
+import plasticine.Globals
 
 import scala.collection.mutable.ListBuffer
 /**
@@ -25,7 +26,8 @@ class RegisterBlock(val w: Int, val l: Int, val r: Int) extends Module {
     val passDataOut     = Vec.fill(r) { UInt(OUTPUT, w) }
   }
 
-  val regs = List.fill(l+r) { Module(new FF(w)) }
+//  val regs = List.fill(l+r) { Module(new FF(w)) }
+  val regs = List.fill(l+r) { if (Globals.noModule) new FFL(w) else Module(new FF(w)) }
   val localRegs = regs.take(l)
   val remoteRegs = regs.takeRight(r)
 
@@ -44,21 +46,25 @@ class RegisterBlock(val w: Int, val l: Int, val r: Int) extends Module {
   }
 
   // Output assignments: to local FU
-  val readLocalAMux = Module(new MuxN(l+r, w))
+//  val readLocalAMux = Module(new MuxN(l+r, w))
+  val readLocalAMux = if (Globals.noModule) new MuxNL(l+r, w) else Module(new MuxN(l+r, w))
   readLocalAMux.io.ins := Vec.tabulate(l+r) { i => regs(i).io.data.out }
   readLocalAMux.io.sel := io.readLocalASel
   io.readLocalA := readLocalAMux.io.out
-  val readLocalBMux = Module(new MuxN(l+r, w))
+//  val readLocalBMux = Module(new MuxN(l+r, w))
+  val readLocalBMux = if (Globals.noModule) new MuxNL(l+r, w) else Module(new MuxN(l+r, w))
   readLocalBMux.io.ins := Vec.tabulate(l+r) { i => regs(i).io.data.out }
   readLocalBMux.io.sel := io.readLocalBSel
   io.readLocalB := readLocalBMux.io.out
 
   // Output assignments: to remote FU
-  val readRemoteAMux = Module(new MuxN(r, w))
+//  val readRemoteAMux = Module(new MuxN(r, w))
+  val readRemoteAMux = if (Globals.noModule) new MuxNL(r, w) else Module(new MuxN(r, w))
   readRemoteAMux.io.ins := Vec.tabulate(r) { i => remoteRegs(i).io.data.out }
   readRemoteAMux.io.sel := io.readRemoteASel
   io.readRemoteA := readRemoteAMux.io.out
-  val readRemoteBMux = Module(new MuxN(r, w))
+//  val readRemoteBMux = Module(new MuxN(r, w))
+  val readRemoteBMux = if (Globals.noModule) new MuxNL(r, w) else Module(new MuxN(r, w))
   readRemoteBMux.io.ins := Vec.tabulate(r) { i => remoteRegs(i).io.data.out }
   readRemoteBMux.io.sel := io.readRemoteBSel
   io.readRemoteB := readRemoteBMux.io.out

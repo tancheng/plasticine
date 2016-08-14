@@ -14,6 +14,18 @@ class MuxN(val numInputs: Int, w: Int) extends Module {
   io.out := io.ins(io.sel)
 }
 
+class MuxNL(val numInputs1: Int, w1: Int) extends MuxN(numInputs1, w1) {
+  override val numSelectBits = log2Up(numInputs1)
+  override val io = new Bundle {
+    val ins = Vec.fill(numInputs1) { Bits(INPUT,  width = w1) }
+    val sel = Bits(INPUT,  numSelectBits)
+    val out = Bits(OUTPUT, width = w1)
+  }
+
+  io.out := io.ins(io.sel)
+}
+
+
 class MuxVec(val numInputs: Int, v: Int, w: Int) extends Module {
   val numSelectBits = log2Up(numInputs)
   val io = new Bundle {

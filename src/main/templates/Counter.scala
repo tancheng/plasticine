@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import Chisel._
+import plasticine.Globals
 
 /**
  * Counter: 1-dimensional counter. Counts upto 'max', each time incrementing
@@ -22,7 +23,8 @@ class Counter(val w: Int) extends Module {
     }
   }
 
-  val reg = Module(new FF(w))
+//  val reg = Module(new FF(w))
+  val reg = if (Globals.noModule) new FFL(w) else Module(new FF(w))
   val init = UInt(0, width = w)
   reg.io.data.init := init
   reg.io.control.enable := io.control.reset | io.control.enable

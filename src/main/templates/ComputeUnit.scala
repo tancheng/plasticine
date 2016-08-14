@@ -2,6 +2,7 @@ package plasticine.templates
 
 import Chisel._
 import plasticine.pisa.ir._
+import plasticine.Globals
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
@@ -194,7 +195,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     mux
   }
   val wenMux = List.tabulate(numScratchpads) { i =>
-    val mux = Module(new MuxN(numCounters+1, 1))
+    val mux = if (Globals.noModule) new MuxNL(numCounters+1, 1) else Module(new MuxN(numCounters+1, 1))
     mux.io.sel := config.scratchpads(i).wen
     mux
   }
@@ -262,7 +263,8 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
 
       val dataSrcA = if (i <= rwStages) {
         // Forwarded memories
-        val memAMux = Module(new MuxN(numScratchpads, w))
+//        val memAMux = Module(new MuxN(numScratchpads, w))
+        val memAMux = if (Globals.noModule) new MuxNL(numScratchpads, w) else Module(new MuxN(numScratchpads, w))
         memAMux.io.ins := Vec(rdata)
         memAMux.io.sel := stageConfig.opA.value
 
@@ -270,7 +272,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
           Vec(localA, rA, stageConfig.opA.value, UInt(0, width=w), memAMux.io.out)
         } else {
           // Forwarded counters
-          val counterAMux = Module(new MuxN(numCounters, w))
+          val counterAMux = if (Globals.noModule) new MuxNL(numCounters, w) else Module(new MuxN(numScratchpads, w))
           counterAMux.io.ins := Vec(counters)
           counterAMux.io.sel := stageConfig.opA.value
           Vec(localA, rA, stageConfig.opA.value, counterAMux.io.out, memAMux.io.out)
@@ -282,7 +284,8 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
       val localB = regblock.io.readLocalB
       val dataSrcB = if (i <= rwStages) {
         // Forwarded memories
-        val memBMux = Module(new MuxN(numScratchpads, w))
+//        val memBMux = Module(new MuxN(numScratchpads, w))
+        val memBMux = if (Globals.noModule) new MuxNL(numScratchpads, w) else Module(new MuxN(numScratchpads, w))
         memBMux.io.ins := Vec(rdata)
         memBMux.io.sel := stageConfig.opB.value
 
@@ -290,7 +293,8 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
           Vec(localB, rB, stageConfig.opB.value, UInt(0, width=w), memBMux.io.out)
         } else {
           // Forwarded counters
-          val counterBMux = Module(new MuxN(numCounters, w))
+//          val counterBMux = Module(new MuxN(numCounters, w))
+          val counterBMux = if (Globals.noModule) new MuxNL(numCounters, w) else Module(new MuxN(numCounters, w))
           counterBMux.io.ins := Vec(counters)
           counterBMux.io.sel := stageConfig.opB.value
           Vec(localB, rB, stageConfig.opB.value, counterBMux.io.out, memBMux.io.out)
@@ -299,10 +303,12 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
         Vec(localB, rB, stageConfig.opB.value)
       }
 
-      val dataSrcAMux = Module(new MuxN(dataSrcA.size, w))
+//      val dataSrcAMux = Module(new MuxN(dataSrcA.size, w))
+      val dataSrcAMux = if (Globals.noModule) new MuxNL(dataSrcA.size, w) else Module(new MuxN(dataSrcA.size, w))
       dataSrcAMux.io.ins := dataSrcA
       dataSrcAMux.io.sel := stageConfig.opA.dataSrc
-      val dataSrcBMux = Module(new MuxN(dataSrcB.size, w))
+//      val dataSrcBMux = Module(new MuxN(dataSrcB.size, w))
+      val dataSrcBMux = if (Globals.noModule) new MuxNL(dataSrcB.size, w) else Module(new MuxN(dataSrcB.size, w))
       dataSrcBMux.io.ins := dataSrcB
       dataSrcBMux.io.sel := stageConfig.opB.dataSrc
 
@@ -390,12 +396,12 @@ object ComputeUnitTest {
     val bitwidth = 32
     val startDelayWidth = 4
     val endDelayWidth = 4
-    val d = 10
-    val v = 16
+    val d = 4
+    val v = 1
     val l = 0
-    val r = 16
-    val rwStages = 3
-    val numTokens = 4
+    val r = 8
+    val rwStages = 1
+    val numTokens = 2
     val m = 64
     chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj.config))) {
       c => new ComputeUnitTests(c)

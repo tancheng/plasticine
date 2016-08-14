@@ -1,4 +1,5 @@
 package plasticine.templates
+import plasticine.Globals
 
 import scala.collection.immutable.Map
 import Chisel._
@@ -47,7 +48,8 @@ class IntFU(val w: Int) extends Module {
     Opcodes.getOp(i, io.a, io.b)
   }
 
-  val m = Module(new MuxN(Opcodes.opcodes.size, w))
+//  val m = Module(new MuxN(Opcodes.opcodes.size, w))
+  val m = if (Globals.noModule) new MuxNL(Opcodes.opcodes.size, w) else Module(new MuxN(Opcodes.opcodes.size, w))
   m.io.ins.zip(ins).foreach { case (in, i) =>
     in := i
   }

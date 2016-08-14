@@ -1,4 +1,5 @@
 package plasticine.templates
+import plasticine.Globals
 
 import Chisel._
 
@@ -12,7 +13,8 @@ class Depulser() extends Module {
     val out = Bool(OUTPUT)
   }
 
-  val r = Module(new FF(1))
+//  val r = Module(new FF(1))
+  val r = if (Globals.noModule) new FFL(1) else Module(new FF(1))
   r.io.data.in := Mux(io.rst, UInt(0), io.in)
   r.io.data.init := UInt(0)
   r.io.control.enable := io.in | io.rst
