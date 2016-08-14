@@ -157,7 +157,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
 
   // Scratchpads
   val scratchpads = List.tabulate(numScratchpads) { i =>
-    Module(new SRAM(w, m))
+    Module(new Scratchpad(w, m, v, inst.scratchpads(i)))
   }
   val waStagesMux = List.tabulate(numScratchpads) { i =>
     val mux = Module(new MuxVec(rwStages, v, log2Up(m)))
@@ -200,9 +200,9 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     mux
   }
   scratchpads.zipWithIndex.foreach { case (s, i) =>
-    s.io.waddr := waSrcMux(i).io.out(0)
-    s.io.wdata := wdMux(i).io.out(0)
-    s.io.raddr := raSrcMux(i).io.out(0)
+    s.io.waddr := waSrcMux(i).io.out
+    s.io.wdata := wdMux(i).io.out
+    s.io.raddr := raSrcMux(i).io.out
     s.io.wen   := wenMux(i).io.out
   }
   val rdata = scratchpads.map { _.io.rdata }
@@ -265,7 +265,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
         // Forwarded memories
 //        val memAMux = Module(new MuxN(numScratchpads, w))
         val memAMux = if (Globals.noModule) new MuxNL(numScratchpads, w) else Module(new MuxN(numScratchpads, w))
-        memAMux.io.ins := Vec(rdata)
+        memAMux.io.ins := Vec(rdata map {_(ii)}) // Get the ii'th element from each Scratchpad's rdata vector
         memAMux.io.sel := stageConfig.opA.value
 
         if (i == rwStages) {
@@ -286,7 +286,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
         // Forwarded memories
 //        val memBMux = Module(new MuxN(numScratchpads, w))
         val memBMux = if (Globals.noModule) new MuxNL(numScratchpads, w) else Module(new MuxN(numScratchpads, w))
-        memBMux.io.ins := Vec(rdata)
+        memBMux.io.ins := Vec(rdata map {_(ii)}) // Get the ii'th element from each Scratchpad's rdata vector
         memBMux.io.sel := stageConfig.opB.value
 
         if (i == rwStages) {

@@ -48,6 +48,8 @@ object Parser {
         new Config(CrossbarConfig(config))
       case "lut" =>
         new Config(LUTConfig(config))
+      case "scratchpad" =>
+        new Config(ScratchpadConfig(config))
       case "cuControl" =>
         new Config(CUControlBoxConfig(config))
       case "cu" =>

@@ -6,6 +6,7 @@ import scala.collection.immutable.Map
 import plasticine.pisa.parser._
 import plasticine.templates.Opcodes
 import scala.collection.mutable.HashMap
+import Chisel.log2Up
 
 object Config {
   def apply(path: String) = Parser(path)
@@ -164,6 +165,26 @@ case class PipeStageConfig(config: Map[Any, Any]) extends AbstractConfig {
  */
 case class SrcValueTuple(val src: Int, val value: Int)
 
+case class BankingConfig(config: String) extends AbstractConfig {
+  def parseMode = config(0) match {
+    case 'x' => 0 // No banking
+    case 'b' => 1 // Strided
+    case 'd' => 2 // Diagonal
+    case _ => throw new Exception(s"Unsupported banking mode ''$config'")
+  }
+  def parseStride = {
+    if (config.size == 1) 0
+    else log2Up(Integer.parseInt(config.drop(1)))
+  }
+  private var _mode = parseMode
+  def mode = _mode
+  def mode_=(x: Int) { _mode = x }
+
+  private var _strideLog2 = parseStride
+  def strideLog2 = _strideLog2
+  def strideLog2_=(x: Int) { _strideLog2 = x }
+}
+
 case class ScratchpadConfig(config: Map[Any, Any]) extends AbstractConfig {
   // Banking stride
   private def parseAddrSource(x: String) = {
@@ -200,6 +221,10 @@ case class ScratchpadConfig(config: Map[Any, Any]) extends AbstractConfig {
   }
   def wen = _wen
   def wen_=(x: Int) { _wen = x }
+
+  private var _banking = BankingConfig(Parser.getFieldString(config, "banking"))
+  def banking = _banking
+  def banking_=(x: BankingConfig) { _banking = x }
 }
 
 case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
