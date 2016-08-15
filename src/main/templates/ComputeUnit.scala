@@ -119,14 +119,18 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   val numCounters = numTokens
 
   val numScratchpads = 4 // TODO: Remove hardcoded number!
+  val numReduceStages = log2Up(v)
+  val numStagesAfterReduction = 2
 
   // Sanity check parameters for validity
   Predef.assert(d >= (rwStages),
     s"""#stages $d < read-write stages ($rwStages)!""")
 
   // #remoteRegs == numCounters + v in current impl
-  Predef.assert(r > (numCounters+numScratchpads),
+  Predef.assert(r >= (numCounters+numScratchpads),
     s"""#Unsupported number of remote registers $r; $r must be >= $numCounters + $numScratchpads (numCounters + numScratchpads))""")
+
+  Predef.assert(d >= (numReduceStages + numStagesAfterReduction), s"Invalid number of stages ($d); must be >= numReduceStages + numStagesAfterReduction ($numReduceStages + $numStagesAfterReduction)")
 
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT) // Reconfiguration interface
@@ -249,10 +253,26 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   val pipeStages = ListBuffer[List[IntFU]]()
   val pipeRegs = ListBuffer[List[RegisterBlock]]()
   pipeRegs.append(initRegblocks)
+
+  // Reduction stages
+  val reduceStages = (0 until d).dropRight(numStagesAfterReduction).takeRight(numReduceStages)
   for (i <- 0 until d) {
     val stage = List.fill(v) { Module(new IntFU(w)) }
     val regblockStage = List.fill(v) { Module(new RegisterBlock(w, l, r)) }
     val stageConfig = config.pipeStage(i)
+
+    // Reduction tree specific:
+    // If this stage is one of the reduction stages, get its position within the reduce tree stages.
+    val isReduceStage = reduceStages.contains(i)
+    val reduceStageNum = reduceStages.indexOf(i)
+    // Lanes in the current stage that need to be forwarded values from previous stage
+    val reduceLanes = (0 until v by (1 << (reduceStageNum+1))).toList
+    // Forward lanes for each lane
+    val fwdLaneMap = new HashMap[Int, Int]()
+    reduceLanes.foreach { r =>
+      fwdLaneMap(r) = r + (1 << reduceStageNum)
+    }
+    println(s"stage $i: fwdLaneMap $fwdLaneMap")
     (0 until v) foreach { ii =>
       val fu = stage(ii)
       val regblock = regblockStage(ii)
@@ -296,6 +316,10 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
           counterBMux.io.sel := stageConfig.opB.value
           Vec(localB, rB, stageConfig.opB.value, counterBMux.io.out, memBMux.io.out)
         }
+      } else if (isReduceStage && fwdLaneMap.contains(ii)) {
+        val prevRegBlock = pipeRegs.last(fwdLaneMap(ii))
+        val reduceVal = prevRegBlock.io.passDataOut(0)
+        Vec(localB, rB, stageConfig.opB.value, reduceVal)
       } else {
         Vec(localB, rB, stageConfig.opB.value)
       }
