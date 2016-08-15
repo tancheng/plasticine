@@ -282,6 +282,11 @@ case class CUControlBoxConfig(config: Map[Any, Any]) extends AbstractConfig {
   def enableLUT = _enableLUT
   def enableLUT_=(x: List[LUTConfig]) { _enableLUT = x }
 
+  private var _tokenDownLUT: LUTConfig = LUTConfig(Parser.getFieldMap(config, "tokenDownLUT"))
+  def tokenDownLUT = _tokenDownLUT
+  def tokenDownLUT_=(x: LUTConfig) { _tokenDownLUT = x }
+
+
   private var _udcInit: List[Int] = Parser.getFieldList(config, "udcInit")
                                         .asInstanceOf[List[String]]
                                         .map { parseValue(_) }
@@ -295,6 +300,28 @@ case class CUControlBoxConfig(config: Map[Any, Any]) extends AbstractConfig {
   private var _incXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "incXbar"), true)
   def incXbar = _incXbar
   def incXbar_=(x: CrossbarConfig) { _incXbar = x }
+
+  private var _doneXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "doneXbar"))
+  def doneXbar = _doneXbar
+  def doneXbar_=(x: CrossbarConfig) { _doneXbar = x }
+
+  private var _enableMux: List[Boolean] = Parser.getFieldList(config, "enableMux")
+                                        .asInstanceOf[List[String]]
+                                        .map { parseValue(_) > 0 }
+  def enableMux = _enableMux
+  def enableMux_=(x: List[Boolean]) { _enableMux = x }
+
+  private var _tokenOutMux: List[Boolean] = Parser.getFieldList(config, "tokenOutMux")
+                                        .asInstanceOf[List[String]]
+                                         .map { parseValue(_) > 0 }
+  def tokenOutMux = _tokenOutMux
+  def tokenOutMux_=(x: List[Boolean]) { _tokenOutMux = x }
+
+  private var _syncTokenMux: Int = parseValue(Parser.getFieldString(config, "syncTokenMux"))
+  def syncTokenMux = _syncTokenMux
+  def syncTokenMux_=(x: Int) { _syncTokenMux = x }
+
+
 }
 
 /**
