@@ -29,6 +29,11 @@ config: $config"""
 abstract class AbstractConfig {
   protected def encodeOneHot(x: Int) = 1 << x
   protected def getRegNum(s: String) = if (s.size <= 1) 0 else s.drop(1).toInt
+
+  def parseValue(x: String):Int = x(0) match {
+    case 'x' => 0
+    case _ => Integer.parseInt(x)
+  }
 }
 
 /**
@@ -92,10 +97,12 @@ case class CounterChainConfig(config: Map[Any, Any]) extends AbstractConfig {
  */
 case class OperandConfig(config: String) extends AbstractConfig {
   private def getDataSrc = config(0) match {
+    case 'x' => 0 // Don't care (must eventually be turned off)
     case 'l' => 0 // Local register
     case 'r' => 1 // Previous pipe stage register
     case 'c' => 2 // Constant
     case 'i' => 3 // Iterator / counter
+    case 't' => 3 // Cross-stage value for reduction
     case 'm' => 4 // Memory
     case _ => throw new Exception(s"Unknown data source '${config(0)}'. Must be l, r, c, i, or m")
   }
@@ -140,8 +147,9 @@ case class PipeStageConfig(config: Map[Any, Any]) extends AbstractConfig {
       val source = fwdMap(reg)
       val regNum = Integer.parseInt(reg.toString.drop(1))
       t(regNum) = source match {
-        case "counter" => 1
-        case "memory" => 1
+        case "i" => 1 // Same number because counter and memory contents don't overlap
+        case "m" => 1
+        case "e" => 1
         case _ => 0
       }
     }
@@ -275,30 +283,38 @@ case class CUControlBoxConfig(config: Map[Any, Any]) extends AbstractConfig {
   def enableLUT_=(x: List[LUTConfig]) { _enableLUT = x }
 
   private var _udcInit: List[Int] = Parser.getFieldList(config, "udcInit")
-                                        .asInstanceOf[List[Double]]
-                                        .map { _.toInt }
+                                        .asInstanceOf[List[String]]
+                                        .map { parseValue(_) }
   def udcInit = _udcInit
   def udcInit_=(x: List[Int]) { _udcInit = x }
 
-  private var _decXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "decXbar"))
+  private var _decXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "decXbar"), true)
   def decXbar = _decXbar
   def decXbar_=(x: CrossbarConfig) { _decXbar = x }
 
-  private var _incXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "incXbar"))
+  private var _incXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "incXbar"), true)
   def incXbar = _incXbar
   def incXbar_=(x: CrossbarConfig) { _incXbar = x }
 }
 
 /**
  * Crossbar config information
+ * @param incByOne: Set to true if crossbar's '0' corresponds to the value 0.
+ * In this case, the user specifies 'x' for don't care, and 0,1,.. for actual values.
+ * Add 1 to each value that is non-'x' if set to true.
  */
-case class CrossbarConfig(config: Map[Any, Any]) extends AbstractConfig {
+case class CrossbarConfig(config: Map[Any, Any], incByOne: Boolean = false) extends AbstractConfig {
   private var _outSelect: List[Int] = Parser.getFieldList(config, "outSelect")
-                                        .asInstanceOf[List[Double]]
-                                        .map { _.toInt }
+                                        .asInstanceOf[List[String]]
+                                        .map { parseValue(_) }
 
   def outSelect = _outSelect
   def outSelect_=(x: List[Int]) { _outSelect = x }
+
+  override def parseValue(x: String):Int = x(0) match {
+    case 'x' => 0
+    case _ => if (incByOne) 1 + Integer.parseInt(x) else Integer.parseInt(x)
+  }
 }
 
 /**
@@ -306,9 +322,8 @@ case class CrossbarConfig(config: Map[Any, Any]) extends AbstractConfig {
  */
 case class LUTConfig(config: Map[Any, Any]) extends AbstractConfig {
   private var _table: List[Int] = Parser.getFieldList(config, "table")
-                                        .asInstanceOf[List[Double]]
-                                        .map { _.toInt }
-
+                                        .asInstanceOf[List[String]]
+                                        .map { parseValue(_) }
   def table = _table
   def table_=(x: List[Int]) { _table = x }
 }
