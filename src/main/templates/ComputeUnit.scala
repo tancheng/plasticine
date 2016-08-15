@@ -217,7 +217,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   counterChain.io.control.zipWithIndex.foreach { case (c,i) =>
    c.enable := counterEnables(i)
   }
-  val counters = counterChain.io.data map { _.out }
+  val counters = counterChain.io.data map { _.out }  // List of counters
 
   // Control block
   val controlBlock = Module(new CUControlBox(w, numCounters, inst.control))
@@ -229,8 +229,11 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
 
   // Empty pipe stage generation for each lane
   // Values passed in - Currently it is counters ++ first element of all dataIn buses
-  val remotesList =  counters ++ io.dataIn.map { _(0) }
-  val initRegblocks = List.fill(v) {
+  val counterVecs = List.tabulate(v) { i =>
+    counters.map { c => c + UInt(i) }
+  }
+  val initRegblocks = List.tabulate(v) { i =>
+    val remotesList =  counterVecs(i) ++ io.dataIn.map { _(0) }
     val regBlock = Module(new RegisterBlock(w, 0 /*local*/,  r /*remote*/))
     regBlock.io.writeData := UInt(0) // Not connected to any ALU output
     regBlock.io.readLocalASel := UInt(0) // No local reads
@@ -292,7 +295,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
         } else {
           // Forwarded counters
           val counterAMux = if (Globals.noModule) new MuxNL(numCounters, w) else Module(new MuxN(numCounters, w))
-          counterAMux.io.ins := Vec(counters)
+          counterAMux.io.ins := Vec(counterVecs(ii))
           counterAMux.io.sel := stageConfig.opA.value
           Vec(localA, rA, stageConfig.opA.value, counterAMux.io.out, memAMux.io.out)
         }
@@ -312,7 +315,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
         } else {
           // Forwarded counters
           val counterBMux = if (Globals.noModule) new MuxNL(numCounters, w) else Module(new MuxN(numCounters, w))
-          counterBMux.io.ins := Vec(counters)
+          counterBMux.io.ins := Vec(counterVecs(ii))
           counterBMux.io.sel := stageConfig.opB.value
           Vec(localB, rB, stageConfig.opB.value, counterBMux.io.out, memBMux.io.out)
         }
@@ -340,11 +343,11 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
 
       // Produce pass data values from counters and regs for the first rwStages
       val passData = if (i < rwStages) {
-        val passCounterMuxes = List.tabulate(numCounters) { i =>
-          Mux(stageConfig.fwd(i), counters(i), pipeRegs.last(ii).io.passDataOut(i))
+        val passCounterMuxes = List.tabulate(numCounters) { j =>
+          Mux(stageConfig.fwd(j), counterVecs(ii)(j), pipeRegs.last(ii).io.passDataOut(j))
         }
-        val passScratchpadMuxes = List.tabulate(numScratchpads) { i =>
-          Mux(stageConfig.fwd(numCounters+i), rdata(i)(ii), pipeRegs.last(ii).io.passDataOut(numCounters+i))
+        val passScratchpadMuxes = List.tabulate(numScratchpads) { j =>
+          Mux(stageConfig.fwd(numCounters+j), rdata(j)(ii), pipeRegs.last(ii).io.passDataOut(numCounters+j))
         }
         passCounterMuxes ++ passScratchpadMuxes ++ pipeRegs.last(ii).io.passDataOut.drop(numCounters+numScratchpads)
       } else {
@@ -374,15 +377,19 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   val wStagesOut = getStageOut(pipeStages.last)
   val lastStageWaddr = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(0) }  // r0 in last stage is local waddr
   val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(1) }  // r1 in last stage in local wdata
-  val countersAsVecs = counters map { c => Vec.fill(v) {c} }  // TODO: Fix when vectorization is enabled
+//  val countersAsVecs = counters map { c => Vec.fill(v) {c} }  // TODO: Fix when vectorization is enabled
 
   // Wire stage outputs into scratchpad address and data
+  val stridedCounters = counters.map { c =>
+    Vec.tabulate(v) { i => c + UInt(i) }
+  }
+
   (0 until numScratchpads) foreach { i =>
     raStagesMux(i).io.ins := Vec (rwStagesOut)
-    raCountersMux(i).io.ins := Vec (countersAsVecs)
+    raCountersMux(i).io.ins := Vec (stridedCounters)
     raSrcMux(i).io.ins := Vec(raStagesMux(i).io.out, raCountersMux(i).io.out)
     waStagesMux(i).io.ins := Vec(rwStagesOut)
-    waCountersMux(i).io.ins := Vec(countersAsVecs)
+    waCountersMux(i).io.ins := Vec(stridedCounters)
     waSrcMux(i).io.ins := Vec(waStagesMux(i).io.out, waCountersMux(i).io.out, lastStageWaddr)
     wdMux(i).io.ins(0) := lastStageWdata // local write data
     wdMux(i).io.ins(1) := remoteWriteData(0) // remote write data - currently pick only the first bus
