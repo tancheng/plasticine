@@ -9,7 +9,9 @@ import scala.collection.mutable.HashMap
  */
 abstract class OpcodeT extends Bundle
 
-abstract class ConfigInterface extends Bundle
+abstract class ConfigInterface extends Bundle {
+  val config_data = Bool(INPUT)
+}
 
 /**
  * Abstract 'ConfigurableModule' class. This class is a thin wrapper
