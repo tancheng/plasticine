@@ -36,7 +36,7 @@ class CrossbarVec(val w: Int, val v: Int, val numInputs: Int, val numOutputs: In
   val configInit = CrossbarOpcode(w, numInputs, numOutputs, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
-    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, reset))
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
   } .otherwise {
     configIn := config
   }
@@ -65,7 +65,7 @@ class Crossbar(val w: Int, val numInputs: Int, val numOutputs: Int, val inst: Cr
   val configInit = CrossbarOpcode(w, numInputs, numOutputs, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
-    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, reset))
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
   } .otherwise {
     configIn := config
   }

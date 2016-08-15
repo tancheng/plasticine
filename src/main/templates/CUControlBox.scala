@@ -63,7 +63,7 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   val configInit = CUControlBoxOpcode(w, numTokens, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
-    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, reset))
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
   } .otherwise {
     configIn := config
   }

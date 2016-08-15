@@ -71,7 +71,7 @@ class LUT(val w: Int, val size: Int, val inst: LUTConfig) extends ConfigurableMo
   val configInit = LUTOpcode(w, size, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
-    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, reset))
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
   } .otherwise {
     configIn := config
   }

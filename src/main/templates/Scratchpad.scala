@@ -39,7 +39,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, inst: ScratchpadConfig) ext
   val configInit = ScratchpadOpcode(d, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
-    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, reset))
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
   } .otherwise {
     configIn := config
   }
