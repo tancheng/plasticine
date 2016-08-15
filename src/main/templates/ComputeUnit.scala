@@ -56,9 +56,9 @@ class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = 
   var opcode = if (config.isDefined) UInt(config.get.opcode, width=log2Up(Opcodes.size)) else UInt(width=log2Up(Opcodes.size))
   var result = if (config.isDefined) UInt(config.get.result, width=l+r) else UInt(width=l+r) // One-hot encoded
   var fwd = if (config.isDefined) {
-      Vec.tabulate(r) { i => UInt(config.get.fwd.getOrElse(i, 0), width=log2Up(r)) }
+    Vec.tabulate(r) { i => Bool(config.get.fwd.getOrElse(i, 0) > 0) }
     } else {
-      Vec.tabulate(r) { i => UInt(width=log2Up(r)) }
+      Vec.tabulate(r) { i => Bool() }
     }
 
   override def cloneType(): this.type = {
@@ -338,7 +338,18 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
       fu.io.opcode := stageConfig.opcode
       regblock.io.writeData := fu.io.out
 
-      val passData = pipeRegs.last(ii).io.passDataOut
+      // Produce pass data values from counters and regs for the first rwStages
+      val passData = if (i < rwStages) {
+        val passCounterMuxes = List.tabulate(numCounters) { i =>
+          Mux(stageConfig.fwd(i), counters(i), pipeRegs.last(ii).io.passDataOut(i))
+        }
+        val passScratchpadMuxes = List.tabulate(numScratchpads) { i =>
+          Mux(stageConfig.fwd(numCounters+i), rdata(i)(ii), pipeRegs.last(ii).io.passDataOut(numCounters+i))
+        }
+        passCounterMuxes ++ passScratchpadMuxes ++ pipeRegs.last(ii).io.passDataOut.drop(numCounters+numScratchpads)
+      } else {
+        pipeRegs.last(ii).io.passDataOut
+      }
       regblock.io.passData := passData
       regblock.io.writeSel := stageConfig.result
       regblock.io.readLocalASel := stageConfig.opA.value
