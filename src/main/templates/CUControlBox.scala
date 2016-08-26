@@ -71,11 +71,14 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   // Done crossbar - connects done signals from counter chains to LUTs
   val doneXbar = Module(new Crossbar(1, numTokens, 2*numTokens, inst.doneXbar))
   doneXbar.io.config_enable := io.config_enable
+  doneXbar.io.config_data := io.config_data
   doneXbar.io.ins.zip(io.done.reverse).foreach { case (in, done) => in := done } // MSB must be in position 0
 
   // Token out LUTs
   val tokenOutLUTs = List.tabulate(numTokens-1) { i =>
     val lut = Module(new LUT(1, 1 << 2, inst.tokenOutLUT(i)))
+    lut.io.config_enable := io.config_enable
+    lut.io.config_data := io.config_data
     lut.io.ins := doneXbar.io.outs.drop(i*2).take(2)
     io.tokenOuts(i+1) := lut.io.out
     lut
@@ -85,6 +88,7 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   // "zero" input which can also be chosen
   val decXbar = Module(new Crossbar(1, numTokens+1, numTokens, inst.decXbar))
   decXbar.io.config_enable := io.config_enable
+  decXbar.io.config_data := io.config_data
   decXbar.io.ins.zipWithIndex.foreach { case (in, i) => if (i == 0) in := UInt(0, width=1) else in := io.done(i-1) }
   val decs = decXbar.io.outs
 
@@ -92,6 +96,7 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   // "zero" input which can also be chosen
   val incXbar = Module(new Crossbar(1, numTokens+1, 2*numTokens, inst.incXbar))
   incXbar.io.config_enable := io.config_enable
+  incXbar.io.config_data := io.config_data
   incXbar.io.ins.zipWithIndex.foreach { case (in, i) => if (i == 0) in := UInt(0, width=1) else in := io.tokenIns(i-1) }
   val incs = incXbar.io.outs.take(numTokens)
   val inits = incXbar.io.outs.takeRight(numTokens)
@@ -117,6 +122,8 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   syncTokenMux.io.sel := config.syncTokenMux
   val syncToken = syncTokenMux.io.out
   val tokenDownLUT = Module(new LUT(1, 1 << (numTokens+1), inst.tokenDownLUT))
+  tokenDownLUT.io.config_enable := io.config_enable
+  tokenDownLUT.io.config_data := io.config_data
   tokenDownLUT.io.ins.zipWithIndex.foreach { case (in, i) =>
     if (i == 0) in := syncToken
     else in := gtzs(i-1)
@@ -125,7 +132,12 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   pulser.io.in := tokenDownLUT.io.out
 
   // Enable Mux
-  val enableLUTs = List.tabulate(numTokens) { i => Module(new LUT(1, 1 << gtzs.size, inst.enableLUT(i))) }
+  val enableLUTs = List.tabulate(numTokens) { i =>
+    val m = Module(new LUT(1, 1 << gtzs.size, inst.enableLUT(i)))
+    m.io.config_enable := io.config_enable
+    m.io.config_data := io.config_data
+    m
+  }
   enableLUTs.foreach { _.io.ins := gtzs.reverse } // MSB must be in position 0
   val enableMux = List.tabulate(numTokens) { i => Mux(config.enableMux(i), io.tokenIns(i), enableLUTs(i).io.out) }
   io.enable.zip(enableMux) foreach { case (en, mux) => en := mux }
