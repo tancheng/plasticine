@@ -57,6 +57,8 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
   val counterInsn = inst.counters
   val counters = (0 until numCounters) map { i =>
     val c = Module(new CounterRC(w, startDelayWidth, endDelayWidth, counterInsn(i)))
+    c.io.config_enable := io.config_enable
+    c.io.config_data := io.config_data
     c.io.data.max := io.data(i).max
     c.io.data.stride := io.data(i).stride
     io.data(i).out := c.io.data.out
