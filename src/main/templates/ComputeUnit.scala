@@ -157,11 +157,16 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   // Crossbar across input buses
   val inputXbar = Module(new CrossbarVec(w, v, numScratchpads, numScratchpads, inst.dataInXbar))
   inputXbar.io.ins := io.dataIn
+  inputXbar.io.config_enable := io.config_enable
+  inputXbar.io.config_data := io.config_data
   val remoteWriteData = inputXbar.io.outs
 
   // Scratchpads
   val scratchpads = List.tabulate(numScratchpads) { i =>
-    Module(new Scratchpad(w, m, v, inst.scratchpads(i)))
+    val mem = Module(new Scratchpad(w, m, v, inst.scratchpads(i)))
+    mem.io.config_enable := io.config_enable
+    mem.io.config_data := io.config_data
+    mem
   }
   val waStagesMux = List.tabulate(numScratchpads) { i =>
     val mux = Module(new MuxVec(rwStages, v, log2Up(m)))
@@ -213,6 +218,8 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
 
   // CounterChain
   val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain))
+  counterChain.io.config_enable := io.config_enable
+  counterChain.io.config_data := io.config_data
   val counterEnables = Vec.fill(numCounters) { Bool() }
   counterChain.io.control.zipWithIndex.foreach { case (c,i) =>
    c.enable := counterEnables(i)
@@ -222,6 +229,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
   // Control block
   val controlBlock = Module(new CUControlBox(w, numCounters, inst.control))
   controlBlock.io.config_enable := io.config_enable
+  controlBlock.io.config_data := io.config_data
   controlBlock.io.tokenIns := io.tokenIns
   controlBlock.io.done := counterChain.io.control map { _.done}
   counterEnables := controlBlock.io.enable
@@ -433,11 +441,11 @@ object ComputeUnitTest {
     val bitwidth = 32
     val startDelayWidth = 4
     val endDelayWidth = 4
-    val d = 10
+    val d = 8
     val v = 16
     val l = 0
     val r = 16
-    val rwStages = 8
+    val rwStages = 4
     val numTokens = 8
     val m = 64
     chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj.config))) {
