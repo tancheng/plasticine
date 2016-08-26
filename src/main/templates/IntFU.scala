@@ -60,10 +60,10 @@ class IntFU(val w: Int) extends Module {
   fpComparator.io.b := io.b
 
   // FMA
-  val fma = Module(new MulAddRecFN(8, 24))
-  fma.io.a := io.a
-  fma.io.b := io.b
-  fma.io.c := io.b
+//  val fma = Module(new MulAddRecFN(8, 24))
+//  fma.io.a := io.a
+//  fma.io.b := io.b
+//  fma.io.c := io.b
 
   // Populate opcode table
   Opcodes.opcodes = List[(String, (UInt, UInt) => UInt)](
@@ -77,7 +77,8 @@ class IntFU(val w: Int) extends Module {
     ("f<" , (a,b)   => UInt(fpComparator.io.lt, width=w)),
     ("f==" , (a,b)  => UInt(fpComparator.io.eq, width=w)),
     ("f>" , (a,b) => UInt(fpComparator.io.gt, width=w)),
-    ("f*" , (a,b) => fma.io.out),
+//    ("f*" , (a,b) => fma.io.out),
+    ("f*" , (a,b) => a*b),
     ("passA" , (a,b) => a),
     ("passB" , (a,b) => b)
   )
