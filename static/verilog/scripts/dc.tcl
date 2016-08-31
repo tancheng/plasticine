@@ -23,32 +23,28 @@ open_mw_lib $MILKYWAY_LIB_NAME
 check_library
 define_design_lib WORK -path ./work
 
-# preserve sequential logics
-set hdlin_preserve_sequential true
-set compile_delete_unloaded_sequential_cells false
-
 # read in verilog using analyze, elaborate, link and check design
 read_verilog -rtl $VERILOG_LIST
 analyze -format verilog $VERILOG_LIST
+
 # remove SRAM as we don't need to elaborate the interface
 remove_design [list SRAM]
+set_dont_touch SRAM
 list_designs
+
 # set top level design
 current_design $PROJECT_NAME
 elaborate $PROJECT_NAME
-
 link
-# check_design
-# Build separate instance for multiply-instantiated sub-modules
 uniquify
 
 #set_operating_conditions WCCOM
 set_dont_use tcbn45gsbwpml/*D0BWP
 
 # Wireload
-set_wire_load_mode top
-set_driving_cell -library tcbn45gsbwpml -lib_cell INVD0BWP -pin ZN [ get_ports "*" -filter {@port_direction == in} ]
-set_load [expr 400 * [load_of tcbn45gsbwpml/INVD0BWP/I]] [get_ports "*" -filter {@port_direction == out} ]
+# set_wire_load_mode top
+# set_driving_cell -library tcbn45gsbwpml -lib_cell INVD0BWP -pin ZN [ get_ports "*" -filter {@port_direction == in} ]
+# set_load [expr 400 * [load_of tcbn45gsbwpml/INVD0BWP/I]] [get_ports "*" -filter {@port_direction == out} ]
 
 # Timing / Area constraints
 # set_max_delay -from [all_inputs] -to [all_outputs] 0.20
@@ -58,6 +54,10 @@ set_load [expr 400 * [load_of tcbn45gsbwpml/INVD0BWP/I]] [get_ports "*" -filter 
 
 # set input and output delays
 # set input_delay 0
+
+# Area constraints
+# currently we are not meeting timing design. design compiler prioritize slack over area. so we
+# don't optimize for area for now.
 
 ###################################################
 
@@ -74,17 +74,11 @@ compile_ultra
 ###################################################
 # Analyze Design
 ###################################################
-report_design
 redirect $PROJECT_PATH/dc_reports/dc_design_report { report_design }
-check_design
 redirect $PROJECT_PATH/dc_reports/dc_design_check {check_design }
-report_area
 redirect $PROJECT_PATH/dc_reports/dc_area_report { report_area }
-report_power
 redirect $PROJECT_PATH/dc_reports/dc_power_report { report_power -analysis_effort hi }
-report_timing
 redirect $PROJECT_PATH/dc_reports/dc_timing_report { report_timing -significant_digits 4 }
-check_error
 redirect $PROJECT_PATH/dc_reports/dc_error_checking_report { check_error }
 
 change_names -rules verilog -hierarchy
