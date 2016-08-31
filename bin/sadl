@@ -68,6 +68,7 @@ def stage(app, params, opts):
         print("Performing Split C++ compilation...")
         os.system("cp %s/* %s" %(static_dir, build_dir))
         ecode = os.system("pushd %s && time ./splitMethods.sh && time make -j16 && popd" %(build_dir))
+        #ecode = os.system("pushd %s && time make -j16 && popd" %(build_dir))
         if (ecode != 0):
             err("SADL compilation failed")
 
@@ -77,6 +78,13 @@ def stage(app, params, opts):
         ecode = os.system(sbt_cmd)
         if ecode != 0:
             err("SADL compilation failed")
+
+    if opts.verilog == True:
+        # Move generated verilog files into a separate "src" folder
+        os.system("mkdir %s/src && mv %s/*.v %s/src" %(build_dir, build_dir, build_dir))
+
+        # Copy Makefile and ASIC flow scripts
+        os.system("cp -r %s/verilog/* %s" %(static_dir, build_dir))
 
 if __name__ == "__main__":
     main()
