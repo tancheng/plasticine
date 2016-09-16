@@ -1,51 +1,61 @@
 #!/bin/bash
 
 EXE=`grep -o "public mod_t" *.h -r | cut -f1 -d'.'`
+FILE=${EXE}.cpp
+EMU_FILE=${EXE}-emulator.cpp
+FILECPY=$FILE
+#FILECPY=${EXE}_copy.cpp
 
-NUM=20000
+NUM=20000 # Maximum number of lines in each split file
+
 ## Split the header file
 GLOBALS=globals.h
 GLOBALDEFS=globalDefs.h
 rm -f $GLOBALS $GLOBALDEFS
 echo "#ifndef __GLOBALS_H__" >> $GLOBALS
 echo "#define __GLOBALS_H__" >> $GLOBALS
-echo "#include \"emulator.h\"" >> $GLOBALS
 echo "#ifndef __GLOBALDEFS_H__" >> $GLOBALDEFS
 echo "#define __GLOBALDEFS_H__" >> $GLOBALDEFS
-echo "#include \"emulator.h\"" >> $GLOBALDEFS
+echo "#include \"emulator.h\"" | tee -a $GLOBALS $GLOBALDEFS > /dev/null
 
 sed -i "s/private/public/" ${EXE}.h
-grep "^[ ][ ]*dat_t<[0-9][0-9]*> .*;" ${EXE}.h >> $GLOBALS
-grep "^[ ][ ]*mem_t<[0-9][0-9,]*> .*;" ${EXE}.h >> $GLOBALS
-grep "^[ ][ ]*val_t __rand_seed;" ${EXE}.h >> $GLOBALS
-grep "^[ ][ ]*clk_t clk;" ${EXE}.h >> $GLOBALS
-grep "^[ ][ ]*dat_t<[0-9][0-9]*> .*;" ${EXE}.h >> $GLOBALDEFS
-grep "^[ ][ ]*mem_t<[0-9][0-9,]*> .*;" ${EXE}.h >> $GLOBALDEFS
-grep "^[ ][ ]*val_t __rand_seed;" ${EXE}.h >> $GLOBALDEFS
-grep "^[ ][ ]*clk_t clk;" ${EXE}.h >> $GLOBALDEFS
+grep "^[ ][ ]*dat_t<[0-9][0-9]*> .*;" ${EXE}.h | tee -a $GLOBALS $GLOBALDEFS > /dev/null
+grep "^[ ][ ]*mem_t<[0-9][0-9,]*> .*;" ${EXE}.h | tee -a $GLOBALS $GLOBALDEFS > /dev/null
+grep "^[ ][ ]*val_t __rand_seed;" ${EXE}.h | tee -a $GLOBALS $GLOBALDEFS > /dev/null
+grep "^[ ][ ]*clk_t clk;" ${EXE}.h | tee -a $GLOBALS $GLOBALDEFS > /dev/null
+#grep "^[ ][ ]*dat_t<[0-9][0-9]*> .*;" ${EXE}.h >> $GLOBALDEFS
+#grep "^[ ][ ]*mem_t<[0-9][0-9,]*> .*;" ${EXE}.h >> $GLOBALDEFS
+#grep "^[ ][ ]*val_t __rand_seed;" ${EXE}.h >> $GLOBALDEFS
+#grep "^[ ][ ]*clk_t clk;" ${EXE}.h >> $GLOBALDEFS
+
+## Move "const val_t" declarations in .h and .cpp file to globals.h and globalDefs.h
+grep "^[ ][ ]*static const .*;" ${EXE}.h | sed 's/static//' | tee -a $GLOBALS > /dev/null
+grep "const val_t ${EXE}_t::.*" ${FILECPY} | sed "s/${EXE}_t:://" | tee -a $GLOBALDEFS > /dev/null
+
+## Add 'extern' prefix to all declarations in globals.h
 sed -i 's/^[ ][ ]*dat_t/extern dat_t/' $GLOBALS
 sed -i 's/^[ ][ ]*mem_t/extern mem_t/' $GLOBALS
 sed -i 's/^[ ][ ]*clk_t/extern clk_t/' $GLOBALS
 sed -i 's/^[ ][ ]*val_t/extern val_t/' $GLOBALS
+sed -i 's/^[ ][ ]*const/extern const/' $GLOBALS
 
+## Delete all moved declarations in .h and .cpp files
 sed -i "s/^[ ][ ]*dat_t<[0-9][0-9]*> .*;//" ${EXE}.h
 sed -i "s/^[ ][ ]*mem_t<[0-9][0-9,]*> .*;//" ${EXE}.h
 sed -i "s/^[ ][ ]*val_t __rand_seed;//" ${EXE}.h
 sed -i "s/^[ ][ ]*clk_t clk;//" ${EXE}.h
+sed -i "s/^[ ][ ]*static const .*;//" ${EXE}.h
+sed -i "s/^[ ]*const .*;//" ${FILECPY}
 
 sed -i "3i #include \"$GLOBALS\"" ${EXE}.h
-echo "#endif" >> $GLOBALS
-echo "#endif" >> $GLOBALDEFS
+echo "#endif" | tee -a $GLOBALS $GLOBALDEFS > /dev/null
 
-FILE=${EXE}.cpp
-EMU_FILE=${EXE}-emulator.cpp
-FILECPY=$FILE
-#FILECPY=${EXE}_copy.cpp
 
 #cp $FILE $FILECPY
 sed -i "s/\&mod->/\&/" $FILECPY
 sed -i 's/module\.clk/clk/g' $EMU_FILE
 sed -i "2i #include \"$GLOBALDEFS\"" ${FILECPY}
+
 
 ## Get starting and ending lines
 initStart=`grep -n "void ${EXE}_t::init" ${FILE} | cut -f1 -d':'`
@@ -100,16 +110,13 @@ CLOCKLO_GLOBALDEFS=clockLoGlobalDefs.h
 rm -f $CLOCKLO_GLOBALS $CLOCKLO_GLOBALDEFS
 echo "#ifndef __CLOCKLO_GLOBALS_H__"    >> $CLOCKLO_GLOBALS
 echo "#define __CLOCKLO_GLOBALS_H__"    >> $CLOCKLO_GLOBALS
-echo "#include \"emulator.h\""  >> $CLOCKLO_GLOBALS
 echo "#ifndef __CLOCKLO_GLOBALDEFS_H__" >> $CLOCKLO_GLOBALDEFS
 echo "#define __CLOCKLO_GLOBALDEFS_H__" >> $CLOCKLO_GLOBALDEFS
-echo "#include \"emulator.h\""  >> $CLOCKLO_GLOBALDEFS
-grep "^[ ][ ]*val_t T[0-9]*;" clockLo.txt >> $CLOCKLO_GLOBALS
-grep "^[ ][ ]*val_t T[0-9]*;" clockLo.txt >> $CLOCKLO_GLOBALDEFS
+echo "#include \"emulator.h\""  | tee -a $CLOCKLO_GLOBALS $CLOCKLO_GLOBALDEFS > /dev/null
+grep "^[ ][ ]*val_t T[0-9]*;" clockLo.txt | tee -a $CLOCKLO_GLOBALS $CLOCKLO_GLOBALDEFS > /dev/null
 sed -i "s/^[ ][ ]*val_t T[0-9]*;//" clockLo.txt
 sed -i 's/^[ ][ ]*val_t/extern val_t/' $CLOCKLO_GLOBALS
-echo "#endif" >> $CLOCKLO_GLOBALS
-echo "#endif" >> $CLOCKLO_GLOBALDEFS
+echo "#endif" | tee -a $CLOCKLO_GLOBALS $CLOCKLO_GLOBALDEFS > /dev/null
 
 sed -i "4i #include\"$CLOCKLO_GLOBALDEFS\"" ${FILECPY}
 
