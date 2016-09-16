@@ -1,6 +1,6 @@
 PARAM_FILE=param.tcl
 
-include Makefile.common
+# include Makefile.common
 
 # [raghu] Perhaps a better way to do this is described here:
 # http://stackoverflow.com/questions/10858261/abort-makefile-if-variable-not-set
