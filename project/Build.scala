@@ -18,7 +18,7 @@ object PlasticineBuild extends Build {
     libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.11.5",
     libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.11.5",
     libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.2",
-    libraryDependencies += "edu.berkeley.cs" %% "chisel" % "latest.release",
+    libraryDependencies += "edu.berkeley.cs" %% "chisel" % "2.2.35",
 
     retrieveManaged := true,
     scalacOptions += "-Yno-generic-signatures",
