@@ -1,6 +1,8 @@
 *.log
 *.vcd
 *.swp
+*.xlsx*
+*.jpg
 *.tags
 .o
 .alib
