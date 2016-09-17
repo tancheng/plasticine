@@ -47,7 +47,7 @@ class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, v
       cus(i).append(cu)
       if (i == 0) { // First row
         if (j == 0) {  // First column
-          // Do nothing
+//           Do nothing
         } else {
           cu.io.dataIn(0) := cus(i)(j-1).io.dataOut
         }
@@ -59,7 +59,6 @@ class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, v
       }
     }
   }
-
   controlBox.io.doneTokenIn := cus(rows-1)(cols-1).io.tokenOuts(0)
 }
 
