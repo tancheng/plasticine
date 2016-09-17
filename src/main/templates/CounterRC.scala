@@ -15,8 +15,8 @@ case class CounterOpcode(val w: Int, val startDelayWidth: Int, val endDelayWidth
   var stride = if (config.isDefined) UInt(config.get.stride, width=w) else UInt(width = w)
   var maxConst = if (config.isDefined) Bool(config.get.maxConst > 0) else Bool()
   var strideConst = if (config.isDefined) Bool(config.get.strideConst > 0) else Bool()
-  var startDelay = if (config.isDefined) UInt(config.get.startDelay, width=startDelayWidth) else UInt(width = startDelayWidth)
-  var endDelay = if (config.isDefined) UInt(config.get.endDelay, width=endDelayWidth) else UInt(width = endDelayWidth)
+  var startDelay = if (config.isDefined) UInt(config.get.startDelay % (1 << startDelayWidth), width=startDelayWidth) else UInt(width = startDelayWidth)
+  var endDelay = if (config.isDefined) UInt(config.get.endDelay % (1 << endDelayWidth), width=endDelayWidth) else UInt(width = endDelayWidth)
 
   override def cloneType(): this.type = {
     new CounterOpcode(w, startDelayWidth, endDelayWidth, config).asInstanceOf[this.type]
@@ -90,6 +90,67 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
   io.control.waitOut := io.control.waitIn | depulser.io.out
 }
 
+class CounterRCReg(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, inst: CounterRCConfig) extends Module {
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
+    val data = new Bundle {
+      val max      = UInt(INPUT,  w)
+      val stride   = UInt(INPUT,  w)
+      val out      = UInt(OUTPUT, w)
+    }
+    val control = new Bundle {
+      val enable    = Bool(INPUT)
+      val waitIn    = Bool(INPUT)
+      val waitOut    = Bool(OUTPUT)
+      val done   = Bool(OUTPUT)
+    }
+  }
+
+  // Register the inputs
+  val maxReg = Module(new FF(w))
+  maxReg.io.control.enable := Bool(true)
+  maxReg.io.data.in := io.data.max
+  val max = maxReg.io.data.out
+
+  val strideReg = Module(new FF(w))
+  strideReg.io.control.enable := Bool(true)
+  strideReg.io.data.in := io.data.stride
+  val stride = strideReg.io.data.out
+
+  val enableReg = Module(new FF(1))
+  enableReg.io.control.enable := Bool(true)
+  enableReg.io.data.in := io.control.enable
+  val enable = enableReg.io.data.out
+
+  val waitInReg = Module(new FF(1))
+  waitInReg.io.control.enable := Bool(true)
+  waitInReg.io.data.in := io.control.waitIn
+  val waitIn = waitInReg.io.data.out
+
+  // Instantiate counter
+  val counter = Module(new CounterRC(w, startDelayWidth, endDelayWidth, inst))
+  counter.io.config_enable := io.config_enable
+  counter.io.config_data := io.config_data
+  counter.io.data.max := max
+  counter.io.data.stride := stride
+  counter.io.control.enable := enable
+  counter.io.control.waitIn := waitIn
+
+  // Register outputs
+  val outReg = Module(new FF(w))
+  outReg.io.control.enable := Bool(true)
+  outReg.io.data.in := counter.io.data.out
+  io.data.out := outReg.io.data.out
+  val waitOutReg = Module(new FF(1))
+  waitOutReg.io.control.enable := Bool(true)
+  waitOutReg.io.data.in := counter.io.control.waitOut
+  io.control.waitOut := waitOutReg.io.data.out
+  val doneReg = Module(new FF(1))
+  doneReg.io.control.enable := Bool(true)
+  doneReg.io.data.in := counter.io.control.done
+  io.control.done := doneReg.io.data.out
+}
+
 /**
  * CounterRC test harness
  */
@@ -111,6 +172,8 @@ class CounterRCTests(c: CounterRC) extends PlasticineTester(c) {
     val done = peek(c.io.control.done)
   }
 }
+
+class CounterRCCharTests(c: CounterRCReg) extends Tester(c)
 
 object CounterRCTest {
 
@@ -137,3 +200,21 @@ object CounterRCTest {
     }
   }
 }
+
+object CounterRCChar {
+  def main(args: Array[String]): Unit = {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 1) {
+      println("Usage: CounterRCChar <w>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    val startDelayWidth = 4
+    val endDelayWidth = 4
+    val config = CounterRCConfig(Map(), true)
+    chiselMainTest(args, () => Module(new CounterRCReg(w, startDelayWidth, endDelayWidth, config))) {
+      c => new CounterRCCharTests(c)
+    }
+  }
+}
+

@@ -88,6 +88,66 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
   }
 }
 
+class CounterChainReg(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val numCounters: Int, inst: CounterChainConfig) extends Module {
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
+    val data = Vec.fill(numCounters) { new Bundle {
+        val max      = UInt(INPUT,  w)
+        val stride   = UInt(INPUT,  w)
+        val out      = UInt(OUTPUT, w)
+      }
+    }
+    val control = Vec.fill(numCounters) { new Bundle {
+        val enable = Bool(INPUT)
+        val done   = Bool(OUTPUT)
+      }
+    }
+  }
+
+  val maxs = List.tabulate(numCounters) { i =>
+    val maxff = Module(new FF(w))
+    maxff.io.control.enable := Bool(true)
+    maxff.io.data.in := io.data(i).max
+    maxff.io.data.out
+  }
+
+  val strides = List.tabulate(numCounters) { i =>
+    val strideff = Module(new FF(w))
+    strideff.io.control.enable := Bool(true)
+    strideff.io.data.in := io.data(i).stride
+    strideff.io.data.out
+  }
+
+  val enables = List.tabulate(numCounters) { i =>
+    val enableff = Module(new FF(1))
+    enableff.io.control.enable := Bool(true)
+    enableff.io.data.in := io.control(i).enable
+    enableff.io.data.out
+  }
+
+  val cchain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst))
+  cchain.io.config_enable := io.config_enable
+  cchain.io.config_data := io.config_data
+  cchain.io.data.zipWithIndex.foreach { case (d, i) =>
+    d.max := maxs(i)
+    d.stride := strides(i)
+  }
+  cchain.io.control.zipWithIndex.foreach { case (c, i) =>
+    c.enable := enables(i)
+  }
+
+  (0 until numCounters) foreach  { i =>
+    val outff = Module(new FF(w))
+    outff.io.control.enable := Bool(true)
+    outff.io.data.in := cchain.io.data(i).out
+    io.data(i).out := outff.io.data.out
+    val doneff = Module(new FF(1))
+    doneff.io.control.enable := Bool(true)
+    doneff.io.data.in := cchain.io.control(i).done
+    io.control(i).done := doneff.io.data.out
+  }
+}
+
 /**
  * CounterChain test harness
  */
@@ -110,6 +170,26 @@ class CounterChainTests(c: CounterChain) extends PlasticineTester(c) {
     step(1)
     c.io.data foreach { d => peek(d.out) }
     val done = peek(c.io.control)
+  }
+}
+
+class CounterChainCharTests(c: CounterChainReg) extends Tester(c)
+
+object CounterChainChar {
+  def main(args: Array[String]): Unit = {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 2) {
+      println("Usage: CounterChainChar <w> <numCounters>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    val numCounters = appArgs(1).toInt
+    val startDelayWidth = 4
+    val endDelayWidth = 4
+    val config = CounterChainConfig(Map(), true)
+    chiselMainTest(args, () => Module(new CounterChainReg(w, startDelayWidth, endDelayWidth, numCounters, config))) {
+      c => new CounterChainCharTests(c)
+    }
   }
 }
 
