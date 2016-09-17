@@ -37,6 +37,37 @@ class MuxVec(val numInputs: Int, v: Int, w: Int) extends Module {
   io.out := io.ins(io.sel)
 }
 
+class MuxNReg(val numInputs: Int, w: Int) extends Module {
+  val numSelectBits = log2Up(numInputs)
+  val io = new Bundle {
+    val ins = Vec.fill(numInputs) { Bits(INPUT,  width = w) }
+    val sel = Bits(INPUT,  numSelectBits)
+    val out = Bits(OUTPUT, width = w)
+  }
+
+  // Register the inputs
+  val ffins = List.tabulate(numInputs) { i =>
+    val ff = Module(new FF(w))
+    ff.io.control.enable := Bool(true)
+    ff.io.data.in := io.ins(i)
+    ff
+  }
+
+  val ffsel = Module(new FF(numSelectBits))
+  ffsel.io.control.enable := Bool(true)
+  ffsel.io.data.in := io.sel
+  val sel = ffsel.io.data.out
+
+  val mux = Module(new MuxN(numInputs, w))
+  mux.io.ins := Vec.tabulate(numInputs) { i => ffins(i).io.data.out }
+  mux.io.sel := sel
+
+  // Register the output
+  val ff = Module(new FF(w))
+  ff.io.control.enable := Bool(true)
+  ff.io.data.in := mux.io.out
+  io.out := ff.io.data.out
+}
 
 class MuxNTests(c: MuxN) extends Tester(c) {
     val ins = List.tabulate(c.numInputs) { i =>
@@ -52,11 +83,34 @@ class MuxNTests(c: MuxN) extends Tester(c) {
     }
 }
 
+class MuxNCharTests(c: MuxNReg) extends Tester(c)
+
 object MuxNTest {
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new MuxN(16, 12))) {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 2) {
+      println("Usage: MuxNTest <wordWidth> <numInputs>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    val numInputs = appArgs(1).toInt
+    chiselMainTest(args, () => Module(new MuxN(numInputs, w))) {
       c => new MuxNTests(c)
     }
   }
 }
 
+object MuxNChar {
+  def main(args: Array[String]): Unit = {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 2) {
+      println("Usage: MuxNChar <wordWidth> <numInputs>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    val numInputs = appArgs(1).toInt
+    chiselMainTest(args, () => Module(new MuxNReg(numInputs, w))) {
+      c => new MuxNCharTests(c)
+    }
+  }
+}

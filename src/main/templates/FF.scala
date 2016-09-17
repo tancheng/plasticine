@@ -29,6 +29,46 @@ class FF(val w: Int) extends Module {
   io.data.out := ff
 }
 
+class FFNoInit(val w: Int) extends Module {
+  val io = new Bundle {
+    val data = new Bundle {
+      val in   = UInt(INPUT,  w)
+      val out  = UInt(OUTPUT, w)
+    }
+    val control = new Bundle {
+      val enable = Bool(INPUT)
+    }
+  }
+
+  val d = UInt(width = w)
+  val ff = Reg(Bits(w), d)
+  when (io.control.enable) {
+    d := io.data.in
+  } .otherwise {
+    d := ff
+  }
+  io.data.out := ff
+}
+
+class FFWrapper(val w: Int, val initVal: Int) extends Module {
+  val io = new Bundle {
+    val data = new Bundle {
+      val in   = UInt(INPUT,  w)
+      val out  = UInt(OUTPUT, w)
+    }
+    val control = new Bundle {
+      val enable = Bool(INPUT)
+    }
+  }
+
+  val init = UInt(initVal % (1 << w), width=w)
+  val ff = Module(new FF(w))
+  ff.io.data.in := io.data.in
+  ff.io.data.init := init
+  ff.io.control.enable := io.control.enable
+  io.data.out := ff.io.data.out
+}
+
 class FFL(val w1: Int) extends FF(w1) {
   override val io = new Bundle {
     val data = new Bundle {
@@ -72,10 +112,48 @@ class FFTests(c: FF) extends Tester(c) {
   }
 }
 
+class FFNoInitTests(c: FFNoInit) extends Tester(c)
+class FFWrapperTests(c: FFWrapper) extends Tester(c)
+
 object FFTest {
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new FF(4))) {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 1) {
+      println("Usage: IntPrimitiveTest <wordWidth>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    chiselMainTest(args, () => Module(new FF(w))) {
       c => new FFTests(c)
+    }
+  }
+}
+
+object FFNoInitChar {
+  def main(args: Array[String]): Unit = {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 1) {
+      println("Usage: FFNoInitChar <wordWidth>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    chiselMainTest(args, () => Module(new FFNoInit(w))) {
+      c => new FFNoInitTests(c)
+    }
+  }
+}
+
+object FFWrapperTest {
+  def main(args: Array[String]): Unit = {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 1) {
+      println("Usage: FFWrapperTest <wordWidth>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    val init = 1
+    chiselMainTest(args, () => Module(new FFWrapper(w, init))) {
+      c => new FFWrapperTests(c)
     }
   }
 }
