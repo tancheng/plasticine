@@ -6,7 +6,8 @@ import scala.collection.immutable.Map
 import plasticine.pisa.parser._
 import plasticine.templates.Opcodes
 import scala.collection.mutable.HashMap
-import Chisel.log2Up
+import scala.util.Random
+import Chisel._
 
 object Config {
   def apply(path: String) = Parser(path)
@@ -29,7 +30,6 @@ config: $config"""
 abstract class AbstractConfig {
   protected def encodeOneHot(x: Int) = 1 << x
   protected def getRegNum(s: String) = if (s.size <= 1) 0 else s.drop(1).toInt
-
   def parseValue(x: String):Int = x(0) match {
     case 'x' => 0
     case _ => Integer.parseInt(x)
@@ -39,54 +39,61 @@ abstract class AbstractConfig {
 /**
  * Parsed config information for a single counter
  */
-case class CounterRCConfig(config: Map[Any, Any]) extends AbstractConfig {
+case class CounterRCConfig(config: Map[Any, Any], randomize: Boolean = false) extends AbstractConfig {
   /** Counter max */
-  private var _max: Int = Parser.getFieldInt(config, "max")
+  private var _max: Int = Parser.getFieldInt(config, "max", randomize)
   def max = _max
   def max_=(x: Int) { _max = x }
 
   /** Counter stride */
-  private var _stride: Int = Parser.getFieldInt(config, "stride")
+  private var _stride: Int = Parser.getFieldInt(config, "stride", randomize)
   def stride = _stride
   def stride_=(x: Int) { _stride = x }
 
   /** Is max const */
-  private var _maxConst: Int = Parser.getFieldInt(config, "maxConst")
+  private var _maxConst: Int = Parser.getFieldInt(config, "maxConst", randomize)
   def maxConst = _maxConst
   def maxConst_=(x: Int) { _maxConst = x }
 
   /** Is stride const */
-  private var _strideConst: Int = Parser.getFieldInt(config, "strideConst")
+  private var _strideConst: Int = Parser.getFieldInt(config, "strideConst", randomize)
   def strideConst = _strideConst
   def strideConst_=(x: Int) { _strideConst = x }
 
   /** Delay the start of counter */
-  private var _startDelay: Int = 1 + Parser.getFieldInt(config, "startDelay")
+  private var _startDelay: Int = 1 + Parser.getFieldInt(config, "startDelay", randomize)
   def startDelay = _startDelay
   def startDelay_=(x: Int) { _startDelay = x }
 
   /** Delay raising the counter 'done' signal */
-  private var _endDelay: Int = 1 + Parser.getFieldInt(config, "endDelay")
+  private var _endDelay: Int = 1 + Parser.getFieldInt(config, "endDelay", randomize)
   def endDelay = _endDelay
   def endDelay_=(x: Int) { _endDelay = x }
 }
 
-
 /**
  * CounterChain config information
  */
-case class CounterChainConfig(config: Map[Any, Any]) extends AbstractConfig {
+case class CounterChainConfig(config: Map[Any, Any], randomize: Boolean = false) extends AbstractConfig {
   // To chain or not?
-  private var _chain: List[Int] = Parser.getFieldList(config, "chain")
+  private var _chain: List[Int] = if (randomize) {
+    List.tabulate(100) { i => i % 2 } // HACK: Fix this by adding template-specific config nodes
+  } else {
+    Parser.getFieldList(config, "chain")
                                         .asInstanceOf[List[Double]]
                                         .map { i => i.toInt }
+  }
 
   def chain = _chain
   def chain_=(x: List[Int]) { _chain = x }
 
   // Configuration for individual counters
-  private var _counters: Seq[CounterRCConfig] = Parser.getFieldListOfMaps(config, "counters")
-                                                      .map { h => new CounterRCConfig(h) }
+  private var _counters: Seq[CounterRCConfig] = if (randomize) {
+    List.fill(100) { CounterRCConfig(Map(), true) }
+  } else {
+    Parser.getFieldListOfMaps(config, "counters")
+       .map { h => new CounterRCConfig(h) }
+  }
   def counters = _counters
   def counters_=(x: Seq[CounterRCConfig]) { _counters = x }
 }

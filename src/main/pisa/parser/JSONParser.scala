@@ -3,6 +3,7 @@ package plasticine.pisa.parser
 import java.io.File
 import _root_.scala.util.parsing.json.JSON
 import scala.collection.mutable.HashMap
+import scala.util.Random
 import plasticine.pisa.ir._
 
 object Parser {
@@ -67,15 +68,15 @@ object Parser {
     }
   }
 
-  def getFieldDouble(map: Map[Any, Any], field: String): Double = {
+  def getFieldDouble(map: Map[Any, Any], field: String, randomize: Boolean = false): Double = {
     map.get(field) match {
       case Some(field) => java.lang.Double.parseDouble(field.toString)
-      case None => fieldNotFound(field, map)
+      case None => if (randomize) Random.nextDouble else fieldNotFound(field, map)
     }
   }
 
-  def getFieldInt(map: Map[Any, Any], field: String): Int = {
-    getFieldDouble(map, field).toInt
+  def getFieldInt(map: Map[Any, Any], field: String, randomize: Boolean = false): Int = {
+    getFieldDouble(map, field, randomize).toInt
   }
 
   def getFieldBoolean(map: Map[Any, Any], field: String): Boolean = {
