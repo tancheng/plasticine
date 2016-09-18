@@ -61,6 +61,18 @@ object Parser {
     CounterChainConfig(chain, counters)
   }
 
+  def parseValue(x: String, incByOne: Boolean = false):Int = x(0) match {
+    case 'x' => 0
+    case _ => if (incByOne) Integer.parseInt(x) + 1 else Integer.parseInt(x)
+  }
+
+  def parseLUT(m: Map[Any, Any]): LUTConfig = {
+    val table: List[Int] = Parser.getFieldList(m, "table")
+                                        .asInstanceOf[List[String]]
+                                        .map { parseValue(_) }
+    LUTConfig(table)
+  }
+
   def parseCU(m: Map[Any, Any]): ComputeUnitConfig = {
     val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
 
@@ -71,10 +83,40 @@ object Parser {
     val pipeStage = Parser.getFieldListOfMaps(m, "pipeStage")
                               .map { h => new PipeStageConfig(h) }
 
-    val control = CUControlBoxConfig(Parser.getFieldMap(m, "control"))
+    val control = parseControlBox(Parser.getFieldMap(m, "control"))
 
-    val dataInXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(m, "dataInXbar"))
+    val dataInXbar = parseCrossbar(Parser.getFieldMap(m, "dataInXbar"))
     ComputeUnitConfig(counterChain, scratchpads, pipeStage, control, dataInXbar)
+  }
+
+  def parseCrossbar(m: Map[Any, Any], incByOne: Boolean = false): CrossbarConfig = {
+    val outSelect: List[Int] = Parser.getFieldList(m, "outSelect")
+                                        .asInstanceOf[List[String]]
+                                        .map { parseValue(_, incByOne) }
+
+    CrossbarConfig(outSelect)
+  }
+
+  def parseControlBox(m: Map[Any, Any]): CUControlBoxConfig = {
+    val tokenOutLUT: List[LUTConfig] = Parser.getFieldListOfMaps(m, "tokenOutLUT")
+                                            .map { parseLUT(_) }
+    val enableLUT: List[LUTConfig] = Parser.getFieldListOfMaps(m, "enableLUT")
+                                            .map { parseLUT(_) }
+    val tokenDownLUT: LUTConfig = parseLUT(Parser.getFieldMap(m, "tokenDownLUT"))
+    val udcInit: List[Int] = Parser.getFieldList(m, "udcInit")
+                                .asInstanceOf[List[String]]
+                                .map { parseValue(_) }
+    val decXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "decXbar"), true)
+    val incXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "incXbar"), true)
+    val doneXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "doneXbar"))
+    val enableMux: List[Boolean] = Parser.getFieldList(m, "enableMux")
+                                .asInstanceOf[List[String]]
+                                .map { parseValue(_) > 0 }
+    val tokenOutMux: List[Boolean] = Parser.getFieldList(m, "tokenOutMux")
+                                .asInstanceOf[List[String]]
+                                 .map { parseValue(_) > 0 }
+    val syncTokenMux: Int = parseValue(Parser.getFieldString(m, "syncTokenMux"))
+    CUControlBoxConfig(tokenOutLUT, enableLUT, tokenDownLUT, udcInit, decXbar, incXbar, doneXbar, enableMux, tokenOutMux, syncTokenMux)
   }
 
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
@@ -92,13 +134,13 @@ object Parser {
       case "counterChain" =>
         parseCounterChain(config)
       case "crossbar" =>
-        new CrossbarConfig(config)
+        parseCrossbar(config)
       case "lut" =>
-        new LUTConfig(config)
+        parseLUT(config)
       case "scratchpad" =>
         new ScratchpadConfig(config)
       case "cuControl" =>
-        new CUControlBoxConfig(config)
+        parseControlBox(config)
       case "cu" =>
         parseCU(config)
       case "plasticine" =>

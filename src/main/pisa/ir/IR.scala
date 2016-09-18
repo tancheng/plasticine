@@ -203,86 +203,55 @@ case class ComputeUnitConfig(
 /**
  * CUControlBox config information
  */
-case class CUControlBoxConfig(config: Map[Any, Any]) extends AbstractConfig {
-  private var _tokenOutLUT: List[LUTConfig] = Parser.getFieldListOfMaps(config, "tokenOutLUT")
-                                                    .map { LUTConfig(_) }
-  def tokenOutLUT = _tokenOutLUT
-  def tokenOutLUT_=(x: List[LUTConfig]) { _tokenOutLUT = x }
-
-  private var _enableLUT: List[LUTConfig] = Parser.getFieldListOfMaps(config, "enableLUT")
-                                                    .map { LUTConfig(_) }
-  def enableLUT = _enableLUT
-  def enableLUT_=(x: List[LUTConfig]) { _enableLUT = x }
-
-  private var _tokenDownLUT: LUTConfig = LUTConfig(Parser.getFieldMap(config, "tokenDownLUT"))
-  def tokenDownLUT = _tokenDownLUT
-  def tokenDownLUT_=(x: LUTConfig) { _tokenDownLUT = x }
-
-
-  private var _udcInit: List[Int] = Parser.getFieldList(config, "udcInit")
-                                        .asInstanceOf[List[String]]
-                                        .map { parseValue(_) }
-  def udcInit = _udcInit
-  def udcInit_=(x: List[Int]) { _udcInit = x }
-
-  private var _decXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "decXbar"), true)
-  def decXbar = _decXbar
-  def decXbar_=(x: CrossbarConfig) { _decXbar = x }
-
-  private var _incXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "incXbar"), true)
-  def incXbar = _incXbar
-  def incXbar_=(x: CrossbarConfig) { _incXbar = x }
-
-  private var _doneXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "doneXbar"))
-  def doneXbar = _doneXbar
-  def doneXbar_=(x: CrossbarConfig) { _doneXbar = x }
-
-  private var _enableMux: List[Boolean] = Parser.getFieldList(config, "enableMux")
-                                        .asInstanceOf[List[String]]
-                                        .map { parseValue(_) > 0 }
-  def enableMux = _enableMux
-  def enableMux_=(x: List[Boolean]) { _enableMux = x }
-
-  private var _tokenOutMux: List[Boolean] = Parser.getFieldList(config, "tokenOutMux")
-                                        .asInstanceOf[List[String]]
-                                         .map { parseValue(_) > 0 }
-  def tokenOutMux = _tokenOutMux
-  def tokenOutMux_=(x: List[Boolean]) { _tokenOutMux = x }
-
-  private var _syncTokenMux: Int = parseValue(Parser.getFieldString(config, "syncTokenMux"))
-  def syncTokenMux = _syncTokenMux
-  def syncTokenMux_=(x: Int) { _syncTokenMux = x }
+case class CUControlBoxConfig(
+  tokenOutLUT: List[LUTConfig],
+  enableLUT: List[LUTConfig],
+  tokenDownLUT: LUTConfig,
+  udcInit: List[Int],
+  decXbar: CrossbarConfig,
+  incXbar: CrossbarConfig,
+  doneXbar: CrossbarConfig,
+  enableMux: List[Boolean],
+  tokenOutMux: List[Boolean],
+  syncTokenMux: Int
+) extends AbstractConfig
+object CUControlBoxConfig {
+  def getRandom(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
+    new CUControlBoxConfig(
+        List.fill(numTokenOut-1) { LUTConfig.getRandom(2) }, // tokenOutLUT
+        List.fill(numCounters) { LUTConfig.getRandom(numCounters)}, // enableLUT
+        LUTConfig.getRandom(numCounters+1), // tokenDownLUT,
+        List.fill(numCounters) { Random.nextInt }, // udcInit,
+        CrossbarConfig.getRandom(numCounters), // decXbar,
+        CrossbarConfig.getRandom(2*numCounters), // incXbar,
+        CrossbarConfig.getRandom(numCounters), // doneXbar,
+        List.fill(numCounters) { Random.nextInt % 2 == 0}, // enableMux,
+        List.fill(numTokenOut-1) { Random.nextInt % 2 == 0}, // tokenOutMux,
+        Random.nextInt % 2 // syncTokenMux
+      )
+  }
 }
-
 /**
  * Crossbar config information
  * @param incByOne: Set to true if crossbar's '0' corresponds to the value 0.
  * In this case, the user specifies 'x' for don't care, and 0,1,.. for actual values.
  * Add 1 to each value that is non-'x' if set to true.
  */
-case class CrossbarConfig(config: Map[Any, Any], incByOne: Boolean = false) extends AbstractConfig {
-  private var _outSelect: List[Int] = Parser.getFieldList(config, "outSelect")
-                                        .asInstanceOf[List[String]]
-                                        .map { parseValue(_) }
-
-  def outSelect = _outSelect
-  def outSelect_=(x: List[Int]) { _outSelect = x }
-
-  override def parseValue(x: String):Int = x(0) match {
-    case 'x' => 0
-    case _ => if (incByOne) 1 + Integer.parseInt(x) else Integer.parseInt(x)
+case class CrossbarConfig(outSelect: List[Int]) extends AbstractConfig
+object CrossbarConfig {
+  def getRandom(numOutputs: Int) = {
+    new CrossbarConfig(List.fill(numOutputs) { Random.nextInt })
   }
 }
 
 /**
  * LUT config information
  */
-case class LUTConfig(config: Map[Any, Any]) extends AbstractConfig {
-  private var _table: List[Int] = Parser.getFieldList(config, "table")
-                                        .asInstanceOf[List[String]]
-                                        .map { parseValue(_) }
-  def table = _table
-  def table_=(x: List[Int]) { _table = x }
+case class LUTConfig(table: List[Int]) extends AbstractConfig
+object LUTConfig {
+  def getRandom(numInputs: Int) = {
+    new LUTConfig(List.tabulate(1 << numInputs) { i => Random.nextInt(2) })
+  }
 }
 
 /**
