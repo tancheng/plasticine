@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import Chisel._
+import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 
 /**
@@ -140,13 +141,13 @@ object ScratchpadTest {
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Config(pisaFile).asInstanceOf[Config[ScratchpadConfig]]
+    val configObj = Parser(pisaFile).asInstanceOf[ScratchpadConfig]
 
     val w = 32
     val d = 64
     val v = 2
 
-    chiselMainTest(args, () => Module(new Scratchpad(w, d, v, configObj.config))) {
+    chiselMainTest(args, () => Module(new Scratchpad(w, d, v, configObj))) {
       c => new ScratchpadTests(c)
     }
   }

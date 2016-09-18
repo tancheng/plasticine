@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import Chisel._
+import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import plasticine.Globals
 
@@ -436,7 +437,7 @@ object ComputeUnitTest {
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Config(pisaFile).asInstanceOf[Config[ComputeUnitConfig]]
+    val configObj = Parser(pisaFile).asInstanceOf[ComputeUnitConfig]
 
     val bitwidth = 32
     val startDelayWidth = 4
@@ -448,7 +449,7 @@ object ComputeUnitTest {
     val rwStages = 4
     val numTokens = 8
     val m = 64
-    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj))) {
       c => new ComputeUnitTests(c)
     }
   }

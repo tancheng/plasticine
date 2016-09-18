@@ -1,5 +1,5 @@
 package plasticine.templates
-
+import plasticine.pisa.parser.Parser
 import plasticine.misc.Utils
 import Chisel._
 
@@ -167,13 +167,13 @@ object CUControlBoxTest {
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Config(pisaFile).asInstanceOf[Config[CUControlBoxConfig]]
+    val configObj = Parser(pisaFile).asInstanceOf[CUControlBoxConfig]
 
 
     val wordSize = 1
     val numTokens = 3
 
-    chiselMainTest(chiselArgs, () => Module(new CUControlBox(wordSize, numTokens, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new CUControlBox(wordSize, numTokens, configObj))) {
       c => new CUControlBoxTests(c)
     }
   }

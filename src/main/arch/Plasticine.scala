@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import Chisel._
+import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 
 import scala.collection.mutable.HashMap
@@ -95,7 +96,7 @@ object PlasticineTest {
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Config(pisaFile).asInstanceOf[Config[PlasticineConfig]]
+    val configObj = Parser(pisaFile).asInstanceOf[PlasticineConfig]
 
     val bitwidth = 32
     val startDelayWidth = 4
@@ -107,7 +108,7 @@ object PlasticineTest {
     val rwStages = 3
     val numTokens = 4
     val m = 64
-    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj))) {
       c => new PlasticineTests(c)
     }
   }

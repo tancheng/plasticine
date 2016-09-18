@@ -9,21 +9,6 @@ import scala.collection.mutable.HashMap
 import scala.util.Random
 import Chisel._
 
-object Config {
-  def apply(path: String) = Parser(path)
-}
-
-class Config[T<:AbstractConfig](val config: T) {
-  private var _v: Double = 0
-  def v = _v
-  def v_=(x: Double) = { _v = x }
-
-  override def toString = {
-s"""PISA version: $v
-config: $config"""
-  }
-}
-
 /**
  * Base class for all Config nodes
  */

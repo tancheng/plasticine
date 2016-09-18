@@ -1,5 +1,6 @@
 package plasticine.templates
 
+import plasticine.pisa.parser.Parser
 import plasticine.misc.Utils
 import Chisel._
 
@@ -110,12 +111,12 @@ object LUTTest {
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Config(pisaFile).asInstanceOf[Config[LUTConfig]]
+    val configObj = Parser(pisaFile).asInstanceOf[LUTConfig]
 
     val wordSize = 1
     val size = 8
 
-    chiselMainTest(args, () => Module(new LUT(wordSize, size, configObj.config))) {
+    chiselMainTest(args, () => Module(new LUT(wordSize, size, configObj))) {
       c => new LUTTests(c)
     }
   }

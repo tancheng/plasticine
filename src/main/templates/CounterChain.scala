@@ -2,6 +2,7 @@ package plasticine.templates
 
 import Chisel._
 
+import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import scala.collection.mutable.HashMap
 
@@ -204,13 +205,13 @@ object CounterChainTest {
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Config(pisaFile).asInstanceOf[Config[CounterChainConfig]]
+    val configObj = Parser(pisaFile).asInstanceOf[CounterChainConfig]
     val bitwidth = 8
     val numCounters = 4
     val startDelayWidth = 4
     val endDelayWidth = 4
 
-    chiselMainTest(args, () => Module(new CounterChain(bitwidth, startDelayWidth, endDelayWidth, numCounters, configObj.config))) {
+    chiselMainTest(args, () => Module(new CounterChain(bitwidth, startDelayWidth, endDelayWidth, numCounters, configObj))) {
       c => new CounterChainTests(c)
     }
   }

@@ -2,7 +2,7 @@ package plasticine.templates
 
 import Chisel._
 
-import plasticine.pisa.parser._
+import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 
 import scala.collection.mutable.HashMap
@@ -186,7 +186,7 @@ object CounterRCTest {
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Config(pisaFile).asInstanceOf[Config[CounterRCConfig]]
+    val configObj = Parser(pisaFile).asInstanceOf[CounterRCConfig]
     val bitwidth = 7
     val startDelayWidth = 4
     val endDelayWidth = 4
@@ -195,7 +195,7 @@ object CounterRCTest {
     // When the design is reset, config is set
     println(s"parsed configObj: $configObj")
 
-    chiselMainTest(chiselArgs, () => Module(new CounterRC(bitwidth, startDelayWidth, endDelayWidth, configObj.config))) {
+    chiselMainTest(chiselArgs, () => Module(new CounterRC(bitwidth, startDelayWidth, endDelayWidth, configObj))) {
       c => new CounterRCTests(c)
     }
   }

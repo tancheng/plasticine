@@ -2,6 +2,7 @@ package plasticine.templates
 
 import Chisel._
 
+import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import plasticine.Globals
 
@@ -99,12 +100,12 @@ object CrossbarTest {
     }
 
     val pisaFile = appArgs(0)
-    val configObj = Config(pisaFile).asInstanceOf[Config[CrossbarConfig]]
+    val configObj = Parser(pisaFile).asInstanceOf[CrossbarConfig]
     val bitwidth = 8
     val inputs = 4
     val outputs = 8
 
-    chiselMainTest(args, () => Module(new Crossbar(bitwidth, inputs, outputs, configObj.config))) {
+    chiselMainTest(args, () => Module(new Crossbar(bitwidth, inputs, outputs, configObj))) {
       c => new CrossbarTests(c)
     }
   }

@@ -21,7 +21,7 @@ object Parser {
 
   def buildFromParsedJSON(json: Any) = {
     json match {
-      case m: Map[Any,Any] =>
+      case m: Map[Any, Any] =>
         val pisam = getFieldMap(m, "PISA")
         println(s"PISA map: $pisam")
         parsePISAMap(pisam)
@@ -33,7 +33,6 @@ object Parser {
     val vs = getFieldDouble(m, "version")
     val configMap = getFieldMap(m, "topconfig")
     val configObj = parseConfigMap(configMap)
-    configObj.v = vs
     configObj
   }
 
@@ -42,21 +41,21 @@ object Parser {
     val config = getFieldMap(m, "config")
     t match {
       case "counter" =>
-        new Config(CounterRCConfig(config))
+        new CounterRCConfig(config)
       case "counterChain" =>
-        new Config(CounterChainConfig(config))
+        new CounterChainConfig(config)
       case "crossbar" =>
-        new Config(CrossbarConfig(config))
+        new CrossbarConfig(config)
       case "lut" =>
-        new Config(LUTConfig(config))
+        new LUTConfig(config)
       case "scratchpad" =>
-        new Config(ScratchpadConfig(config))
+        new ScratchpadConfig(config)
       case "cuControl" =>
-        new Config(CUControlBoxConfig(config))
+        new CUControlBoxConfig(config)
       case "cu" =>
-        new Config(ComputeUnitConfig(config))
+        new ComputeUnitConfig(config)
       case "plasticine" =>
-        new Config(PlasticineConfig(config))
+        new PlasticineConfig(config)
       case _ => throw new Exception(s"not handled yet: $t")
     }
   }
