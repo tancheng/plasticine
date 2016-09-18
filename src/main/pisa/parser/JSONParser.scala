@@ -36,14 +36,61 @@ object Parser {
     configObj
   }
 
+  def parseCounterRC(m: Map[Any, Any]): CounterRCConfig = {
+    val max: Int = Parser.getFieldInt(m, "max")
+
+    val stride: Int = Parser.getFieldInt(m, "stride")
+
+    val maxConst: Int = Parser.getFieldInt(m, "maxConst")
+
+    val strideConst: Int = Parser.getFieldInt(m, "strideConst")
+
+    val startDelay: Int = 1 + Parser.getFieldInt(m, "startDelay")
+
+    val endDelay: Int = 1 + Parser.getFieldInt(m, "endDelay")
+    CounterRCConfig(max, stride, maxConst, strideConst, startDelay, endDelay)
+  }
+
+  def parseCounterChain(m: Map[Any, Any]): CounterChainConfig = {
+    val chain: List[Int] = Parser.getFieldList(m, "chain")
+                                        .asInstanceOf[List[Double]]
+                                        .map { i => i.toInt }
+    // Configuration for individual counters
+    val counters: List[CounterRCConfig] = Parser.getFieldListOfMaps(m, "counters")
+                                         .map { parseCounterRC(_) }
+    CounterChainConfig(chain, counters)
+  }
+
+  def parseCU(m: Map[Any, Any]): ComputeUnitConfig = {
+    val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
+
+    val scratchpads =  Parser.getFieldListOfMaps(m, "scratchpads")
+                                      .map { new ScratchpadConfig(_) }
+
+    /* Pipe stages config */
+    val pipeStage = Parser.getFieldListOfMaps(m, "pipeStage")
+                              .map { h => new PipeStageConfig(h) }
+
+    val control = CUControlBoxConfig(Parser.getFieldMap(m, "control"))
+
+    val dataInXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(m, "dataInXbar"))
+    ComputeUnitConfig(counterChain, scratchpads, pipeStage, control, dataInXbar)
+  }
+
+  def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
+    val cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(m, "cu")
+                                          .map { parseCU(_) }
+    PlasticineConfig(cu)
+  }
+
   def parseConfigMap(m: Map[Any, Any]) = {
     val t = getFieldString(m, "type")
     val config = getFieldMap(m, "config")
     t match {
       case "counter" =>
-        new CounterRCConfig(config)
+        parseCounterRC(config)
       case "counterChain" =>
-        new CounterChainConfig(config)
+        parseCounterChain(config)
       case "crossbar" =>
         new CrossbarConfig(config)
       case "lut" =>
@@ -53,9 +100,9 @@ object Parser {
       case "cuControl" =>
         new CUControlBoxConfig(config)
       case "cu" =>
-        new ComputeUnitConfig(config)
+        parseCU(config)
       case "plasticine" =>
-        new PlasticineConfig(config)
+        parsePlasticine(config)
       case _ => throw new Exception(s"not handled yet: $t")
     }
   }

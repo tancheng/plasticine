@@ -187,7 +187,7 @@ object CounterChainChar {
     val numCounters = appArgs(1).toInt
     val startDelayWidth = 4
     val endDelayWidth = 4
-    val config = CounterChainConfig(Map(), true)
+    val config = CounterChainConfig.getRandom(numCounters)
     chiselMainTest(args, () => Module(new CounterChainReg(w, startDelayWidth, endDelayWidth, numCounters, config))) {
       c => new CounterChainCharTests(c)
     }

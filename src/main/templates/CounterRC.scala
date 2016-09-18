@@ -211,7 +211,7 @@ object CounterRCChar {
     val w = appArgs(0).toInt
     val startDelayWidth = 4
     val endDelayWidth = 4
-    val config = CounterRCConfig(Map(), true)
+    val config = CounterRCConfig.getRandom
     chiselMainTest(args, () => Module(new CounterRCReg(w, startDelayWidth, endDelayWidth, config))) {
       c => new CounterRCCharTests(c)
     }

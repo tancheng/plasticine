@@ -24,66 +24,32 @@ abstract class AbstractConfig {
 /**
  * Parsed config information for a single counter
  */
-case class CounterRCConfig(config: Map[Any, Any], randomize: Boolean = false) extends AbstractConfig {
-  /** Counter max */
-  private var _max: Int = Parser.getFieldInt(config, "max", randomize)
-  def max = _max
-  def max_=(x: Int) { _max = x }
-
-  /** Counter stride */
-  private var _stride: Int = Parser.getFieldInt(config, "stride", randomize)
-  def stride = _stride
-  def stride_=(x: Int) { _stride = x }
-
-  /** Is max const */
-  private var _maxConst: Int = Parser.getFieldInt(config, "maxConst", randomize)
-  def maxConst = _maxConst
-  def maxConst_=(x: Int) { _maxConst = x }
-
-  /** Is stride const */
-  private var _strideConst: Int = Parser.getFieldInt(config, "strideConst", randomize)
-  def strideConst = _strideConst
-  def strideConst_=(x: Int) { _strideConst = x }
-
-  /** Delay the start of counter */
-  private var _startDelay: Int = 1 + Parser.getFieldInt(config, "startDelay", randomize)
-  def startDelay = _startDelay
-  def startDelay_=(x: Int) { _startDelay = x }
-
-  /** Delay raising the counter 'done' signal */
-  private var _endDelay: Int = 1 + Parser.getFieldInt(config, "endDelay", randomize)
-  def endDelay = _endDelay
-  def endDelay_=(x: Int) { _endDelay = x }
+case class CounterRCConfig(max: Int, stride: Int, maxConst: Int, strideConst: Int, startDelay: Int, endDelay: Int) extends AbstractConfig
+object CounterRCConfig {
+  def getRandom = {
+    new CounterRCConfig(
+        Random.nextInt(16),
+        Random.nextInt(16),
+        Random.nextInt(2),
+        Random.nextInt(2),
+        Random.nextInt(16),
+        Random.nextInt(16)
+      )
+  }
 }
 
 /**
  * CounterChain config information
  */
-case class CounterChainConfig(config: Map[Any, Any], randomize: Boolean = false) extends AbstractConfig {
-  // To chain or not?
-  private var _chain: List[Int] = if (randomize) {
-    List.tabulate(100) { i => i % 2 } // HACK: Fix this by adding template-specific config nodes
-  } else {
-    Parser.getFieldList(config, "chain")
-                                        .asInstanceOf[List[Double]]
-                                        .map { i => i.toInt }
+case class CounterChainConfig(chain: List[Int], counters: List[CounterRCConfig]) extends AbstractConfig
+object CounterChainConfig {
+  def getRandom(numCounters: Int) = {
+    new CounterChainConfig(
+      List.fill(numCounters) { Random.nextInt(16) },
+      List.fill(numCounters) { CounterRCConfig.getRandom }
+      )
   }
-
-  def chain = _chain
-  def chain_=(x: List[Int]) { _chain = x }
-
-  // Configuration for individual counters
-  private var _counters: Seq[CounterRCConfig] = if (randomize) {
-    List.fill(100) { CounterRCConfig(Map(), true) }
-  } else {
-    Parser.getFieldListOfMaps(config, "counters")
-       .map { h => new CounterRCConfig(h) }
-  }
-  def counters = _counters
-  def counters_=(x: Seq[CounterRCConfig]) { _counters = x }
 }
-
-
 /**
  * Parsed configuration information for ComputeUnit
  */
@@ -227,38 +193,12 @@ case class ScratchpadConfig(config: Map[Any, Any]) extends AbstractConfig {
   def banking_=(x: BankingConfig) { _banking = x }
 }
 
-case class ComputeUnitConfig(config: Map[Any, Any]) extends AbstractConfig {
-  /* CounterChain config */
-  private var _counterChain = new CounterChainConfig(
-    Parser.getFieldMap(config, "counterChain"))
-  def counterChain() = _counterChain
-  def counterChain_=(x: CounterChainConfig) { _counterChain = x }
-
-
-  private var _scratchpads =  Parser.getFieldListOfMaps(config, "scratchpads")
-                                    .map { ScratchpadConfig(_) }
-  def scratchpads = _scratchpads
-  def scratchpads_=(x: List[ScratchpadConfig]) { _scratchpads = x }
-
-  /* Pipe stages config */
-  private var _pipeStage = Parser.getFieldListOfMaps(config, "pipeStage")
-                            .map { h => new PipeStageConfig(h) }
-  def pipeStage = _pipeStage
-  def pipeStage_=(x: List[PipeStageConfig]) { _pipeStage = x }
-
-  private var _control = CUControlBoxConfig(Parser.getFieldMap(config, "control"))
-  def control = _control
-  def control_=(x: CUControlBoxConfig) { _control = x }
-
-  private var _dataInXbar: CrossbarConfig  = CrossbarConfig(Parser.getFieldMap(config, "dataInXbar"))
-  def dataInXbar = _dataInXbar
-  def dataInXbar_=(x: CrossbarConfig) { _dataInXbar = x }
-
-  override def toString = {
-    s"pipeStage:\n" +
-    pipeStage.map { _.toString }.reduce {_+_}
-  }
-}
+case class ComputeUnitConfig(
+  counterChain: CounterChainConfig,
+  scratchpads: List[ScratchpadConfig],
+  pipeStage: List[PipeStageConfig],
+  control: CUControlBoxConfig,
+  dataInXbar: CrossbarConfig) extends AbstractConfig
 
 /**
  * CUControlBox config information
@@ -312,8 +252,6 @@ case class CUControlBoxConfig(config: Map[Any, Any]) extends AbstractConfig {
   private var _syncTokenMux: Int = parseValue(Parser.getFieldString(config, "syncTokenMux"))
   def syncTokenMux = _syncTokenMux
   def syncTokenMux_=(x: Int) { _syncTokenMux = x }
-
-
 }
 
 /**
@@ -350,10 +288,4 @@ case class LUTConfig(config: Map[Any, Any]) extends AbstractConfig {
 /**
  * Plasticine config information
  */
-case class PlasticineConfig(config: Map[Any, Any]) extends AbstractConfig {
-  private var _cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(config, "cu")
-                                        .map { ComputeUnitConfig(_) }
-
-  def cu = _cu
-  def cu_=(x: List[ComputeUnitConfig]) { _cu = x }
-}
+case class PlasticineConfig(cu: List[ComputeUnitConfig]) extends AbstractConfig
