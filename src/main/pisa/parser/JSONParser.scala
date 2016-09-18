@@ -5,6 +5,8 @@ import _root_.scala.util.parsing.json.JSON
 import scala.collection.mutable.HashMap
 import scala.util.Random
 import plasticine.pisa.ir._
+import plasticine.templates.Opcodes
+import Chisel._
 
 object Parser {
   def apply(path: String) = {
@@ -66,6 +68,11 @@ object Parser {
     case _ => if (incByOne) Integer.parseInt(x) + 1 else Integer.parseInt(x)
   }
 
+  def encodeOneHot(x: Int) = 1 << x
+
+  def getRegNum(s: String) = if (s.size <= 1) 0 else s.drop(1).toInt
+
+
   def parseLUT(m: Map[Any, Any]): LUTConfig = {
     val table: List[Int] = Parser.getFieldList(m, "table")
                                         .asInstanceOf[List[String]]
@@ -73,15 +80,55 @@ object Parser {
     LUTConfig(table)
   }
 
+  def parseOperandConfig(s: String): OperandConfig = {
+    def getDataSrc = s(0) match {
+      case 'x' => 0 // Don't care (must eventually be turned off)
+      case 'l' => 0 // Local register
+      case 'r' => 1 // Previous pipe stage register
+      case 'c' => 2 // Constant
+      case 'i' => 3 // Iterator / counter
+      case 't' => 3 // Cross-stage value for reduction
+      case 'm' => 4 // Memory
+      case _ => throw new Exception(s"Unknown data source '${s(0)}'. Must be l, r, c, i, or m")
+    }
+    val dataSrc = getDataSrc
+    val value = getRegNum(s)
+    OperandConfig(dataSrc, value)
+  }
+
+  def parsePipeStage(m: Map[Any, Any]): PipeStageConfig = {
+    val opA = parseOperandConfig(Parser.getFieldString(m, "opA"))
+    val opB = parseOperandConfig(Parser.getFieldString(m, "opB"))
+    val opcode = Opcodes.getCode(Parser.getFieldString(m, "opcode"))
+    val result = encodeOneHot(getRegNum(Parser.getFieldString(m, "result")))
+
+    // Map (regNum -> muxconfig)
+    val fwd: Map[Int, Int] = {
+      val fwdMap = Parser.getFieldMap(m, "fwd")
+      val t = HashMap[Int, Int]()
+      fwdMap.keys.foreach { reg =>
+        val source = fwdMap(reg)
+        val regNum = getRegNum(reg.toString)
+        t(regNum) = source match {
+          case "i" => 1 // Same number because counter and memory contents don't overlap
+          case "m" => 1
+          case "e" => 1
+          case _ => 0
+        }
+      }
+      t.toMap
+    }
+    PipeStageConfig(opA, opB, opcode, result, fwd)
+  }
+
   def parseCU(m: Map[Any, Any]): ComputeUnitConfig = {
     val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
 
     val scratchpads =  Parser.getFieldListOfMaps(m, "scratchpads")
-                                      .map { new ScratchpadConfig(_) }
+                                      .map { parseScratchpad(_) }
 
-    /* Pipe stages config */
     val pipeStage = Parser.getFieldListOfMaps(m, "pipeStage")
-                              .map { h => new PipeStageConfig(h) }
+                              .map { h => parsePipeStage(h) }
 
     val control = parseControlBox(Parser.getFieldMap(m, "control"))
 
@@ -119,6 +166,55 @@ object Parser {
     CUControlBoxConfig(tokenOutLUT, enableLUT, tokenDownLUT, udcInit, decXbar, incXbar, doneXbar, enableMux, tokenOutMux, syncTokenMux)
   }
 
+  def parseBankingConfig(s: String): BankingConfig = {
+    def parseMode = s(0) match {
+      case 'x' => 0 // No banking
+      case 'b' => 1 // Strided
+      case 'd' => 2 // Diagonal
+      case _ => throw new Exception(s"Unsupported banking mode ''$s'")
+    }
+    def parseStride = {
+      if (s.size == 1) 0
+      else log2Up(Integer.parseInt(s.drop(1)))
+    }
+     val mode = parseMode
+     val strideLog2 = parseStride
+    BankingConfig(mode, strideLog2)
+  }
+
+  def parseScratchpad(m: Map[Any, Any]): ScratchpadConfig = {
+    // Banking stride
+    def parseAddrSource(x: String) = {
+      val src = x(0) match {
+        case 'x' => 0  // Don't care
+        case 's' => 0  // Stage
+        case 'i' => 1  // Iterator
+        case 'l' => 2  // Last stage - only for write addr. TODO: Error out for reads
+        case _ => throw new Exception(s"Unknwon address source ${x(0)}; must be one of s, i, or l")
+     }
+     SrcValueTuple(src, if (x == "x") 0 else x.drop(1).toInt)
+    }
+
+    val wa = parseAddrSource(Parser.getFieldString(m, "wa"))
+
+    val ra = parseAddrSource(Parser.getFieldString(m, "ra"))
+
+    val wd = Parser.getFieldString(m, "wd") match {
+      case "x" => 0 // Don't care
+      case "local" => 0
+      case "remote" => 1
+      case _ => throw new Exception(s"Unknown write data source; must be either local or remote")
+    }
+
+    val wen = Parser.getFieldString(m, "wen") match {
+      case "x" => 0
+      case n@_ => n.drop(1).toInt + 1
+    }
+
+    val banking = parseBankingConfig(Parser.getFieldString(m, "banking"))
+    ScratchpadConfig(wa, ra, wd, wen, banking)
+  }
+
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
     val cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(m, "cu")
                                           .map { parseCU(_) }
@@ -138,7 +234,7 @@ object Parser {
       case "lut" =>
         parseLUT(config)
       case "scratchpad" =>
-        new ScratchpadConfig(config)
+        parseScratchpad(config)
       case "cuControl" =>
         parseControlBox(config)
       case "cu" =>

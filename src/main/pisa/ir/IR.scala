@@ -50,77 +50,30 @@ object CounterChainConfig {
       )
   }
 }
-/**
- * Parsed configuration information for ComputeUnit
- */
-case class OperandConfig(config: String) extends AbstractConfig {
-  private def getDataSrc = config(0) match {
-    case 'x' => 0 // Don't care (must eventually be turned off)
-    case 'l' => 0 // Local register
-    case 'r' => 1 // Previous pipe stage register
-    case 'c' => 2 // Constant
-    case 'i' => 3 // Iterator / counter
-    case 't' => 3 // Cross-stage value for reduction
-    case 'm' => 4 // Memory
-    case _ => throw new Exception(s"Unknown data source '${config(0)}'. Must be l, r, c, i, or m")
-  }
-  private var _dataSrc = getDataSrc
-  def dataSrc() = _dataSrc
-  def dataSrc_=(x: Int) { _dataSrc = x }
 
-  private var _value = getRegNum(config)
-  def value() = _value
-  def value_=(x: Int) { _value = x }
-
-  override def toString = {
-    s"dataSrc: $dataSrc\n" +
-    s"value: $value\n"
+case class OperandConfig(dataSrc: Int, value: Int) extends AbstractConfig
+object OperandConfig {
+  def getRandom = {
+    new OperandConfig(Random.nextInt, Random.nextInt)
   }
 }
 
-case class PipeStageConfig(config: Map[Any, Any]) extends AbstractConfig {
-  private var _opA = new OperandConfig(Parser.getFieldString(config, "opA"))
-  def opA() = _opA
-  def opA_=(x: OperandConfig) { _opA = x }
-
-  private var _opB = new OperandConfig(Parser.getFieldString(config, "opB"))
-  def opB() = _opB
-  def opB_=(x: OperandConfig) { _opB = x }
-
-  private var _opcode = Opcodes.getCode(Parser.getFieldString(config, "opcode"))
-  def opcode() = _opcode
-  def opcode_=(x: Int) { _opcode = x }
-
-  private var _result = encodeOneHot(getRegNum(Parser.getFieldString(config, "result")))
-  def result() = _result
-  def result_=(x: Int) { _result = x }
-
-  // TODO: Remove hardcoded constant!
-  val r = 4
-  // Map (regNum -> muxconfig)
-  private var _fwd: Map[Int, Int] = {
-    val fwdMap = Parser.getFieldMap(config, "fwd")
-    val t = HashMap[Int, Int]()
-    fwdMap.keys.foreach { reg =>
-      val source = fwdMap(reg)
-      val regNum = Integer.parseInt(reg.toString.drop(1))
-      t(regNum) = source match {
-        case "i" => 1 // Same number because counter and memory contents don't overlap
-        case "m" => 1
-        case "e" => 1
-        case _ => 0
-      }
-    }
-    t.toMap
-  }
-  def fwd = _fwd
-  def fwd_=(x: Map[Int, Int]) { _fwd = x }
-
-  override def toString = {
-    s"opA:\n ${opA.toString}" + "\n" +
-    s"opB:\n ${opB.toString}" + "\n" +
-    s"opcode: $opcode" + "\n" +
-    s"result: $result"
+case class PipeStageConfig(
+  opA: OperandConfig,
+  opB: OperandConfig,
+  opcode: Int,
+  result: Int,
+  fwd: Map[Int, Int]
+) extends AbstractConfig
+object PipeStageConfig {
+  def getRandom = {
+    new PipeStageConfig(
+        OperandConfig.getRandom,
+        OperandConfig.getRandom,
+        Random.nextInt % Opcodes.size,
+        Random.nextInt,
+        Map[Int,Int]()
+      )
   }
 }
 
@@ -131,78 +84,24 @@ case class PipeStageConfig(config: Map[Any, Any]) extends AbstractConfig {
  */
 case class SrcValueTuple(val src: Int, val value: Int)
 
-case class BankingConfig(config: String) extends AbstractConfig {
-  def parseMode = config(0) match {
-    case 'x' => 0 // No banking
-    case 'b' => 1 // Strided
-    case 'd' => 2 // Diagonal
-    case _ => throw new Exception(s"Unsupported banking mode ''$config'")
-  }
-  def parseStride = {
-    if (config.size == 1) 0
-    else log2Up(Integer.parseInt(config.drop(1)))
-  }
-  private var _mode = parseMode
-  def mode = _mode
-  def mode_=(x: Int) { _mode = x }
+case class BankingConfig(mode: Int, strideLog2: Int) extends AbstractConfig
 
-  private var _strideLog2 = parseStride
-  def strideLog2 = _strideLog2
-  def strideLog2_=(x: Int) { _strideLog2 = x }
-}
-
-case class ScratchpadConfig(config: Map[Any, Any]) extends AbstractConfig {
-  // Banking stride
-  private def parseAddrSource(x: String) = {
-    val src = x(0) match {
-      case 'x' => 0  // Don't care
-      case 's' => 0  // Stage
-      case 'i' => 1  // Iterator
-      case 'l' => 2  // Last stage - only for write addr. TODO: Error out for reads
-      case _ => throw new Exception(s"Unknwon address source ${x(0)}; must be one of s, i, or l")
-   }
-   SrcValueTuple(src, if (x == "x") 0 else x.drop(1).toInt)
-  }
-
-  private var _wa = parseAddrSource(Parser.getFieldString(config, "wa"))
-  def wa = _wa
-  def wa_=(x: SrcValueTuple) { _wa = x }
-
-  private var _ra = parseAddrSource(Parser.getFieldString(config, "ra"))
-  def ra = _ra
-  def ra_=(x: SrcValueTuple) { _ra = x }
-
-  private var _wd = Parser.getFieldString(config, "wd") match {
-    case "x" => 0 // Don't care
-    case "local" => 0
-    case "remote" => 1
-    case _ => throw new Exception(s"Unknown write data source; must be either local or remote")
-  }
-  def wd = _wd
-  def wd_=(x: Int) { _wd = x }
-
-  private var _wen = Parser.getFieldString(config, "wen") match {
-    case "x" => 0
-    case n@_ => n.drop(1).toInt + 1
-  }
-  def wen = _wen
-  def wen_=(x: Int) { _wen = x }
-
-  private var _banking = BankingConfig(Parser.getFieldString(config, "banking"))
-  def banking = _banking
-  def banking_=(x: BankingConfig) { _banking = x }
-}
+case class ScratchpadConfig(
+  wa: SrcValueTuple,
+  ra: SrcValueTuple,
+  wd: Int,
+  wen: Int,
+  banking: BankingConfig
+) extends AbstractConfig
 
 case class ComputeUnitConfig(
   counterChain: CounterChainConfig,
   scratchpads: List[ScratchpadConfig],
   pipeStage: List[PipeStageConfig],
   control: CUControlBoxConfig,
-  dataInXbar: CrossbarConfig) extends AbstractConfig
+  dataInXbar: CrossbarConfig
+) extends AbstractConfig
 
-/**
- * CUControlBox config information
- */
 case class CUControlBoxConfig(
   tokenOutLUT: List[LUTConfig],
   enableLUT: List[LUTConfig],
