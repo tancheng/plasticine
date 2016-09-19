@@ -21,6 +21,17 @@ abstract class AbstractConfig {
   }
 }
 
+abstract class DataSource
+case class DONTCARE() extends DataSource
+case class EMPTY() extends DataSource
+case class STAGE() extends DataSource
+case class FWD() extends DataSource
+case class REMOTE() extends DataSource
+case class CONST() extends DataSource
+case class COUNTER() extends DataSource
+case class MEMORY() extends DataSource
+case class TREE() extends DataSource
+
 /**
  * Parsed config information for a single counter
  */
