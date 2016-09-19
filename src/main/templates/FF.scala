@@ -50,6 +50,27 @@ class FFNoInit(val w: Int) extends Module {
   io.data.out := ff
 }
 
+class TFF(val w: Int) extends Module {
+  val io = new Bundle {
+    val data = new Bundle {
+      val out  = UInt(OUTPUT, w)
+    }
+    val control = new Bundle {
+      val enable = Bool(INPUT)
+    }
+  }
+
+  val d = UInt(width = w)
+  val ff = Reg(Bits(w), d, UInt(0, width=w))
+  when (io.control.enable) {
+    d := ~ff
+  } .otherwise {
+    d := ff
+  }
+  io.data.out := ff
+}
+
+
 class FFWrapper(val w: Int, val initVal: Int) extends Module {
   val io = new Bundle {
     val data = new Bundle {
@@ -112,6 +133,20 @@ class FFTests(c: FF) extends Tester(c) {
   }
 }
 
+class TFFTests(c: TFF) extends Tester(c) {
+  step(1)
+  reset(1)
+  expect(c.io.data.out, 0)
+  val numCycles = 10
+  for (i <- 0 until numCycles) {
+    val newenable = rnd.nextInt(2)
+    val oldout = peek(c.io.data.out)
+    poke(c.io.control.enable, newenable)
+    step(1)
+    if (newenable == 1) expect(c.io.data.out, ~oldout) else expect(c.io.data.out, oldout)
+  }
+}
+
 class FFNoInitTests(c: FFNoInit) extends Tester(c)
 class FFWrapperTests(c: FFWrapper) extends Tester(c)
 
@@ -128,6 +163,21 @@ object FFTest {
     }
   }
 }
+
+object TFFTest {
+  def main(args: Array[String]): Unit = {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 1) {
+      println("Usage: FFTest <wordWidth>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    chiselMainTest(args, () => Module(new TFF(w))) {
+      c => new TFFTests(c)
+    }
+  }
+}
+
 
 object FFNoInitChar {
   def main(args: Array[String]): Unit = {
