@@ -43,7 +43,7 @@ object Parser {
     val strideStr = Parser.getFieldString(m, "stride")
     def parseSrcValue(s: String) = s(0) match{
       case 'x' => (0, 0)   // Don't care
-      case 'i' => (s.drop(1).toInt, 1) // Constant value
+      case 'c' => (s.drop(1).toInt, 1) // Constant value
       case 'e' => (s.drop(1).toInt, 0) // From empty stage
       case _ => throw new Exception("Unknown source for max/stride " + s(0))
     }

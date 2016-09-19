@@ -6,9 +6,9 @@
               "chain" : ["0","0","0","0","0","0","0"],
               "counters" : [
                 {
-                  "max" : "i4",
-                  "stride" : "i1",
-                  "min" : "i0",
+                  "max" : "c4",
+                  "stride" : "c1",
+                  "min" : "c0",
                   "startDelay" : "11",
                   "endDelay" : "0"
                 },
@@ -20,9 +20,9 @@
                   "endDelay" : "x"
                 },
                 {
-                  "max" : "i4",
-                  "min" : "i0",
-                  "stride" : "i1",
+                  "max" : "c4",
+                  "min" : "c0",
+                  "stride" : "c1",
                   "startDelay" : "11",
                   "endDelay" : "0"
                 },
@@ -34,9 +34,9 @@
                   "endDelay" : "x"
                 },
                 {
-                  "max" : "i4",
-                  "min" : "i0",
-                  "stride" : "i1",
+                  "max" : "c4",
+                  "min" : "c0",
+                  "stride" : "c1",
                   "startDelay" : "0",
                   "endDelay" : "10"
                 },
