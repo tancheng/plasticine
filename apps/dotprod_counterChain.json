@@ -1,0 +1,68 @@
+{"PISA":{
+"version"     : 0.1,
+"topconfig" : {
+  "type" : "counterChain",
+  "config" : {
+              "chain" : ["0","0","0","0","0","0","0"],
+              "counters" : [
+                {
+                  "max" : "i4",
+                  "stride" : "i1",
+                  "min" : "i0",
+                  "startDelay" : "11",
+                  "endDelay" : "0"
+                },
+                {
+                  "max" : "x",
+                  "min" : "x",
+                  "stride" : "x",
+                  "startDelay" : "x",
+                  "endDelay" : "x"
+                },
+                {
+                  "max" : "i4",
+                  "min" : "i0",
+                  "stride" : "i1",
+                  "startDelay" : "11",
+                  "endDelay" : "0"
+                },
+                {
+                  "max" : "x",
+                  "min" : "x",
+                  "stride" : "x",
+                  "startDelay" : "x",
+                  "endDelay" : "x"
+                },
+                {
+                  "max" : "i4",
+                  "min" : "i0",
+                  "stride" : "i1",
+                  "startDelay" : "0",
+                  "endDelay" : "10"
+                },
+                {
+                  "max" : "x",
+                  "min" : "x",
+                  "stride" : "x",
+                  "startDelay" : "x",
+                  "endDelay" : "x"
+                },
+                {
+                  "max" : "x",
+                  "min" : "x",
+                  "stride" : "x",
+                  "startDelay" : "x",
+                  "endDelay" : "x"
+                },
+                {
+                  "max" : "x",
+                  "min" : "x",
+                  "stride" : "x",
+                  "startDelay" : "x",
+                  "endDelay" : "x"
+                }
+              ]
+            }
+    }
+  }
+}

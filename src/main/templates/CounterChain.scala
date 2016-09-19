@@ -207,7 +207,7 @@ object CounterChainTest {
     val pisaFile = appArgs(0)
     val configObj = Parser(pisaFile).asInstanceOf[CounterChainConfig]
     val bitwidth = 8
-    val numCounters = 4
+    val numCounters = 8
     val startDelayWidth = 4
     val endDelayWidth = 4
 

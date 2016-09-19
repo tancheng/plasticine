@@ -39,25 +39,35 @@ object Parser {
   }
 
   def parseCounterRC(m: Map[Any, Any]): CounterRCConfig = {
-    val max: Int = Parser.getFieldInt(m, "max")
+    val maxStr = Parser.getFieldString(m, "max")
+    val strideStr = Parser.getFieldString(m, "stride")
+    def parseSrcValue(s: String) = s(0) match{
+      case 'x' => (0, 0)   // Don't care
+      case 'i' => (s.drop(1).toInt, 1) // Constant value
+      case 'e' => (s.drop(1).toInt, 0) // From empty stage
+      case _ => throw new Exception("Unknown source for max/stride " + s(0))
+    }
 
-    val stride: Int = Parser.getFieldInt(m, "stride")
+    val (max, maxConst) = parseSrcValue(maxStr)
+    val (stride, strideConst) = parseSrcValue(strideStr)
 
-    val maxConst: Int = Parser.getFieldInt(m, "maxConst")
+    val startDelay: Int = Parser.getFieldString(m, "startDelay") match {
+      case "x" => 0 // Don't care
+      case n@_ => 1 + n.toInt
+    }
 
-    val strideConst: Int = Parser.getFieldInt(m, "strideConst")
-
-    val startDelay: Int = 1 + Parser.getFieldInt(m, "startDelay")
-
-    val endDelay: Int = 1 + Parser.getFieldInt(m, "endDelay")
+    val endDelay: Int = Parser.getFieldString(m, "endDelay") match {
+      case "x" => 0 // Don't care
+      case n@_ => 1 + n.toInt
+    }
     CounterRCConfig(max, stride, maxConst, strideConst, startDelay, endDelay)
   }
 
   def parseCounterChain(m: Map[Any, Any]): CounterChainConfig = {
     val chain: List[Int] = Parser.getFieldList(m, "chain")
-                                        .asInstanceOf[List[Double]]
+                                        .asInstanceOf[List[String]]
                                         .map { i => i.toInt }
-    // Configuration for individual counters
+
     val counters: List[CounterRCConfig] = Parser.getFieldListOfMaps(m, "counters")
                                          .map { parseCounterRC(_) }
     CounterChainConfig(chain, counters)
