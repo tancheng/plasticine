@@ -7,7 +7,8 @@
       "wa": "x",
       "wd" : "x",
       "wen" : "x",
-      "banking" : "b1"
+      "banking" : "b1",
+      "numBufs" : "3"
       }
     }
   }
