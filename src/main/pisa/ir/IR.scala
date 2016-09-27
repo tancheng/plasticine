@@ -102,7 +102,8 @@ case class ScratchpadConfig(
   ra: SrcValueTuple,
   wd: Int,
   wen: Int,
-  banking: BankingConfig
+  banking: BankingConfig,
+  numBufs: Int
 ) extends AbstractConfig
 
 case class ComputeUnitConfig(

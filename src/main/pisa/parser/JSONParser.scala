@@ -185,7 +185,10 @@ object Parser {
     }
     def parseStride = {
       if (s.size == 1) 0
-      else log2Up(Integer.parseInt(s.drop(1)))
+      else {
+        val stride = Integer.parseInt(s.drop(1))
+        if (stride == 1) 0 else log2Up(stride)
+      }
     }
      val mode = parseMode
      val strideLog2 = parseStride
@@ -222,7 +225,10 @@ object Parser {
     }
 
     val banking = parseBankingConfig(Parser.getFieldString(m, "banking"))
-    ScratchpadConfig(wa, ra, wd, wen, banking)
+
+    val numBufs = Parser.getFieldInt(m, "numBufs")
+
+    ScratchpadConfig(wa, ra, wd, wen, banking, numBufs)
   }
 
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
