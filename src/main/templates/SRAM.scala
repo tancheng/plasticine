@@ -16,9 +16,9 @@ class SRAM(val w: Int, val d: Int) extends Module {
   val raddr_reg = Reg(Bits(width = addrWidth))
   when (io.wen) {
     mem(io.waddr) := io.wdata
-  } .otherwise  {
-    raddr_reg := io.raddr
   }
+  raddr_reg := io.raddr
+
   io.rdata := mem(raddr_reg)
 }
 
