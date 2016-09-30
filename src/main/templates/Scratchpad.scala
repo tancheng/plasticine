@@ -81,6 +81,43 @@ class AddrDecoder(val d: Int, val v: Int) extends Module {
   io.localAddr := getLocalAddr(io.addr)
 }
 
+class AddrDecoderReg(val d: Int, val v: Int) extends Module {
+  val addrWidth = log2Up(d)
+  val bankAddrWidth = log2Up(v)
+  val localAddrWidth = log2Up(d/v)
+  val strideLog2Width = log2Up(log2Up(d) - log2Up(v))
+  val io = new Bundle {
+    val addr = UInt(INPUT, width = addrWidth)
+    val strideLog2 = UInt(INPUT, width = strideLog2Width)
+    val bankAddr = UInt(OUTPUT, width = bankAddrWidth)
+    val localAddr = UInt(OUTPUT, width = localAddrWidth)
+  }
+
+  val addrReg = Module(new FF(addrWidth))
+  addrReg.io.control.enable := Bool(true)
+  addrReg.io.data.in := io.addr
+  val addr = addrReg.io.data.out
+
+  val strideLog2Reg = Module(new FF(strideLog2Width))
+  strideLog2Reg.io.control.enable := Bool(true)
+  strideLog2Reg.io.data.in := io.strideLog2
+  val strideLog2 = strideLog2Reg.io.data.out
+
+  val decoder = Module(new AddrDecoder(d, v))
+  decoder.io.addr := addr
+  decoder.io.strideLog2 := strideLog2
+
+  val bankAddrReg = Module(new FF(bankAddrWidth))
+  bankAddrReg.io.control.enable := Bool(true)
+  bankAddrReg.io.data.in := decoder.io.bankAddr
+  io.bankAddr := bankAddrReg.io.data.out
+
+  val localAddrReg = Module(new FF(localAddrWidth))
+  localAddrReg.io.control.enable := Bool(true)
+  localAddrReg.io.data.in := decoder.io.localAddr
+  io.localAddr := localAddrReg.io.data.out
+}
+
 /**
  * Scratchpad memory that supports various banking modes
  * and double buffering
@@ -259,6 +296,8 @@ class ScratchpadTestHarness(val w: Int, val v: Int, val d: Int, val inst: Scratc
   io.rdata := scratchpad.io.rdata
 }
 
+class AddrDecoderCharTests(c: AddrDecoderReg) extends Tester(c)
+
 class AddrDecoderTests(c: AddrDecoder) extends Tester(c) {
   val addrWidth = log2Up(c.d)
   val bankAddrWidth = log2Up(c.v)
@@ -403,6 +442,24 @@ class ScratchpadTests(c: ScratchpadTestHarness, dataGen: (Int, Int) => Int) exte
     println(s"Test FAILED")
   } else {
     println(s"Test PASSED")
+  }
+}
+
+object AddrDecoderChar {
+  def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    if (appArgs.size != 2) {
+      println("Usage: bin/sadl AddrDecoderChar <sramDepth> <banking>")
+      sys.exit(-1)
+    }
+
+    val d = appArgs(0).toInt
+    val v = appArgs(1).toInt
+
+    chiselMainTest(args, () => Module(new AddrDecoderReg(d, v))) {
+      c => new AddrDecoderCharTests(c)
+    }
   }
 }
 
