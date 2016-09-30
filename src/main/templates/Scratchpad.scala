@@ -13,12 +13,72 @@ case class ScratchpadOpcode(val d: Int, val v: Int, config: Option[ScratchpadCon
   def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
 
   var mode = if (config.isDefined) UInt(config.get.banking.mode, width=2) else UInt(width=2)
-  var strideLog2 = if (config.isDefined) UInt(config.get.banking.strideLog2, width=log2Up(d)) else UInt(width = log2Up(d))
+  var strideLog2 = if (config.isDefined) UInt(config.get.banking.strideLog2, width=log2Up(log2Up(d)-log2Up(v))) else UInt(width = log2Up(log2Up(d) - log2Up(v)))
   var bufSize = if (config.isDefined) UInt(d / (v*config.get.numBufs), width=log2Up(d/v)+1) else UInt(width = log2Up(d/v))
 
   override def cloneType(): this.type = {
     new ScratchpadOpcode(d, v, config).asInstanceOf[this.type]
   }
+}
+
+
+/**
+ * Scratchpad Address decoder: For an input address,
+ * instantiate decode logic which outputs a bank address
+ * and local address
+ */
+
+class AddrDecoder(val d: Int, val v: Int) extends Module {
+  val addrWidth = log2Up(d)
+  val bankAddrWidth = log2Up(v)
+  val localAddrWidth = log2Up(d/v)
+  val strideLog2Width = log2Up(log2Up(d) - log2Up(v))
+  val io = new Bundle {
+    val addr = UInt(INPUT, width = addrWidth)
+    val strideLog2 = UInt(INPUT, width = strideLog2Width)
+    val bankAddr = UInt(OUTPUT, width = bankAddrWidth)
+    val localAddr = UInt(OUTPUT, width = localAddrWidth)
+  }
+
+  implicit def uintToVec(x: UInt, width: Int): Vec[UInt] = {
+    Vec.tabulate(width) { i => UInt(x(i), width=1) }
+  }
+
+  implicit def vecToUInt(x: Vec[UInt]): UInt = {
+    x.reduce{ Cat(_,_) }
+  }
+
+  def getBankAddrIndices(l: Vec[UInt], size: Int) = {
+    List.tabulate(l.size-size+1) { i => List.tabulate(size) { j => i + j } }
+  }
+
+
+  def getLocalAddrSlices(l: Vec[UInt], size: Int): Vec[UInt] = {
+    Vec(getBankAddrIndices(l, size).map { idxs => vecToUInt(Vec(l.zipWithIndex.filterNot { i => idxs.contains(i._2) }.map { _._1 }.reverse)) }.reverse )
+  }
+
+  def getBankAddrSlices(l: Vec[UInt], size: Int): Vec[UInt] = {
+    Vec(getBankAddrIndices(l, size).map { idxs => vecToUInt(Vec(l.zipWithIndex.filter { i => idxs.contains(i._2) }.map { _._1 }.reverse)) })
+  }
+
+  def getBankAddr(addr: UInt) = {
+    val bankAddrSlices = getBankAddrSlices(uintToVec(addr, addrWidth), bankAddrWidth)
+    val bankAddrMux = Module(new MuxN(bankAddrSlices.size, bankAddrWidth))
+    bankAddrMux.io.ins := bankAddrSlices
+    bankAddrMux.io.sel := io.strideLog2
+    bankAddrMux.io.out
+  }
+
+  def getLocalAddr(addr: UInt) = {
+    val localAddrSlices = getLocalAddrSlices(uintToVec(addr, addrWidth), bankAddrWidth)
+    val localAddrMux = Module(new MuxN(localAddrSlices.size, localAddrWidth))
+    localAddrMux.io.ins := localAddrSlices.reverse
+    localAddrMux.io.sel := io.strideLog2
+    localAddrMux.io.out
+  }
+
+  io.bankAddr := getBankAddr(io.addr)
+  io.localAddr := getLocalAddr(io.addr)
 }
 
 /**
@@ -51,44 +111,6 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
     configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
   } .otherwise {
     configIn := config
-  }
-
-  def getBitSequences(l: Vec[UInt], size: Int): Vec[UInt] = {
-    Vec(
-      List.tabulate(l.size-size+1) { i => l.drop(i).take(size).reverse }
-        .map { seq => seq.reduce{ Cat(_,_) } }
-      )
-  }
-
-  def getBitSequences(l: UInt, width: Int, size: Int): Vec[UInt] = {
-      val uintAsVec = Vec.tabulate(width) { i => UInt(l(i), width=1) }
-      getBitSequences(uintAsVec, size)
-  }
-
-  /**
-   * Decode given address into a (bankAddr, localAddr) tuple
-   */
-  def getBankAddr(addr: UInt) = {
-    /** Bank address a.k.a. which SRAM? */
-    val bankAddrWidth = log2Up(v)
-    val bankAddrSlices = getBitSequences(addr, addrWidth, bankAddrWidth)
-    val bankAddrMux = Module(new MuxN(bankAddrSlices.size, bankAddrWidth))
-    bankAddrMux.io.ins := bankAddrSlices
-    bankAddrMux.io.sel := config.strideLog2
-    bankAddrMux.io.out
-  }
-  def getLocalAddr(addr: UInt) = {
-    /** Local address a.k.a. which word within an SRAM? */
-    val localAddrWidth = log2Up(d/v)
-    val localAddrSlices = getBitSequences(addr, addrWidth, localAddrWidth)
-    val localAddrMux = Module(new MuxN(localAddrSlices.size, localAddrWidth))
-    localAddrMux.io.ins := localAddrSlices.reverse
-    localAddrMux.io.sel := config.strideLog2
-    localAddrMux.io.out
-  }
-
-  def decodeAddr(addr: UInt) = {
-    (getBankAddr(addr), getLocalAddr(addr))
   }
 
   // Check for sizes and v
@@ -125,12 +147,16 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
     val laneWaddr = io.waddr(i)
 
     // Read address
-    val localRaddr = getLocalAddr(laneRaddr)
+    val raddrDecoder = Module(new AddrDecoder(d, v))
+    raddrDecoder.io.addr := laneRaddr
+    val localRaddr = raddrDecoder.io.localAddr
     m.io.raddr := localRaddr + rptr.io.data.out
 
 
     // Write address
-    val localWaddr = getLocalAddr(laneWaddr)
+    val waddrDecoder = Module(new AddrDecoder(d, v))
+    waddrDecoder.io.addr := laneWaddr
+    val localWaddr = waddrDecoder.io.localAddr
     m.io.waddr := localWaddr + wptr.io.data.out
 
     // Write data
@@ -159,7 +185,7 @@ class DummyReader(w: Int, v: Int) extends Module {
   c.io.control.saturate := Bool(false)
   io.done := c.io.control.done
   c.io.data.max := io.max
-  c.io.data.stride := io.stride* UInt(v)
+  c.io.data.stride := UInt(v)
 
   io.raddr := Vec.tabulate(v) { i => c.io.data.out + UInt(i) * io.stride }
 }
@@ -182,7 +208,7 @@ class DummyWriter(w: Int, v: Int, dataGen: (UInt,UInt) => UInt) extends Module {
   c.io.control.saturate := Bool(false)
   io.done := c.io.control.done
   c.io.data.max := io.max
-  c.io.data.stride := io.stride * UInt(v)
+  c.io.data.stride := UInt(v)
 
   val waddr = Vec.tabulate(v) { i => c.io.data.out + UInt(i) * io.stride }
   io.waddr := waddr
@@ -233,6 +259,29 @@ class ScratchpadTestHarness(val w: Int, val v: Int, val d: Int, val inst: Scratc
   io.rdata := scratchpad.io.rdata
 }
 
+class AddrDecoderTests(c: AddrDecoder) extends Tester(c) {
+  val addrWidth = log2Up(c.d)
+  val bankAddrWidth = log2Up(c.v)
+  val localAddrWidth = log2Up(c.d/c.v)
+
+  val numSupportedStrides = log2Up(c.d) - log2Up(c.v)  // Only powers-of-2 are supported
+  val strides = List.tabulate(numSupportedStrides) { i => 1 << i }
+
+  strides foreach { i =>
+    val addrs = List.tabulate(c.d) { i => i }
+    val strideLog2 = if (i == 1) 0 else log2Up(i)
+    poke(c.io.strideLog2, strideLog2)
+
+    addrs foreach { addr =>
+      poke(c.io.addr, addr)
+      val expectedBankAddr = (addr >> strideLog2) & ((1 << bankAddrWidth)-1)
+      val expectedLocalAddr = ((addr >> (strideLog2+bankAddrWidth)) << strideLog2) | (addr & ((1 << strideLog2) - 1))
+      expect(c.io.bankAddr, expectedBankAddr)
+      expect(c.io.localAddr, expectedLocalAddr)
+      step(1)
+    }
+  }
+}
 
 class ScratchpadTests(c: ScratchpadTestHarness, dataGen: (Int, Int) => Int) extends Tester(c) {
   val bankSize = c.d/c.v
@@ -357,6 +406,24 @@ class ScratchpadTests(c: ScratchpadTestHarness, dataGen: (Int, Int) => Int) exte
   }
 }
 
+object AddrDecoderTest {
+  def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    if (appArgs.size != 2) {
+      println("Usage: bin/sadl AddrDecoderTest <sramDepth> <banking>")
+      sys.exit(-1)
+    }
+
+    val d = appArgs(0).toInt
+    val v = appArgs(1).toInt
+
+    chiselMainTest(args, () => Module(new AddrDecoder(d, v))) {
+      c => new AddrDecoderTests(c)
+    }
+  }
+}
+
 object ScratchpadTest {
 
   // Dumb, but cannot use type parameters
@@ -375,8 +442,8 @@ object ScratchpadTest {
     val configObj = Parser(pisaFile).asInstanceOf[ScratchpadConfig]
 
     val w = 32
-    val d = 64
-    val v = 2
+    val d = 4096
+    val v = 16
 
     chiselMainTest(args, () => Module(new ScratchpadTestHarness(w, v, d, configObj, dataGen))) {
       c => new ScratchpadTests(c, dataGen)
