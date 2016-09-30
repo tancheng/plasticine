@@ -44,7 +44,7 @@ class IntPrimitiveReg(val w: Int, op: (UInt, UInt) => UInt) extends Module {
 class IntPrimitiveTests(c: IntPrimitiveReg) extends Tester(c) {
 }
 
-object IntPrimitiveTest {
+object IntPrimitiveChar {
   def main(args: Array[String]): Unit = {
     val appArgs = args.take(args.indexOf("end"))
     if (appArgs.size < 2) {
