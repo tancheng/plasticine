@@ -403,7 +403,7 @@ class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, 
     wdMux(i).io.ins(0) := lastStageWdata // local write data
     wdMux(i).io.ins(1) := remoteWriteData(0) // remote write data - currently pick only the first bus
     wenMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
-      if (ii == 0) in := UInt(0, width=1)
+      if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
       else in := counterEnables(ii-1)
     }
   }
