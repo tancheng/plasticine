@@ -1,0 +1,7 @@
+./.git/info/exclude:1:# git ls-files --others --exclude-from=.git/info/exclude
+Binary file ./DRAMSim matches
+Binary file ./example_app/libdramsim.dylib matches
+Binary file ./libdramsim.dylib matches
+./MemoryController.cpp:888:			csvOut << CSVWriter::IndexedName("Background_Power",myChannel,r) <<backgroundPower[r];
+Binary file ./MemoryController.o matches
+Binary file ./MemoryController.po matches

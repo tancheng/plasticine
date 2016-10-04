@@ -1,0 +1,2252 @@
+ =======================================================
+ ============== Printing Statistics [id:0]==============
+   Total Return Transactions : 0 (0 bytes) aggregate average bandwidth 0.000GB/s
+      -Rank   0 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        0
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   1 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        1
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   2 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        2
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   3 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        3
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   4 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        4
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   5 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        5
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   6 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        6
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   7 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        7
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   8 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        8
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   9 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        9
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   10 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        10
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   11 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        11
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   12 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        12
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   13 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        13
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   14 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        14
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   15 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        15
+   Average Power (watts)     : 0.000
+     -Background (watts)     : 0.000
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+
+ == Pending Transactions : 0 (0)==
+ ++ Adding IDD2N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD2P to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD2P to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD2P to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD2P to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2P to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2P to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2P to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD2P to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD2P to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD2P to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD2P to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2P to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2P to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2P to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD2P to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD2P to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD2P to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD2P to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2P to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2P to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2P to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD2N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD2N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD2N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD2P to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2P to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2P to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2P to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD2N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD2N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD2N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD2N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2P to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2P to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2P to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD2N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD2N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD2N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2P to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2P to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD2N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD2N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2P to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD2N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD2N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD2N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD2N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Activate and Precharge energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding Write energy to total energy
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+ ++ Adding IDD3N to total energy [from rank 0]
+ ++ Adding IDD2P to total energy [from rank 1]
+ ++ Adding IDD3N to total energy [from rank 2]
+ ++ Adding IDD2P to total energy [from rank 3]
+ ++ Adding IDD3N to total energy [from rank 4]
+ ++ Adding IDD2P to total energy [from rank 5]
+ ++ Adding IDD3N to total energy [from rank 6]
+ ++ Adding IDD2P to total energy [from rank 7]
+ ++ Adding IDD3N to total energy [from rank 8]
+ ++ Adding IDD2P to total energy [from rank 9]
+ ++ Adding IDD3N to total energy [from rank 10]
+ ++ Adding IDD2P to total energy [from rank 11]
+ ++ Adding IDD3N to total energy [from rank 12]
+ ++ Adding IDD2P to total energy [from rank 13]
+ ++ Adding IDD3N to total energy [from rank 14]
+ ++ Adding IDD2P to total energy [from rank 15]
+==== Channel [0] ====
+ =======================================================
+ ============== Printing Statistics [id:0]==============
+   Total Return Transactions : 29 (928 bytes) aggregate average bandwidth 2.881GB/s
+      -Rank   0 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 4 (128 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        0
+   Average Power (watts)     : 1.573
+     -Background (watts)     : 0.790
+     -Act/Pre    (watts)     : 0.691
+     -Burst      (watts)     : 0.092
+     -Refresh    (watts)     : 0.000
+      -Rank   1 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        1
+   Average Power (watts)     : 0.101
+     -Background (watts)     : 0.101
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   2 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 4 (128 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        2
+   Average Power (watts)     : 1.550
+     -Background (watts)     : 0.767
+     -Act/Pre    (watts)     : 0.691
+     -Burst      (watts)     : 0.092
+     -Refresh    (watts)     : 0.000
+      -Rank   3 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        3
+   Average Power (watts)     : 0.101
+     -Background (watts)     : 0.101
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   4 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 3 (96 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        4
+   Average Power (watts)     : 1.525
+     -Background (watts)     : 0.765
+     -Act/Pre    (watts)     : 0.691
+     -Burst      (watts)     : 0.069
+     -Refresh    (watts)     : 0.000
+      -Rank   5 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        5
+   Average Power (watts)     : 0.101
+     -Background (watts)     : 0.101
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   6 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 4 (128 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        6
+   Average Power (watts)     : 1.546
+     -Background (watts)     : 0.763
+     -Act/Pre    (watts)     : 0.691
+     -Burst      (watts)     : 0.092
+     -Refresh    (watts)     : 0.000
+      -Rank   7 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        7
+   Average Power (watts)     : 0.101
+     -Background (watts)     : 0.101
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   8 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 3 (96 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        8
+   Average Power (watts)     : 1.516
+     -Background (watts)     : 0.756
+     -Act/Pre    (watts)     : 0.691
+     -Burst      (watts)     : 0.069
+     -Refresh    (watts)     : 0.000
+      -Rank   9 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        9
+   Average Power (watts)     : 0.101
+     -Background (watts)     : 0.101
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   10 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 3 (96 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        10
+   Average Power (watts)     : 1.509
+     -Background (watts)     : 0.749
+     -Act/Pre    (watts)     : 0.691
+     -Burst      (watts)     : 0.069
+     -Refresh    (watts)     : 0.000
+      -Rank   11 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        11
+   Average Power (watts)     : 0.101
+     -Background (watts)     : 0.101
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   12 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 4 (128 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        12
+   Average Power (watts)     : 1.525
+     -Background (watts)     : 0.742
+     -Act/Pre    (watts)     : 0.691
+     -Burst      (watts)     : 0.092
+     -Refresh    (watts)     : 0.000
+      -Rank   13 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        13
+   Average Power (watts)     : 0.101
+     -Background (watts)     : 0.101
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+      -Rank   14 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 4 (128 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.099 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        14
+   Average Power (watts)     : 1.541
+     -Background (watts)     : 0.735
+     -Act/Pre    (watts)     : 0.691
+     -Burst      (watts)     : 0.115
+     -Refresh    (watts)     : 0.000
+      -Rank   15 : 
+        -Reads  : 0 (0 bytes)
+        -Writes : 0 (0 bytes)
+        -Bandwidth / Latency  (Bank 0): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 1): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 2): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 3): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 4): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 5): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 6): 0.000 GB/s		-nan ns
+        -Bandwidth / Latency  (Bank 7): 0.000 GB/s		-nan ns
+ == Power Data for Rank        15
+   Average Power (watts)     : 0.101
+     -Background (watts)     : 0.101
+     -Act/Pre    (watts)     : 0.000
+     -Burst      (watts)     : 0.000
+     -Refresh    (watts)     : 0.000
+ ---  Latency list (0)
+       [lat] : #
+
+ == Pending Transactions : 0 (100)==
+//// Channel [0] ////
