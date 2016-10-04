@@ -1,0 +1,6 @@
+Binary file ./dramsim_test matches
+./dramsim_test.h:41:		void read_complete(unsigned, uint64_t, uint64_t);
+./dramsim_test.cpp:40:void some_object::read_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
+./dramsim_test.cpp:142:	TransactionCompleteCB *read_cb = new Callback<some_object, void, unsigned, uint64_t, uint64_t>(&obj, &some_object::read_complete);
+Binary file ./dramsim_test.dSYM/Contents/Resources/DWARF/dramsim_test matches
+Binary file ./.dramsim_test.cpp.swp matches
