@@ -1,0 +1,271 @@
+[0m[[0minfo[0m] [0mSet current project to plasticinecontroller (in build file:/local/ssd/home/tianzhao/DRAMSimulator/DRAMSim2_master/plasticineController/)[0m
+[0m[[0minfo[0m] [0mRunning plasticineController.PlasticineControllerTop [0m
+[[35minfo[0m] [0.078] // COMPILING < (class plasticineController.PlasticineControllerTop)>(2)
+[[35minfo[0m] [0.108] giving names
+[[35minfo[0m] [0.132] executing custom transforms
+[[35minfo[0m] [0.132] convert masked writes of inline mems
+[[35minfo[0m] [0.140] adding clocks and resets
+[[35minfo[0m] [0.153] inferring widths
+[[35minfo[0m] [0.171] checking widths
+[[35minfo[0m] [0.176] lowering complex nodes to primitives
+[[35minfo[0m] [0.185] removing type nodes
+[[35minfo[0m] [0.192] compiling 57 nodes
+[[35minfo[0m] [0.192] computing memory ports
+[[35minfo[0m] [0.201] resolving nodes to the components
+[[35minfo[0m] [0.235] creating clock domains
+[[35minfo[0m] [0.237] pruning unconnected IOs
+[[35minfo[0m] [0.240] checking for combinational loops
+[[35minfo[0m] [0.247] NO COMBINATIONAL LOOP FOUND
+[[35minfo[0m] [0.267] COMPILING <controller (class plasticineController.PlasticineController)> 0 CHILDREN (0,1)
+[[35minfo[0m] [0.284] COMPILING <dramsim (class plasticineController.DRAMSim2)> 0 CHILDREN (0,1)
+[[35minfo[0m] [0.285] COMPILING <PlasticineControllerTop (class plasticineController.PlasticineControllerTop)> 2 CHILDREN (1,0)
+sim start on london at Tue Sep 27 15:42:12 2016
+inChannelName: 00073559.in
+outChannelName: 00073559.out
+cmdChannelName: 00073559.cmd
+SEED 1475016131715
+STARTING ./PlasticineControllerTop -q +vcs+initreg+0  
+RESETINGGGGG
+>>>>>>>>>> calling clock_lo from clock()
+RESETINGGGGG
+>>>>>>>>>> calling clock_lo from clock()
+RESETINGGGGG
+>>>>>>>>>> calling clock_lo from clock()
+RESETINGGGGG
+>>>>>>>>>> calling clock_lo from clock()
+RESETINGGGGG
+>>>>>>>>>> calling clock_lo from clock()
+  POKE PlasticineControllerTop.io_start <- 0x0
+STEP 1 -> 1
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 1
+  POKE PlasticineControllerTop.io_start <- 0x1
+UPDATINGGGGG
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 2
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 2
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 3
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 3
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 4
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 4
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 5
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 5
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 6
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 6
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 7
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 7
+>>>>>>>>> step == 6, turning on TX_COMP
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 8
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 1
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 8
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 9
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 9
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 10
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 10
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 11
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 11
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 12
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 12
+  PEEK PlasticineControllerTop.io_done <- 0x0
+  POKE PlasticineControllerTop.io_start <- 0x1
+UPDATINGGGGG
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 13
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 13
+  POKE PlasticineControllerTop.io_start <- 0x0
+UPDATINGGGGG
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 14
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 14
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 15
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 15
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 16
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 16
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 17
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 17
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 18
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 18
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 19
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 19
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 20
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 20
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 21
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 21
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 22
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 22
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 23
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 23
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 24
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 24
+  PEEK PlasticineControllerTop.io_done <- 0x0
+  POKE PlasticineControllerTop.io_start <- 0x1
+UPDATINGGGGG
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 25
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 25
+  POKE PlasticineControllerTop.io_start <- 0x0
+UPDATINGGGGG
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 26
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 26
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 27
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 27
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 28
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 28
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 29
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 29
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 30
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 30
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 31
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 31
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 32
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 32
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 33
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 33
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 34
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 34
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 35
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 35
+  PEEK PlasticineControllerTop.io_done <- 0x0
+STEP 1 -> 36
+STEPPINGGGGG
+>>>>>>>>>> TX_COMP = 0
+>>>>>>>>>> calling clock_lo from clock()
+call clock_lo from step, steps = 36
+  PEEK PlasticineControllerTop.io_done <- 0x0
+FINISHINGGGGG
+>>>>>>>>>> calling clock_lo from clock()
+RAN 36 CYCLES PASSED
+[0m[[32msuccess[0m] [0mTotal time: 1 s, completed Sep 27, 2016 3:42:12 PM[0m
