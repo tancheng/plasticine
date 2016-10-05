@@ -39,8 +39,8 @@ case class CounterRCConfig(max: Int, stride: Int, maxConst: Int, strideConst: In
 object CounterRCConfig {
   def getRandom = {
     new CounterRCConfig(
-        Random.nextInt(16),
-        Random.nextInt(16),
+        math.abs(Random.nextInt(16)),
+        math.abs(Random.nextInt(16)),
         Random.nextInt(2),
         Random.nextInt(2),
         Random.nextInt(16),
