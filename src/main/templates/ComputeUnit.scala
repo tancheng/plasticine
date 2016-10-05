@@ -114,14 +114,27 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, val l: Int, 
  * @param r: Number of remote pipeline registers
  * @param m: Scratchpad size in words
  */
-class ComputeUnit(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val d: Int, val v: Int, rwStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: ComputeUnitConfig) extends ConfigurableModule[ComputeUnitOpcode] {
+class ComputeUnit(
+  val w: Int,
+  val startDelayWidth: Int,
+  val endDelayWidth: Int,
+  val d: Int,
+  val v: Int, rwStages: Int,
+  val numTokens: Int,
+  val l: Int,
+  val r: Int,
+  val m: Int,
+  val numScratchpads: Int,
+  val numStagesAfterReduction: Int,
+  inst: ComputeUnitConfig
+) extends ConfigurableModule[ComputeUnitOpcode] {
 
   // Currently, numCounters == numTokens
   val numCounters = numTokens
 
-  val numScratchpads = 4 // TODO: Remove hardcoded number!
+//  val numScratchpads = 4 // TODO: Remove hardcoded number!
+//  val numStagesAfterReduction = 2
   val numReduceStages = log2Up(v)
-  val numStagesAfterReduction = 2
 
   // Sanity check parameters for validity
   Predef.assert(d >= (rwStages),
@@ -449,7 +462,9 @@ object ComputeUnitTest {
     val rwStages = 4
     val numTokens = 8
     val m = 64
-    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj))) {
+    val numScratchpads = 4
+    val numStagesAfterReduction = 2
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, configObj))) {
       c => new ComputeUnitTests(c)
     }
   }

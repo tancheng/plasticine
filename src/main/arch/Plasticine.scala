@@ -20,7 +20,18 @@ import scala.collection.mutable.ListBuffer
  * @param r: Number of remote pipeline registers
  * @param m: Scratchpad size in words
  */
-class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val d: Int, val v: Int, rwStages: Int, val numTokens: Int, val l: Int, val r: Int, val m: Int, inst: PlasticineConfig) extends Module {
+class Plasticine(val w: Int,
+  val startDelayWidth: Int,
+  val endDelayWidth: Int,
+  val d: Int,
+  val v: Int, rwStages: Int,
+  val numTokens: Int,
+  val l: Int,
+  val r: Int,
+  val m: Int,
+  val numScratchpads: Int,
+  val numStagesAfterReduction: Int,
+ inst: PlasticineConfig) extends Module {
 
   val rows = 4
   val cols = 4
@@ -43,7 +54,7 @@ class Plasticine(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, v
   for (i <- 0 until rows) {
     cus.append(new ListBuffer[ComputeUnit]())
     for (j <- 0 until cols) {
-      val cu = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, inst.cu(i)))
+      val cu = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, inst.cu(i)))
       cu.io.config_enable := io.config_enable
       cus(i).append(cu)
       if (i == 0) { // First row
@@ -108,7 +119,9 @@ object PlasticineTest {
     val rwStages = 3
     val numTokens = 4
     val m = 64
-    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, configObj))) {
+    val numScratchpads = 4
+    val numStagesAfterReduction = 2
+    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, configObj))) {
       c => new PlasticineTests(c)
     }
   }
