@@ -5,80 +5,92 @@
   "config" : {
 
    "scratchpads" : [
-      {"ra" : "i0", "wa": "x", "wd" : "x", "wen" : "x", "banking" : "b1"},
-      {"ra" : "i0", "wa": "x", "wd" : "x", "wen" : "x", "banking" : "x"},
-      {"ra" : "i0", "wa": "x", "wd" : "x", "wen" : "x", "banking" : "x"},
-      {"ra" : "i0", "wa": "x", "wd" : "x", "wen" : "x", "banking" : "x"}
+      {
+        "ra" : "i0",
+        "wa": "x",
+        "wd" : "x",
+        "wen" : "x",
+        "banking" : "b1",
+        "numBufs" : "1"
+      },
+      {
+        "ra" : "x",
+        "wa": "x",
+        "wd" : "x",
+        "wen" : "x",
+        "banking" : "x",
+        "numBufs" : "1"
+      },
+      {
+        "ra" : "x",
+        "wa": "x",
+        "wd" : "x",
+        "wen" : "x",
+        "banking" : "x",
+        "numBufs" : "1"
+      },
+      {
+        "ra" : "x",
+        "wa": "x",
+        "wd" : "x",
+        "wen" : "x",
+        "banking" : "x",
+        "numBufs" : "1"
+      }
     ],
 
     "dataInXbar" : {"outSelect": ["1","1","0","0"]},
 
     "counterChain" : {
-      "chain" : [0, 0, 0, 0, 0, 0, 0, 0],
+      "chain" : ["0", "0", "0", "0", "0", "0", "0", "0"],
       "counters" : [
         {
-          "max"         : 5,
-          "stride"      : 1,
-          "maxConst"    : 1,
-          "strideConst" : 1,
-          "startDelay" :  0,
-          "endDelay" : 0
+          "max"         : "c5",
+          "stride"      : "c1",
+          "startDelay" :  "0",
+          "endDelay" : "0"
         },
         {
-          "max"         : 0,
-          "stride"      : 0,
-          "maxConst"    : 0,
-          "strideConst" : 0,
-          "startDelay" :  0,
-          "endDelay" : 0
+          "max"         : "x",
+          "stride"      : "x",
+          "startDelay"  : "x",
+          "endDelay"    : "x"
         },
         {
-          "max"         : 0,
-          "stride"      : 0,
-          "maxConst"    : 0,
-          "strideConst" : 0,
-          "startDelay" :  0,
-          "endDelay" : 0
+          "max"         : "x",
+          "stride"      : "x",
+          "startDelay"  : "x",
+          "endDelay"    : "x"
         },
         {
-          "max"         : 0,
-          "stride"      : 0,
-          "maxConst"    : 0,
-          "strideConst" : 0,
-          "startDelay" :  0,
-          "endDelay" : 0
+          "max"         : "x",
+          "stride"      : "x",
+          "startDelay"  : "x",
+          "endDelay"    : "x"
         },
          {
-          "max"         : 0,
-          "stride"      : 0,
-          "maxConst"    : 0,
-          "strideConst" : 0,
-          "startDelay" :  0,
-          "endDelay" : 0
+          "max"         : "x",
+          "stride"      : "x",
+          "startDelay"  : "x",
+          "endDelay"    : "x"
         },
          {
-          "max"         : 0,
-          "stride"      : 0,
-          "maxConst"    : 0,
-          "strideConst" : 0,
-          "startDelay" :  0,
-          "endDelay" : 0
+          "max"         : "x",
+          "stride"      : "x",
+          "startDelay"  : "x",
+          "endDelay"    : "x"
         },
          {
-          "max"         : 0,
-          "stride"      : 0,
-          "maxConst"    : 0,
-          "strideConst" : 0,
-          "startDelay" :  0,
-          "endDelay" : 0
+          "max"         : "x",
+          "stride"      : "x",
+          "startDelay"  : "x",
+          "endDelay"    : "x"
         },
         {
-          "max"         : 0,
-          "stride"      : 0,
-          "maxConst"    : 0,
-          "strideConst" : 0,
-          "startDelay" :  0,
-          "endDelay" : 0
+          "max"         : "x",
+          "stride"      : "x",
+          "startDelay"  : "x",
+          "endDelay"    : "x"
         }
       ]
     },
