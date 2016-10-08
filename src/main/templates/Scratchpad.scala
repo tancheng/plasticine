@@ -186,6 +186,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
     // Read address
     val raddrDecoder = Module(new AddrDecoder(d, v))
     raddrDecoder.io.addr := laneRaddr
+    raddrDecoder.io.strideLog2 := config.strideLog2
     val localRaddr = raddrDecoder.io.localAddr
     m.io.raddr := localRaddr + rptr.io.data.out
 
@@ -193,6 +194,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
     // Write address
     val waddrDecoder = Module(new AddrDecoder(d, v))
     waddrDecoder.io.addr := laneWaddr
+    waddrDecoder.io.strideLog2 := config.strideLog2
     val localWaddr = waddrDecoder.io.localAddr
     m.io.waddr := localWaddr + wptr.io.data.out
 
@@ -216,15 +218,23 @@ class DummyReader(w: Int, v: Int) extends Module {
     val raddr = Vec.fill(v) { UInt(OUTPUT, width=w) }
   }
 
-  val c = Module(new Counter(w))
-  c.io.control.enable := io.en
-  c.io.control.reset := Bool(false)
-  c.io.control.saturate := Bool(false)
-  io.done := c.io.control.done
-  c.io.data.max := io.max
-  c.io.data.stride := UInt(v)
+  val startDelayWidth = 4
+  val endDelayWidth = 4
+  val numCounters = 2
+  val inst = CounterChainConfig (
+    List(1, 1),
+    List.fill(numCounters) { CounterRCConfig(0, 0, 0, 0, 0, 0) }
+  )
+  val c = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst))
+  c.io.data(0).max := io.max
+  c.io.data(0).stride := UInt(v) * io.stride
+  c.io.data(1).max := io.stride
+  c.io.data(1).stride := UInt(1)
+  c.io.control(0).enable := io.en
+  c.io.control(1).enable := io.en // This should not be necessary
+  io.done := c.io.control(1).done
 
-  io.raddr := Vec.tabulate(v) { i => c.io.data.out + UInt(i) * io.stride }
+  io.raddr := Vec.tabulate(v) { i => c.io.data(0).out + c.io.data(1).out + UInt(i) * io.stride }
 }
 
 class DummyWriter(w: Int, v: Int, dataGen: (UInt,UInt) => UInt) extends Module {
@@ -239,15 +249,23 @@ class DummyWriter(w: Int, v: Int, dataGen: (UInt,UInt) => UInt) extends Module {
     val wen = Bool(OUTPUT)
   }
 
-  val c = Module(new Counter(w))
-  c.io.control.enable := io.en
-  c.io.control.reset := Bool(false)
-  c.io.control.saturate := Bool(false)
-  io.done := c.io.control.done
-  c.io.data.max := io.max
-  c.io.data.stride := UInt(v)
+  val startDelayWidth = 4
+  val endDelayWidth = 4
+  val numCounters = 2
+  val inst = CounterChainConfig (
+    List(1, 1),
+    List.fill(numCounters) { CounterRCConfig(0, 0, 0, 0, 0, 0) }
+  )
+  val c = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst))
+  c.io.data(0).max := io.max
+  c.io.data(0).stride := UInt(v) * io.stride
+  c.io.data(1).max := io.stride
+  c.io.data(1).stride := UInt(1)
+  c.io.control(0).enable := io.en
+  c.io.control(1).enable := io.en // This should not be necessary
+  io.done := c.io.control(1).done
 
-  val waddr = Vec.tabulate(v) { i => c.io.data.out + UInt(i) * io.stride }
+  val waddr = Vec.tabulate(v) { i => c.io.data(0).out + c.io.data(1).out + UInt(i) * io.stride }
   io.waddr := waddr
   io.wen := io.en
   io.wdata := Vec.tabulate(v) { i => dataGen(waddr(i), io.const) }
@@ -326,11 +344,14 @@ class ScratchpadTests(c: ScratchpadTestHarness, dataGen: (Int, Int) => Int) exte
   val bankSize = c.d/c.v
   val bufSize = bankSize - (bankSize % c.inst.numBufs)/ c.inst.numBufs
   val numBufs = c.inst.numBufs
-
+  val stride = 1 << c.inst.banking.strideLog2
   // This is the formula for max block size as a function of d, v, and numBufs
-  val blockSize = (c.d / (c.v * numBufs)) * c.v
+  val blockSizeMax = (c.d / (c.v * numBufs)) * c.v
+  val blockSize = blockSizeMax - (blockSizeMax % (c.v*stride))
 
-  val numIter = 6
+  // Block size must be a multiple
+
+  val numIter = 1
   poke(c.io.max, blockSize)
   poke(c.io.stride, 1 << c.inst.banking.strideLog2)
   println(s"strideLog2 = ${c.inst.banking.strideLog2}, log2Up(1) = ${log2Up(1)}")
@@ -366,19 +387,25 @@ class ScratchpadTests(c: ScratchpadTestHarness, dataGen: (Int, Int) => Int) exte
       poke(c.io.readerEn, 1)
       var rdone = false
       var wdone = false
+      val readAddr = ListBuffer[Int]()
       val readData = ListBuffer[Int]()
       while (!(rdone && wdone)) {
+        peek(c.reader.io.raddr).reverse map {_.toInt } foreach { readAddr.append(_) }
         step(1)
         peek(c.io.rdata).reverse map {_.toInt } foreach { e => readData.append(e) }
         rdone = peek(c.io.readerDone) > 0
         wdone = peek(c.io.writerDone) > 0
       }
+      peek(c.reader.io.raddr).reverse map {_.toInt } foreach { readAddr.append(_) }
       step(1)
       peek(c.io.rdata).reverse map {_.toInt } foreach { readData.append(_) }
       poke(c.io.readerEn, 0)
       poke(c.io.writerEn, 0)
+
+      val reassembledData = readAddr.zip(readData).sortBy(_._1).map(_._2)
+
       // Drop the last few elements if the block size is not a multiple of numbanks
-      observedData.append(readData.dropRight(blockSize % c.v).toList)
+      observedData.append(reassembledData.dropRight(blockSize % c.v).toList)
       expectedData.append (
           List.tabulate(blockSize) { i => dataGen(i, iter) }
         )
@@ -388,43 +415,53 @@ class ScratchpadTests(c: ScratchpadTestHarness, dataGen: (Int, Int) => Int) exte
 
     // Drain stages
     for (i <- 0 until numDrain) {
+      val readAddr = ListBuffer[Int]()
       val readData = ListBuffer[Int]()
       poke(c.io.readerEn, 1)
       while (peek(c.io.readerDone) != 1) {
+        peek(c.reader.io.raddr).reverse map {_.toInt } foreach { readAddr.append(_) }
         step(1)
         peek(c.io.rdata).reverse map {_.toInt } foreach { readData.append(_) }
       }
+      peek(c.reader.io.raddr).reverse map {_.toInt } foreach { readAddr.append(_) }
       step(1)
       peek(c.io.rdata).reverse map {_.toInt } foreach { readData.append(_) }
       poke(c.io.readerEn, 0)
-      observedData.append(readData.dropRight(blockSize % c.v).toList)
+
+      val reassembledData = readAddr.zip(readData).sortBy(_._1).map(_._2)
+      observedData.append(reassembledData.dropRight(blockSize % c.v).toList)
       iter += 1
     }
   } else {  // Unpipelined test
+    var cycles = 0
     for (i <- 0 until 1) {
       poke(c.io.writerConst, iter)
       poke(c.io.writerEn, 1)
       while (peek(c.io.writerDone) != 1) {
         val writerDone = peek(c.io.writerDone)
         println(s"dummyWriter done: $writerDone")
-        step(1)
+        step(1); cycles += 1
       }
       println("dummyWriter done")
-      step(1)
+      step(1); cycles += 1
       poke(c.io.writerEn, 0)
 
       poke(c.io.readerEn, 1)
       val readData = ListBuffer[Int]()
+      val readAddr = ListBuffer[Int]()
       while (peek(c.io.readerDone) != 1) {
-        step(1)
+        peek(c.reader.io.raddr).reverse map {_.toInt } foreach { readAddr.append(_) }
+        step(1); cycles += 1
         peek(c.io.rdata).reverse map {_.toInt } foreach { readData.append(_) }
       }
-      step(1)
+      peek(c.reader.io.raddr).reverse map {_.toInt } foreach { readAddr.append(_) }
+      step(1); cycles += 1
       peek(c.io.rdata).reverse map {_.toInt } foreach { readData.append(_) }
       println("dummyReader done")
       poke(c.io.readerEn, 0)
 
-      observedData.append(readData.dropRight(blockSize % c.v).toList)
+      val reassembledData = readAddr.zip(readData).sortBy(_._1).map(_._2)
+      observedData.append(reassembledData.dropRight(blockSize % c.v).toList)
       expectedData.append (
           List.tabulate(blockSize) { i => dataGen(i, iter) }
         )
@@ -501,6 +538,8 @@ object ScratchpadTest {
     val w = 32
     val d = 4096
     val v = 16
+//    val d = 64
+//    val v = 4
 
     chiselMainTest(args, () => Module(new ScratchpadTestHarness(w, v, d, configObj, dataGen))) {
       c => new ScratchpadTests(c, dataGen)
