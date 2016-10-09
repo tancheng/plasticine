@@ -117,7 +117,7 @@ case class ComputeUnitConfig(
 case class CUControlBoxConfig(
   tokenOutLUT: List[LUTConfig],
   enableLUT: List[LUTConfig],
-  tokenDownLUT: LUTConfig,
+  tokenDownLUT: List[LUTConfig],
   udcInit: List[Int],
   decXbar: CrossbarConfig,
   incXbar: CrossbarConfig,
@@ -131,7 +131,7 @@ object CUControlBoxConfig {
     new CUControlBoxConfig(
         List.fill(numTokenOut-1) { LUTConfig.getRandom(2) }, // tokenOutLUT
         List.fill(numCounters) { LUTConfig.getRandom(numCounters)}, // enableLUT
-        LUTConfig.getRandom(numCounters+1), // tokenDownLUT,
+        List.fill(2) { LUTConfig.getRandom(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { Random.nextInt }, // udcInit,
         CrossbarConfig.getRandom(numCounters), // decXbar,
         CrossbarConfig.getRandom(2*numCounters), // incXbar,

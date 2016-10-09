@@ -167,7 +167,8 @@ object Parser {
                                             .map { parseLUT(_) }
     val enableLUT: List[LUTConfig] = Parser.getFieldListOfMaps(m, "enableLUT")
                                             .map { parseLUT(_) }
-    val tokenDownLUT: LUTConfig = parseLUT(Parser.getFieldMap(m, "tokenDownLUT"))
+    val tokenDownLUT: List[LUTConfig] =Parser.getFieldListOfMaps(m, "tokenDownLUT")
+                                            .map { parseLUT(_) }
     val udcInit: List[Int] = Parser.getFieldList(m, "udcInit")
                                 .asInstanceOf[List[String]]
                                 .map { parseValue(_) }
@@ -259,7 +260,7 @@ object Parser {
         parseLUT(config)
       case "scratchpad" =>
         parseScratchpad(config)
-      case "cuControl" =>
+      case "control" =>
         parseControlBox(config)
       case "cu" =>
         parseCU(config)

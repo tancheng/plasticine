@@ -121,7 +121,7 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   syncTokenMux.io.ins := io.tokenIns
   syncTokenMux.io.sel := config.syncTokenMux
   val syncToken = syncTokenMux.io.out
-  val tokenDownLUT = Module(new LUT(1, 1 << (numTokens+1), inst.tokenDownLUT))
+  val tokenDownLUT = Module(new LUT(1, 1 << (numTokens+1), inst.tokenDownLUT(0)))
   tokenDownLUT.io.config_enable := io.config_enable
   tokenDownLUT.io.config_data := io.config_data
   tokenDownLUT.io.ins.zipWithIndex.foreach { case (in, i) =>
