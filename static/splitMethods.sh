@@ -113,7 +113,7 @@ echo "#define __CLOCKLO_GLOBALS_H__"    >> $CLOCKLO_GLOBALS
 echo "#ifndef __CLOCKLO_GLOBALDEFS_H__" >> $CLOCKLO_GLOBALDEFS
 echo "#define __CLOCKLO_GLOBALDEFS_H__" >> $CLOCKLO_GLOBALDEFS
 echo "#include \"emulator.h\""  | tee -a $CLOCKLO_GLOBALS $CLOCKLO_GLOBALDEFS > /dev/null
-grep "^[ ][ ]*val_t T[0-9]*;" clockLo.txt | tee -a $CLOCKLO_GLOBALS $CLOCKLO_GLOBALDEFS > /dev/null
+grep "^[ ][ ]*val_t T[0-9]*.*;" clockLo.txt | tee -a $CLOCKLO_GLOBALS $CLOCKLO_GLOBALDEFS > /dev/null
 sed -i "s/^[ ][ ]*val_t T[0-9]*;//" clockLo.txt
 sed -i 's/^[ ][ ]*val_t/extern val_t/' $CLOCKLO_GLOBALS
 echo "#endif" | tee -a $CLOCKLO_GLOBALS $CLOCKLO_GLOBALDEFS > /dev/null
