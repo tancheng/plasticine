@@ -110,8 +110,8 @@ case class ComputeUnitConfig(
   counterChain: CounterChainConfig,
   scratchpads: List[ScratchpadConfig],
   pipeStage: List[PipeStageConfig],
-  control: CUControlBoxConfig,
-  dataInXbar: CrossbarConfig
+  control: CUControlBoxConfig
+//  dataInXbar: CrossbarConfig
 ) extends AbstractConfig
 
 case class CUControlBoxConfig(

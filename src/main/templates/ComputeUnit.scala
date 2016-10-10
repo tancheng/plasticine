@@ -169,11 +169,12 @@ class ComputeUnit(
   }
 
   // Crossbar across input buses
-  val inputXbar = Module(new CrossbarVec(w, v, numScratchpads, numScratchpads, inst.dataInXbar))
-  inputXbar.io.ins := io.dataIn
-  inputXbar.io.config_enable := io.config_enable
-  inputXbar.io.config_data := io.config_data
-  val remoteWriteData = inputXbar.io.outs
+//  val inputXbar = Module(new CrossbarVec(w, v, numScratchpads, numScratchpads, inst.dataInXbar))
+//  inputXbar.io.ins := io.dataIn
+//  inputXbar.io.config_enable := io.config_enable
+//  inputXbar.io.config_data := io.config_data
+//  val remoteWriteData = inputXbar.io.outs
+  val remoteWriteData = io.dataIn
 
   // Scratchpads
   val scratchpads = List.tabulate(numScratchpads) { i =>
@@ -255,7 +256,7 @@ class ComputeUnit(
     counters.map { c => c + UInt(i) }
   }
   val initRegblocks = List.tabulate(v) { i =>
-    val remotesList =  counterVecs(i) ++ io.dataIn.map { _(0) }
+    val remotesList =  counterVecs(i) ++ io.dataIn.map { _(i) }
     val regBlock = Module(new RegisterBlock(w, 0 /*local*/,  r /*remote*/))
     regBlock.io.writeData := UInt(0) // Not connected to any ALU output
     regBlock.io.readLocalASel := UInt(0) // No local reads
@@ -429,6 +430,11 @@ class ComputeUnit(
  */
 class ComputeUnitTests(c: ComputeUnit) extends PlasticineTester(c) {
   var numCycles = 0
+
+  // Pulse for one cycle
+  poke(c.io.tokenIns(0), 1)
+  step(1)
+  poke(c.io.tokenIns(0), 0)
 
   while (numCycles < 100) {
     step(1)

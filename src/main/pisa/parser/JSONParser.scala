@@ -88,7 +88,15 @@ object Parser {
 
   def encodeOneHot(x: Int) = 1 << x
 
-  def getRegNum(s: String) = if (s.size <= 1) 0 else s.drop(1).toInt
+  def getRegNum(s: String) = if (s.size <= 1) 0 else {
+    val value = s.drop(1)
+    value.last match {
+      case 'i' => Integer.parseInt(value.dropRight(1))
+//      case 'f' => java.lang.Float.parseFloat(value.dropRight(1))
+//      case 'd' => java.lang.Double.parseDouble(value.dropRight(1))
+      case _ => value.toInt
+    }
+  }
 
 
   def parseLUT(m: Map[Any, Any]): LUTConfig = {
@@ -117,8 +125,20 @@ object Parser {
   def parsePipeStage(m: Map[Any, Any]): PipeStageConfig = {
     val opA = parseOperandConfig(Parser.getFieldString(m, "opA"))
     val opB = parseOperandConfig(Parser.getFieldString(m, "opB"))
-    val opcode = Opcodes.getCode(Parser.getFieldString(m, "opcode"))
-    val result = encodeOneHot(getRegNum(Parser.getFieldString(m, "result")))
+    val opcode = {
+      val o = Parser.getFieldString(m, "opcode")
+      if (o == "x") 0
+      else {
+        val c = Opcodes.getCode(o)
+        println(s"o = $o, c = $c")
+        Opcodes.getCode(o)
+      }
+    }
+    val result = ((Parser.getFieldList(m, "result")
+                  .asInstanceOf[List[String]])
+                  ++ List("0")) // To handle empty stages
+                  .map { r => encodeOneHot(getRegNum(r)) }
+                  .reduce {_|_}
 
     // Map (regNum -> muxconfig)
     val fwd: Map[Int, Int] = {
@@ -146,12 +166,13 @@ object Parser {
                                       .map { parseScratchpad(_) }
 
     val pipeStage = Parser.getFieldListOfMaps(m, "pipeStage")
+                              .drop(1)
                               .map { h => parsePipeStage(h) }
 
     val control = parseControlBox(Parser.getFieldMap(m, "control"))
 
-    val dataInXbar = parseCrossbar(Parser.getFieldMap(m, "dataInXbar"))
-    ComputeUnitConfig(counterChain, scratchpads, pipeStage, control, dataInXbar)
+//    val dataInXbar = parseCrossbar(Parser.getFieldMap(m, "dataInXbar"))
+    ComputeUnitConfig(counterChain, scratchpads, pipeStage, control)
   }
 
   def parseCrossbar(m: Map[Any, Any], incByOne: Boolean = false): CrossbarConfig = {
