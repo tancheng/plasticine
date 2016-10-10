@@ -2,7 +2,7 @@ package plasticine.templates
 
 import Chisel._
 
-class SRAM(val w: Int, val d: Int) extends Module {
+class SRAM(val w: Int, val d: Int) extends BlackBox {
   val addrWidth = log2Up(d)
   val io = new Bundle {
     val raddr = UInt(INPUT, width = addrWidth)
