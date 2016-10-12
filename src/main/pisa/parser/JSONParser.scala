@@ -25,7 +25,6 @@ object Parser {
     json match {
       case m: Map[Any, Any] =>
         val pisam = getFieldMap(m, "PISA")
-        println(s"PISA map: $pisam")
         parsePISAMap(pisam)
       case err@_ => mapNotFound(err)
     }
@@ -113,7 +112,7 @@ object Parser {
       case 'r' => 1 // Previous pipe stage register
       case 'c' => 2 // Constant
       case 'i' => 3 // Iterator / counter
-      case 't' => 3 // Cross-stage value for reduction
+      case 't' => 3 // Cross-stage value for reduction tree
       case 'm' => 4 // Memory
       case _ => throw new Exception(s"Unknown data source '${s(0)}'. Must be l, r, c, i, or m")
     }
@@ -127,17 +126,12 @@ object Parser {
     val opB = parseOperandConfig(Parser.getFieldString(m, "opB"))
     val opcode = {
       val o = Parser.getFieldString(m, "opcode")
-      if (o == "x") 0
-      else {
-        val c = Opcodes.getCode(o)
-        println(s"o = $o, c = $c")
-        Opcodes.getCode(o)
-      }
+      if (o == "x") 0 else Opcodes.getCode(o)
     }
-    val result = ((Parser.getFieldList(m, "result")
+    val result = (((Parser.getFieldList(m, "result")
                   .asInstanceOf[List[String]])
-                  ++ List("0")) // To handle empty stages
-                  .map { r => encodeOneHot(getRegNum(r)) }
+                  .map { r => encodeOneHot(getRegNum(r)) })
+                  ++ List(0)) // To handle empty /don't care stages
                   .reduce {_|_}
 
     // Map (regNum -> muxconfig)
