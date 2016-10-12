@@ -137,8 +137,16 @@ class ComputeUnit(
   val numReduceStages = log2Up(v)
 
   // Sanity check parameters for validity
-  Predef.assert(d >= (rwStages),
-    s"""#stages $d < read-write stages ($rwStages)!""")
+  // numStagesAfterReduction: Must be at least 1, where the accumulation happens.
+  Predef.assert(numStagesAfterReduction >= 1,
+    s"Must have at least 1 stage after reduction (currently $numStagesAfterReduction)")
+
+  // #stages: Currently there must be at least one 'regular' stage
+  // after 'rwStages' and before 'reduction' stages because of the way
+  // the dataSrc muxes are created.
+  // i.e., d >= rwStages + 1 + numReduceStages + numStagesAfterReduction
+  Predef.assert(d >= (rwStages + 1 + numReduceStages + numStagesAfterReduction),
+    s"""#stages $d < min. legal stages ($rwStages + 1 + $numReduceStages + $numStagesAfterReduction)!""")
 
   // #remoteRegs == numCounters + v in current impl
   Predef.assert(r >= (numCounters+numScratchpads),
@@ -325,6 +333,7 @@ class ComputeUnit(
       } else {
         Vec(localA, rA, stageConfig.opA.value)
       }
+
       val rB = pipeRegs.last(ii).io.readRemoteB
       val localB = regblock.io.readLocalB
       val dataSrcB = if (i <= rwStages) {
@@ -344,7 +353,7 @@ class ComputeUnit(
         }
       } else if (isReduceStage && fwdLaneMap.contains(ii)) {
         val prevRegBlock = pipeRegs.last(fwdLaneMap(ii))
-        val reduceVal = prevRegBlock.io.passDataOut(0)
+        val reduceVal = prevRegBlock.io.passDataOut(0) // Reg '0' in corresponding lane in prev stage is the reduction register
         Vec(localB, rB, stageConfig.opB.value, reduceVal)
       } else {
         Vec(localB, rB, stageConfig.opB.value)
@@ -415,7 +424,7 @@ class ComputeUnit(
     waCountersMux(i).io.ins := Vec(stridedCounters)
     waSrcMux(i).io.ins := Vec(waStagesMux(i).io.out, waCountersMux(i).io.out, lastStageWaddr)
     wdMux(i).io.ins(0) := lastStageWdata // local write data
-    wdMux(i).io.ins(1) := remoteWriteData(0) // remote write data - currently pick only the first bus
+    wdMux(i).io.ins(1) := remoteWriteData(i) // remote write data - one-to-one correspondence between input bus and scratchpad
     wenMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
       if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
       else in := counterEnables(ii-1)
@@ -461,10 +470,10 @@ object ComputeUnitTest {
     val bitwidth = 32
     val startDelayWidth = 4
     val endDelayWidth = 4
-    val d = 8
-    val v = 16
+    val d = 9
+    val v = 4
     val l = 0
-    val r = 16
+    val r = 12
     val rwStages = 4
     val numTokens = 8
     val m = 64
