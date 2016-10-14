@@ -15,6 +15,7 @@ class UpDownCtr(val w: Int) extends Module {
     val inc      = Bool(INPUT)
     val dec      = Bool(INPUT)
     val gtz      = Bool(OUTPUT)  // greater-than-zero
+    val out      = UInt(OUTPUT, w)
   }
 
 //  val reg = Module(new FF(w))
@@ -31,6 +32,7 @@ class UpDownCtr(val w: Int) extends Module {
 
   reg.io.data.in := Mux (io.init, io.initval, Mux(io.inc, incval, decval))
   io.gtz := (reg.io.data.out > UInt(0))
+  io.out := reg.io.data.out
 }
 
 /**
