@@ -28,7 +28,7 @@ case class CounterChainOpcode(val w: Int, val numCounters: Int, config: Option[C
  * @param endDelayWidth: Width of end delay counters
  * @param numCounters: Number of counters
  */
-class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val numCounters: Int, inst: CounterChainConfig) extends ConfigurableModule[CounterChainOpcode] {
+class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val numCounters: Int, inst: CounterChainConfig, val harden: Boolean = false) extends ConfigurableModule[CounterChainOpcode] {
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
     val data = Vec.fill(numCounters) { new Bundle {
@@ -47,7 +47,7 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
   val configType = CounterChainOpcode(w, numCounters)
   val configIn = CounterChainOpcode(w, numCounters)
   val configInit = CounterChainOpcode(w, numCounters, Some(inst))
-  val config = Reg(configType, configIn, configInit)
+  val config = if (harden) configInit else Reg(configType, configIn, configInit)
   when (io.config_enable) {
     configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
   } .otherwise {
@@ -56,8 +56,10 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
 
 
   val counterInsn = inst.counters
+  val startWidth = if (harden) 0 else startDelayWidth
+  val endWidth = if (harden) 0 else endDelayWidth
   val counters = (0 until numCounters) map { i =>
-    val c = Module(new CounterRC(w, startDelayWidth, endDelayWidth, counterInsn(i)))
+    val c = Module(new CounterRC(w, startWidth, endWidth, counterInsn(i), harden))
     c.io.config_enable := io.config_enable
     c.io.config_data := io.config_data
     c.io.data.max := io.data(i).max
@@ -208,8 +210,8 @@ object CounterChainTest {
     val configObj = Parser(pisaFile).asInstanceOf[CounterChainConfig]
     val bitwidth = 8
     val numCounters = 8
-    val startDelayWidth = 4
-    val endDelayWidth = 4
+    val startDelayWidth = 0
+    val endDelayWidth = 0
 
     chiselMainTest(args, () => Module(new CounterChain(bitwidth, startDelayWidth, endDelayWidth, numCounters, configObj))) {
       c => new CounterChainTests(c)
