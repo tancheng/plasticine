@@ -210,8 +210,8 @@ object CounterChainTest {
     val configObj = Parser(pisaFile).asInstanceOf[CounterChainConfig]
     val bitwidth = 8
     val numCounters = 8
-    val startDelayWidth = 0
-    val endDelayWidth = 0
+    val startDelayWidth = 4
+    val endDelayWidth = 4
 
     chiselMainTest(args, () => Module(new CounterChain(bitwidth, startDelayWidth, endDelayWidth, numCounters, configObj))) {
       c => new CounterChainTests(c)
