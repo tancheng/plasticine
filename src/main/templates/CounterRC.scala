@@ -15,8 +15,14 @@ case class CounterOpcode(val w: Int, val startDelayWidth: Int, val endDelayWidth
   var stride = if (config.isDefined) UInt(config.get.stride % (1.toLong << w), width=w) else UInt(width = w)
   var maxConst = if (config.isDefined) Bool(config.get.maxConst > 0) else Bool()
   var strideConst = if (config.isDefined) Bool(config.get.strideConst > 0) else Bool()
-  var startDelay = if (config.isDefined) UInt(config.get.startDelay % (1 << startDelayWidth), width=startDelayWidth) else UInt(width = startDelayWidth)
-  var endDelay = if (config.isDefined) UInt(config.get.endDelay % (1 << endDelayWidth), width=endDelayWidth) else UInt(width = endDelayWidth)
+  var startDelay = {
+    val delayWidth = math.max(startDelayWidth, 1)
+    if (config.isDefined) UInt(config.get.startDelay % (1 << startDelayWidth), width=delayWidth) else UInt(width = delayWidth)
+  }
+  var endDelay = {
+    val delayWidth = math.max(startDelayWidth, 1)
+    if (config.isDefined) UInt(config.get.endDelay % (1 << endDelayWidth), width=delayWidth) else UInt(width = delayWidth)
+  }
 
   override def cloneType(): this.type = {
     new CounterOpcode(w, startDelayWidth, endDelayWidth, config).asInstanceOf[this.type]
@@ -29,7 +35,7 @@ case class CounterOpcode(val w: Int, val startDelayWidth: Int, val endDelayWidth
  * @param startDelayWidth: Width of start delay counter
  * @param endDelayWidth: Width of end delay counter
  */
-class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, inst: CounterRCConfig) extends ConfigurableModule[CounterOpcode] {
+class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, inst: CounterRCConfig, val harden: Boolean = false) extends ConfigurableModule[CounterOpcode] {
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
     val data = new Bundle {
@@ -48,18 +54,12 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
   val configType = CounterOpcode(w, startDelayWidth, endDelayWidth)
   val configIn = CounterOpcode(w, startDelayWidth, endDelayWidth)
   val configInit = CounterOpcode(w, startDelayWidth, endDelayWidth, Some(inst))
-  val config = Reg(configType, configIn, configInit)
+  val config = if (harden) configInit else Reg(configType, configIn, configInit)
   when (io.config_enable) {
     configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
   } .otherwise {
     configIn := config
   }
-
-  // Start delay counter
-  val startDelayCounter = Module(new Counter(startDelayWidth))
-  startDelayCounter.io.data.max := config.startDelay
-  startDelayCounter.io.data.stride := UInt(1, width=startDelayWidth)
-  startDelayCounter.io.control.saturate := Bool(true)
 
   // Actual counter
   val counter = Module(new Counter(w))
@@ -67,25 +67,47 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
   counter.io.data.stride := Mux(config.strideConst, config.stride, io.data.stride)
   io.data.out := counter.io.data.out
 
-  // End delay counter
-  val endDelayCounter = Module(new Counter(endDelayWidth))
-  endDelayCounter.io.data.max := config.endDelay
-  endDelayCounter.io.data.stride := UInt(1, width=endDelayWidth)
-  counter.io.control.reset := Bool(false)
-  endDelayCounter.io.control.saturate := Bool(false)
-
-  // Control signal wiring up
-  val localEnable = io.control.enable & ~io.control.waitIn
-  startDelayCounter.io.control.enable := localEnable
-  startDelayCounter.io.control.reset := counter.io.control.done
   val depulser = Module(new Depulser())
   depulser.io.in := counter.io.control.done
-  endDelayCounter.io.control.enable := depulser.io.out | counter.io.control.done
-  depulser.io.rst := endDelayCounter.io.control.done
-  counter.io.control.enable := startDelayCounter.io.control.done & ~depulser.io.out
-  counter.io.control.saturate := endDelayCounter.io.control.enable
-  counter.io.control.reset := endDelayCounter.io.control.done
-  io.control.done := endDelayCounter.io.control.done
+
+  // Assign counter enable signal
+  if (startDelayWidth > 0) {
+    // Start delay counter
+    val startDelayCounter = Module(new Counter(startDelayWidth))
+    startDelayCounter.io.data.max := config.startDelay
+    startDelayCounter.io.data.stride := UInt(1, width=startDelayWidth)
+    startDelayCounter.io.control.saturate := Bool(true)
+
+    val localEnable = io.control.enable & ~io.control.waitIn
+    startDelayCounter.io.control.enable := localEnable
+    startDelayCounter.io.control.reset := counter.io.control.done
+    counter.io.control.enable := startDelayCounter.io.control.done & ~depulser.io.out
+  } else {
+    counter.io.control.enable := io.control.enable
+  }
+
+  if (endDelayWidth > 0) {
+    // End delay counter
+    val endDelayCounter = Module(new Counter(endDelayWidth))
+    endDelayCounter.io.data.max := config.endDelay
+    endDelayCounter.io.data.stride := UInt(1, width=endDelayWidth)
+    counter.io.control.reset := Bool(false)
+    endDelayCounter.io.control.saturate := Bool(false)
+
+    endDelayCounter.io.control.enable := depulser.io.out | counter.io.control.done
+    depulser.io.rst := endDelayCounter.io.control.done
+    counter.io.control.saturate := endDelayCounter.io.control.enable
+    counter.io.control.reset := endDelayCounter.io.control.done
+    io.control.done := endDelayCounter.io.control.done
+  } else {
+    counter.io.control.saturate := Bool(false)
+    counter.io.control.reset := Bool(false)
+    io.control.done := counter.io.control.done
+  }
+
+
+
+  // Control signal wiring up
 //  io.control.waitOut := depulser.io.out | counter.io.control.done | endDelayCounter.io.control.enable
   io.control.waitOut := io.control.waitIn | depulser.io.out
 }
