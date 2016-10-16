@@ -106,6 +106,11 @@ case class ScratchpadConfig(
   numBufs: Int
 ) extends AbstractConfig
 
+case class FIFOConfig (
+  chain: Int
+) extends AbstractConfig
+
+
 case class ComputeUnitConfig(
   counterChain: CounterChainConfig,
   scratchpads: List[ScratchpadConfig],
