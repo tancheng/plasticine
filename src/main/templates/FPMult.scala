@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import Chisel._
+import plasticine.templates.hardfloat._
 
 /**
  * FPMult: Wrapper around Chisel's floating point multiplier.
@@ -10,30 +11,37 @@ import Chisel._
  */
 class FPMult extends Module {
   val io = new Bundle {
-    val a = Flo(INPUT)
-    val b = Flo(INPUT)
-    val out  = Flo(OUTPUT)
+    val a = Bits(INPUT, width=32)
+    val b = Bits(INPUT, width=32)
+    val c = Bits(INPUT, width=32)
+    val out  = Bits(OUTPUT, width=32)
   }
 
-  io.out := io.a * io.b
+  val fma = Module(new MulAddRecFN(8, 24))
+
+  // Convert to Berkeley's special floating point format
+  fma.io.a := recFNFromFN(8, 24, io.a)
+  fma.io.b := recFNFromFN(8, 24, io.b)
+  fma.io.c := recFNFromFN(8, 24, io.c)
+
+  // Convert back
+  io.out := fNFromRecFN(8, 24, fma.io.out)
 }
 
 /**
  * FPMult test harness
  */
 class FPMultTests(c: FPMult) extends Tester(c) {
+  val a = 2.4f
+  val b = 3.5f
+  val d = 0.0f
+  val out = a * b
+  poke(c.io.a, java.lang.Float.floatToRawIntBits(a))
+  poke(c.io.b, java.lang.Float.floatToRawIntBits(b))
+  poke(c.io.c, java.lang.Float.floatToRawIntBits(d))
 
-  val numCycles = 10
-  for (i <- 0 until numCycles) {
-    val a = 2.4f
-    val b = 3.5f
-    val out = a * b
-    poke(c.io.a, a)
-    poke(c.io.b, b)
-
-    expect(c.io.out, out)
-    step(1)
-  }
+  expect(c.io.out, out)
+  step(1)
 }
 
 object FPMultTest {
