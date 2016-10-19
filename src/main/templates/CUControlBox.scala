@@ -106,6 +106,8 @@ class CUControlBox(val w: Int, val numTokens: Int, inst: CUControlBoxConfig) ext
   val udCounters = List.tabulate(numTokens) { i =>
     val udc = Module(new UpDownCtr(udctrWidth))
     udc.io.initval := config.udcInit(i)
+    udc.io.strideInc := UInt(1)
+    udc.io.strideDec := UInt(1)
     udc.io.init := inits(i)
     udc.io.inc := incs(i)
     udc.io.dec := decs(i)

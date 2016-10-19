@@ -11,10 +11,14 @@ import Chisel._
 class UpDownCtr(val w: Int) extends Module {
   val io = new Bundle {
     val initval  = UInt(INPUT, w)
+    val max      = UInt(INPUT, w)
+    val strideInc   = UInt(INPUT, w)
+    val strideDec   = UInt(INPUT, w)
     val init     = Bool(INPUT)
     val inc      = Bool(INPUT)
     val dec      = Bool(INPUT)
     val gtz      = Bool(OUTPUT)  // greater-than-zero
+    val isMax    = Bool(OUTPUT)
     val out      = UInt(OUTPUT, w)
   }
 
@@ -27,9 +31,10 @@ class UpDownCtr(val w: Int) extends Module {
   // should be unaffected. Catch that with an xor
   reg.io.control.enable := (io.inc ^ io.dec) | io.init
 
-  val incval = reg.io.data.out + UInt(1)
-  val decval = reg.io.data.out - UInt(1)
+  val incval = reg.io.data.out + UInt(io.strideInc)
+  val decval = reg.io.data.out - UInt(io.strideDec)
 
+  io.isMax := incval > io.max
   reg.io.data.in := Mux (io.init, io.initval, Mux(io.inc, incval, decval))
   io.gtz := (reg.io.data.out > UInt(0))
   io.out := reg.io.data.out
