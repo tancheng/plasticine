@@ -5,8 +5,6 @@ import plasticine.templates.hardfloat._
 
 /**
  * FPMult: Wrapper around Chisel's floating point multiplier.
- * Note that the "Flo" and "Dbl" types are a bit misleading
- * as the actual hardware
  * For a full floating point unit, see: https://github.com/ucb-bar/berkeley-hardfloat
  */
 class FPMult extends Module {
