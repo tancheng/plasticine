@@ -1,6 +1,6 @@
 #!/bin/bash
 
-W="1 2 4 8 16 32 64"
+W=(1 2 3 4 5 6 8 10 12 16 20 24 32 40 48 64)
 
 MODULE=CounterRC
 RUNNER_NAME="${MODULE}Char"
@@ -11,9 +11,10 @@ LOG="${OUT}_log.log"
 rm -rf $OUT $TMPDIR $LOG
 mkdir $OUT $TMPDIR
 
-for w in $W; do
+for wIdx in $(seq 0 $(expr ${#W[@]} - 1)); do
+  w=${W[$wIdx]}
   echo "Generating $RUNNER_NAME for $w word width"
-  bin/sadl --verilog --dest $TMPDIR $RUNNER_NAME $w 2>&1 >> $LOG
+  bin/sadl --verilog --dest $TMPDIR $RUNNER_NAME $w >> $LOG 2>&1
   if [ $? -ne 0 ]; then
     echo "Microbenchmark generation failed, exit code $?"
     exit -1

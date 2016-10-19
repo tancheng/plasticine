@@ -3,8 +3,8 @@
 W=(1 2 3 4 5 6 8 10 12 16 20 24 32 40 48 64)
 #OP=("*" "+" "-" "/" "&" "|" "==" ">" "<")
 #OPNAME=("mul" "add" "sub" "div" "and" "or" "eq" "gt" "lt")
-OP=(">" "<")
-OPNAME=("gt" "lt")
+OP=("==")
+OPNAME=("eq")
 
 OUT="comparators"
 TMPDIR="${OUT}_tmp"
