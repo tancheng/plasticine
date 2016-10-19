@@ -107,7 +107,8 @@ case class ScratchpadConfig(
 ) extends AbstractConfig
 
 case class FIFOConfig (
-  chain: Int
+  chainRead: Int,
+  chainWrite: Int
 ) extends AbstractConfig
 
 

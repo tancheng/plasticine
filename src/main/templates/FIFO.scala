@@ -11,7 +11,8 @@ import plasticine.pisa.ir._
 case class FIFOOpcode(val d: Int, val v: Int, config: Option[FIFOConfig] = None) extends OpcodeT {
   def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
 
-  var chain = if (config.isDefined) Bool(config.get.chain > 0) else Bool()
+  var chainWrite = if (config.isDefined) Bool(config.get.chainWrite > 0) else Bool()
+  var chainRead = if (config.isDefined) Bool(config.get.chainRead > 0) else Bool()
 
   override def cloneType(): this.type = {
     new FIFOOpcode(d, v, config).asInstanceOf[this.type]
@@ -51,8 +52,12 @@ class FIFO(val w: Int, val d: Int, val v: Int, val inst: FIFOConfig) extends Con
   val sizeUDC = Module(new UpDownCtr(log2Up(d+1)))
   val size = sizeUDC.io.out
   val empty = size === UInt(0)
-  val full = size === Mux(config.chain, UInt(d), UInt(bankSize))
+  val full = sizeUDC.io.isMax
   sizeUDC.io.initval := UInt(0)
+  sizeUDC.io.max := UInt(d)
+  sizeUDC.io.init := UInt(0)
+  sizeUDC.io.strideInc := Mux(config.chainWrite, UInt(1), UInt(v))
+  sizeUDC.io.strideDec := Mux(config.chainRead, UInt(1), UInt(v))
   sizeUDC.io.init := UInt(0)
 
   val writeEn = io.enqVld & ~full
@@ -61,25 +66,38 @@ class FIFO(val w: Int, val d: Int, val v: Int, val inst: FIFOConfig) extends Con
   sizeUDC.io.dec := readEn
 
   // Create wptr (tail) counter chain
-  val ptrConfig = CounterChainConfig(
-      List(inst.chain),
+  val writePtrConfig = CounterChainConfig(
+      List(inst.chainWrite),
       List.tabulate(2) { i => i match {
-        case 0 => // Localaddr: max = bankSize, stride = 1
+        case 1 => // Localaddr: max = bankSize, stride = 1
           CounterRCConfig(bankSize, 1, 1, 1, 0, 0)
-        case 1 => // Bankaddr: max = v, stride = 1
+        case 0 => // Bankaddr: max = v, stride = 1
           CounterRCConfig(v, 1, 1, 1, 0, 0)
       }}
     )
-  val wptr = Module(new CounterChain(log2Up(bankSize+1), 0, 0, 2, ptrConfig, true))
+
+
+  val readPtrConfig = CounterChainConfig(
+      List(inst.chainRead),
+      List.tabulate(2) { i => i match {
+        case 1 => // Localaddr: max = bankSize, stride = 1
+          CounterRCConfig(bankSize, 1, 1, 1, 0, 0)
+        case 0 => // Bankaddr: max = v, stride = 1
+          CounterRCConfig(v, 1, 1, 1, 0, 0)
+      }}
+    )
+  val wptr = Module(new CounterChain(log2Up(bankSize+1), 0, 0, 2, writePtrConfig, true))
   wptr.io.control(0).enable := writeEn
-  val tailLocalAddr = wptr.io.data(0).out
-  val tailBankAddr = wptr.io.data(1).out
+  wptr.io.control(1).enable := writeEn
+  val tailLocalAddr = wptr.io.data(1).out
+  val tailBankAddr = wptr.io.data(0).out
 
   // Create rptr (head) counter chain
-  val rptr = Module(new CounterChain(log2Up(bankSize+1), 0, 0, 2, ptrConfig, true))
+  val rptr = Module(new CounterChain(log2Up(bankSize+1), 0, 0, 2, readPtrConfig, true))
   rptr.io.control(0).enable := readEn
-  val headLocalAddr = rptr.io.data(0).out
-  val headBankAddr = rptr.io.data(1).out
+  rptr.io.control(1).enable := readEn
+  val headLocalAddr = rptr.io.data(1).out
+  val headBankAddr = rptr.io.data(0).out
 
   // Backing SRAM
   val mems = List.fill(v) { Module(new SRAM(w, bankSize)) }
@@ -93,12 +111,12 @@ class FIFO(val w: Int, val d: Int, val v: Int, val inst: FIFOConfig) extends Con
     // Write data
     val wdata = i match {
       case 0 => io.enq(i)
-      case _ => Mux(config.chain, io.enq(0), io.enq(i))
+      case _ => Mux(config.chainWrite, io.enq(0), io.enq(i))
     }
     m.io.wdata := wdata
 
     // Write enable
-    val wen = Mux(config.chain,
+    val wen = Mux(config.chainWrite,
                     io.enqVld & tailBankAddr === UInt(i),
                     io.enqVld)
     m.io.wen := wen
@@ -130,20 +148,30 @@ class FIFOTests(c: FIFO) extends Tester(c) {
 
   val expectedQ = Queue[Int]()  // Expected queue of size c.d
 
-  val parQ = c.inst.chain == 0
-  val maxQSize = if (parQ) c.d/c.v else c.d
+  val writeParQ = c.inst.chainWrite == 0
+  val readParQ = c.inst.chainRead == 0
+  val maxQSize = c.d
 
   def qEmpty = if (expectedQ.isEmpty) 1 else 0
-  def qFull = if (expectedQ.size == maxQSize) 1 else 0
+  def qFull = if (writeParQ) {
+    if ((expectedQ.size + c.v) > maxQSize) 1 else 0
+  } else {
+    if (expectedQ.size == maxQSize) 1 else 0
+  }
 
   def headDUT = peek(c.io.deq)
   def headQ = expectedQ.head
 
   def enqueueBoth(elem: Int) {
-    c.io.enq foreach { i => poke(i, elem) }
+    if (writeParQ) {
+      c.io.enq foreach { i => poke(i, elem) }
+      (0 until c.v) foreach { i => expectedQ += elem }
+    } else {
+      poke(c.io.enq(0), elem)
+      expectedQ += elem
+    }
     poke(c.io.enqVld, 1)
     step(1)
-    expectedQ += elem
     poke(c.io.enqVld, 0)
   }
 
@@ -151,10 +179,11 @@ class FIFOTests(c: FIFO) extends Tester(c) {
     poke(c.io.deqVld, 1)
     step(1)
     poke(c.io.deqVld, 0)
-    val expected = expectedQ.dequeue
-    if (parQ) {
-      c.io.deq foreach { o => expect(o, expected) }
+    if (readParQ) {
+      val expected = List.fill(c.v) { expectedQ.dequeue }
+      c.io.deq.zip(expected) foreach { case (o, e) => expect(o, e) }
     } else {
+      val expected = expectedQ.dequeue
       expect(c.io.deq(0), expected)
     }
   }
@@ -172,10 +201,14 @@ class FIFOTests(c: FIFO) extends Tester(c) {
   checkQStatus
 
   // Fill up the FIFO
-  for (i <- 0 until maxQSize) {
+  var i = 0
+  while (qFull != 1) {
     enqueueBoth(i)
     checkQStatus
+    i += 1
   }
+//  for (i <- 0 until maxQSize) {
+//  }
 
   println(s"Queue: $expectedQ")
 
@@ -193,7 +226,8 @@ class FIFOTests(c: FIFO) extends Tester(c) {
   }
 
   // Pop everything
-  for (i <- 0 until maxQSize) {
+//  for (i <- 0 until maxQSize) {
+  while (qEmpty != 1) {
     dequeueBoth
     checkQStatus
   }
@@ -207,7 +241,7 @@ object FIFOTest {
   val d = 16
 
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new FIFO(w, d, v, FIFOConfig(0)))) {
+    chiselMainTest(args, () => Module(new FIFO(w, d, v, FIFOConfig(1, 0)))) {
       c => new FIFOTests(c)
     }
   }
