@@ -6,8 +6,8 @@ import plasticine.templates._
 class Compute(override val w: Int) extends In4Out4(w) {
 
   // Instantiate MUXes that control each input to IntFU
-  val aluMux0 = Module(new Mux8(w))
-  val aluMux1 = Module(new Mux8(w))
+  val aluMux0 = Module(new MuxN(8, w))
+  val aluMux1 = Module(new MuxN(8, w))
 
   // Instantiate Register at output of IntFU
   val reg_out = Reg(Bits(width = w))
@@ -21,24 +21,24 @@ class Compute(override val w: Int) extends In4Out4(w) {
   alu.io.a := aluMux1.io.out
 
   // Wire up the inputs to each mux
-  aluMux0.io.in0 := io.in0
-  aluMux0.io.in1 := io.in1
-  aluMux0.io.in2 := io.in2
-  aluMux0.io.in3 := io.in3
-  aluMux0.io.in4 := reg_const
-  aluMux0.io.in5 := reg_out
-  aluMux0.io.in6 := UInt(0)
-  aluMux0.io.in7 := UInt(0)
+  aluMux0.io.ins(0) := io.in0
+  aluMux0.io.ins(1) := io.in1
+  aluMux0.io.ins(2) := io.in2
+  aluMux0.io.ins(3) := io.in3
+  aluMux0.io.ins(4) := reg_const
+  aluMux0.io.ins(5) := reg_out
+  aluMux0.io.ins(6) := UInt(0)
+  aluMux0.io.ins(7) := UInt(0)
 
   // Wire up the inputs to each mux
-  aluMux1.io.in0 := io.in0
-  aluMux1.io.in1 := io.in1
-  aluMux1.io.in2 := io.in2
-  aluMux1.io.in3 := io.in3
-  aluMux1.io.in4 := reg_const
-  aluMux1.io.in5 := reg_out
-  aluMux1.io.in6 := UInt(0)
-  aluMux1.io.in7 := UInt(0)
+  aluMux1.io.ins(0) := io.in0
+  aluMux1.io.ins(1) := io.in1
+  aluMux1.io.ins(2) := io.in2
+  aluMux1.io.ins(3) := io.in3
+  aluMux1.io.ins(4) := reg_const
+  aluMux1.io.ins(5) := reg_out
+  aluMux1.io.ins(6) := UInt(0)
+  aluMux1.io.ins(7) := UInt(0)
 
   // Config bits ("instruction"):
   // w+8       w+6      w+3        w          0
