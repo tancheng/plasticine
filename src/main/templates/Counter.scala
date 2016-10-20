@@ -14,6 +14,7 @@ class Counter(val w: Int) extends Module {
       val max      = UInt(INPUT,  w)
       val stride   = UInt(INPUT,  w)
       val out      = UInt(OUTPUT, w)
+      val next     = UInt(OUTPUT, w)
     }
     val control = new Bundle {
       val reset  = Bool(INPUT)
@@ -32,14 +33,15 @@ class Counter(val w: Int) extends Module {
   val count = Cat(UInt(0, width=1), reg.io.data.out)
   val newval = count + io.data.stride
   val isMax = newval >= io.data.max
-
+  val next = Mux(isMax, Mux(io.control.saturate, count, init), newval)
   when (io.control.reset) {
     reg.io.data.in := init
   } .otherwise {
-    reg.io.data.in := Mux(isMax, Mux(io.control.saturate, count, init), newval)
+    reg.io.data.in := next
   }
 
   io.data.out := count
+  io.data.next := next
   io.control.done := io.control.enable & isMax
 }
 

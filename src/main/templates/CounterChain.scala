@@ -35,6 +35,7 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
         val max      = UInt(INPUT,  w)
         val stride   = UInt(INPUT,  w)
         val out      = UInt(OUTPUT, w)
+        val next     = UInt(OUTPUT, w)
       }
     }
     val control = Vec.fill(numCounters) { new Bundle {
@@ -65,6 +66,7 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
     c.io.data.max := io.data(i).max
     c.io.data.stride := io.data(i).stride
     io.data(i).out := c.io.data.out
+    io.data(i).next := c.io.data.next
     c
   }
 
@@ -75,7 +77,7 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
       counters(i).io.control.enable := io.control(i).enable
     } else {
       counters(i).io.control.enable := Mux(config.chain(i-1),
-        io.control(i).enable & counters(i-1).io.control.done,
+        counters(i-1).io.control.done,
         io.control(i).enable)
     }
 
