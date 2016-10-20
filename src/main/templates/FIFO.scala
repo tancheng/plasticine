@@ -97,13 +97,15 @@ class FIFO(val w: Int, val d: Int, val v: Int, val inst: FIFOConfig) extends Con
   rptr.io.control(0).enable := readEn
   rptr.io.control(1).enable := readEn
   val headLocalAddr = rptr.io.data(1).out
+  val nextHeadLocalAddr = Mux(config.chainRead, Mux(rptr.io.control(0).done, rptr.io.data(1).next, rptr.io.data(1).out), rptr.io.data(1).next)
   val headBankAddr = rptr.io.data(0).out
+  val nextHeadBankAddr = rptr.io.data(0).next
 
   // Backing SRAM
   val mems = List.fill(v) { Module(new SRAM(w, bankSize)) }
   mems.zipWithIndex.foreach { case (m, i) =>
     // Read address
-    m.io.raddr := headLocalAddr
+    m.io.raddr := Mux(readEn, nextHeadLocalAddr, headLocalAddr)
 
     // Write address
     m.io.waddr := tailLocalAddr
@@ -126,7 +128,7 @@ class FIFO(val w: Int, val d: Int, val v: Int, val inst: FIFOConfig) extends Con
       case 0 =>
         val rdata0Mux = Module(new MuxN(v, w))
         val addrFF = Module(new FF(log2Up(v)))
-        addrFF.io.data.in := headBankAddr
+        addrFF.io.data.in := Mux(readEn, nextHeadBankAddr, headBankAddr)
         addrFF.io.control.enable := Bool(true)
 
         rdata0Mux.io.ins := Vec(mems.map {_.io.rdata })
@@ -144,7 +146,7 @@ class FIFO(val w: Int, val d: Int, val v: Int, val inst: FIFOConfig) extends Con
 
 class FIFOTests(c: FIFO) extends Tester(c) {
 
-  val magicData = 10
+  val magicData = 12
 
   val expectedQ = Queue[Int]()  // Expected queue of size c.d
 
@@ -180,17 +182,25 @@ class FIFOTests(c: FIFO) extends Tester(c) {
     step(1)
     poke(c.io.deqVld, 0)
     if (readParQ) {
-      val expected = List.fill(c.v) { expectedQ.dequeue }
-      c.io.deq.zip(expected) foreach { case (o, e) => expect(o, e) }
+      val old = List.fill(c.v) { expectedQ.dequeue }
     } else {
-      val expected = expectedQ.dequeue
-      expect(c.io.deq(0), expected)
+      val old = expectedQ.dequeue
     }
+    checkQStatus
   }
 
   def checkQStatus {
     expect(c.io.empty, qEmpty)
     expect(c.io.full, qFull)
+    if (qEmpty == 0) {
+      if (readParQ) {
+        val expected = List.tabulate(c.v) { expectedQ(_) }
+        c.io.deq.zip(expected) foreach { case (o, e) => expect(o, e) }
+      } else {
+        val expected = expectedQ.head
+        expect(c.io.deq(0), expected)
+      }
+    }
   }
 
   // Smoke test with one element
@@ -207,26 +217,23 @@ class FIFOTests(c: FIFO) extends Tester(c) {
     checkQStatus
     i += 1
   }
-//  for (i <- 0 until maxQSize) {
-//  }
 
   println(s"Queue: $expectedQ")
 
   // Pop a few, then fill up again - this tests counter wrap
-  val numToPop = 5
+  val numToPop = 4
   for (i <- 0 until numToPop) {
     dequeueBoth
     checkQStatus
   }
 
   val magicOffset = 100
-  for (i <- 0 until numToPop) {
+  for (i <- 0 until numToPop/c.v) {
     enqueueBoth(i+magicOffset)
     checkQStatus
   }
 
   // Pop everything
-//  for (i <- 0 until maxQSize) {
   while (qEmpty != 1) {
     dequeueBoth
     checkQStatus
@@ -241,7 +248,7 @@ object FIFOTest {
   val d = 16
 
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new FIFO(w, d, v, FIFOConfig(1, 0)))) {
+    chiselMainTest(args, () => Module(new FIFO(w, d, v, FIFOConfig(0, 1)))) {
       c => new FIFOTests(c)
     }
   }
