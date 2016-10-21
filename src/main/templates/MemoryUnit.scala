@@ -57,10 +57,17 @@ class MemoryUnit(
 
   val burstSizeBytes = 64
 
+  // The data bus width to DRAM is 1-burst wide
+  // While it should be possible in the future to add a write combining buffer
+  // and decouple Plasticine's data bus width from the DRAM bus width,
+  // this is currently left out as a wishful todo.
+  // Check and error out if the data bus width does not match DRAM burst size
+  Predef.assert(w/8*v == 64, s"Unsupported combination of w=$w and v=$v; data bus width must equal DRAM burst size ($burstSizeBytes bytes)")
+
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
     val interconnect = new PlasticineMemoryCmdInterface(w, v)
-    val dram = new DRAMCmdInterface(w, v)
+    val dram = new DRAMCmdInterface(w, v) // Should not have to pass vector width; must be DRAM burst width
   }
 
   val configType = MemoryUnitOpcode()
@@ -120,11 +127,11 @@ class MemoryUnit(
   rwFifo.io.enqVld := io.interconnect.vldIn
 
   // Data FIFO
-  val dataFifo = Module(new FIFO(w, d, v, FIFOConfig(1-inst.scatterGather, 1)))
+  val dataFifo = Module(new FIFO(w, d, v, FIFOConfig(0, 0)))
   dataFifo.io.config_enable := io.config_enable
   dataFifo.io.config_data := io.config_data
   dataFifo.io.enq := io.interconnect.wdata
-  dataFifo.io.enqVld := io.interconnect.vldIn
+  dataFifo.io.enqVld := io.interconnect.vldIn & io.interconnect.isWr
 
   // Burst offset counter
   val burstCounter = Module(new Counter(w))
@@ -174,7 +181,7 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     enqueueCmd(addr, size, 0)
   }
 
-  def enqueueBurstWrite(addr: Int, data: List[Int]) {
+  def enqueueBurstWrite(addr: Int, size: Int, data: List[Int]) {
     enqueueCmd(addr, size, 1, data)
   }
 
@@ -184,11 +191,17 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
 
   // 2a. Smoke test, read: Single burst with a single burst size
   val addr = 0x1000
-  val size = 70
+  val size = 64
   enqueueBurstRead(addr, size)
-  step(10)
+  step(1)
+  // TODO: Add verification conditions here!
 
-  // 2b. Smoke test, read: Single burst with a single burst size
+  // 2b. Smoke test, write: Single burst with a single burst size
+  val waddr = 0x2000
+  val wdata = List.tabulate(c.v) { i => i + 0xcafe }
+  enqueueBurstWrite(waddr, size, wdata)
+  step(1)
+
   // 3a. Bigger smoke test, read: Single burst address with multi-burst size
   // 3b. Bigger smoke test, write: Single burst address with multi-burst size
   // 4. Multiple commands - read
@@ -197,9 +210,9 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
 }
 
 object MemoryUnitTest {
-  val w = 16
-  val v = 2
-  val d = 16
+  val w = 32
+  val v = 16
+  val d = 512
   val numOutstandingBursts = 16
 
   def main(args: Array[String]): Unit = {
