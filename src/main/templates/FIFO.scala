@@ -87,14 +87,14 @@ class FIFO(val w: Int, val d: Int, val v: Int, val inst: FIFOConfig) extends Con
       }}
     )
   val wptr = Module(new CounterChain(log2Up(bankSize+1), 0, 0, 2, writePtrConfig, true))
-  wptr.io.control(0).enable := writeEn
+  wptr.io.control(0).enable := writeEn & config.chainWrite
   wptr.io.control(1).enable := writeEn
   val tailLocalAddr = wptr.io.data(1).out
   val tailBankAddr = wptr.io.data(0).out
 
   // Create rptr (head) counter chain
   val rptr = Module(new CounterChain(log2Up(bankSize+1), 0, 0, 2, readPtrConfig, true))
-  rptr.io.control(0).enable := readEn
+  rptr.io.control(0).enable := readEn & config.chainRead
   rptr.io.control(1).enable := readEn
   val headLocalAddr = rptr.io.data(1).out
   val nextHeadLocalAddr = Mux(config.chainRead, Mux(rptr.io.control(0).done, rptr.io.data(1).next, rptr.io.data(1).out), rptr.io.data(1).next)
@@ -132,7 +132,7 @@ class FIFO(val w: Int, val d: Int, val v: Int, val inst: FIFOConfig) extends Con
         addrFF.io.control.enable := Bool(true)
 
         rdata0Mux.io.ins := Vec(mems.map {_.io.rdata })
-        rdata0Mux.io.sel := addrFF.io.data.out
+        rdata0Mux.io.sel := Mux(config.chainRead, addrFF.io.data.out, UInt(0))
         rdata0Mux.io.out
       case _ =>
         m.io.rdata
