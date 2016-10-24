@@ -40,6 +40,7 @@ abstract class AbstractMemoryCmdInterface(w: Int, v: Int, dir: IODirection) exte
 class PlasticineMemoryCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPUT) {
   val addr = Vec.fill(v) { UInt(INPUT, width=w) }
   val size = UInt(INPUT, width=w)
+  val dataVldIn = Bool(INPUT)
 }
 
 class DRAMCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, OUTPUT) {
@@ -62,7 +63,8 @@ class MemoryUnit(
   // and decouple Plasticine's data bus width from the DRAM bus width,
   // this is currently left out as a wishful todo.
   // Check and error out if the data bus width does not match DRAM burst size
-  Predef.assert(w/8*v == 64, s"Unsupported combination of w=$w and v=$v; data bus width must equal DRAM burst size ($burstSizeBytes bytes)")
+  Predef.assert(w/8*v == 64,
+  s"Unsupported combination of w=$w and v=$v; data bus width must equal DRAM burst size ($burstSizeBytes bytes)")
 
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
@@ -127,11 +129,15 @@ class MemoryUnit(
   rwFifo.io.enqVld := io.interconnect.vldIn
 
   // Data FIFO
+  // Deriving the 'enqVld' signal from the other FIFO states is potentially
+  // dangerous because there is no guarantee that the data input pins actually contain
+  // valid data. The safest approach is to have separate enables for command (addr, size, rdwr)
+  // and data.
   val dataFifo = Module(new FIFO(w, d, v, FIFOConfig(0, 0)))
   dataFifo.io.config_enable := io.config_enable
   dataFifo.io.config_data := io.config_data
   dataFifo.io.enq := io.interconnect.wdata
-  dataFifo.io.enqVld := io.interconnect.vldIn & io.interconnect.isWr
+  dataFifo.io.enqVld := io.interconnect.dataVldIn
 
   // Burst offset counter
   val burstCounter = Module(new Counter(w))
@@ -165,6 +171,17 @@ class MemoryUnit(
 }
 
 class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
+  val size = 64
+  val burstSizeBytes = 64
+  val wordsPerBurst = burstSizeBytes / (c.w / 8)
+
+  def getDataInBursts(data: List[Int]) = {
+    Queue.tabulate(data.size / wordsPerBurst) { i => data.slice(i*wordsPerBurst, i*wordsPerBurst + wordsPerBurst) }
+  }
+
+  def poke(port: Vec[UInt], value: Seq[Int]) {
+    port.zip(value) foreach { case (in, i) => poke(in, i) }
+  }
 
   def enqueueCmd(addr: Int, size: Int, isWr: Int, data: List[Int] = List[Int]()) {
     poke(c.io.interconnect.vldIn, 1)
@@ -172,9 +189,21 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     poke(c.io.interconnect.size, size)
     poke(c.io.interconnect.isWr, isWr)
 
-    if (isWr > 0) c.io.interconnect.wdata.zip(data) foreach { case (in, i) => poke(in, i) }
+    // If it is a write, enqueue first burst
+    val dataInBursts = getDataInBursts(data)
+    if (isWr > 0) {
+      poke(c.io.interconnect.wdata, dataInBursts.dequeue)
+      poke(c.io.interconnect.dataVldIn, 1)
+    }
     step(1)
     poke(c.io.interconnect.vldIn, 0)
+    if (isWr > 0) {
+      while (!dataInBursts.isEmpty) {
+        poke(c.io.interconnect.wdata, dataInBursts.dequeue)
+        step(1)
+      }
+    }
+    poke(c.io.interconnect.dataVldIn, 0)
   }
 
   def enqueueBurstRead(addr: Int, size: Int) {
@@ -191,19 +220,26 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
 
   // 2a. Smoke test, read: Single burst with a single burst size
   val addr = 0x1000
-  val size = 64
-  enqueueBurstRead(addr, size)
+  enqueueBurstRead(addr, burstSizeBytes)
   step(1)
   // TODO: Add verification conditions here!
 
   // 2b. Smoke test, write: Single burst with a single burst size
   val waddr = 0x2000
-  val wdata = List.tabulate(c.v) { i => i + 0xcafe }
-  enqueueBurstWrite(waddr, size, wdata)
+  val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
+  enqueueBurstWrite(waddr, burstSizeBytes, wdata)
   step(1)
 
   // 3a. Bigger smoke test, read: Single burst address with multi-burst size
+  val numBursts = 10
+  enqueueBurstRead(addr, numBursts * burstSizeBytes)
+  step(numBursts+5)
+
   // 3b. Bigger smoke test, write: Single burst address with multi-burst size
+  val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
+  enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
+  step(numBursts+5)
+
   // 4. Multiple commands - read
   // 5. Fill up address queue
   // 6. Fill up data queue
