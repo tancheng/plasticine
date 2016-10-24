@@ -12,17 +12,7 @@ class DRAMCmdIn(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPUT) 
   val tagOut = UInt(OUTPUT, width=w)
 }
 
-class IdealMemory(
-  val w: Int,
-  val burstSizeBytes: Int,
-  val pageSizeBytes: Int
-) extends Module {
-
-  val wordSize = w/8
-  val pageSizeWords = pageSizeBytes / (wordSize)
-
-  val io = new DRAMCmdIn(w, burstSizeBytes/(w/8))
-
+trait DataHandling { self: IdealMemory =>
   // Rudimentary page table with (pageAddr, contents)
   val pageTable = HashMap[Int, ListBuffer[Int]]()
 
@@ -106,12 +96,83 @@ class IdealMemory(
   }
 }
 
+class IdealMemory(
+  val w: Int,
+  val burstSizeBytes: Int,
+  val pageSizeBytes: Int
+) extends Module with DataHandling {
+
+  val wordSize = w/8
+  val pageSizeWords = pageSizeBytes / (wordSize)
+
+  val io = new DRAMCmdIn(w, burstSizeBytes/wordSize)
+
+  // Flop vld and tag inputs to delay the response by one cycle
+  val tagInFF = Module(new FF(w))
+  tagInFF.io.control.enable := Bool(true)
+  tagInFF.io.data.in := io.tagIn
+  io.tagOut := tagInFF.io.data.out
+
+  val vldInFF = Module(new FF(1))
+  vldInFF.io.control.enable := Bool(true)
+  vldInFF.io.data.in := io.vldIn & ~io.isWr
+  io.vldOut := vldInFF.io.data.out
+
+  // Main memory: Big SRAM module
+  // TODO: Chisel's simulation is barfing when the SRAM depth is big
+  // Current size is a measly 2 Mega Words. Investigate alternatives if necessary.
+  val mems = List.tabulate(burstSizeBytes/wordSize) { i =>
+    val m = Module(new SRAM(w, 262144))
+    m.io.raddr := io.addr
+    m.io.waddr := io.addr
+    m.io.wdata := io.wdata(i)
+    m.io.wen := io.isWr & io.vldIn
+    m
+  }
+  io.rdata := mems.map { _.io.rdata }
+}
+
 class IdealMemoryTests(c: IdealMemory) extends Tester(c) {
+
+  val burstSizeWords = c.burstSizeBytes / c.wordSize
+  val burstSizeBytes = c.burstSizeBytes
 
   def randomData(size: Int) = List.fill(size) { rnd.nextInt }
 
   def printFail(msg: String) = println(Console.BLACK + Console.RED_B + s"FAIL: $msg" + Console.RESET)
   def printPass(msg: String) = println(Console.BLACK + Console.GREEN_B + s"PASS: $msg" + Console.RESET)
+
+  def poke(port: Vec[UInt], value: Seq[Int]) {
+    port.zip(value) foreach { case (in, i) => poke(in, i) }
+  }
+
+  def peek(port: Vec[UInt]): List[Int] = {
+    port.map { peek(_).toInt }.toList
+  }
+
+
+  // Test out a write and a read
+  val wdata = randomData(burstSizeWords)
+  val waddr = 0x1
+  poke(c.io.addr, waddr)
+  poke(c.io.wdata, wdata)
+  poke(c.io.isWr, 1)
+  poke(c.io.tagIn, 1)
+  poke(c.io.vldIn, 1)
+  step(1)
+  poke(c.io.vldIn, 0)
+  poke(c.io.isWr, 0)
+  poke(c.io.addr, 0x2)
+  step(1)
+  poke(c.io.addr, waddr)
+  poke(c.io.vldIn, 1)
+  step(1)
+  poke(c.io.vldIn, 0)
+  val rdata = peek(c.io.rdata)
+  println(s"wdata: $wdata")
+  println(s"rdata: $rdata")
+
+
 
   {
     // Set one page and retrieve it
@@ -165,8 +226,6 @@ class IdealMemoryTests(c: IdealMemory) extends Tester(c) {
                        data.takeRight(data.size - updateSize - (updateAddr - addr) / c.wordSize)
     if (observedData == expectedData) printPass(testName) else printFail(testName)
   }
-
-
 }
 
 object IdealMemoryTest {
