@@ -45,9 +45,9 @@ class Plasticine(val w: Int,
   }
 
   // Main control with command and status
-  val controlBox = Module(new TopUnit())
-  controlBox.io.command := io.command
-  io.status := controlBox.io.statusOut
+//  val controlBox = Module(new TopUnit())
+//  controlBox.io.command := io.command
+//  io.status := controlBox.io.statusOut
 
   // Point-to-point interconnect
   val cus = ListBuffer[ListBuffer[ComputeUnit]]()
@@ -71,7 +71,7 @@ class Plasticine(val w: Int,
       }
     }
   }
-  controlBox.io.doneTokenIn := cus(rows-1)(cols-1).io.tokenOuts(0)
+//  controlBox.io.doneTokenIn := cus(rows-1)(cols-1).io.tokenOuts(0)
 }
 
 /**
