@@ -186,7 +186,7 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
   val addr = 0x1000
   val size = 70
   enqueueBurstRead(addr, size)
-  step(10)
+  step(50)
 
   // 2b. Smoke test, read: Single burst with a single burst size
   // 3a. Bigger smoke test, read: Single burst address with multi-burst size

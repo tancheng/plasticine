@@ -1,1 +1,0 @@
-void x00init();
