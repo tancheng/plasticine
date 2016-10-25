@@ -3,10 +3,10 @@ package plasticine.templates
 import Chisel._
 
 /**
- * MainControlBox: Command and Status registers that generate the first token,
+ * TopUnit: Command and Status registers that generate the first token,
  * and wait for the last token respectively.
  */
-class MainControlBox() extends Module {
+class TopUnit() extends Module {
   val io = new Bundle {
 //    val configEnable = UInt(INPUT, width=1)
     val command = UInt(INPUT, width=1)
@@ -31,9 +31,9 @@ class MainControlBox() extends Module {
 }
 
 /**
- * MainControlBox test harness
+ * TopUnit test harness
  */
-class MainControlBoxTests(c: MainControlBox) extends Tester(c) {
+class TopUnitTests(c: TopUnit) extends Tester(c) {
   step(10)
   poke(c.io.command, 1)
   expect(c.io.startTokenOut, 0)
@@ -57,11 +57,11 @@ class MainControlBoxTests(c: MainControlBox) extends Tester(c) {
   expect(c.io.statusOut, 0)
 }
 
-object MainControlBoxTest {
+object TopUnitTest {
 
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new MainControlBox())) {
-      c => new MainControlBoxTests(c)
+    chiselMainTest(args, () => Module(new TopUnit())) {
+      c => new TopUnitTests(c)
     }
   }
 }

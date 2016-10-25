@@ -45,7 +45,7 @@ class Plasticine(val w: Int,
   }
 
   // Main control with command and status
-  val controlBox = Module(new MainControlBox())
+  val controlBox = Module(new TopUnit())
   controlBox.io.command := io.command
   io.status := controlBox.io.statusOut
 
