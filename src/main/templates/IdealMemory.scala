@@ -98,11 +98,11 @@ trait DataHandling { self: IdealMemory =>
 
 class IdealMemory(
   val w: Int,
-  val burstSizeBytes: Int,
-  val pageSizeBytes: Int
+  val burstSizeBytes: Int
 ) extends Module with DataHandling {
 
   val wordSize = w/8
+  val pageSizeBytes = 16
   val pageSizeWords = pageSizeBytes / (wordSize)
 
   val io = new DRAMCmdIn(w, burstSizeBytes/wordSize)
@@ -232,10 +232,9 @@ object IdealMemoryTest {
 
   val w = 32
   val burstSizeBytes = 64
-  val pageSizeBytes = 16
 
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new IdealMemory(w, burstSizeBytes, pageSizeBytes))) {
+    chiselMainTest(args, () => Module(new IdealMemory(w, burstSizeBytes))) {
       c => new IdealMemoryTests(c)
     }
   }

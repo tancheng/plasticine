@@ -170,7 +170,53 @@ class MemoryUnit(
   io.interconnect.rdyOut := ~addrFifo.io.full & ~dataFifo.io.full
 }
 
-class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
+class MemoryTester (
+  val w: Int,
+  val d: Int,
+  val v: Int,
+  val numOutstandingBursts: Int,
+  val burstSizeBytes: Int,
+  val inst: MemoryUnitConfig) extends Module {
+
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
+    val interconnect = new PlasticineMemoryCmdInterface(w, v)
+    val dram = new DRAMCmdInterface(w, v) // Should not have to pass vector width; must be DRAM burst width
+  }
+
+  val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, inst))
+  mu.io.config_enable := io.config_enable
+  mu.io.config_data := io.config_data
+  mu.io.interconnect.rdyIn := io.interconnect.rdyIn
+  mu.io.interconnect.vldIn := io.interconnect.vldIn
+  io.interconnect.rdyOut := mu.io.interconnect.rdyOut
+  io.interconnect.vldOut := mu.io.interconnect.vldOut
+  mu.io.interconnect.addr := io.interconnect.addr
+  mu.io.interconnect.wdata := io.interconnect.wdata
+  mu.io.interconnect.isWr := io.interconnect.isWr
+  mu.io.interconnect.dataVldIn := io.interconnect.dataVldIn
+  mu.io.interconnect.size := io.interconnect.size
+  io.interconnect.rdata := mu.io.interconnect.rdata
+
+  io.dram.addr := mu.io.dram.addr
+  io.dram.wdata := mu.io.dram.wdata
+  io.dram.tagOut := mu.io.dram.tagOut
+  io.dram.vldOut := mu.io.dram.vldOut
+  io.dram.isWr := mu.io.dram.isWr
+
+  val idealMem = Module(new IdealMemory(w, burstSizeBytes))
+  idealMem.io.addr := mu.io.dram.addr
+  idealMem.io.wdata := mu.io.dram.wdata
+  idealMem.io.tagIn := mu.io.dram.tagOut
+  idealMem.io.vldIn := mu.io.dram.vldOut
+  idealMem.io.isWr := mu.io.dram.isWr
+  mu.io.dram.rdata := idealMem.io.rdata
+  mu.io.dram.vldIn := idealMem.io.vldOut
+  mu.io.dram.tagIn := idealMem.io.tagOut
+}
+
+
+class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
   val size = 64
   val burstSizeBytes = 64
   val wordsPerBurst = burstSizeBytes / (c.w / 8)
@@ -303,22 +349,21 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
   // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
   expect(c.io.interconnect.rdyOut, 1)
 
-  // 2a. Smoke test, read: Single burst with a single burst size
-  enqueueBurstRead(addr, burstSizeBytes)
-  observeFor(1)
-  check("Single burst read")
-  // TODO: Add verification conditions here!
-
   // 2b. Smoke test, write: Single burst with a single burst size
   val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
   enqueueBurstWrite(waddr, burstSizeBytes, wdata)
   observeFor(1)
   check("Single burst write")
 
+  // 2a. Smoke test, read: Single burst with a single burst size
+  enqueueBurstRead(addr, burstSizeBytes)
+  observeFor(1)
+  check("Single burst read")
+
 
   val numBursts = 10
   // 3a. Bigger smoke test, read: Single burst address with multi-burst size
-  enqueueBurstRead(addr, numBursts * burstSizeBytes)
+  enqueueBurstRead(waddr, numBursts * burstSizeBytes)
   observeFor(numBursts+8)
   check("Single Multi-burst read")
 
@@ -364,9 +409,10 @@ object MemoryUnitTest {
   val v = 16
   val d = 512
   val numOutstandingBursts = 16
+  val burstSizeBytes = 64
 
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new MemoryUnit(w, d, v, numOutstandingBursts, MemoryUnitConfig(0)))) {
+    chiselMainTest(args, () => Module(new MemoryTester(w, d, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0)))) {
       c => new MemoryUnitTests(c)
     }
   }
