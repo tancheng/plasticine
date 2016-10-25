@@ -10,10 +10,12 @@ class TopUnit(val w: Int, val v: Int) extends Module {
   val io = new Bundle {
     val addr = UInt(INPUT, width=w)
     val wdata = UInt(INPUT, width=w)
-    val wen = UInt(INPUT, width=1)
+    val wen = Bool(INPUT)
+    val dataVld = Bool(INPUT)
     val rdata = UInt(OUTPUT, width=w)
     val doneTokenIn = Bool(INPUT)
     val startTokenOut = UInt(OUTPUT, width=1)
+    val in = Vec.fill(v) { UInt(INPUT, width=w) }
     val out = Vec.fill(v) { UInt(OUTPUT, width=w) }
   }
 
@@ -26,15 +28,18 @@ class TopUnit(val w: Int, val v: Int) extends Module {
 
   val regs = List.tabulate(v+2) { i =>
     val ff = Module(new FF(w))
-    val en = i match {
+    val enable = i match {
       case `statusRegIdx` => UInt(1)
-      case _ => (io.addr === UInt(i)) & io.wen
+      case `commandRegIdx` => ((io.addr === UInt(i)) &  io.wen)
+      case _ => io.dataVld | ((io.addr === UInt(i)) &  io.wen)
     }
-    ff.io.control.enable := en
+    ff.io.control.enable := enable
 
     val wdata = i match {
       case `statusRegIdx` => depulser.io.out
-      case _ => io.wdata
+      case `commandRegIdx` => io.wdata
+      case _ =>
+        Mux(io.wen, io.wdata, io.in(i - dataRegIdx))
     }
     ff.io.data.in := wdata
     ff
@@ -88,11 +93,13 @@ class TopUnitTests(c: TopUnit) extends Tester(c) {
   def readCmd = read(c.commandRegIdx)
   def readStatus = read(c.statusRegIdx)
 
-  def pokeDone {
-    poke(c.io.doneTokenIn, 1)
+  def pulseSignal(s: UInt) {
+    poke(s, 1)
     step(1)
-    poke(c.io.doneTokenIn, 0)
+    poke(s, 0)
   }
+
+  def pulseDone = pulseSignal(c.io.doneTokenIn)
 
   def expect(observed: Int, expected: Int, msg: String = "") = {
     if (observed == expected) printPass(s"$msg: ($observed == $expected)")
@@ -119,6 +126,18 @@ class TopUnitTests(c: TopUnit) extends Tester(c) {
     expect(observed, expected, "DataBus")
   }
 
+  // Write from data bus
+  val newWriteVals = List.tabulate(c.v) { i => 0xF00D + i }
+  c.io.in.zip(newWriteVals).foreach { case (in, i) => poke(in, i) }
+  pulseSignal(c.io.dataVld)
+  // Test output data bus
+  for (i <- 0 until c.v) {
+    val observed = peek(c.io.out(i)).toInt
+    val expected = newWriteVals(i)
+    expect(observed, expected, "WriteFromDataBus")
+  }
+
+
   // Write and read from cmd register, test startTokenOut
   setCmd
   var commandReg = readCmd
@@ -139,7 +158,7 @@ class TopUnitTests(c: TopUnit) extends Tester(c) {
   write(c.statusRegIdx, 0xF00)
   expect(read(c.statusRegIdx), 0x0, "StatusWrite")
   setCmd  // Done does not go high unless command is set!
-  pokeDone
+  pulseDone
   expect(read(c.statusRegIdx), 0x0, "StatusRead - single cycle delay after done (1)")
   step(1)
   expect(read(c.statusRegIdx), 0x1, "StatusRead - done (2)")
@@ -155,7 +174,7 @@ class TopUnitTests(c: TopUnit) extends Tester(c) {
   expect(read(c.statusRegIdx), 0x1, "StatusRead - ready after cmd reset (2)")
   setCmd
   expect(read(c.statusRegIdx), 0x0, "StatusRead - next cmd running (1)")
-  pokeDone
+  pulseDone
   expect(read(c.statusRegIdx), 0x0, "StatusRead - single cycle delay after done (1)")
   step(1)
   expect(read(c.statusRegIdx), 0x1, "StatusRead - done (2)")
