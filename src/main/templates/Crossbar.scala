@@ -50,6 +50,41 @@ class CrossbarVec(val w: Int, val v: Int, val numInputs: Int, val numOutputs: In
   }
 }
 
+class CrossbarVecReg(val w: Int, val v: Int, val numInputs: Int, val numOutputs: Int, val inst: CrossbarConfig) extends ConfigurableModule[CrossbarOpcode] {
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
+    val ins = Vec.fill(numInputs) { Vec.fill(v) { Bits(INPUT,  width = w) } }
+    val outs = Vec.fill(numOutputs) { Vec.fill(v) { Bits(OUTPUT,  width = w) } }
+  }
+
+  val configType = CrossbarOpcode(w, numInputs, numOutputs)
+  val configIn = CrossbarOpcode(w, numInputs, numOutputs)
+  val configInit = CrossbarOpcode(w, numInputs, numOutputs, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
+  } .otherwise {
+    configIn := config
+  }
+
+  io.outs.zipWithIndex.foreach { case(out,i) =>
+    val outMux = Module(new MuxVec(numInputs, v, w))
+
+    outMux.io.ins := io.ins
+    outMux.io.sel := config.outSelect(i)
+
+    val outFFs = List.tabulate(v) { i =>
+      val ff = Module(new FF(w))
+      ff.io.control.enable := UInt(1)
+      ff.io.data.in := outMux.io.out(i)
+      ff
+    }
+
+    val outVec = Vec.tabulate(v) { i => outFFs(i).io.data.out }
+
+    out := outVec
+  }
+}
 
 /**
  * Crossbar that connects every input to every output
