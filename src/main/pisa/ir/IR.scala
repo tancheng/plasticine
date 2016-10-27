@@ -105,7 +105,18 @@ case class ScratchpadConfig(
   banking: BankingConfig,
   numBufs: Int
 ) extends AbstractConfig
-
+object ScratchpadConfig {
+  def getRandom = {
+    new ScratchpadConfig(
+      SrcValueTuple(0, 0), // wa
+      SrcValueTuple(0, 0), // ra
+      0,
+      0,
+      BankingConfig(0, 1),
+      1
+    )
+  }
+}
 case class FIFOConfig (
   chainWrite: Int,
   chainRead: Int
@@ -123,7 +134,16 @@ case class ComputeUnitConfig(
   control: CUControlBoxConfig
 //  dataInXbar: CrossbarConfig
 ) extends AbstractConfig
-
+object ComputeUnitConfig {
+  def getRandom(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
+    new ComputeUnitConfig (
+      CounterChainConfig.getRandom(numCounters),
+      List.tabulate(numScratchpads) { i => ScratchpadConfig.getRandom },
+      List.tabulate(d) { i => PipeStageConfig.getRandom },
+      CUControlBoxConfig.getRandom(numTokenIn, numTokenOut, numCounters)
+      )
+  }
+}
 case class CUControlBoxConfig(
   tokenOutLUT: List[LUTConfig],
   enableLUT: List[LUTConfig],
@@ -161,7 +181,7 @@ object CUControlBoxConfig {
 case class CrossbarConfig(outSelect: List[Int]) extends AbstractConfig
 object CrossbarConfig {
   def getRandom(numOutputs: Int) = {
-    new CrossbarConfig(List.fill(numOutputs) { Random.nextInt })
+    new CrossbarConfig(List.fill(numOutputs) { math.abs(Random.nextInt) % 5 })
   }
 }
 
@@ -171,11 +191,32 @@ object CrossbarConfig {
 case class LUTConfig(table: List[Int]) extends AbstractConfig
 object LUTConfig {
   def getRandom(numInputs: Int) = {
-    new LUTConfig(List.tabulate(1 << numInputs) { i => Random.nextInt(2) })
+    new LUTConfig(List.tabulate(1 << numInputs) { i => math.abs(Random.nextInt(2)) })
   }
 }
 
 /**
  * Plasticine config information
  */
-case class PlasticineConfig(cu: List[ComputeUnitConfig]) extends AbstractConfig
+case class PlasticineConfig(
+  cu: List[ComputeUnitConfig],
+  dataSwitch: List[CrossbarConfig],
+  controlSwitch: List[CrossbarConfig]
+) extends AbstractConfig
+
+object PlasticineConfig {
+  def getRandom(
+    d: Int,
+    rows: Int,
+    cols: Int,
+    numTokenIn: Int,
+    numTokenOut: Int,
+    numCounters: Int,
+    numScratchpads: Int
+  ) = {
+    new PlasticineConfig(
+      List.tabulate(rows*cols) { i => ComputeUnitConfig.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) })
+      }
+}

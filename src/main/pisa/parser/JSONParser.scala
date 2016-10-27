@@ -258,7 +258,14 @@ object Parser {
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
     val cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(m, "cu")
                                           .map { parseCU(_) }
-    PlasticineConfig(cu)
+    val dataSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "dataSwitch")
+                                          .map { parseCrossbar(_) }
+
+    val controlSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "controlSwitch")
+                                          .map { parseCrossbar(_) }
+
+
+    PlasticineConfig(cu, dataSwitch, controlSwitch)
   }
 
   def parseConfigMap(m: Map[Any, Any]) = {
