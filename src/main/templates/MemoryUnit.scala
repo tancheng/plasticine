@@ -205,7 +205,7 @@ class MemoryTester (
   io.dram.isWr := mu.io.dram.isWr
 
   // added by tian
-  io.dram.tagIn := mu.io.dram.tagIn
+  mu.io.dram.tagIn := io.dram.tagIn
 
 //   val idealMem = Module(new IdealMemory(w, burstSizeBytes))
 //   idealMem.io.addr := mu.io.dram.addr

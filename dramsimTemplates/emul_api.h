@@ -156,6 +156,24 @@ private:
   	MemoryTester_t *pctrl = (MemoryTester_t *)module;
     pctrl->MemoryTester_mu__io_dram_vldIn.values[0] = 1;
   	printf("[Callback] read complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
+	pctrl->MemoryTester__io_dram_tagIn = tagMap[address];
+	vector<dat_t<32> > rdataVec = dataMap[address];
+	pctrl->MemoryTester_mu__io_dram_rdata_0 = rdataVec.at(0);
+	pctrl->MemoryTester_mu__io_dram_rdata_1 = rdataVec.at(1);
+	pctrl->MemoryTester_mu__io_dram_rdata_2 = rdataVec.at(2);
+	pctrl->MemoryTester_mu__io_dram_rdata_3 = rdataVec.at(3);
+	pctrl->MemoryTester_mu__io_dram_rdata_4 = rdataVec.at(4);
+	pctrl->MemoryTester_mu__io_dram_rdata_5 = rdataVec.at(5);
+	pctrl->MemoryTester_mu__io_dram_rdata_6 = rdataVec.at(6);
+	pctrl->MemoryTester_mu__io_dram_rdata_7 = rdataVec.at(7);
+	pctrl->MemoryTester_mu__io_dram_rdata_8 = rdataVec.at(8);
+	pctrl->MemoryTester_mu__io_dram_rdata_9 = rdataVec.at(9);
+	pctrl->MemoryTester_mu__io_dram_rdata_10 = rdataVec.at(10);
+	pctrl->MemoryTester_mu__io_dram_rdata_11 = rdataVec.at(11);
+	pctrl->MemoryTester_mu__io_dram_rdata_12 = rdataVec.at(12);
+	pctrl->MemoryTester_mu__io_dram_rdata_13 = rdataVec.at(13);
+	pctrl->MemoryTester_mu__io_dram_rdata_14 = rdataVec.at(14);
+	pctrl->MemoryTester_mu__io_dram_rdata_15 = rdataVec.at(15);
   }
 
   void write_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
@@ -163,8 +181,7 @@ private:
   	MemoryTester_t *pctrl = (MemoryTester_t *)module;
     pctrl->MemoryTester_mu__io_dram_vldIn.values[0] = 1;
   	printf("[Callback] write complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
-	dat_t<32> tag = tagMap[addr];
-	pctrl->
+	pctrl->MemoryTester__io_dram_tagIn = tagMap[address];
   }
 
   virtual inline void step() {
