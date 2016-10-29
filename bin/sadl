@@ -24,6 +24,8 @@ def main():
     parser.add_option("--vcd", dest="vcd", action="store_true", default=False, help="Generate waveform")
     parser.add_option("--verilog", dest="verilog", action="store_true", default=False, help="Generate Verilog RTL")
     parser.add_option("-d", "--dest", action="store", dest="build_dir", default=os.getenv("PWD"), help="output location for generated files")
+    parser.add_option("--prep", dest="prep", action="store_true", default=False, help="Generate C++ simulator without compiling")
+    parser.add_option("--runPrep", dest="runPrep", action="store_true", default=False, help="Compile C++ simulator and run. Will generate auxiliary verilog file")
 
     (opts, args) = parser.parse_args()
     if len(args) < 1:
@@ -37,8 +39,9 @@ def stage(app, params, opts):
     build_dir = opts.build_dir + os.sep + "generated" + os.sep + app + os.sep
     static_dir = os.getenv("PWD") + os.sep + "static"
 
-    print("Clearing build directory %s..." %(build_dir))
-    os.system("rm -rf %s" %(build_dir))
+    if not opts.runPrep:
+		print("Clearing build directory %s..." %(build_dir))
+		os.system("rm -rf %s" %(build_dir))
 
     sbt_opts = sbt_opts + " --targetDir " + build_dir
     if (opts.sim == True | opts.hex == True | opts.verilog == True):
@@ -53,6 +56,10 @@ def stage(app, params, opts):
         sbt_opts = sbt_opts + " --backend flo"
     if opts.vcd == True:
         sbt_opts = sbt_opts + " --vcd"
+    if opts.prep == True:
+        sbt_opts = sbt_opts + " --debug --backend c --genHarness --vcd"
+    if opts.runPrep == True:
+        sbt_opts = sbt_opts + " --test --backend v"
 
     cp = "../target/scala-2.11/classes"
     app_prefix = "plasticine.templates"
@@ -61,6 +68,12 @@ def stage(app, params, opts):
     print sbt_cmd
     print("Invoking Chisel...")
     ecode = os.system(sbt_cmd)
+    print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
+    os.system("cp ./dramsimTemplates/libdramsim.so ./dramsimTemplates/DRAMSim.h ./dramsimTemplates/Callback.h ./generated")
+    os.system("cp ./dramsimTemplates/Makefile ./generated/%s" %(app))
+#    print("Copying Makefile into generated folder")
+#    os.system("cp ./dramsimTemplates/libdramsim.so ./generated")
+
     if ecode != 0:
         err("SADL compilation failed")
 

@@ -204,15 +204,18 @@ class MemoryTester (
   io.dram.vldOut := mu.io.dram.vldOut
   io.dram.isWr := mu.io.dram.isWr
 
-  val idealMem = Module(new IdealMemory(w, burstSizeBytes))
-  idealMem.io.addr := mu.io.dram.addr
-  idealMem.io.wdata := mu.io.dram.wdata
-  idealMem.io.tagIn := mu.io.dram.tagOut
-  idealMem.io.vldIn := mu.io.dram.vldOut
-  idealMem.io.isWr := mu.io.dram.isWr
-  mu.io.dram.rdata := idealMem.io.rdata
-  mu.io.dram.vldIn := idealMem.io.vldOut
-  mu.io.dram.tagIn := idealMem.io.tagOut
+  // added by tian
+  io.dram.tagIn := mu.io.dram.tagIn
+
+//   val idealMem = Module(new IdealMemory(w, burstSizeBytes))
+//   idealMem.io.addr := mu.io.dram.addr
+//   idealMem.io.wdata := mu.io.dram.wdata
+//   idealMem.io.tagIn := mu.io.dram.tagOut
+//   idealMem.io.vldIn := mu.io.dram.vldOut
+//   idealMem.io.isWr := mu.io.dram.isWr
+//   mu.io.dram.rdata := idealMem.io.rdata
+//   mu.io.dram.vldIn := idealMem.io.vldOut
+//   mu.io.dram.tagIn := idealMem.io.tagOut
 }
 
 
