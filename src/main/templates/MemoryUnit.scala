@@ -391,55 +391,57 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
   val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
   enqueueBurstWrite(waddr, burstSizeBytes, wdata)
   observeFor(1)
-  step(50)
-
+//  step(50)
+  step(1)
   check("Single burst write")
 
   // 2a. Smoke test, read: Single burst with a single burst size
-  // TODO: do we just feed zeros? 
+  // TODO: do we just feed zeros?
   enqueueBurstRead(addr, burstSizeBytes)
-  step(50)
+ // step(50)
   observeFor(1)
+  step(1)
   check("Single burst read")
 
+//  step(60)
 
   val numBursts = 10
-//  // 3a. Bigger smoke test, read: Single burst address with multi-burst size
-//  enqueueBurstRead(waddr, numBursts * burstSizeBytes)
-//  observeFor(numBursts+8)
-//  step(50)
-//  check("Single Multi-burst read")
-//
-//  // 3b. Bigger smoke test, write: Single burst address with multi-burst size
-//  val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
-//  enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
-//  observeFor(numBursts+5)
-//  check("Single Multi-burst write")
-//
-//  // 4. Multiple commands - read
-//  val numCommands = c.numOutstandingBursts
-//  val maxSizeBursts = 9 // arbitrary
-//  val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-//  val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-//  raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
-//  val cyclesToWait = rsizes.map { size =>
-//    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-//  }.sum
-//  observeFor(cyclesToWait*5)
-//  check("Multiple multi-burst read")
-//
-//  // 5. Multiple commands - write
-//  val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-//  val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-//  waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
-//    val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
-//    enqueueBurstWrite(waddr, wsize, wdata)
-//  }
-//  val wCyclesToWait = wsizes.map { size =>
-//    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-//  }.sum
-//  observeFor(wCyclesToWait)
-//  check("Multiple multi-burst write")
+  // 3a. Bigger smoke test, read: Single burst address with multi-burst size
+  enqueueBurstRead(waddr, numBursts * burstSizeBytes)
+  observeFor(numBursts+8)
+  step(50)
+  check("Single Multi-burst read")
+
+  // 3b. Bigger smoke test, write: Single burst address with multi-burst size
+  val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
+  enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
+  observeFor(numBursts+5)
+  check("Single Multi-burst write")
+
+  // 4. Multiple commands - read
+  val numCommands = c.numOutstandingBursts
+  val maxSizeBursts = 9 // arbitrary
+  val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+  val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+  raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
+  val cyclesToWait = rsizes.map { size =>
+    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+  }.sum
+  observeFor(cyclesToWait*5)
+  check("Multiple multi-burst read")
+
+  // 5. Multiple commands - write
+  val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+  val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+  waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
+    val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
+    enqueueBurstWrite(waddr, wsize, wdata)
+  }
+  val wCyclesToWait = wsizes.map { size =>
+    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+  }.sum
+  observeFor(wCyclesToWait)
+  check("Multiple multi-burst write")
 
 
   // 5. Fill up address queue

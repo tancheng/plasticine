@@ -149,7 +149,8 @@ private:
   bool is_exit;
   virtual inline void finish() {
     module->clock(LIT<1>(0)); // to vcd-dump the last cycle
-    is_exit = true; 
+    is_exit = true;
+	mcMem->printStats(true);
   }
 
   void read_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
