@@ -60,6 +60,9 @@ def stage(app, params, opts):
         sbt_opts = sbt_opts + " --debug --backend c --genHarness --vcd"
     if opts.runPrep == True:
         sbt_opts = sbt_opts + " --test --backend v"
+		# runPrep can only be excuted after you do bin/sadl --prep
+        print("Copying system configurations to generated folder")
+        os.system("cp -r ./dramsimTemplates/ini ./generated/")
 
     cp = "../target/scala-2.11/classes"
     app_prefix = "plasticine.templates"
@@ -68,11 +71,10 @@ def stage(app, params, opts):
     print sbt_cmd
     print("Invoking Chisel...")
     ecode = os.system(sbt_cmd)
-    print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
-    os.system("cp ./dramsimTemplates/libdramsim.so ./dramsimTemplates/DRAMSim.h ./dramsimTemplates/Callback.h ./generated")
-    os.system("cp ./dramsimTemplates/Makefile ./generated/%s" %(app))
-#    print("Copying Makefile into generated folder")
-#    os.system("cp ./dramsimTemplates/libdramsim.so ./generated")
+    if opts.prep == True:
+        print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
+        os.system("cp ./dramsimTemplates/libdramsim.so ./dramsimTemplates/DRAMSim.h ./dramsimTemplates/Callback.h ./generated")
+        os.system("cp ./dramsimTemplates/Makefile ./generated/%s" %(app))
 
     if ecode != 0:
         err("SADL compilation failed")

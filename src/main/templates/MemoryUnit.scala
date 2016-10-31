@@ -49,6 +49,26 @@ class DRAMCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, 
   val tagOut = UInt(OUTPUT, width=w)
 }
 
+class DRAMSimulator(val w: Int, val burstSizeBytes: Int) extends BlackBox {
+  val wordSize = w/8
+  val io = new DRAMCmdIn(w, burstSizeBytes/wordSize) {
+//    val dram = new DRAMCmdIn(w, burstSizeBytes/wordSize)
+    val addrSimOut = UInt(OUTPUT, width=w)
+    val tagInSimOut = UInt(OUTPUT, width=w)
+    val isWrSimOut = UInt(OUTPUT, width=1)
+    val wdataSimOut = Vec.fill(burstSizeBytes/wordSize) { UInt(OUTPUT, width=w) }
+    val vldInSimOut = Bool(OUTPUT)
+    val rdyInSimOut = Bool(OUTPUT)
+  }
+
+  io.addrSimOut := io.addr
+  io.tagInSimOut := io.tagIn
+  io.isWrSimOut := io.isWr
+  io.wdataSimOut := io.wdata
+  io.vldInSimOut := io.vldIn
+  io.rdyInSimOut := io.rdyIn
+}
+
 class MemoryUnit(
   val w: Int,
   val d: Int,
@@ -70,7 +90,12 @@ class MemoryUnit(
     val config_enable = Bool(INPUT)
     val interconnect = new PlasticineMemoryCmdInterface(w, v)
     val dram = new DRAMCmdInterface(w, v) // Should not have to pass vector width; must be DRAM burst width
+    // for simulation only
+    val tagInSimOut = UInt(OUTPUT, width=w)
   }
+
+  // for simulation only
+  io.tagInSimOut := io.dram.tagIn
 
   val configType = MemoryUnitOpcode()
   val configIn = MemoryUnitOpcode()
@@ -165,6 +190,7 @@ class MemoryUnit(
   io.dram.vldOut := burstVld
   io.dram.isWr := rwFifo.io.deq(0)
 
+
   io.interconnect.rdata := io.dram.rdata
   io.interconnect.vldOut := io.dram.vldIn
   io.interconnect.rdyOut := ~addrFifo.io.full & ~dataFifo.io.full
@@ -182,6 +208,7 @@ class MemoryTester (
     val config_enable = Bool(INPUT)
     val interconnect = new PlasticineMemoryCmdInterface(w, v)
     val dram = new DRAMCmdInterface(w, v) // Should not have to pass vector width; must be DRAM burst width
+    val tagInSimIn = UInt(INPUT, width=w)
   }
 
   val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, inst))
@@ -204,20 +231,26 @@ class MemoryTester (
   io.dram.vldOut := mu.io.dram.vldOut
   io.dram.isWr := mu.io.dram.isWr
 
-  // added by tian
-  mu.io.dram.tagIn := io.dram.tagIn
+  //val DRAMSimulator = Module(new DRAMSimulator(w, burstSizeBytes))
+  //DRAMSimulator.io.addr := mu.io.dram.addr
+  //DRAMSimulator.io.wdata := mu.io.dram.wdata
+  //DRAMSimulator.io.tagIn := mu.io.dram.tagOut
+  //DRAMSimulator.io.vldIn := mu.io.dram.vldOut
+  //DRAMSimulator.io.isWr := mu.io.dram.isWr
+  //mu.io.dram.rdata := DRAMSimulator.io.rdata
+  //mu.io.dram.vldIn := DRAMSimulator.io.vldOut
+  //mu.io.dram.tagIn := DRAMSimulator.io.tagOut
 
-//   val idealMem = Module(new IdealMemory(w, burstSizeBytes))
-//   idealMem.io.addr := mu.io.dram.addr
-//   idealMem.io.wdata := mu.io.dram.wdata
-//   idealMem.io.tagIn := mu.io.dram.tagOut
-//   idealMem.io.vldIn := mu.io.dram.vldOut
-//   idealMem.io.isWr := mu.io.dram.isWr
-//   mu.io.dram.rdata := idealMem.io.rdata
-//   mu.io.dram.vldIn := idealMem.io.vldOut
-//   mu.io.dram.tagIn := idealMem.io.tagOut
+  val DRAMSimulator = Module(new DRAMSimulator(w, burstSizeBytes))
+  DRAMSimulator.io.addr := mu.io.dram.addr
+  DRAMSimulator.io.wdata := mu.io.dram.wdata
+  DRAMSimulator.io.tagIn := mu.io.dram.tagOut
+  DRAMSimulator.io.vldIn := mu.io.dram.vldOut
+  DRAMSimulator.io.isWr := mu.io.dram.isWr
+  mu.io.dram.rdata := DRAMSimulator.io.rdata
+  mu.io.dram.vldIn := DRAMSimulator.io.vldOut
+  mu.io.dram.tagIn := DRAMSimulator.io.tagOut
 }
-
 
 class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
   val size = 64
@@ -351,55 +384,66 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
   // Test burst mode
   // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
   expect(c.io.interconnect.rdyOut, 1)
+  // added by tian: setting initial value for vldIn
+  poke(c.io.dram.vldIn, 0)
 
   // 2b. Smoke test, write: Single burst with a single burst size
   val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
   enqueueBurstWrite(waddr, burstSizeBytes, wdata)
   observeFor(1)
+
+  for (a <- 1 to 50) {
+    step(1)
+    peek(c.io.dram.vldIn)
+    peek(c.io.dram.vldOut)
+  }
+//  step(50)
   check("Single burst write")
 
-  // 2a. Smoke test, read: Single burst with a single burst size
-  enqueueBurstRead(addr, burstSizeBytes)
-  observeFor(1)
-  check("Single burst read")
-
+//  // 2a. Smoke test, read: Single burst with a single burst size
+//  enqueueBurstRead(addr, burstSizeBytes)
+//  observeFor(1)
+//  step(50)
+//  check("Single burst read")
+//
 
   val numBursts = 10
-  // 3a. Bigger smoke test, read: Single burst address with multi-burst size
-  enqueueBurstRead(waddr, numBursts * burstSizeBytes)
-  observeFor(numBursts+8)
-  check("Single Multi-burst read")
-
-  // 3b. Bigger smoke test, write: Single burst address with multi-burst size
-  val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
-  enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
-  observeFor(numBursts+5)
-  check("Single Multi-burst write")
-
-  // 4. Multiple commands - read
-  val numCommands = c.numOutstandingBursts
-  val maxSizeBursts = 9 // arbitrary
-  val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-  val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-  raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
-  val cyclesToWait = rsizes.map { size =>
-    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-  }.sum
-  observeFor(cyclesToWait*5)
-  check("Multiple multi-burst read")
-
-  // 5. Multiple commands - write
-  val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-  val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-  waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
-    val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
-    enqueueBurstWrite(waddr, wsize, wdata)
-  }
-  val wCyclesToWait = wsizes.map { size =>
-    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-  }.sum
-  observeFor(wCyclesToWait)
-  check("Multiple multi-burst write")
+//  // 3a. Bigger smoke test, read: Single burst address with multi-burst size
+//  enqueueBurstRead(waddr, numBursts * burstSizeBytes)
+//  observeFor(numBursts+8)
+//  step(50)
+//  check("Single Multi-burst read")
+//
+//  // 3b. Bigger smoke test, write: Single burst address with multi-burst size
+//  val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
+//  enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
+//  observeFor(numBursts+5)
+//  check("Single Multi-burst write")
+//
+//  // 4. Multiple commands - read
+//  val numCommands = c.numOutstandingBursts
+//  val maxSizeBursts = 9 // arbitrary
+//  val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+//  val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+//  raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
+//  val cyclesToWait = rsizes.map { size =>
+//    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+//  }.sum
+//  observeFor(cyclesToWait*5)
+//  check("Multiple multi-burst read")
+//
+//  // 5. Multiple commands - write
+//  val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+//  val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+//  waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
+//    val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
+//    enqueueBurstWrite(waddr, wsize, wdata)
+//  }
+//  val wCyclesToWait = wsizes.map { size =>
+//    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+//  }.sum
+//  observeFor(wCyclesToWait)
+//  check("Multiple multi-burst write")
 
 
   // 5. Fill up address queue

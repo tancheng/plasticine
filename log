@@ -1,0 +1,731 @@
+[0m[[0minfo[0m] [0mLoading project definition from /local/ssd/home/tianzhao/DRAMSimulator/plasticine_burst/plasticine/project[0m
+[0m[[0minfo[0m] [0mSet current project to plasticine (in build file:/local/ssd/home/tianzhao/DRAMSimulator/plasticine_burst/plasticine/)[0m
+[0m[[0minfo[0m] [0mRunning plasticine.templates.MemoryUnitTest end --targetDir /home/tianzhao/DRAMSimulator/plasticine_burst/plasticine/generated/MemoryUnitTest/ --test --backend v[0m
+[[35minfo[0m] [1.055] // COMPILING < (class plasticine.templates.MemoryTester)>(2)
+[[35minfo[0m] [1.357] giving names
+[[35minfo[0m] [1.528] executing custom transforms
+[[35minfo[0m] [1.529] convert masked writes of inline mems
+[[35minfo[0m] [1.562] adding clocks and resets
+[[35minfo[0m] [1.611] inferring widths
+[[35minfo[0m] [1.695] checking widths
+[[35minfo[0m] [1.732] lowering complex nodes to primitives
+[[35minfo[0m] [1.765] removing type nodes
+[[35minfo[0m] [1.790] compiling 3996 nodes
+[[35minfo[0m] [1.790] computing memory ports
+[[35minfo[0m] [1.812] resolving nodes to the components
+[[35minfo[0m] [1.990] creating clock domains
+[[35minfo[0m] [2.004] pruning unconnected IOs
+[[35minfo[0m] [2.012] checking for combinational loops
+[[35minfo[0m] [2.045] NO COMBINATIONAL LOOP FOUND
+[[35minfo[0m] [2.131] COMPILING <DRAMSimulator (class plasticine.templates.DRAMSimulator)> 0 CHILDREN (0,1)
+[[35minfo[0m] [2.134] COMPILING <SRAM (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.134] COMPILING <SRAM_1 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.134] 	2 components
+[[35minfo[0m] [2.134] COMPILING <SRAM_2 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.134] 	3 components
+[[35minfo[0m] [2.134] COMPILING <SRAM_3 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.134] 	4 components
+[[35minfo[0m] [2.135] COMPILING <SRAM_4 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.135] 	5 components
+[[35minfo[0m] [2.135] COMPILING <SRAM_5 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.135] 	6 components
+[[35minfo[0m] [2.135] COMPILING <SRAM_6 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.135] 	7 components
+[[35minfo[0m] [2.135] COMPILING <SRAM_7 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.135] 	8 components
+[[35minfo[0m] [2.135] COMPILING <SRAM_8 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.136] 	9 components
+[[35minfo[0m] [2.136] COMPILING <SRAM_9 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.136] 	10 components
+[[35minfo[0m] [2.136] COMPILING <SRAM_10 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.136] 	11 components
+[[35minfo[0m] [2.136] COMPILING <SRAM_11 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.136] 	12 components
+[[35minfo[0m] [2.136] COMPILING <SRAM_12 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.137] 	13 components
+[[35minfo[0m] [2.137] COMPILING <SRAM_13 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.137] 	14 components
+[[35minfo[0m] [2.137] COMPILING <SRAM_14 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.137] 	15 components
+[[35minfo[0m] [2.137] COMPILING <SRAM_15 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.137] 	16 components
+[[35minfo[0m] [2.137] COMPILING <MuxN (class plasticine.templates.MuxN)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.150] COMPILING <FF (class plasticine.templates.FF)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.153] COMPILING <SRAM (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.153] 	17 components
+[[35minfo[0m] [2.153] COMPILING <SRAM_1 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.153] 	18 components
+[[35minfo[0m] [2.153] COMPILING <SRAM_2 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.153] 	19 components
+[[35minfo[0m] [2.154] COMPILING <SRAM_3 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.154] 	20 components
+[[35minfo[0m] [2.154] COMPILING <SRAM_4 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.154] 	21 components
+[[35minfo[0m] [2.154] COMPILING <SRAM_5 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.154] 	22 components
+[[35minfo[0m] [2.154] COMPILING <SRAM_6 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.154] 	23 components
+[[35minfo[0m] [2.155] COMPILING <SRAM_7 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.155] 	24 components
+[[35minfo[0m] [2.155] COMPILING <SRAM_8 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.155] 	25 components
+[[35minfo[0m] [2.155] COMPILING <SRAM_9 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.155] 	26 components
+[[35minfo[0m] [2.155] COMPILING <SRAM_10 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.155] 	27 components
+[[35minfo[0m] [2.156] COMPILING <SRAM_11 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.156] 	28 components
+[[35minfo[0m] [2.156] COMPILING <SRAM_12 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.156] 	29 components
+[[35minfo[0m] [2.156] COMPILING <SRAM_13 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.156] 	30 components
+[[35minfo[0m] [2.156] COMPILING <SRAM_14 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.156] 	31 components
+[[35minfo[0m] [2.156] COMPILING <SRAM_15 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.157] 	32 components
+[[35minfo[0m] [2.157] COMPILING <MuxN (class plasticine.templates.MuxN)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.165] 	2 components
+[[35minfo[0m] [2.166] COMPILING <FF (class plasticine.templates.FF)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.167] 	2 components
+[[35minfo[0m] [2.167] COMPILING <SRAM (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.167] 	33 components
+[[35minfo[0m] [2.169] COMPILING <SRAM_1 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.169] 	34 components
+[[35minfo[0m] [2.169] COMPILING <SRAM_2 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.169] 	35 components
+[[35minfo[0m] [2.169] COMPILING <SRAM_3 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.170] 	36 components
+[[35minfo[0m] [2.170] COMPILING <SRAM_4 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.170] 	37 components
+[[35minfo[0m] [2.170] COMPILING <SRAM_5 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.170] 	38 components
+[[35minfo[0m] [2.170] COMPILING <SRAM_6 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.170] 	39 components
+[[35minfo[0m] [2.170] COMPILING <SRAM_7 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.170] 	40 components
+[[35minfo[0m] [2.171] COMPILING <SRAM_8 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.171] 	41 components
+[[35minfo[0m] [2.171] COMPILING <SRAM_9 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.171] 	42 components
+[[35minfo[0m] [2.171] COMPILING <SRAM_10 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.171] 	43 components
+[[35minfo[0m] [2.171] COMPILING <SRAM_11 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.171] 	44 components
+[[35minfo[0m] [2.172] COMPILING <SRAM_12 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.172] 	45 components
+[[35minfo[0m] [2.172] COMPILING <SRAM_13 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.172] 	46 components
+[[35minfo[0m] [2.172] COMPILING <SRAM_14 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.172] 	47 components
+[[35minfo[0m] [2.172] COMPILING <SRAM_15 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.172] 	48 components
+[[35minfo[0m] [2.172] COMPILING <MuxN (class plasticine.templates.MuxN)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.175] COMPILING <FF (class plasticine.templates.FF)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.176] 	3 components
+[[35minfo[0m] [2.176] COMPILING <SRAM (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.176] 	49 components
+[[35minfo[0m] [2.177] COMPILING <SRAM_1 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.177] 	50 components
+[[35minfo[0m] [2.177] COMPILING <SRAM_2 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.177] 	51 components
+[[35minfo[0m] [2.177] COMPILING <SRAM_3 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.177] 	52 components
+[[35minfo[0m] [2.177] COMPILING <SRAM_4 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.177] 	53 components
+[[35minfo[0m] [2.178] COMPILING <SRAM_5 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.178] 	54 components
+[[35minfo[0m] [2.178] COMPILING <SRAM_6 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.178] 	55 components
+[[35minfo[0m] [2.178] COMPILING <SRAM_7 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.178] 	56 components
+[[35minfo[0m] [2.178] COMPILING <SRAM_8 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.178] 	57 components
+[[35minfo[0m] [2.178] COMPILING <SRAM_9 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.179] 	58 components
+[[35minfo[0m] [2.179] COMPILING <SRAM_10 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.179] 	59 components
+[[35minfo[0m] [2.179] COMPILING <SRAM_11 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.179] 	60 components
+[[35minfo[0m] [2.179] COMPILING <SRAM_12 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.179] 	61 components
+[[35minfo[0m] [2.179] COMPILING <SRAM_13 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.180] 	62 components
+[[35minfo[0m] [2.180] COMPILING <SRAM_14 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.180] 	63 components
+[[35minfo[0m] [2.180] COMPILING <SRAM_15 (class plasticine.templates.SRAM)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.180] 	64 components
+[[35minfo[0m] [2.180] COMPILING <MuxN (class plasticine.templates.MuxN)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.184] 	3 components
+[[35minfo[0m] [2.184] COMPILING <FF (class plasticine.templates.FF)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.185] 	4 components
+[[35minfo[0m] [2.185] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.186] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,3)
+[[35minfo[0m] [2.186] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,4)
+[[35minfo[0m] [2.187] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,4)
+[[35minfo[0m] [2.188] 	2 components
+[[35minfo[0m] [2.188] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,4)
+[[35minfo[0m] [2.189] 	3 components
+[[35minfo[0m] [2.189] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,4)
+[[35minfo[0m] [2.190] 	4 components
+[[35minfo[0m] [2.190] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.190] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.191] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.192] 	2 components
+[[35minfo[0m] [2.192] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.193] 	2 components
+[[35minfo[0m] [2.193] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.194] 	3 components
+[[35minfo[0m] [2.194] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.194] 	3 components
+[[35minfo[0m] [2.194] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.195] 	4 components
+[[35minfo[0m] [2.195] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.196] 	4 components
+[[35minfo[0m] [2.196] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.196] 	5 components
+[[35minfo[0m] [2.197] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.197] 	5 components
+[[35minfo[0m] [2.197] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.198] 	6 components
+[[35minfo[0m] [2.198] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.199] 	6 components
+[[35minfo[0m] [2.199] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.199] 	7 components
+[[35minfo[0m] [2.199] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.200] 	7 components
+[[35minfo[0m] [2.200] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.201] 	8 components
+[[35minfo[0m] [2.201] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.201] 	8 components
+[[35minfo[0m] [2.201] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.202] 	9 components
+[[35minfo[0m] [2.202] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.203] 	9 components
+[[35minfo[0m] [2.203] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.203] 	10 components
+[[35minfo[0m] [2.203] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.204] 	10 components
+[[35minfo[0m] [2.204] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.205] 	11 components
+[[35minfo[0m] [2.205] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.205] 	11 components
+[[35minfo[0m] [2.205] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.206] 	12 components
+[[35minfo[0m] [2.206] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.207] 	12 components
+[[35minfo[0m] [2.207] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.207] 	13 components
+[[35minfo[0m] [2.208] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.208] 	13 components
+[[35minfo[0m] [2.208] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.212] 	14 components
+[[35minfo[0m] [2.212] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.213] 	14 components
+[[35minfo[0m] [2.213] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.213] 	15 components
+[[35minfo[0m] [2.213] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.214] 	15 components
+[[35minfo[0m] [2.214] COMPILING <reg_ (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.214] 	16 components
+[[35minfo[0m] [2.215] COMPILING <r (class plasticine.templates.FF)> 0 CHILDREN (0,6)
+[[35minfo[0m] [2.215] 	16 components
+[[35minfo[0m] [2.215] COMPILING <burstCounter (class plasticine.templates.Counter)> 1 CHILDREN (1,2)
+[[35minfo[0m] [2.221] COMPILING <burstTagCounter (class plasticine.templates.Counter)> 1 CHILDREN (1,2)
+[[35minfo[0m] [2.222] COMPILING <sizeUDC (class plasticine.templates.UpDownCtr)> 1 CHILDREN (1,3)
+[[35minfo[0m] [2.223] COMPILING <sizeUDC (class plasticine.templates.UpDownCtr)> 1 CHILDREN (1,3)
+[[35minfo[0m] [2.224] 	2 components
+[[35minfo[0m] [2.224] COMPILING <sizeUDC (class plasticine.templates.UpDownCtr)> 1 CHILDREN (1,3)
+[[35minfo[0m] [2.225] 	3 components
+[[35minfo[0m] [2.225] COMPILING <sizeUDC (class plasticine.templates.UpDownCtr)> 1 CHILDREN (1,3)
+[[35minfo[0m] [2.226] 	4 components
+[[35minfo[0m] [2.226] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.228] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.228] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.229] 	2 components
+[[35minfo[0m] [2.229] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.230] 	2 components
+[[35minfo[0m] [2.230] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.231] 	3 components
+[[35minfo[0m] [2.231] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.232] 	3 components
+[[35minfo[0m] [2.232] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.233] 	4 components
+[[35minfo[0m] [2.233] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.234] 	4 components
+[[35minfo[0m] [2.234] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.235] 	5 components
+[[35minfo[0m] [2.235] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.236] 	5 components
+[[35minfo[0m] [2.236] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.237] 	6 components
+[[35minfo[0m] [2.237] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.237] 	6 components
+[[35minfo[0m] [2.238] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.240] 	7 components
+[[35minfo[0m] [2.241] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.241] 	7 components
+[[35minfo[0m] [2.241] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.242] 	8 components
+[[35minfo[0m] [2.242] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.243] 	8 components
+[[35minfo[0m] [2.243] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.244] 	9 components
+[[35minfo[0m] [2.244] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.245] 	9 components
+[[35minfo[0m] [2.245] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.246] 	10 components
+[[35minfo[0m] [2.246] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.247] 	10 components
+[[35minfo[0m] [2.247] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.248] 	11 components
+[[35minfo[0m] [2.248] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.248] 	11 components
+[[35minfo[0m] [2.249] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.250] 	12 components
+[[35minfo[0m] [2.250] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.250] 	12 components
+[[35minfo[0m] [2.250] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.252] 	13 components
+[[35minfo[0m] [2.252] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.252] 	13 components
+[[35minfo[0m] [2.252] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.253] 	14 components
+[[35minfo[0m] [2.254] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.254] 	14 components
+[[35minfo[0m] [2.254] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.255] 	15 components
+[[35minfo[0m] [2.255] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.256] 	15 components
+[[35minfo[0m] [2.256] COMPILING <counter (class plasticine.templates.Counter)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.257] 	16 components
+[[35minfo[0m] [2.257] COMPILING <depulser (class plasticine.templates.Depulser)> 1 CHILDREN (1,5)
+[[35minfo[0m] [2.258] 	16 components
+[[35minfo[0m] [2.258] COMPILING <CounterRC (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.259] COMPILING <CounterRC_1 (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.260] COMPILING <CounterRC (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.261] 	2 components
+[[35minfo[0m] [2.261] COMPILING <CounterRC_1 (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.262] 	2 components
+[[35minfo[0m] [2.262] COMPILING <CounterRC (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.263] 	3 components
+[[35minfo[0m] [2.263] COMPILING <CounterRC_1 (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.265] 	3 components
+[[35minfo[0m] [2.266] COMPILING <CounterRC (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.266] 	4 components
+[[35minfo[0m] [2.267] COMPILING <CounterRC_1 (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.267] 	4 components
+[[35minfo[0m] [2.268] COMPILING <CounterRC (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.268] 	5 components
+[[35minfo[0m] [2.269] COMPILING <CounterRC_1 (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.269] 	5 components
+[[35minfo[0m] [2.270] COMPILING <CounterRC (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.271] 	6 components
+[[35minfo[0m] [2.271] COMPILING <CounterRC_1 (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.272] 	6 components
+[[35minfo[0m] [2.272] COMPILING <CounterRC (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.273] 	7 components
+[[35minfo[0m] [2.273] COMPILING <CounterRC_1 (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.274] 	7 components
+[[35minfo[0m] [2.274] COMPILING <CounterRC (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.275] 	8 components
+[[35minfo[0m] [2.275] COMPILING <CounterRC_1 (class plasticine.templates.CounterRC)> 2 CHILDREN (2,4)
+[[35minfo[0m] [2.276] 	8 components
+[[35minfo[0m] [2.276] COMPILING <wptr (class plasticine.templates.CounterChain)> 2 CHILDREN (3,3)
+[[35minfo[0m] [2.277] COMPILING <rptr (class plasticine.templates.CounterChain)> 2 CHILDREN (3,3)
+[[35minfo[0m] [2.278] 	2 components
+[[35minfo[0m] [2.278] COMPILING <wptr (class plasticine.templates.CounterChain)> 2 CHILDREN (3,3)
+[[35minfo[0m] [2.279] 	3 components
+[[35minfo[0m] [2.279] COMPILING <rptr (class plasticine.templates.CounterChain)> 2 CHILDREN (3,3)
+[[35minfo[0m] [2.281] 	4 components
+[[35minfo[0m] [2.281] COMPILING <wptr (class plasticine.templates.CounterChain)> 2 CHILDREN (3,3)
+[[35minfo[0m] [2.282] 	5 components
+[[35minfo[0m] [2.282] COMPILING <rptr (class plasticine.templates.CounterChain)> 2 CHILDREN (3,3)
+[[35minfo[0m] [2.283] 	6 components
+[[35minfo[0m] [2.283] COMPILING <wptr (class plasticine.templates.CounterChain)> 2 CHILDREN (3,3)
+[[35minfo[0m] [2.284] COMPILING <rptr (class plasticine.templates.CounterChain)> 2 CHILDREN (3,3)
+[[35minfo[0m] [2.287] 	2 components
+[[35minfo[0m] [2.287] COMPILING <addrFifo (class plasticine.templates.FIFO)> 21 CHILDREN (4,2)
+[[35minfo[0m] [2.298] COMPILING <sizeFifo (class plasticine.templates.FIFO)> 21 CHILDREN (4,2)
+[[35minfo[0m] [2.311] 	2 components
+[[35minfo[0m] [2.311] COMPILING <rwFifo (class plasticine.templates.FIFO)> 21 CHILDREN (4,2)
+[[35minfo[0m] [2.321] COMPILING <dataFifo (class plasticine.templates.FIFO)> 21 CHILDREN (4,2)
+[[35minfo[0m] [2.332] COMPILING <mu (class plasticine.templates.MemoryUnit)> 6 CHILDREN (5,1)
+[[35minfo[0m] [2.337] COMPILING <MemoryTester (class plasticine.templates.MemoryTester)> 2 CHILDREN (6,0)
+[[33mwarn[0m] MemoryUnit.scala:462: 'end' is an unknown argument. in class plasticine.templates.MemoryUnitTest$
+[clockDomainCrosser]: clock1 = 666666666, clock2 = 622222222
+== Loading device model file '../ini/DDR3_micron_64M_8B_x4_sg15.ini' == 
+== Loading system model file '../system.ini' == 
+===== MemorySystem 0 =====
+CH. 0 TOTAL_STORAGE : 65536MB | 16 Ranks | 16 Devices per rank
+sim start on london at Mon Oct 31 02:45:21 2016
+inChannelName: 00100027.in
+outChannelName: 00100027.out
+cmdChannelName: 00100027.cmd
+SEED 1477907119200
+STARTING /home/tianzhao/DRAMSimulator/plasticine_burst/plasticine/generated/MemoryUnitTest//MemoryTester -q +vcs+initreg+0  
+  EXPECT MemoryTester.io_interconnect_rdyOut -> 0x1 == 0x1 PASS
+  POKE MemoryTester.io_dram_vldIn <- 0x0
+  POKE MemoryTester.io_interconnect_vldIn <- 0x1
+  POKE MemoryTester.io_interconnect_addr_0 <- 0x2000
+  POKE MemoryTester.io_interconnect_size <- 0x40
+  POKE MemoryTester.io_interconnect_isWr <- 0x1
+  POKE MemoryTester.io_interconnect_wdata_0 <- 0xcafe
+  POKE MemoryTester.io_interconnect_wdata_1 <- 0xcaff
+  POKE MemoryTester.io_interconnect_wdata_2 <- 0xcb00
+  POKE MemoryTester.io_interconnect_wdata_3 <- 0xcb01
+  POKE MemoryTester.io_interconnect_wdata_4 <- 0xcb02
+  POKE MemoryTester.io_interconnect_wdata_5 <- 0xcb03
+  POKE MemoryTester.io_interconnect_wdata_6 <- 0xcb04
+  POKE MemoryTester.io_interconnect_wdata_7 <- 0xcb05
+  POKE MemoryTester.io_interconnect_wdata_8 <- 0xcb06
+  POKE MemoryTester.io_interconnect_wdata_9 <- 0xcb07
+  POKE MemoryTester.io_interconnect_wdata_10 <- 0xcb08
+  POKE MemoryTester.io_interconnect_wdata_11 <- 0xcb09
+  POKE MemoryTester.io_interconnect_wdata_12 <- 0xcb0a
+  POKE MemoryTester.io_interconnect_wdata_13 <- 0xcb0b
+  POKE MemoryTester.io_interconnect_wdata_14 <- 0xcb0c
+  POKE MemoryTester.io_interconnect_wdata_15 <- 0xcb0d
+  POKE MemoryTester.io_interconnect_dataVldIn <- 0x1
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 1
+[MultiChannelMemorySystem] currentClockCycle = 0
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+current clock cycle = 2
+>>>>>>>>>> isWR <<<<<<<<<<
+writing vis file to ../results/MemoryTester/DDR3_micron_64M_8B_x4_sg15/64GB.1Ch.16R.scheme2.open_page.32TQ.32CQ.RtB.pRank.vis
+DRAMSim2 Clock Frequency =666666666Hz, CPU Clock Frequency=622222222Hz
+current clock cycle = 2
+  POKE MemoryTester.io_interconnect_vldIn <- 0x0
+  POKE MemoryTester.io_interconnect_dataVldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x1
+  PEEK MemoryTester.io_dram_addr <- 0x80
+  PEEK MemoryTester.io_dram_wdata_0 <- 0xcafe
+  PEEK MemoryTester.io_dram_wdata_1 <- 0xcaff
+  PEEK MemoryTester.io_dram_wdata_2 <- 0xcb00
+  PEEK MemoryTester.io_dram_wdata_3 <- 0xcb01
+  PEEK MemoryTester.io_dram_wdata_4 <- 0xcb02
+  PEEK MemoryTester.io_dram_wdata_5 <- 0xcb03
+  PEEK MemoryTester.io_dram_wdata_6 <- 0xcb04
+  PEEK MemoryTester.io_dram_wdata_7 <- 0xcb05
+  PEEK MemoryTester.io_dram_wdata_8 <- 0xcb06
+  PEEK MemoryTester.io_dram_wdata_9 <- 0xcb07
+  PEEK MemoryTester.io_dram_wdata_10 <- 0xcb08
+  PEEK MemoryTester.io_dram_wdata_11 <- 0xcb09
+  PEEK MemoryTester.io_dram_wdata_12 <- 0xcb0a
+  PEEK MemoryTester.io_dram_wdata_13 <- 0xcb0b
+  PEEK MemoryTester.io_dram_wdata_14 <- 0xcb0c
+  PEEK MemoryTester.io_dram_wdata_15 <- 0xcb0d
+  PEEK MemoryTester.io_dram_isWr <- 0x1
+  PEEK MemoryTester.io_dram_tagOut <- 0x0
+STEP 1 -> 2
+[MultiChannelMemorySystem] currentClockCycle = 2
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+STEP 1 -> 3
+[MultiChannelMemorySystem] currentClockCycle = 3
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 4
+[MultiChannelMemorySystem] currentClockCycle = 4
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 5
+[MultiChannelMemorySystem] currentClockCycle = 5
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 6
+[MultiChannelMemorySystem] currentClockCycle = 6
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 7
+[MultiChannelMemorySystem] currentClockCycle = 7
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 8
+[MultiChannelMemorySystem] currentClockCycle = 8
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 9
+[MultiChannelMemorySystem] currentClockCycle = 9
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 10
+[MultiChannelMemorySystem] currentClockCycle = 10
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 11
+[MultiChannelMemorySystem] currentClockCycle = 11
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 12
+[MultiChannelMemorySystem] currentClockCycle = 12
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 13
+[MultiChannelMemorySystem] currentClockCycle = 13
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 14
+[MultiChannelMemorySystem] currentClockCycle = 14
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 15
+[MultiChannelMemorySystem] currentClockCycle = 15
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 16
+[MultiChannelMemorySystem] currentClockCycle = 17
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 17
+[MultiChannelMemorySystem] currentClockCycle = 18
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 18
+[MultiChannelMemorySystem] currentClockCycle = 19
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 19
+[MultiChannelMemorySystem] currentClockCycle = 20
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 20
+[MultiChannelMemorySystem] currentClockCycle = 21
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 21
+[MultiChannelMemorySystem] currentClockCycle = 22
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 22
+[MultiChannelMemorySystem] currentClockCycle = 23
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 23
+[MultiChannelMemorySystem] currentClockCycle = 24
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 24
+[MultiChannelMemorySystem] currentClockCycle = 25
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 25
+[MultiChannelMemorySystem] currentClockCycle = 26
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 26
+[MultiChannelMemorySystem] currentClockCycle = 27
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 27
+[MultiChannelMemorySystem] currentClockCycle = 28
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 28
+[MultiChannelMemorySystem] currentClockCycle = 29
+before clock, DRAMSimulator_vldOut = 0
+after clock, DRAMSimulator_vldOut = 0
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 29
+[MultiChannelMemorySystem] currentClockCycle = 30
+[Callback] write complete: 0 0x80 cycle=31
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 30
+[MultiChannelMemorySystem] currentClockCycle = 32
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 31
+[MultiChannelMemorySystem] currentClockCycle = 33
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 32
+[MultiChannelMemorySystem] currentClockCycle = 34
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 33
+[MultiChannelMemorySystem] currentClockCycle = 35
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 34
+[MultiChannelMemorySystem] currentClockCycle = 36
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 35
+[MultiChannelMemorySystem] currentClockCycle = 37
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 36
+[MultiChannelMemorySystem] currentClockCycle = 38
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 37
+[MultiChannelMemorySystem] currentClockCycle = 39
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 38
+[MultiChannelMemorySystem] currentClockCycle = 40
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 39
+[MultiChannelMemorySystem] currentClockCycle = 41
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 40
+[MultiChannelMemorySystem] currentClockCycle = 42
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 41
+[MultiChannelMemorySystem] currentClockCycle = 43
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 42
+[MultiChannelMemorySystem] currentClockCycle = 44
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 43
+[MultiChannelMemorySystem] currentClockCycle = 45
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 44
+[MultiChannelMemorySystem] currentClockCycle = 47
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 45
+[MultiChannelMemorySystem] currentClockCycle = 48
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 46
+[MultiChannelMemorySystem] currentClockCycle = 49
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 47
+[MultiChannelMemorySystem] currentClockCycle = 50
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 48
+[MultiChannelMemorySystem] currentClockCycle = 51
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 49
+[MultiChannelMemorySystem] currentClockCycle = 52
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 50
+[MultiChannelMemorySystem] currentClockCycle = 53
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 51
+[MultiChannelMemorySystem] currentClockCycle = 54
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+STEP 1 -> 52
+[MultiChannelMemorySystem] currentClockCycle = 55
+before clock, DRAMSimulator_vldOut = 1
+after clock, DRAMSimulator_vldOut = 1
+  PEEK MemoryTester.io_dram_vldIn <- 0x0
+  PEEK MemoryTester.io_dram_vldOut <- 0x0
+[30m[42mPASS: Single burst write[0m
+RAN 52 CYCLES PASSED
+[0m[[32msuccess[0m] [0mTotal time: 4 s, completed Oct 31, 2016 2:45:21 AM[0m
+Copying system configurations to generated folder
+CLASSPATH=../target/scala-2.11/classes:$CLASSPATH sbt "; run-main plasticine.templates.MemoryUnitTest  end  --targetDir /home/tianzhao/DRAMSimulator/plasticine_burst/plasticine/generated/MemoryUnitTest/ --test --backend v"
+Invoking Chisel...

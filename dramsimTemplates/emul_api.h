@@ -101,6 +101,7 @@ public:
   	uint64_t cpuClkFreqHz = 622222222;
   	mcMem->setCPUClockSpeed(cpuClkFreqHz);
   	mcMem->RegisterCallbacks(read_cb, write_cb, power_callback);
+
     is_exit = false;
   }
   inline bool exit() { return is_exit; }
@@ -128,14 +129,14 @@ private:
   virtual inline std::string get_value(dat_api_base* &sig) {
     return sig->get_value();
   }
-
+  
   virtual inline size_t get_value(dat_api_base* &sig, uint64_t* data) {
     return sig->get_value(data);
   }
 
   virtual inline size_t get_chunk(dat_api_base* &sig) {
     return sig->get_num_words();
-  }
+  } 
 
   virtual inline void reset() {
     module->clock(LIT<1>(1));
@@ -148,97 +149,83 @@ private:
   bool is_exit;
   virtual inline void finish() {
     module->clock(LIT<1>(0)); // to vcd-dump the last cycle
-    is_exit = true;
+    is_exit = true; 
   }
 
   void read_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
   {
   	MemoryTester_t *pctrl = (MemoryTester_t *)module;
-    pctrl->MemoryTester_mu__io_dram_vldIn.values[0] = 1;
+	pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] = 1;
   	printf("[Callback] read complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
-	pctrl->MemoryTester__io_dram_tagIn = tagMap[address];
+	printf("starting getting tags \n");
+	pctrl->MemoryTester_DRAMSimulator__io_tagOut = tagMap[address];
+	printf("starting getting rdataVec from dataMap \n");
 	vector<dat_t<32> > rdataVec = dataMap[address];
-	pctrl->MemoryTester_mu__io_dram_rdata_0 = rdataVec.at(0);
-	pctrl->MemoryTester_mu__io_dram_rdata_1 = rdataVec.at(1);
-	pctrl->MemoryTester_mu__io_dram_rdata_2 = rdataVec.at(2);
-	pctrl->MemoryTester_mu__io_dram_rdata_3 = rdataVec.at(3);
-	pctrl->MemoryTester_mu__io_dram_rdata_4 = rdataVec.at(4);
-	pctrl->MemoryTester_mu__io_dram_rdata_5 = rdataVec.at(5);
-	pctrl->MemoryTester_mu__io_dram_rdata_6 = rdataVec.at(6);
-	pctrl->MemoryTester_mu__io_dram_rdata_7 = rdataVec.at(7);
-	pctrl->MemoryTester_mu__io_dram_rdata_8 = rdataVec.at(8);
-	pctrl->MemoryTester_mu__io_dram_rdata_9 = rdataVec.at(9);
-	pctrl->MemoryTester_mu__io_dram_rdata_10 = rdataVec.at(10);
-	pctrl->MemoryTester_mu__io_dram_rdata_11 = rdataVec.at(11);
-	pctrl->MemoryTester_mu__io_dram_rdata_12 = rdataVec.at(12);
-	pctrl->MemoryTester_mu__io_dram_rdata_13 = rdataVec.at(13);
-	pctrl->MemoryTester_mu__io_dram_rdata_14 = rdataVec.at(14);
-	pctrl->MemoryTester_mu__io_dram_rdata_15 = rdataVec.at(15);
+	printf("size of rdataVec is %lu \n", rdataVec.size());
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_0 = rdataVec.at(0);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_1 = rdataVec.at(1);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_2 = rdataVec.at(2);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_3 = rdataVec.at(3);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_4 = rdataVec.at(4);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_5 = rdataVec.at(5);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_6 = rdataVec.at(6);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_7 = rdataVec.at(7);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_8 = rdataVec.at(8);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_9 = rdataVec.at(9);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_10 = rdataVec.at(10);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_11 = rdataVec.at(11);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_12 = rdataVec.at(12);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_13 = rdataVec.at(13);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_14 = rdataVec.at(14);
+	pctrl->MemoryTester_DRAMSimulator__io_rdata_15 = rdataVec.at(15);
+
   }
 
   void write_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
   {
   	MemoryTester_t *pctrl = (MemoryTester_t *)module;
-    pctrl->MemoryTester_mu__io_dram_vldIn.values[0] = 1;
-  	printf("[Callback] write complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
-	pctrl->MemoryTester__io_dram_tagIn = tagMap[address];
+	pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] = 1;
+    printf("[Callback] write complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
+	pctrl->MemoryTester_DRAMSimulator__io_tagOut = tagMap[address];
   }
 
   virtual inline void step() {
     mcMem->update();
-  	MemoryTester_t *pctrl = (MemoryTester_t *)module;
     module->clock(LIT<1>(0));
     // FIXME: should call twice to get the output for now
     module->clock_lo(LIT<1>(0), false);
 
-	if (pctrl->MemoryTester_mu__io_dram_vldOut.values[0] > 0)
+  	MemoryTester_t *pctrl = (MemoryTester_t *)module;
+	if (pctrl->MemoryTester_DRAMSimulator__io_vldIn.values[0] > 0)
 	{
-	  // for every new transaction a new tag is generated...
-	  dat_t<32> transTag = pctrl->MemoryTester_mu__io_dram_tagOut;
-	  bool isWR = pctrl->MemoryTester_mu__io_dram_isWr.values[0];
-	  uint64_t addr = pctrl->MemoryTester_mu__io_dram_addr.values[0];
+	  dat_t<32> transTag = pctrl->MemoryTester_DRAMSimulator__io_tagIn;
+	  bool isWR = pctrl->MemoryTester_DRAMSimulator__io_isWr.values[0];
+	  uint64_t addr = pctrl->MemoryTester_DRAMSimulator__io_addr.values[0];
 	  tagMap[addr] = transTag;
 	  bool transSuccess = mcMem->addTransaction(isWR, addr);
 	  // TODO: need to take the case where a transaction
 	  // cannot be completed due to size limit
 
-//	  vector<dat_t<32> > rdataVec;
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_0);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_1);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_2);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_3);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_4);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_5);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_6);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_7);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_8);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_9);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_10);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_11);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_12);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_13);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_14);
-//	  rdataVec.push_back(pctrl->MemoryTester_mu__io_dram_rdata_15);
-
 	  if (isWR)
 	  {
+	    cout << ">>>>>>>>>> isWR <<<<<<<<<<" << endl;
 	  	vector<dat_t<32> > wdataVec;
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_0);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_1);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_2);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_3);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_4);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_5);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_6);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_7);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_8);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_9);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_10);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_11);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_12);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_13);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_14);
-	  	wdataVec.push_back(pctrl->MemoryTester_mu__io_dram_wdata_15);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_0);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_1);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_2);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_3);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_4);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_5);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_6);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_7);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_8);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_9);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_10);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_11);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_12);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_13);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_14);
+	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_15);
 	 	dataMap[addr] = wdataVec;
 	  }
 	}
