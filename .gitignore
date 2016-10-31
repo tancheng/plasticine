@@ -1,5 +1,4 @@
 *.log
-*.vcd
 *.swp
 *.xlsx*
 *.jpg
@@ -7,6 +6,5 @@
 .o
 .alib
 build/
-generated/
 lib_managed/
 target/

@@ -154,6 +154,14 @@ private:
 
   void read_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
   {
+	// check keys....
+	cout << "checking keys stored in dataMap" << endl;
+	cout << "requested address = " << address << endl;
+	for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
+	{
+		cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
+	}
+
   	MemoryTester_t *pctrl = (MemoryTester_t *)module;
 	pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] = 1;
   	printf("[Callback] read complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
@@ -191,16 +199,63 @@ private:
 
   virtual inline void step() {
     mcMem->update();
+  	MemoryTester_t *pctrl = (MemoryTester_t *)module;
+
+	// NOTES: in the generated simulation code, chisel front end
+	// samples the values in clock_lo. need to reset the values in 
+	// a proper way
+	
+	//	cout << "before clock, DRAMSimulator_vldOut = " << pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] << endl;
+
+	// tmp values
+//	dat_t<1> tmpVldOut = pctrl->MemoryTester_DRAMSimulator__io_vldOut;
+//	dat_t<32> tmpTagIn = pctrl->MemoryTester_DRAMSimulator__io_tagOut;
+//	dat_t<32> tmpRd0 = pctrl->MemoryTester_DRAMSimulator__io_rdata_0;
+//	dat_t<32> tmpRd1 = pctrl->MemoryTester_DRAMSimulator__io_rdata_1;
+//	dat_t<32> tmpRd2 = pctrl->MemoryTester_DRAMSimulator__io_rdata_2;
+//	dat_t<32> tmpRd3 = pctrl->MemoryTester_DRAMSimulator__io_rdata_3;
+//	dat_t<32> tmpRd4 = pctrl->MemoryTester_DRAMSimulator__io_rdata_4;
+//	dat_t<32> tmpRd5 = pctrl->MemoryTester_DRAMSimulator__io_rdata_5;
+//	dat_t<32> tmpRd6 = pctrl->MemoryTester_DRAMSimulator__io_rdata_6;
+//	dat_t<32> tmpRd7 = pctrl->MemoryTester_DRAMSimulator__io_rdata_7;
+//	dat_t<32> tmpRd8 = pctrl->MemoryTester_DRAMSimulator__io_rdata_8;
+//	dat_t<32> tmpRd9 = pctrl->MemoryTester_DRAMSimulator__io_rdata_9;
+//	dat_t<32> tmpRd10 = pctrl->MemoryTester_DRAMSimulator__io_rdata_10;
+//	dat_t<32> tmpRd11 = pctrl->MemoryTester_DRAMSimulator__io_rdata_11;
+//	dat_t<32> tmpRd12 = pctrl->MemoryTester_DRAMSimulator__io_rdata_12;
+//	dat_t<32> tmpRd13 = pctrl->MemoryTester_DRAMSimulator__io_rdata_13;
+//	dat_t<32> tmpRd14 = pctrl->MemoryTester_DRAMSimulator__io_rdata_14;
+//	dat_t<32> tmpRd15 = pctrl->MemoryTester_DRAMSimulator__io_rdata_15;
+
     module->clock(LIT<1>(0));
     // FIXME: should call twice to get the output for now
     module->clock_lo(LIT<1>(0), false);
+//	pctrl->MemoryTester_DRAMSimulator__io_vldOut = tmpVldOut;
+//	pctrl->MemoryTester_DRAMSimulator__io_tagOut = tmpTagIn;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_0 = tmpRd0;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_1 = tmpRd1;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_2 = tmpRd2;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_3 = tmpRd3;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_4 = tmpRd4;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_5 = tmpRd5;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_6 = tmpRd6;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_7 = tmpRd7;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_8 = tmpRd8;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_9 = tmpRd9;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_10 = tmpRd10;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_11 = tmpRd11;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_12 = tmpRd12;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_13 = tmpRd13;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_14 = tmpRd14;
+//	pctrl->MemoryTester_DRAMSimulator__io_rdata_15 = tmpRd15;
+//	cout << "after clock, DRAMSimulator_vldOut = " << pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] << endl;
 
-  	MemoryTester_t *pctrl = (MemoryTester_t *)module;
 	if (pctrl->MemoryTester_DRAMSimulator__io_vldIn.values[0] > 0)
 	{
 	  dat_t<32> transTag = pctrl->MemoryTester_DRAMSimulator__io_tagIn;
 	  bool isWR = pctrl->MemoryTester_DRAMSimulator__io_isWr.values[0];
 	  uint64_t addr = pctrl->MemoryTester_DRAMSimulator__io_addr.values[0];
+	  cout << "isWr: writing to addr = " << addr << endl;
 	  tagMap[addr] = transTag;
 	  bool transSuccess = mcMem->addTransaction(isWR, addr);
 	  // TODO: need to take the case where a transaction
@@ -227,6 +282,13 @@ private:
 	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_14);
 	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_15);
 	 	dataMap[addr] = wdataVec;
+	
+		// check keys....
+		cout << "checking keys stored in dataMap" << endl;
+		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
+		{
+			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
+		}
 	  }
 	}
   }

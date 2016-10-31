@@ -391,21 +391,17 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
   val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
   enqueueBurstWrite(waddr, burstSizeBytes, wdata)
   observeFor(1)
+  step(50)
 
-  for (a <- 1 to 50) {
-    step(1)
-    peek(c.io.dram.vldIn)
-    peek(c.io.dram.vldOut)
-  }
-//  step(50)
   check("Single burst write")
 
-//  // 2a. Smoke test, read: Single burst with a single burst size
-//  enqueueBurstRead(addr, burstSizeBytes)
-//  observeFor(1)
-//  step(50)
-//  check("Single burst read")
-//
+  // 2a. Smoke test, read: Single burst with a single burst size
+  // TODO: do we just feed zeros? 
+  enqueueBurstRead(addr, burstSizeBytes)
+  step(50)
+  observeFor(1)
+  check("Single burst read")
+
 
   val numBursts = 10
 //  // 3a. Bigger smoke test, read: Single burst address with multi-burst size
