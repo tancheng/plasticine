@@ -1,21 +1,52 @@
 package plasticine.templates
 
+import plasticine.pisa.ir._
 import Chisel._
+
+case class ConnBoxOpcode(val numInputs: Int, config: Option[ConnBoxConfig] = None) extends OpcodeT {
+
+  val sel = if (config.isDefined) UInt(config.get.sel, width=log2Up(numInputs)) else UInt(width=log2Up(numInputs))
+
+  override def cloneType(): this.type = {
+    new ConnBoxOpcode(numInputs, config).asInstanceOf[this.type]
+  }
+}
+
+
+class ConnBox(val numInputs: Int, v: Int, w: Int, inst: ConnBoxConfig) extends ConfigurableModule[ConnBoxOpcode] {
+  val numSelectBits = log2Up(numInputs)
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
+    val ins = Vec.fill(numInputs) { Vec.fill(v) { Bits(INPUT,  width = w) } }
+    val out = Vec.fill(v) { Bits(OUTPUT, width = w) }
+  }
+
+  val configType = ConnBoxOpcode(numInputs)
+  val configIn = ConnBoxOpcode(numInputs)
+  val configInit = ConnBoxOpcode(numInputs, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
+  } .otherwise {
+    configIn := config
+  }
+
+  io.out := io.ins(config.sel)
+}
 
 /**
  * TopUnit: Command and Status registers that generate the first token,
  * and wait for the last token respectively.
  */
-class TopUnit(val w: Int, val v: Int) extends Module {
+class TopUnit(val w: Int, val v: Int, val numInputs: Int, val inst: TopUnitConfig) extends Module {
   val io = new Bundle {
     val addr = UInt(INPUT, width=w)
     val wdata = UInt(INPUT, width=w)
     val wen = Bool(INPUT)
-    val dataVld = Bool(INPUT)
     val rdata = UInt(OUTPUT, width=w)
-    val doneTokenIn = Bool(INPUT)
+    val ctrlIns = Vec.fill(numInputs) { Bool(INPUT) }
     val startTokenOut = UInt(OUTPUT, width=1)
-    val in = Vec.fill(v) { UInt(INPUT, width=w) }
+    val ins = Vec.fill(numInputs) { Vec.fill(v) { UInt(INPUT, width=w) } }
     val out = Vec.fill(v) { UInt(OUTPUT, width=w) }
   }
 
@@ -23,15 +54,29 @@ class TopUnit(val w: Int, val v: Int) extends Module {
   val statusRegIdx = commandRegIdx + 1
   val dataRegIdx = statusRegIdx + 1
 
+  // Two connection boxes - one indicating design done,
+  // the other indicating writes to argout
+  val doneConnBox = Module(new ConnBox(numInputs, 1, 1, inst.doneConnBox))
+  doneConnBox.io.ins := io.ctrlIns
+  val doneTokenIn = doneConnBox.io.out(0) // Conn box assumes vector input/output ports
+
+  val dataVldConnBox = Module(new ConnBox(numInputs, 1, 1, inst.dataVldConnBox))
+  dataVldConnBox.io.ins := io.ctrlIns
+  val dataVld = dataVldConnBox.io.out(0) // Conn box assumes vector input/output ports
+
   val depulser = Module(new Depulser())
-  depulser.io.in := io.doneTokenIn
+  depulser.io.in := Bool(doneTokenIn)
+
+  val argOutConnBox = Module(new ConnBox(numInputs, v, w, inst.argOutConnBox))
+  argOutConnBox.io.ins := io.ins
+  val inBus = argOutConnBox.io.out
 
   val regs = List.tabulate(v+2) { i =>
     val ff = Module(new FF(w))
     val enable = i match {
       case `statusRegIdx` => UInt(1)
       case `commandRegIdx` => ((io.addr === UInt(i)) &  io.wen)
-      case _ => io.dataVld | ((io.addr === UInt(i)) &  io.wen)
+      case _ => dataVld | ((io.addr === UInt(i)) &  io.wen)
     }
     ff.io.control.enable := enable
 
@@ -39,7 +84,7 @@ class TopUnit(val w: Int, val v: Int) extends Module {
       case `statusRegIdx` => depulser.io.out
       case `commandRegIdx` => io.wdata
       case _ =>
-        Mux(io.wen, io.wdata, io.in(i - dataRegIdx))
+        Mux(io.wen, io.wdata, inBus(i - dataRegIdx))
     }
     ff.io.data.in := wdata
     ff
@@ -99,7 +144,7 @@ class TopUnitTests(c: TopUnit) extends Tester(c) {
     poke(s, 0)
   }
 
-  def pulseDone = pulseSignal(c.io.doneTokenIn)
+  def pulseDone = pulseSignal(c.io.ctrlIns(c.inst.doneConnBox.sel))
 
   def expect(observed: Int, expected: Int, msg: String = "") = {
     if (observed == expected) printPass(s"$msg: ($observed == $expected)")
@@ -128,8 +173,8 @@ class TopUnitTests(c: TopUnit) extends Tester(c) {
 
   // Write from data bus
   val newWriteVals = List.tabulate(c.v) { i => 0xF00D + i }
-  c.io.in.zip(newWriteVals).foreach { case (in, i) => poke(in, i) }
-  pulseSignal(c.io.dataVld)
+  c.io.ins(0).zip(newWriteVals).foreach { case (in, i) => poke(in, i) }
+  pulseSignal(c.io.ctrlIns(c.inst.dataVldConnBox.sel))
   // Test output data bus
   for (i <- 0 until c.v) {
     val observed = peek(c.io.out(i)).toInt
@@ -184,9 +229,11 @@ object TopUnitTest {
 
   val w = 32
   val v = 16
+  val numInputs = 1
+  val config = TopUnitConfig.getRandom(numInputs)
 
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new TopUnit(w, v))) {
+    chiselMainTest(args, () => Module(new TopUnit(w, v, numInputs, config))) {
       c => new TopUnitTests(c)
     }
   }
