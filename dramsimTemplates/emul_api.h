@@ -154,39 +154,61 @@ private:
 
   void read_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
   {
-	// check keys....
-	cout << "checking keys stored in dataMap" << endl;
-	cout << "requested address = " << address << endl;
-	for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
-	{
-		cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
-	}
+	  // check keys....
+	  cout << "checking keys stored in dataMap" << endl;
+	  cout << "requested address = " << address << endl;
+	  for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
+	  {
+	  	cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
+	  }
 
-  	MemoryTester_t *pctrl = (MemoryTester_t *)module;
-	pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] = 1;
+    MemoryTester_t *pctrl = (MemoryTester_t *)module;
+	  pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] = 1;
   	printf("[Callback] read complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
-	printf("starting getting tags \n");
-	pctrl->MemoryTester_DRAMSimulator__io_tagOut = tagMap[address];
-	printf("starting getting rdataVec from dataMap \n");
-	vector<dat_t<32> > rdataVec = dataMap[address];
-	printf("size of rdataVec is %lu \n", rdataVec.size());
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_0 = rdataVec.at(0);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_1 = rdataVec.at(1);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_2 = rdataVec.at(2);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_3 = rdataVec.at(3);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_4 = rdataVec.at(4);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_5 = rdataVec.at(5);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_6 = rdataVec.at(6);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_7 = rdataVec.at(7);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_8 = rdataVec.at(8);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_9 = rdataVec.at(9);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_10 = rdataVec.at(10);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_11 = rdataVec.at(11);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_12 = rdataVec.at(12);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_13 = rdataVec.at(13);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_14 = rdataVec.at(14);
-	pctrl->MemoryTester_DRAMSimulator__io_rdata_15 = rdataVec.at(15);
+	  printf("starting getting tags \n");
+	  pctrl->MemoryTester_DRAMSimulator__io_tagOut = tagMap[address];
+	  printf("starting getting rdataVec from dataMap \n");
+	  vector<dat_t<32> > rdataVec = dataMap[address];
+	  printf("size of rdataVec is %lu \n", rdataVec.size());
 
+    if (rdataVec.size() == 0)
+    {
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_0.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_1.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_2.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_3.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_4.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_5.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_6.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_7.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_8.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_9.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_10.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_11.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_12.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_13.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_14.values[0] = 0;
+    	pctrl->MemoryTester_DRAMSimulator__io_rdata_15.values[0] = 0;
+    }
+    else
+    {
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_0 = rdataVec.at(0);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_1 = rdataVec.at(1);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_2 = rdataVec.at(2);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_3 = rdataVec.at(3);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_4 = rdataVec.at(4);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_5 = rdataVec.at(5);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_6 = rdataVec.at(6);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_7 = rdataVec.at(7);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_8 = rdataVec.at(8);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_9 = rdataVec.at(9);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_10 = rdataVec.at(10);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_11 = rdataVec.at(11);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_12 = rdataVec.at(12);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_13 = rdataVec.at(13);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_14 = rdataVec.at(14);
+	    pctrl->MemoryTester_DRAMSimulator__io_rdata_15 = rdataVec.at(15);
+    }
   }
 
   void write_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
@@ -201,96 +223,99 @@ private:
     mcMem->update();
   	MemoryTester_t *pctrl = (MemoryTester_t *)module;
 
-	// NOTES: in the generated simulation code, chisel front end
-	// samples the values in clock_lo. need to reset the values in 
-	// a proper way
-	
-	//	cout << "before clock, DRAMSimulator_vldOut = " << pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] << endl;
-
-	// tmp values
-//	dat_t<1> tmpVldOut = pctrl->MemoryTester_DRAMSimulator__io_vldOut;
-//	dat_t<32> tmpTagIn = pctrl->MemoryTester_DRAMSimulator__io_tagOut;
-//	dat_t<32> tmpRd0 = pctrl->MemoryTester_DRAMSimulator__io_rdata_0;
-//	dat_t<32> tmpRd1 = pctrl->MemoryTester_DRAMSimulator__io_rdata_1;
-//	dat_t<32> tmpRd2 = pctrl->MemoryTester_DRAMSimulator__io_rdata_2;
-//	dat_t<32> tmpRd3 = pctrl->MemoryTester_DRAMSimulator__io_rdata_3;
-//	dat_t<32> tmpRd4 = pctrl->MemoryTester_DRAMSimulator__io_rdata_4;
-//	dat_t<32> tmpRd5 = pctrl->MemoryTester_DRAMSimulator__io_rdata_5;
-//	dat_t<32> tmpRd6 = pctrl->MemoryTester_DRAMSimulator__io_rdata_6;
-//	dat_t<32> tmpRd7 = pctrl->MemoryTester_DRAMSimulator__io_rdata_7;
-//	dat_t<32> tmpRd8 = pctrl->MemoryTester_DRAMSimulator__io_rdata_8;
-//	dat_t<32> tmpRd9 = pctrl->MemoryTester_DRAMSimulator__io_rdata_9;
-//	dat_t<32> tmpRd10 = pctrl->MemoryTester_DRAMSimulator__io_rdata_10;
-//	dat_t<32> tmpRd11 = pctrl->MemoryTester_DRAMSimulator__io_rdata_11;
-//	dat_t<32> tmpRd12 = pctrl->MemoryTester_DRAMSimulator__io_rdata_12;
-//	dat_t<32> tmpRd13 = pctrl->MemoryTester_DRAMSimulator__io_rdata_13;
-//	dat_t<32> tmpRd14 = pctrl->MemoryTester_DRAMSimulator__io_rdata_14;
-//	dat_t<32> tmpRd15 = pctrl->MemoryTester_DRAMSimulator__io_rdata_15;
+  	// NOTES: in the generated simulation code, all the output of the DRAMSimulator module would be reset to 
+  	// 0 at posedge of every clock. The callback of write / read complete is triggerred before step() function 
+  	// is called.
+  	cout << "before clock, DRAMSimulator_vldOut = " << pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] << endl;
+  	// tmp values
+  	dat_t<1> tmpVldOut = pctrl->MemoryTester_DRAMSimulator__io_vldOut;
+  	dat_t<32> tmpTagIn = pctrl->MemoryTester_DRAMSimulator__io_tagOut;
+  	dat_t<32> tmpRd0 = pctrl->MemoryTester_DRAMSimulator__io_rdata_0;
+  	dat_t<32> tmpRd1 = pctrl->MemoryTester_DRAMSimulator__io_rdata_1;
+  	dat_t<32> tmpRd2 = pctrl->MemoryTester_DRAMSimulator__io_rdata_2;
+  	dat_t<32> tmpRd3 = pctrl->MemoryTester_DRAMSimulator__io_rdata_3;
+  	dat_t<32> tmpRd4 = pctrl->MemoryTester_DRAMSimulator__io_rdata_4;
+  	dat_t<32> tmpRd5 = pctrl->MemoryTester_DRAMSimulator__io_rdata_5;
+  	dat_t<32> tmpRd6 = pctrl->MemoryTester_DRAMSimulator__io_rdata_6;
+  	dat_t<32> tmpRd7 = pctrl->MemoryTester_DRAMSimulator__io_rdata_7;
+  	dat_t<32> tmpRd8 = pctrl->MemoryTester_DRAMSimulator__io_rdata_8;
+  	dat_t<32> tmpRd9 = pctrl->MemoryTester_DRAMSimulator__io_rdata_9;
+  	dat_t<32> tmpRd10 = pctrl->MemoryTester_DRAMSimulator__io_rdata_10;
+  	dat_t<32> tmpRd11 = pctrl->MemoryTester_DRAMSimulator__io_rdata_11;
+  	dat_t<32> tmpRd12 = pctrl->MemoryTester_DRAMSimulator__io_rdata_12;
+  	dat_t<32> tmpRd13 = pctrl->MemoryTester_DRAMSimulator__io_rdata_13;
+  	dat_t<32> tmpRd14 = pctrl->MemoryTester_DRAMSimulator__io_rdata_14;
+  	dat_t<32> tmpRd15 = pctrl->MemoryTester_DRAMSimulator__io_rdata_15;
 
     module->clock(LIT<1>(0));
     // FIXME: should call twice to get the output for now
     module->clock_lo(LIT<1>(0), false);
-//	pctrl->MemoryTester_DRAMSimulator__io_vldOut = tmpVldOut;
-//	pctrl->MemoryTester_DRAMSimulator__io_tagOut = tmpTagIn;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_0 = tmpRd0;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_1 = tmpRd1;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_2 = tmpRd2;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_3 = tmpRd3;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_4 = tmpRd4;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_5 = tmpRd5;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_6 = tmpRd6;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_7 = tmpRd7;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_8 = tmpRd8;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_9 = tmpRd9;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_10 = tmpRd10;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_11 = tmpRd11;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_12 = tmpRd12;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_13 = tmpRd13;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_14 = tmpRd14;
-//	pctrl->MemoryTester_DRAMSimulator__io_rdata_15 = tmpRd15;
-//	cout << "after clock, DRAMSimulator_vldOut = " << pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] << endl;
+  	pctrl->MemoryTester_DRAMSimulator__io_vldOut = tmpVldOut;
+  	pctrl->MemoryTester_DRAMSimulator__io_tagOut = tmpTagIn;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_0 = tmpRd0;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_1 = tmpRd1;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_2 = tmpRd2;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_3 = tmpRd3;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_4 = tmpRd4;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_5 = tmpRd5;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_6 = tmpRd6;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_7 = tmpRd7;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_8 = tmpRd8;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_9 = tmpRd9;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_10 = tmpRd10;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_11 = tmpRd11;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_12 = tmpRd12;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_13 = tmpRd13;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_14 = tmpRd14;
+  	pctrl->MemoryTester_DRAMSimulator__io_rdata_15 = tmpRd15;
+  	cout << "after clock, DRAMSimulator_vldOut = " << pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] << endl;
 
-	if (pctrl->MemoryTester_DRAMSimulator__io_vldIn.values[0] > 0)
-	{
-	  dat_t<32> transTag = pctrl->MemoryTester_DRAMSimulator__io_tagIn;
-	  bool isWR = pctrl->MemoryTester_DRAMSimulator__io_isWr.values[0];
-	  uint64_t addr = pctrl->MemoryTester_DRAMSimulator__io_addr.values[0];
-	  cout << "isWr: writing to addr = " << addr << endl;
-	  tagMap[addr] = transTag;
-	  bool transSuccess = mcMem->addTransaction(isWR, addr);
-	  // TODO: need to take the case where a transaction
-	  // cannot be completed due to size limit
+  	if (pctrl->MemoryTester_DRAMSimulator__io_vldIn.values[0] > 0)
+  	{
+  	  dat_t<32> transTag = pctrl->MemoryTester_DRAMSimulator__io_tagIn;
+  	  bool isWR = pctrl->MemoryTester_DRAMSimulator__io_isWr.values[0];
+  	  uint64_t addr = pctrl->MemoryTester_DRAMSimulator__io_addr.values[0];
+  	  cout << "isWr: writing to addr = " << addr << endl;
+  	  tagMap[addr] = transTag;
+  	  bool transSuccess = mcMem->addTransaction(isWR, addr);
+  	  // TODO: need to take the case where a transaction
+  	  // cannot be completed due to size limit
 
-	  if (isWR)
-	  {
-	    cout << ">>>>>>>>>> isWR <<<<<<<<<<" << endl;
-	  	vector<dat_t<32> > wdataVec;
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_0);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_1);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_2);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_3);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_4);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_5);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_6);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_7);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_8);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_9);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_10);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_11);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_12);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_13);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_14);
-	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_15);
-	 	dataMap[addr] = wdataVec;
-	
-		// check keys....
-		cout << "checking keys stored in dataMap" << endl;
-		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
-		{
-			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
-		}
-	  }
-	}
+  	  if (isWR)
+  	  {
+  	    cout << ">>>>>>>>>> isWR <<<<<<<<<<" << endl;
+  	  	vector<dat_t<32> > wdataVec;
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_0);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_1);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_2);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_3);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_4);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_5);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_6);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_7);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_8);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_9);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_10);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_11);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_12);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_13);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_14);
+  	  	wdataVec.push_back(pctrl->MemoryTester_DRAMSimulator__io_wdata_15);
+    	 	dataMap[addr] = wdataVec;
+        //
+    		// check keys....
+    		cout << "checking keys stored in dataMap" << endl;
+    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
+    		{
+    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
+    		}
+  	  }
+  	}
+
+    // reset the control signals at falling edge... that way control signals
+    // are 1 clock cycle wide
+    // TODO: need to set rdyOut as well...
+    pctrl->MemoryTester_DRAMSimulator__io_vldOut.values[0] = 0;
   }
 
   virtual inline void update() {
