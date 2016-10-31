@@ -18,12 +18,12 @@ trait DirectionOps {
   trait East extends Direction
   trait South extends Direction
 
-  def rowOffset(d: Direction) = d match {
-    case _:North => -1
-    case _: South => 1
+  def yOffset(d: Direction) = d match {
+    case _:North => 1
+    case _: South => -1
     case _ => 0
   }
-  def colOffset(d: Direction) = d match {
+  def xOffset(d: Direction) = d match {
     case _:East => 1
     case _:West => -1
     case _ => 0
@@ -47,6 +47,527 @@ trait DirectionOps {
     case NE() => SW()
     case SW() => NE()
     case SE() => NW()
+  }
+}
+
+/**
+ * InterconnectHelper trait. Contains methods that help connect together
+ * the switches, CUs, memory units, and top unit. The interconnection is
+ * currently hardcoded to one particular topology. Other topologies
+ * need changes in the method implementation
+ */
+trait InterconnectHelper extends DirectionOps {
+  // Absolute direction order
+  final val dirOrder: List[Direction] = List(W(), NW(), N(), NE(), E(), SE(), S(), SW())
+
+  /**
+   * Values below to be overridden during instantiation
+   */
+  // Interconnect components
+  val cus: ListBuffer[ListBuffer[ComputeUnit]]
+  val switches: ListBuffer[ListBuffer[CrossbarVecReg]]
+  val mus: List[MemoryTester]
+  val topUnit: TopUnit
+
+  // CU organization
+  val rows: Int
+  val cols: Int
+
+  // Dot file printer for the graph
+  val dot: PrintWriter
+
+  // Returns if switch at (x,y) is connected to a MU
+  def isMUSwitch(x: Int, y: Int) = {
+    val mXs = List(0)  // Currently only first column
+    val mYs = List.tabulate(mus.size) { i => i }  // Rows 0 .. mus.size-1
+    if (mXs.contains(x) && mYs.contains(y)) true else false
+  }
+
+  // Define valid IOs for switches along each edge of the 2D array
+  val baseIODirs = Set(N(), S())
+  def topIO(iodir: IODirection): Set[Direction] = {
+    (iodir match {
+      case INPUT => Set(W(), E(), SW())
+      case OUTPUT => Set(W(), E(), SE())
+      case _ => throw new Exception(s"Unknown direction $iodir")
+    }) ++ baseIODirs
+  }
+
+  def botIO(iodir: IODirection): Set[Direction] = {
+    (iodir match {
+      case INPUT => Set(W(), E(), NW())
+      case OUTPUT => Set(W(), E(), NE())
+      case _ => throw new Exception(s"Unknown direction $iodir")
+    }) ++ baseIODirs
+  }
+
+  def rightIO(iodir: IODirection): Set[Direction] = {
+    (iodir match {
+      case INPUT => Set(NW(), W(), SW())
+      case OUTPUT => Set(W())
+      case _ => throw new Exception(s"Unknown direction $iodir")
+    }) ++ baseIODirs
+  }
+
+  def leftIO(iodir: IODirection): Set[Direction] = {
+    (iodir match {
+      case INPUT => Set(E())
+      case OUTPUT => Set(E(), NE(), SE())
+      case _ => throw new Exception(s"Unknown direction $iodir")
+    }) ++ baseIODirs
+  }
+
+  // A regular switch has the union of all of the special cases above
+  def regularIO(iodir: IODirection): Set[Direction] = topIO(iodir) ++ botIO(iodir) ++ leftIO(iodir) ++ rightIO(iodir)
+
+  // Returns the set of valid IO directions for a switch
+  // at position (x, y) in cartesian co-ordinate system
+  def getValidIO(x: Int, y: Int, iodir: IODirection): Set[Direction] = {
+    var validIO = regularIO(iodir)
+
+    validIO = x match {
+      case 0 => validIO.intersect(leftIO(iodir))
+      case `cols` => validIO.intersect(rightIO(iodir))
+      case _ => validIO
+    }
+    validIO = y match {
+      case 0 => validIO.intersect(botIO(iodir))
+      case `cols` => validIO.intersect(topIO(iodir))
+      case _ => validIO
+    }
+
+    if (isMUSwitch(x, y)) {
+      validIO = x match {
+        case 0 => // Leftmost column
+          iodir match {
+            case INPUT => validIO ++ Set(W())
+            case OUTPUT => validIO ++ Set(W())
+          }
+        case `cols` => // Rightmost column
+          iodir match {
+            case INPUT => validIO ++ Set(E())
+            case OUTPUT => validIO ++ Set(E())
+          }
+        case _ => throw new Exception(s"Invalid MU switch position ($x, $y): MU can only be attached to col 0 or col $cols")
+      }
+    }
+    validIO
+  }
+
+  // Number of links in each direction
+  val defaultNumLinks = 1
+  def getNumLinks(x: Int, y: Int, d: Direction, iodir: IODirection) = {
+    d match {
+        case W() => iodir match {
+          case INPUT => if (isMUSwitch(x, y) & (x == 0)) 1 else defaultNumLinks
+          case OUTPUT => if (isMUSwitch(x, y) & (x == 0)) 3 else defaultNumLinks
+        }
+        case E() => iodir match {
+          case INPUT => if (isMUSwitch(x, y) & (x == cols)) 1 else defaultNumLinks
+          case OUTPUT => if (isMUSwitch(x, y) & (x == cols)) 3 else defaultNumLinks
+        }
+        case _ => defaultNumLinks
+    }
+  }
+
+  // Direction -> index conversion
+  def getIdxBase(x: Int, y: Int, d: Direction, validDirs: Set[Direction], iodir: IODirection) = {
+    Predef.assert(validDirs.contains(d), s"[getIdx, switch $x $y] Direction '$d' not in validDirs set ($validDirs))")
+    val validDirOrder = dirOrder.filter(validDirs.contains(_))
+    val previousDirs = validDirOrder.splitAt(validDirOrder.indexOf(d))._1
+    previousDirs.map { getNumLinks(x, y, _, iodir) }.sum
+  }
+
+  def getIdxs(x: Int, y: Int, d: Direction, iodir: IODirection) = {
+    val validDirs = getValidIO(x, y, iodir)
+    val baseIdx = getIdxBase(x, y, d, validDirs, iodir)
+    List.tabulate(getNumLinks(x, y, d, iodir)) { i => baseIdx + i }
+  }
+
+  def getDirAssignment(x: Int, y: Int, iodir: IODirection) = {
+    println(s"[switch $x $y $iodir] Switch directions and indices:")
+    val validDirs = getValidIO(x, y, iodir)
+    println(s"\tvalidDirs: $validDirs")
+    validDirs.foreach { d =>
+      val baseIdx = getIdxBase(x, y, d, validDirs, iodir)
+      val idxs = getIdxs(x, y, d, iodir)
+      println(s"\t $d: baseIdx = $baseIdx, idxs = $idxs")
+    }
+  }
+
+  // CU Input order: West: 0, NW: 1, S: 2, SW: 3
+  def getCUInputIdx(d: Direction) = d match {
+    case W() => 0
+    case NW() => 1
+    case S() => 2
+    case SW() => 3
+    case _ => throw new Exception(s"Unsupported input direction $d for CU")
+  }
+
+  def genSwitchArray(wordWidth: Int, v: Int, inst: List[CrossbarConfig]) = {
+    ListBuffer.tabulate(cols+1) { x =>
+      ListBuffer.tabulate(rows+1) { y =>
+        val validInDirs = getValidIO(x, y, INPUT)
+        val validOutDirs = getValidIO(x, y, OUTPUT)
+        val numIns = validInDirs.toList.map { getNumLinks(x, y, _, INPUT) }.sum
+        val numOuts = validOutDirs.toList.map { getNumLinks(x, y, _, OUTPUT) }.sum
+        println(s"[switch $x $y] $numIns (${validInDirs}) x $numOuts (${validOutDirs}) ")
+        Module(new CrossbarVecReg(wordWidth, v, numIns, numOuts, inst(x*(cols+1)+y)))
+      }
+    }
+  }
+
+  def connectSwitchArray {
+    for (x <- 0 to cols) {
+      for (y <- 0 to rows) {
+        dot.println(s"""s${x}${y} [ shape=square style=filled fillcolor=red fontcolor=white color=white fillcolor=red pos= "${x*2},${y*2}!"]""")
+        val validInputDirs = getValidIO(x, y, INPUT).intersect(Set(W(), N(), E(), S()))
+//        getDirAssignment(x, y, INPUT)
+        if (y == rows) { List(N(), NE(), NW()) foreach { validInputDirs -= _ } }
+        if (y == 0) { List(S(), SE(), SW()) foreach { validInputDirs -= _ } }
+        if (x == 0) { List(W(), NW(), SW()) foreach { validInputDirs -= _ } }
+        if (x == cols) { List(E(), SE(), NE()) foreach { validInputDirs -= _ } }
+        validInputDirs.foreach { case d =>
+          val inIdxs = getIdxs(x, y, d, INPUT) // Indices of input ports
+          val r = yOffset(d)
+          val c = xOffset(d)
+          val outIdxs = getIdxs(x+c, y+r, reverseDir(d), OUTPUT)  // Indices of output that connects to idxs
+          println(s"[switch $x $y $d] : inIdxs: $inIdxs, outSwitch: [${x+c} ${y+r}], outSwitchDir: ${reverseDir(d)}, outIdxs: $outIdxs")
+          inIdxs.zip(outIdxs) foreach { case (inIdx, outIdx) =>
+            switches(x)(y).io.ins(inIdx) := switches(x+c)(y+r).io.outs(outIdx)
+            dot.println(s"s${(x+c)}${(y+r)} -> s${x}${y}")
+          }
+        }
+      }
+    }
+  }
+
+  def connectTopUnit = {
+    for (y <- List(0, rows)) {
+      val d = if (y == 0) S() else N()
+      for (x <- 0 to cols) {
+        val switchOut = getIdxs(x, y, d, OUTPUT)(0)
+        val switchIn = getIdxs(x, y, d, INPUT)(0)
+        switches(x)(y).io.ins(switchIn) := topUnit.io.out
+        val topInIdx = if (y > 0) cols + x else x
+        topUnit.io.ins(topInIdx) := switches(x)(y).io.outs(switchOut)
+        dot.println(s"top -> s${x}${y}")
+        dot.println(s"s${x}${y} -> top")
+      }
+    }
+  }
+
+  def connectCUArray {
+    for (x <- 0 until cols) {
+      for (y <- 0 until rows) {
+        dot.println(s"""${x}${y} [pos="${x*2+1},${y*2+1}!"]""")
+        val validInputs = Set(W(), S())
+
+        // Connect CUs together (inputs 0 (W) and 2(S))
+        if (y == 0) { validInputs -= S() }
+        if (x == 0) { validInputs -= W() }
+        validInputs.foreach { case in =>
+          val inIdx = getCUInputIdx(in) // Indices of input ports
+          val r = yOffset(in)
+          val c = xOffset(in)
+          println(s"[cu $x $y] input dir: $in, inIdx = $inIdx, input CU = cu ${x+c}${y+r}")
+          cus(x)(y).io.dataIn(inIdx) := cus(x+c)(y+r).io.dataOut
+            dot.println(s"${(x+c)}${(y+r)} -> ${x}${y}")
+        }
+      }
+    }
+  }
+
+  def connectCUAndSwitch = {
+    for (i <- 0 until cols) {
+      for (j <- 0 until rows) {
+        // Connect NW (1) and SW(3) inputs for CUs
+        val validDirs = List(NW(), SW())
+        validDirs.foreach { dir =>
+          val (switchx, switchy) = dir match {
+            case NW() => (i, j+1)
+            case SW() => (i, j)
+            case _ => throw new Exception(s"Unsupported CU input dir $dir to connect switches")
+          }
+
+          // Currently we support only a single link in each of these directions
+          Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), INPUT) == 1, s"Num links in $dir direction must be 1")
+          Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), OUTPUT) == 1, s"Num links in $dir direction must be 1")
+
+          val switchOutIdx = getIdxs(switchx, switchy, reverseDir(dir), OUTPUT)(0)
+          val cuIdx = getCUInputIdx(dir)
+          cus(i)(j).io.dataIn(cuIdx) := switches(switchx)(switchy).io.outs(switchOutIdx)
+          dot.println(s"s${(switchx)}${(switchy)} -> ${i}${j}")
+        }
+
+        // Connect CU output to SW (i, j+1) and NW (i+1, j+1)
+        val swIdxSwitch = getIdxs(i+1, j+1, SW(), INPUT)(0)
+        val nwIdxSwitch = getIdxs(i+1, j, NW(), INPUT)(0)
+        switches(i+1)(j+1).io.ins(swIdxSwitch) := cus(i)(j).io.dataOut
+        switches(i+1)(j).io.ins(nwIdxSwitch) := cus(i)(j).io.dataOut
+        dot.println(s"${(i)}${(j)} -> s${i+1}${j+1}")
+        dot.println(s"${(i)}${(j)} -> s${i+1}${j}")
+      }
+    }
+  }
+
+  // Connect first 'numMemoryUnits' switches in first column to memory units
+   def connectMUs = {
+     for (i <- 0 until mus.size) {
+      dot.println(s"""m${i} [shape=rectangle style=filled fillcolor=gray color=white pos="-1,${i*2}!"]""")
+      val switchx = 0
+      val switchy = i
+      val westOutputs = getIdxs(switchx, switchy, W(), OUTPUT).map { switches(switchx)(switchy).io.outs(_) }
+      val westInputs = getIdxs(switchx, switchy, W(), INPUT).map { switches(switchx)(switchy).io.ins(_) }
+      val addr = westOutputs(0)
+      val size = westOutputs(1)
+      val wdata = westOutputs(2)
+      val rdata = westInputs(0)
+
+      rdata := mus(i).io.interconnect.rdata
+      mus(i).io.interconnect.wdata := wdata
+      mus(i).io.interconnect.addr :=  addr
+      mus(i).io.interconnect.size :=  size(0)  // Size is a scalar
+
+      dot.println(s"m${i} -> s${0}${i}")
+      dot.println(s"s${0}${i} -> m${i}")
+      dot.println(s"s${0}${i} -> m${i}")
+      dot.println(s"s${0}${i} -> m${i}")
+    }
+  }
+
+  def performConnections = {
+    connectSwitchArray
+    connectTopUnit
+    connectMUs
+    connectCUArray
+    connectCUAndSwitch
+  }
+
+  def connectAll = {
+    dot.println("digraph G {")
+    dot.println(s"""top [pos="${rows},-1!"]""")
+    performConnections
+    dot.println("}")
+    dot.close
+  }
+}
+
+trait CtrlInterconnectHelper extends InterconnectHelper {
+
+  // Define valid IOs for switches along each edge of the 2D array
+  override def topIO(iodir: IODirection): Set[Direction] = {
+    (iodir match {
+      case INPUT => Set(W(), E(), SW(), SE())
+      case OUTPUT => Set(W(), E(), SW(), SE())
+      case _ => throw new Exception(s"Unknown direction $iodir")
+    }) ++ baseIODirs
+  }
+
+  override def botIO(iodir: IODirection): Set[Direction] = {
+    (iodir match {
+      case INPUT => Set(W(), E(), NW(), NE())
+      case OUTPUT => Set(W(), E(), NW(), NE())
+      case _ => throw new Exception(s"Unknown direction $iodir")
+    }) ++ baseIODirs
+  }
+
+  override def rightIO(iodir: IODirection): Set[Direction] = {
+    (iodir match {
+      case INPUT => Set(W(), NW(), SW())
+      case OUTPUT => Set(W(), NW(), SW())
+      case _ => throw new Exception(s"Unknown direction $iodir")
+    }) ++ baseIODirs
+  }
+
+  override def leftIO(iodir: IODirection): Set[Direction] = {
+    (iodir match {
+      case INPUT => Set(E(), NE(), SE())
+      case OUTPUT => Set(E(), NE(), SE())
+      case _ => throw new Exception(s"Unknown direction $iodir")
+    }) ++ baseIODirs
+  }
+
+  // Returns the set of valid IO directions for a switch
+  // at position (x, y) in cartesian co-ordinate system
+  override def getValidIO(x: Int, y: Int, iodir: IODirection): Set[Direction] = {
+    var validIO = regularIO(iodir)
+
+    validIO = x match {
+      case 0 => validIO.intersect(leftIO(iodir))
+      case `cols` => validIO.intersect(rightIO(iodir))
+      case _ => validIO
+    }
+    validIO = y match {
+      case 0 => validIO.intersect(botIO(iodir))
+      case `cols` => validIO.intersect(topIO(iodir))
+      case _ => validIO
+    }
+
+    if (isMUSwitch(x, y)) {
+      validIO = x match {
+        case 0 => // Leftmost column
+          iodir match {
+            case INPUT => validIO ++ Set(W())
+            case OUTPUT => validIO ++ Set(W())
+          }
+        case `cols` => // Rightmost column
+          iodir match {
+            case INPUT => validIO ++ Set(E())
+            case OUTPUT => validIO ++ Set(E())
+          }
+        case _ => throw new Exception(s"Invalid MU switch position ($x, $y): MU can only be attached to col 0 or col $cols")
+      }
+    }
+    validIO
+  }
+
+  override def getNumLinks(x: Int, y: Int, d: Direction, iodir: IODirection) = {
+    d match {
+        case W() => if (isMUSwitch(x, y) & (x == 0)) 3 else defaultNumLinks
+        case E() => if (isMUSwitch(x, y) & (x == cols)) 3 else defaultNumLinks
+        case _ => defaultNumLinks
+    }
+  }
+
+  override def connectSwitchArray {
+    for (x <- 0 to cols) {
+      for (y <- 0 to rows) {
+        dot.println(s"""s${x}${y} [ shape=square style=filled fillcolor=red fontcolor=white color=white fillcolor=red pos= "${x*2},${y*2}!"]""")
+        val validInputDirs = getValidIO(x, y, INPUT).intersect(Set(W(), N(), E(), S()))
+        getDirAssignment(x, y, INPUT)
+        if (x == 0) { List(W(), NW(), SW()) foreach { validInputDirs -= _ } }
+        if (x == cols) { List(E(), SE(), NE()) foreach { validInputDirs -= _ } }
+        if (y == 0) { List(S(), SE(), SW()) foreach { validInputDirs -= _ } }
+        if (y == rows) { List(N(), NE(), NW()) foreach { validInputDirs -= _ } }
+        validInputDirs.foreach { case d =>
+          val inIdxs = getIdxs(x, y, d, INPUT) // Indices of input ports
+          val r = yOffset(d)
+          val c = xOffset(d)
+          val outIdxs = getIdxs(x+c, y+r, reverseDir(d), OUTPUT)  // Indices of output that connects to idxs
+          println(s"[switch $x $y $d] : inIdxs: $inIdxs, outSwitch: [${x+c} ${y+r}], outSwitchDir: ${reverseDir(d)}, outIdxs: $outIdxs")
+          inIdxs.zip(outIdxs) foreach { case (inIdx, outIdx) =>
+            switches(x)(y).io.ins(inIdx)(0) := switches(x+c)(y+r).io.outs(outIdx)(0)
+            dot.println(s"s${(x+c)}${(y+r)} -> s${x}${y}")
+          }
+        }
+      }
+    }
+  }
+
+  override def connectTopUnit = {
+    for (y <- List(0, rows)) {
+      val d = if (y == 0) S() else N()
+      for (x <- 0 to cols) {
+        val switchOut = getIdxs(x, y, d, OUTPUT)(0)
+        val switchIn = getIdxs(x, y, d, INPUT)(0)
+        switches(x)(y).io.ins(switchIn)(0) := topUnit.io.startTokenOut
+        val topInIdx = if (y > 0) cols + x else x  // Row 0 gets 0..cols-1, last row gets cols..
+        topUnit.io.ctrlIns(topInIdx) := switches(x)(y).io.outs(switchOut)(0)
+        dot.println(s"top -> s${x}${y}")
+        dot.println(s"s${x}${y} -> top")
+      }
+    }
+  }
+
+  // Connect first 'numMemoryUnits' switches in first column to memory units
+  override def connectMUs = {
+     for (i <- 0 until mus.size) {
+      dot.println(s"""m${i} [shape=rectangle style=filled fillcolor=gray color=white pos="-1,${i*2}!"]""")
+      val switchx = 0
+      val switchy = i
+      val westOutputs = getIdxs(switchx, switchy, W(), OUTPUT).map { switches(switchx)(switchy).io.outs(_)(0) }
+      val westInputs = getIdxs(switchx, switchy, W(), INPUT).map { switches(switchx)(switchy).io.ins(_)(0) }
+      val rdyIn = westOutputs(0)
+      val vldIn = westOutputs(1)
+      val dataVldIn = westOutputs(2)
+      val rdyOut = westInputs(0)
+      val dataRdyOut = westInputs(1)
+      val vldOut = westInputs(2)
+
+      mus(i).io.interconnect.rdyIn := rdyIn
+      mus(i).io.interconnect.vldIn := vldIn
+      mus(i).io.interconnect.dataVldIn := dataVldIn
+      dot.println(s"s${switchx}${switchy} -> m${i}")
+      dot.println(s"s${switchx}${switchy} -> m${i}")
+      dot.println(s"s${switchx}${switchy} -> m${i}")
+
+      rdyOut := mus(i).io.interconnect.rdyOut
+      dataRdyOut := mus(i).io.interconnect.dataRdyOut
+      vldOut := mus(i).io.interconnect.vldOut
+      dot.println(s"m${i} -> s${switchx}${switchy}")
+      dot.println(s"m${i} -> s${switchx}${switchy}")
+      dot.println(s"m${i} -> s${switchx}${switchy}")
+    }
+  }
+
+  // CU Input order: All 8 directions valid for control
+  override def getCUInputIdx(d: Direction) = dirOrder.indexOf(d)
+
+  override def connectCUArray {
+    for (x <- 0 until cols) {
+      for (y <- 0 until rows) {
+        dot.println(s"""${x}${y} [pos="${x*2+1},${y*2+1}!"]""")
+        val validInputs = Set(W(), N(), E(), S())
+
+        // Connect CUs together (inputs 0 (W) and 2(S))
+        if (y == 0) { validInputs -= S() }
+        if (y == rows-1) { validInputs -= N() }
+        if (x == 0) { validInputs -= W() }
+        if (x == cols-1) { validInputs -= E() }
+        validInputs.foreach { case in =>
+          val inIdx = getCUInputIdx(in) // Indices of input ports
+          val outIdx = getCUInputIdx(reverseDir(in))
+          val r = yOffset(in)
+          val c = xOffset(in)
+          println(s"[cu $x $y] $in ($inIdx) = cu [${x+c}${y+r}] ${reverseDir(in)} $outIdx")
+
+          val pipelineReg = Module(new FF(1))
+          pipelineReg.io.control.enable := Bool(true)
+          pipelineReg.io.data.in := cus(x+c)(y+r).io.tokenOuts(outIdx)
+          cus(x)(y).io.tokenIns(inIdx) := pipelineReg.io.data.out
+            dot.println(s"${(x+c)}${(y+r)} -> ${x}${y}")
+        }
+      }
+    }
+  }
+
+  override def connectCUAndSwitch = {
+    for (i <- 0 until cols) {
+      for (j <- 0 until rows) {
+        // Connect NW (1), NE(3), SE(5), SW(7) inputs for CUs
+        val validDirs = List(NW(), NE(), SE(), SW())
+        validDirs.foreach { dir =>
+          val (switchx, switchy) = dir match {
+            case NW() => (i, j+1)
+            case NE() => (i+1, j+1)
+            case SE() => (i+1, j)
+            case SW() => (i, j)
+            case _ => throw new Exception(s"Unsupported CU input direction $dir to connect switches")
+          }
+
+          // Currently we support only a single link in each of these directions
+          Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), INPUT) == 1, s"Num links in $dir direction must be 1")
+          Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), OUTPUT) == 1, s"Num links in $dir direction must be 1")
+
+          val switchOutIdx = getIdxs(switchx, switchy, reverseDir(dir), OUTPUT)(0)
+          val switchInIdx = getIdxs(switchx, switchy, reverseDir(dir), INPUT)(0)
+          val cuIdx = getCUInputIdx(dir)  // Same idx for both input and output
+          cus(i)(j).io.tokenIns(cuIdx) := switches(switchx)(switchy).io.outs(switchOutIdx)(0)
+          switches(switchx)(switchy).io.ins(switchInIdx)(0) := cus(i)(j).io.tokenOuts(cuIdx)
+          dot.println(s"s${(switchx)}${(switchy)} -> ${i}${j}")
+          dot.println(s" ${i}${j} -> s${(switchx)}${(switchy)}")
+        }
+      }
+    }
+  }
+
+  override def performConnections = {
+    connectSwitchArray
+    connectTopUnit
+    connectMUs
+    connectCUArray
+    connectCUAndSwitch
   }
 }
 
@@ -76,125 +597,67 @@ class Plasticine(val w: Int,
   val numStagesAfterReduction: Int,
  inst: PlasticineConfig) extends Module with DirectionOps {
 
-  val rows = 4
-  val cols = 4
+  val numRows = 4
+  val numCols = 4
 
   val io = new Bundle {
     val config_enable = Bool(INPUT) // Reconfiguration interface
 
-    /* Control interface */
-    val command = Bool(INPUT)
-    val status =  Bool(OUTPUT)
+    /* Register interface */
+    val addr = UInt(INPUT, width=w)
+    val wdata = UInt(INPUT, width=w)
+    val wen = Bool(INPUT)
+    val dataVld = Bool(INPUT)
+    val rdata = UInt(OUTPUT, width=w)
   }
 
-  def genSwitchArray(radix: Int, inst: List[CrossbarConfig]) = {
-    ListBuffer.tabulate(rows+1) { i =>
-      ListBuffer.tabulate(cols+1) { j =>
-        Module(new CrossbarVecReg(w, v, radix, radix, inst(i*cols+j)))
+  val numOutstandingBursts = 16
+  val burstSizeBytes = 64
+  val numMemoryUnits = 4
+  def genMemoryUnits = {
+    List.tabulate(numMemoryUnits) { i =>
+      Module(new MemoryTester(w, m, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0)))
+    }
+  }
+
+  def genDataArray(inst: List[ComputeUnitConfig]) = {
+    ListBuffer.tabulate(numCols) { i =>
+      ListBuffer.tabulate(numRows) { j =>
+        Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, inst(i*numCols+j)))
       }
     }
   }
 
-  // Absolute direction ordering - assumes a max of '8' directions for now
-  // Supporting more directions will need some other way of representing directions
-  val dirOrder: List[Direction] = List(W(), NW(), N(), NE(), E(), SE(), S(), SW())
+  val memoryUnits = genMemoryUnits
+  val top = Module(new TopUnit(w, v, (numCols+1) * 2, inst.top))
+  top.io.addr := io.addr
+  top.io.wdata := io.wdata
+  top.io.wen:= io.wen
+  io.rdata := top.io.rdata
 
-  val dataNumLinksPerDir = 1
-  val dataSwitchValidIn: Set[Direction] = Set(N(), S(), E(), W(), NW(), SW())
-  val dataSwitchValidOut: Set[Direction] = Set(W(), N(), NE(), E(), SE(), S())
+  val computeUnits = genDataArray(inst.cu)
 
-  val ctrlNumLinksPerDir = 4
-  val ctrlSwitchValidIn = dataSwitchValidIn
-  val ctrlSwitchValidOut = dataSwitchValidOut
-
-  def getIdxBase(d: Direction, validDirs: Set[Direction], numLinksPerDir: Int) = {
-    Predef.assert(validDirs.contains(d), s"[getIdx] Direction '$d' not in validDirs set ($validDirs))")
-    dirOrder.filter(validDirs.contains(_)).indexOf(d) * numLinksPerDir
+  val dataInterconnect = new InterconnectHelper {
+    val rows = numRows
+    val cols = numCols
+    val mus = memoryUnits
+    val cus = computeUnits
+    val topUnit = top
+    val dot = new PrintWriter("data.dot")
+    val switches = genSwitchArray(w, v, inst.dataSwitch)
   }
+  dataInterconnect.connectAll
 
-  def getIdxs(d: Direction, validDirs: Set[Direction], numLinksPerDir: Int) = {
-    val baseIdx = getIdxBase(d, validDirs, numLinksPerDir)
-    List.tabulate(numLinksPerDir) { i => baseIdx + i }
+  val ctrlInterconnect = new CtrlInterconnectHelper {
+    val rows = numRows
+    val cols = numCols
+    val cus = computeUnits
+    val mus = memoryUnits
+    val topUnit = top
+    val dot = new PrintWriter("control.dot")
+    val switches = genSwitchArray(1, 1, inst.controlSwitch)
   }
-
-  def getCtrlInputIdxs(d: Direction) = {
-    getIdxs(d, ctrlSwitchValidIn, ctrlNumLinksPerDir)
-  }
-
-  def getCtrlOutputIdxs(d: Direction) = {
-    getIdxs(d, ctrlSwitchValidOut, ctrlNumLinksPerDir)
-  }
-
-  def getDataInputIdxs(d: Direction) = {
-    getIdxs(d, dataSwitchValidIn, dataNumLinksPerDir)
-  }
-
-  def getDataOutputIdxs(d: Direction) = {
-    getIdxs(d, dataSwitchValidOut, dataNumLinksPerDir)
-  }
-
-  def connectSwitchArray(switches: ListBuffer[ListBuffer[CrossbarVecReg]]) {
-    val pw = new PrintWriter("switchDot.dot")
-    pw.println("digraph G {")
-    for (i <- 0 to rows) {
-      for (j <- 0 to cols) {
-        pw.println(s"""${i}${j} [ pos= "$i,$j!"]""")
-        val validInputs = Set(W(), N(), E(), S())
-        if (i == 0) { List(N(), NE(), NW()) foreach { validInputs -= _ } }
-        if (i == rows) { List(S(), SE(), SW()) foreach { validInputs -= _ } }
-        if (j == 0) { List(W(), NW(), SW()) foreach { validInputs -= _ } }
-        if (j == rows) { List(E(), SE(), NE()) foreach { validInputs -= _ } }
-        validInputs.foreach { case in =>
-          val inIdxs = getDataInputIdxs(in) // Indices of input ports
-          val outIdxs = getDataOutputIdxs(reverseDir(in))  // Indices of output that connects to idxs
-          val r = rowOffset(in)
-          val c = colOffset(in)
-          inIdxs.zip(outIdxs) foreach { case (inIdx, outIdx) =>
-            switches(i)(j).io.ins(inIdx) := switches(i+r)(j+c).io.outs(outIdx)
-            pw.println(s"${(i+r)}${(j+c)} -> ${i}${j}")
-          }
-//          println(s"Assigning ${i+r}, ${j+c}, ${reverseIdx} (${switches(i+r)(j+c).io.outs(reverseIdx)}) to (${i}, ${j}, ${idx}) (${switches(i)(j).io.ins(idx)})")
-        }
-      }
-    }
-    pw.println("}")
-    pw.close
-  }
-
-
-  Predef.assert(dataSwitchValidIn.size == dataSwitchValidOut.size,
-    s"Data switch has unequal number of inputs and outputs, which is currently unsupported")
-  val dataSwitches = genSwitchArray(dataSwitchValidIn.size, inst.dataSwitch)
-  connectSwitchArray(dataSwitches)
-
-  // Main control with command and status
-//  val controlBox = Module(new TopUnit())
-//  controlBox.io.command := io.command
-//  io.status := controlBox.io.statusOut
-
-  // Point-to-point interconnect
-//  val cus = ListBuffer[ListBuffer[ComputeUnit]]()
-//  for (i <- 0 until rows) {
-//    cus.append(new ListBuffer[ComputeUnit]())
-//    for (j <- 0 until cols) {
-//      val cu = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, inst.cu(i)))
-//      cu.io.config_enable := io.config_enable
-//      cus(i).append(cu)
-//      if (i == 0) { // First row
-//        if (j == 0) {  // First column
-////           Do nothing
-//        } else {
-//          cu.io.dataIn(0) := cus(i)(j-1).io.dataOut
-//        }
-//      } else if (j == 0) { // First column
-//        cu.io.dataIn(1) := cus(i-1)(j).io.dataOut
-//      } else  {
-//        cu.io.dataIn(0) := cus(i)(j-1).io.dataOut
-//        cu.io.dataIn(1) := cus(i-1)(j).io.dataOut
-//      }
-//    }
-//  }
-//  controlBox.io.doneTokenIn := cus(rows-1)(cols-1).io.tokenOuts(0)
+  ctrlInterconnect.connectAll
 }
 
 /**
@@ -203,9 +666,9 @@ class Plasticine(val w: Int,
 class PlasticineTests(c: Plasticine) extends PlasticineTester(c) {
   var numCycles = 0
 
-  val a = Array.tabulate(c.m) { i => i}
-  val b = Array.tabulate(c.m) { i => i*2}
-  val res = Array.tabulate(c.m) { i => a(i) * b(i)}
+  val a = Array.tabulate(c.m) { i => i }
+  val b = Array.tabulate(c.m) { i => i*2 }
+  val res = Array.tabulate(c.m) { i => a(i) * b(i) }
 //  setMem(c.cu0.scratchpads(0), a)
 //  setMem(c.cu0.scratchpads(1), b)
 //  poke(c.io.command, 1)
@@ -240,7 +703,7 @@ object PlasticineTest {
     val l = 0
     val r = 16
     val rwStages = 3
-    val numTokens = 4
+    val numTokens = 8
     val m = 64
     val numScratchpads = 4
     val numStagesAfterReduction = 2
