@@ -151,10 +151,12 @@ case class CUControlBoxConfig(
   udcInit: List[Int],
   decXbar: CrossbarConfig,
   incXbar: CrossbarConfig,
+  tokenInXbar: CrossbarConfig,
   doneXbar: CrossbarConfig,
   enableMux: List[Boolean],
   tokenOutMux: List[Boolean],
-  syncTokenMux: Int
+  syncTokenMux: Int,
+  tokenOutXbar: CrossbarConfig
 ) extends AbstractConfig
 object CUControlBoxConfig {
   def getRandom(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
@@ -165,10 +167,12 @@ object CUControlBoxConfig {
         List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
         CrossbarConfig.getRandom(numCounters), // decXbar,
         CrossbarConfig.getRandom(2*numCounters), // incXbar,
+        CrossbarConfig.getRandom(numCounters), // tokenInXbar,
         CrossbarConfig.getRandom(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
         List.fill(numTokenOut) { math.abs(Random.nextInt) % 2 == 0}, // tokenOutMux,
-        math.abs(Random.nextInt) % 2 // syncTokenMux
+        math.abs(Random.nextInt) % 2, // syncTokenMux
+        CrossbarConfig.getRandom(numCounters) // tokenOutXbar,
       )
   }
 }

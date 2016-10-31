@@ -250,7 +250,7 @@ class ComputeUnit(
   val counters = counterChain.io.data map { _.out }  // List of counters
 
   // Control block
-  val controlBlock = Module(new CUControlBox(w, numCounters, inst.control))
+  val controlBlock = Module(new CUControlBox(numCounters, inst.control))
   controlBlock.io.config_enable := io.config_enable
   controlBlock.io.config_data := io.config_data
   controlBlock.io.tokenIns := io.tokenIns
