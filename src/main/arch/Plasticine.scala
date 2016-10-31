@@ -66,7 +66,7 @@ trait InterconnectHelper extends DirectionOps {
   // Interconnect components
   val cus: ListBuffer[ListBuffer[ComputeUnit]]
   val switches: ListBuffer[ListBuffer[CrossbarVecReg]]
-  val mus: List[MemoryTester]
+  val mus: List[MemoryUnit]
   val topUnit: TopUnit
 
   // CU organization
@@ -75,6 +75,10 @@ trait InterconnectHelper extends DirectionOps {
 
   // Dot file printer for the graph
   val dot: PrintWriter
+
+  // Config interface
+  val config_enable: Bool
+  val config_data: Bool
 
   // Returns if switch at (x,y) is connected to a MU
   def isMUSwitch(x: Int, y: Int) = {
@@ -212,7 +216,10 @@ trait InterconnectHelper extends DirectionOps {
         val numIns = validInDirs.toList.map { getNumLinks(x, y, _, INPUT) }.sum
         val numOuts = validOutDirs.toList.map { getNumLinks(x, y, _, OUTPUT) }.sum
         println(s"[switch $x $y] $numIns (${validInDirs}) x $numOuts (${validOutDirs}) ")
-        Module(new CrossbarVecReg(wordWidth, v, numIns, numOuts, inst(x*(cols+1)+y)))
+        val c = Module(new CrossbarVecReg(wordWidth, v, numIns, numOuts, inst(x*(cols+1)+y)))
+        c.io.config_enable := config_enable
+        c.io.config_data := config_data
+        c
       }
     }
   }
@@ -599,9 +606,12 @@ class Plasticine(val w: Int,
 
   val numRows = 4
   val numCols = 4
+  val numMemoryUnits = 4
+  val burstSizeBytes = 64
 
-  val io = new Bundle {
-    val config_enable = Bool(INPUT) // Reconfiguration interface
+  val io = new ConfigInterface {
+    /* Configuration interface */
+    val config_enable = Bool(INPUT)
 
     /* Register interface */
     val addr = UInt(INPUT, width=w)
@@ -609,27 +619,51 @@ class Plasticine(val w: Int,
     val wen = Bool(INPUT)
     val dataVld = Bool(INPUT)
     val rdata = UInt(OUTPUT, width=w)
+
+    /* Memory interface */
+    val dramChannel = Vec.fill(numMemoryUnits) { new DRAMCmdInterface(w, v) }
   }
 
   val numOutstandingBursts = 16
-  val burstSizeBytes = 64
-  val numMemoryUnits = 4
   def genMemoryUnits = {
     List.tabulate(numMemoryUnits) { i =>
-      Module(new MemoryTester(w, m, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0)))
+      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, MemoryUnitConfig(0)))
+      mu.io.config_enable := io.config_enable
+      mu.io.config_data := io.config_data
+
+      io.dramChannel(i).addr := mu.io.dram.addr
+      io.dramChannel(i).wdata := mu.io.dram.wdata
+      io.dramChannel(i).tagOut := mu.io.dram.tagOut
+
+      io.dramChannel(i).vldOut := mu.io.dram.vldOut
+      io.dramChannel(i).rdyOut := mu.io.dram.rdyOut
+      io.dramChannel(i).isWr  := mu.io.dram.isWr
+
+      mu.io.dram.rdata := io.dramChannel(i).rdata
+      mu.io.dram.vldIn := io.dramChannel(i).vldIn
+      mu.io.dram.rdyIn := io.dramChannel(i).rdyIn
+      mu.io.dram.tagIn := io.dramChannel(i).tagIn
+
+      mu
     }
   }
 
   def genDataArray(inst: List[ComputeUnitConfig]) = {
     ListBuffer.tabulate(numCols) { i =>
       ListBuffer.tabulate(numRows) { j =>
-        Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, inst(i*numCols+j)))
+        val cu = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, inst(i*numCols+j)))
+        cu.io.config_enable := io.config_enable
+        cu.io.config_data := io.config_data
+        cu
       }
     }
   }
 
   val memoryUnits = genMemoryUnits
+
   val top = Module(new TopUnit(w, v, (numCols+1) * 2, inst.top))
+  top.io.config_enable := io.config_enable
+  top.io.config_data := io.config_data
   top.io.addr := io.addr
   top.io.wdata := io.wdata
   top.io.wen:= io.wen
@@ -643,6 +677,8 @@ class Plasticine(val w: Int,
     val mus = memoryUnits
     val cus = computeUnits
     val topUnit = top
+    val config_enable = io.config_enable
+    val config_data = io.config_data
     val dot = new PrintWriter("data.dot")
     val switches = genSwitchArray(w, v, inst.dataSwitch)
   }
@@ -654,6 +690,8 @@ class Plasticine(val w: Int,
     val cus = computeUnits
     val mus = memoryUnits
     val topUnit = top
+    val config_enable = io.config_enable
+    val config_data = io.config_data
     val dot = new PrintWriter("control.dot")
     val switches = genSwitchArray(1, 1, inst.controlSwitch)
   }

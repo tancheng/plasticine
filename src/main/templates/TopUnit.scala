@@ -39,7 +39,8 @@ class ConnBox(val numInputs: Int, v: Int, w: Int, inst: ConnBoxConfig) extends C
  * and wait for the last token respectively.
  */
 class TopUnit(val w: Int, val v: Int, val numInputs: Int, val inst: TopUnitConfig) extends Module {
-  val io = new Bundle {
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
     val addr = UInt(INPUT, width=w)
     val wdata = UInt(INPUT, width=w)
     val wen = Bool(INPUT)
