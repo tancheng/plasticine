@@ -255,6 +255,13 @@ object Parser {
     ScratchpadConfig(wa, ra, wd, wen, banking, numBufs)
   }
 
+  def parseTopUnit(m: Map[Any, Any]): TopUnitConfig = {
+    val doneConnBox = ConnBoxConfig(Parser.getFieldInt(m, "doneConnBox"))
+    val dataVldConnBox = ConnBoxConfig(Parser.getFieldInt(m, "dataVldConnBox"))
+    val argOutConnBox = ConnBoxConfig(Parser.getFieldInt(m, "argOutConnBox"))
+    TopUnitConfig(doneConnBox, dataVldConnBox, argOutConnBox)
+  }
+
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
     val cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(m, "cu")
                                           .map { parseCU(_) }
@@ -264,8 +271,9 @@ object Parser {
     val controlSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "controlSwitch")
                                           .map { parseCrossbar(_) }
 
+    val top: TopUnitConfig = parseTopUnit(Parser.getFieldMap(m, "top"))
 
-    PlasticineConfig(cu, dataSwitch, controlSwitch)
+    PlasticineConfig(cu, dataSwitch, controlSwitch, top)
   }
 
   def parseConfigMap(m: Map[Any, Any]) = {

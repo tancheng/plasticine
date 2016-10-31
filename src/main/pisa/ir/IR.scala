@@ -65,7 +65,7 @@ object CounterChainConfig {
 case class OperandConfig(dataSrc: Int, value: Int) extends AbstractConfig
 object OperandConfig {
   def getRandom = {
-    new OperandConfig(Random.nextInt, Random.nextInt)
+    new OperandConfig(math.abs(Random.nextInt) % 4, math.abs(Random.nextInt) % 4)
   }
 }
 
@@ -81,8 +81,8 @@ object PipeStageConfig {
     new PipeStageConfig(
         OperandConfig.getRandom,
         OperandConfig.getRandom,
-        Random.nextInt % Opcodes.size,
-        Random.nextInt,
+        math.abs(Random.nextInt) % Opcodes.size,
+        math.abs(Random.nextInt) % 4,
         Map[Int,Int]()
       )
   }
@@ -162,13 +162,13 @@ object CUControlBoxConfig {
         List.fill(numTokenOut-1) { LUTConfig.getRandom(2) }, // tokenOutLUT
         List.fill(numCounters) { LUTConfig.getRandom(numCounters)}, // enableLUT
         List.fill(2) { LUTConfig.getRandom(numCounters+1) }, // tokenDownLUT,
-        List.fill(numCounters) { Random.nextInt }, // udcInit,
+        List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
         CrossbarConfig.getRandom(numCounters), // decXbar,
         CrossbarConfig.getRandom(2*numCounters), // incXbar,
-        CrossbarConfig.getRandom(numCounters), // doneXbar,
-        List.fill(numCounters) { Random.nextInt % 2 == 0}, // enableMux,
-        List.fill(numTokenOut-1) { Random.nextInt % 2 == 0}, // tokenOutMux,
-        Random.nextInt % 2 // syncTokenMux
+        CrossbarConfig.getRandom(2*numCounters), // doneXbar,
+        List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
+        List.fill(numTokenOut) { math.abs(Random.nextInt) % 2 == 0}, // tokenOutMux,
+        math.abs(Random.nextInt) % 2 // syncTokenMux
       )
   }
 }
@@ -181,7 +181,7 @@ object CUControlBoxConfig {
 case class CrossbarConfig(outSelect: List[Int]) extends AbstractConfig
 object CrossbarConfig {
   def getRandom(numOutputs: Int) = {
-    new CrossbarConfig(List.fill(numOutputs) { math.abs(Random.nextInt) % 5 })
+    new CrossbarConfig(List.fill(1+numOutputs) { math.abs(Random.nextInt) % 2 })
   }
 }
 
@@ -196,12 +196,42 @@ object LUTConfig {
 }
 
 /**
+ * Connection box config information
+ */
+case class ConnBoxConfig(sel: Int) extends AbstractConfig
+object ConnBoxConfig {
+  def getRandom(numInputs: Int) = {
+    new ConnBoxConfig(math.abs(Random.nextInt(numInputs)))
+  }
+}
+
+/**
+ * TopUnitConfig
+ */
+case class TopUnitConfig(
+  doneConnBox: ConnBoxConfig,
+  dataVldConnBox: ConnBoxConfig,
+  argOutConnBox: ConnBoxConfig
+) extends AbstractConfig
+object TopUnitConfig {
+  def getRandom(numInputs: Int) = {
+    new TopUnitConfig(
+      ConnBoxConfig.getRandom(numInputs),
+      ConnBoxConfig.getRandom(numInputs),
+      ConnBoxConfig.getRandom(numInputs)
+      )
+  }
+}
+
+
+/**
  * Plasticine config information
  */
 case class PlasticineConfig(
   cu: List[ComputeUnitConfig],
   dataSwitch: List[CrossbarConfig],
-  controlSwitch: List[CrossbarConfig]
+  controlSwitch: List[CrossbarConfig],
+  top: TopUnitConfig
 ) extends AbstractConfig
 
 object PlasticineConfig {
@@ -217,6 +247,7 @@ object PlasticineConfig {
     new PlasticineConfig(
       List.tabulate(rows*cols) { i => ComputeUnitConfig.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
       List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) })
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
+      TopUnitConfig.getRandom(8))
       }
 }
