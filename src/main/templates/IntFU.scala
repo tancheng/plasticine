@@ -105,10 +105,10 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
     ("<" , (a,b)   => a<b),
     ("<<" , (a,b)   => a<<b),
     (">>" , (a,b)   => a>>b),
-    ("f<" , (a,b)   => UInt(0)),
-    ("f==" , (a,b)  => UInt(0)),
-    ("f>" , (a,b) => UInt(0)),
-    ("f*" , (a,b) => UInt(0)),
+    ("f<" , (a,b)   => fpLt),
+    ("f==" , (a,b)  => fpEq),
+    ("f>" , (a,b) => fpGt),
+    ("f*" , (a,b) => fmaOut),
     ("passA" , (a,b) => a),
     ("passB" , (a,b) => b)
   )
