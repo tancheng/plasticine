@@ -14,7 +14,13 @@ case class ScratchpadOpcode(val d: Int, val v: Int, config: Option[ScratchpadCon
 
   var mode = if (config.isDefined) UInt(config.get.banking.mode, width=2) else UInt(width=2)
   var strideLog2 = if (config.isDefined) UInt(config.get.banking.strideLog2, width=log2Up(log2Up(d)-log2Up(v))) else UInt(width = log2Up(log2Up(d) - log2Up(v)))
-  var bufSize = if (config.isDefined) UInt(d / (v*config.get.numBufs), width=log2Up(d/v)+1) else UInt(width = log2Up(d/v))
+  var bufSize = if (config.isDefined) {
+    // Clamp bufSize value to be at least 1
+    // If bufSize is 1, the Scratchpad is configured as a FIFO
+    // The JSON specifies the "numBufs" field - this should be set to at least (d/v) to configure scratchpad as FIFO
+    // It can be set to an outrageous number (say INT_MAX) to be safe
+    UInt(math.max(1, d / (v*config.get.numBufs)), width=log2Up(d/v)+1)
+  } else UInt(width = log2Up(d/v))
 
   override def cloneType(): this.type = {
     new ScratchpadOpcode(d, v, config).asInstanceOf[this.type]
@@ -27,7 +33,6 @@ case class ScratchpadOpcode(val d: Int, val v: Int, config: Option[ScratchpadCon
  * instantiate decode logic which outputs a bank address
  * and local address
  */
-
 class AddrDecoder(val d: Int, val v: Int) extends Module {
   val addrWidth = log2Up(d)
   val bankAddrWidth = log2Up(v)
@@ -160,12 +165,13 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
   val mems = List.fill(v) { Module(new SRAM(w, bankSize)) }
 
   // Create size register
+  val isFifo = config.bufSize === UInt(1)
   val sizeUDC = Module(new UpDownCtr(log2Up(d+1)))
   val size = sizeUDC.io.out
   val empty = size === UInt(0)
   val full = sizeUDC.io.isMax
   sizeUDC.io.initval := UInt(0)
-  sizeUDC.io.max := UInt(d)
+  sizeUDC.io.max := UInt(d - v * (bankSize % inst.numBufs))
   sizeUDC.io.init := UInt(0)
 //  sizeUDC.io.strideInc := Mux(config.chainWrite, UInt(1), UInt(v))
   sizeUDC.io.strideInc := UInt(v)
@@ -233,20 +239,20 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
     raddrDecoder.io.addr := laneRaddr
     raddrDecoder.io.strideLog2 := config.strideLog2
     val localRaddr = raddrDecoder.io.localAddr
-    m.io.raddr := localRaddr + headLocalAddr // Mux(readEn, nextHeadLocalAddr, headLocalAddr)
+    m.io.raddr := Mux(isFifo, Mux(readEn, nextHeadLocalAddr, headLocalAddr), localRaddr + headLocalAddr)
 
     // Write address
     val waddrDecoder = Module(new AddrDecoder(d, v))
     waddrDecoder.io.addr := laneWaddr
     waddrDecoder.io.strideLog2 := config.strideLog2
     val localWaddr = waddrDecoder.io.localAddr
-    m.io.waddr := localWaddr + tailLocalAddr
+    m.io.waddr := Mux(isFifo, tailLocalAddr, localWaddr + tailLocalAddr)
 
     // Write data
     m.io.wdata := io.wdata(i)
 
     // Write enable
-    m.io.wen := io.wen | io.wdone
+    m.io.wen := io.wen | io.wdone // wdone becomes the 'enable' in FIFO mode
 
     // Read data
     io.rdata(i) := m.io.rdata
