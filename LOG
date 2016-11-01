@@ -1,0 +1,88 @@
+Binary file ./lib_managed/bundles/org.scala-lang.modules/scala-xml_2.11/scala-xml_2.11-1.0.3.jar matches
+Binary file ./lib_managed/bundles/org.scala-lang.modules/scala-parser-combinators_2.11/scala-parser-combinators_2.11-1.0.3.jar matches
+Binary file ./lib_managed/bundles/org.scalatest/scalatest_2.11/scalatest_2.11-2.2.2.jar matches
+Binary file ./lib_managed/jars/jline/jline/jline-2.12.jar matches
+Binary file ./lib_managed/jars/org.scala-lang/scala-library/scala-library-2.11.7.jar matches
+Binary file ./lib_managed/jars/org.scala-lang/scala-library/scala-library-2.11.5.jar matches
+Binary file ./lib_managed/jars/org.scala-lang/scala-compiler/scala-compiler-2.11.5.jar matches
+Binary file ./lib_managed/jars/org.scala-lang/scala-reflect/scala-reflect-2.11.7.jar matches
+Binary file ./lib_managed/jars/org.scala-lang/scala-reflect/scala-reflect-2.11.5.jar matches
+Binary file ./lib_managed/jars/edu.berkeley.cs/chisel_2.11/chisel_2.11-2.2.35.jar matches
+Binary file ./dramsimTemplates/MemoryTester.o matches
+./dramsimTemplates/MemoryTester.vcd:1641:$var wire 1 ## reset $end
+./dramsimTemplates/MemoryTester.vcd:2299:b1 ##
+./dramsimTemplates/MemoryTester.vcd:3957:b0 ##
+Binary file ./generated/MemoryUnitTest/MemoryTester matches
+Binary file ./generated/MemoryUnitTest/MemoryTester.o matches
+./generated/MemoryUnitTest/MemoryTester.vcd:1641:$var wire 1 ## reset $end
+./generated/MemoryUnitTest/MemoryTester.vcd:2299:b1 ##
+./generated/MemoryUnitTest/MemoryTester.vcd:3957:b0 ##
+Binary file ./generated/MemoryUnitTest/MemoryTester-emulator.o matches
+./.git/hooks/update.sample:73:		short_refname=${refname##refs/tags/}
+Binary file ./.git/objects/46/e17a661885f547f845a8f61d3da384b342460d matches
+Binary file ./.git/objects/57/d8605023db1beb21a7114e01a43b65e9849049 matches
+Binary file ./.git/objects/ea/e8f9753cb8461b4a1a50ccf19201b7265b5d97 matches
+Binary file ./.git/objects/98/35e78ad293b74411b5eb46a558d112dc701d5c matches
+Binary file ./.git/objects/pack/pack-9d8258bc18bd49054c36c234d8c99766bd31b6f9.idx matches
+Binary file ./.git/objects/pack/pack-9d8258bc18bd49054c36c234d8c99766bd31b6f9.pack matches
+Binary file ./.git/objects/5c/93fd0ac1179d5d562c1486c1ba8ab24bc7dfea matches
+Binary file ./.git/objects/04/b78c861e390c712a9e0fb04d10b0001018d0fd matches
+Binary file ./.git/objects/c0/569e48fd2672669dc3a10bc873877bfebc292c matches
+Binary file ./.git/objects/a8/e83389309d4b8d77805883b4909f491291ee12 matches
+Binary file ./.git/objects/64/fbf08dbb71b26315d7b004d95635a080d17706 matches
+Binary file ./.git/objects/e2/f935387c91214499a78a537157fda19aa83980 matches
+Binary file ./.git/objects/dd/bbe8361a0a9bd01bcc6d95c3c66131059e2963 matches
+./static/splitMethods.sh:11:## Split the header file
+./static/splitMethods.sh:31:## Move "const val_t" declarations in .h and .cpp file to globals.h and globalDefs.h
+./static/splitMethods.sh:35:## Add 'extern' prefix to all declarations in globals.h
+./static/splitMethods.sh:42:## Delete all moved declarations in .h and .cpp files
+./static/splitMethods.sh:60:## Get starting and ending lines
+./static/splitMethods.sh:64:## Extract body into separate file, add a placeholder to append stuff in
+./static/splitMethods.sh:68:## Delete chopped up lines from file
+./static/splitMethods.sh:72:## Chop up file into several pieces
+./static/splitMethods.sh:75:## Append common header files, method call names for each file
+./static/splitMethods.sh:76:## Insert method calls in place (don't forget semicolons)
+./static/splitMethods.sh:98:## Extract body into separate file, add a placeholder to append stuff in
+./static/splitMethods.sh:104:## Delete chopped up lines from file
+./static/splitMethods.sh:107:## Move "val_t T<num>;" declarations into a global header file
+./static/splitMethods.sh:123:## Replace "this" with "ptr"
+./static/splitMethods.sh:126:## Chop up file into several pieces
+./static/splitMethods.sh:129:## Append common header files, method call names for each file
+./static/splitMethods.sh:148:## dump_init
+./static/splitMethods.sh:149:## Get starting and ending lines
+./static/splitMethods.sh:154:  ## Extract body into separate file, add a placeholder to append stuff in
+./static/splitMethods.sh:158:  ## Delete chopped up lines from file
+./static/splitMethods.sh:162:  ## Chop up file into several pieces
+./static/splitMethods.sh:165:  ## Append common header files, method call names for each file
+./static/splitMethods.sh:166:  ## Insert method calls in place (don't forget semicolons)
+./static/verilog/scripts/icc.tcl:39:## create_floorplan
+./static/verilog/scripts/icc.tcl:84:###################################################
+./static/verilog/scripts/icc.tcl:86:###################################################
+./static/verilog/scripts/icc.tcl:96:###################################################
+./static/verilog/scripts/icc.tcl:98:###################################################
+./static/verilog/scripts/setup.sh:1:## set up synopsys requirements: 
+./static/verilog/scripts/setup.sh:32:## set up TSMC 45 library
+./static/verilog/scripts/setup.sh:35:## verilog simulations libraries
+./static/verilog/scripts/dc.tcl:62:###################################################
+./static/verilog/scripts/dc.tcl:74:###################################################
+./static/verilog/scripts/dc.tcl:76:###################################################
+./static/verilog/scripts/genParam.sh:15:## Settings
+./static/verilog/scripts/genParam.sh:34:## Emit 'set $KEY $VALUE'
+./scripts/synthesize.tcl:197:## read_sverilog $file > ${ANALYZE_PATH}  
+./scripts/run_design.sh:40: ## VCS
+./scripts/curveFit.py:8:## Various curve-fitting functions
+./scripts/curveFit.py:42:## Calculate coefficient of determination
+./scripts/curveFit.py:88:## Read csv file
+./scripts/curveFit.py:91:## Process 'arr' to get X and Y arrays
+./scripts/curveFit.py:105:### Additional stuff for debugging
+./scripts/curveFit.py:112:### Calc R^2 for excel values
+./scripts/watch.sh:10:## Watch a folder recursively for new files created/deleted
+Binary file ./target/scala-2.11/classes/plasticine/pisa/parser/Parser$.class matches
+Binary file ./target/scala-2.11/classes/plasticine/templates/hardfloat/DivSqrtRecF64_mulAddZ31.class matches
+Binary file ./target/scala-2.11/classes/plasticine/spade/ir/ComputeUnitParams.class matches
+./target/streams/compile/compileIncremental/$global/streams/out:57:[0m[[0mdebug[0m] [0m	notify, unapply, TopUnitConfig, wait, copy$default$2, $asInstanceOf, sel, productArity, equals, copy$default$12, asInstanceOf, PlasticineConfig, synchronized, tokenInXbar, $isInstanceOf, encodeOneHot, copy$default$8, canEqual, copy$default$4, productPrefix, notifyAll, readResolve, isInstanceOf, getRandom, getRegNum, <init>, controlSwitch, ConnBoxConfig, ScratchpadConfig, apply, ==, clone, copy$default$10, ComputeUnitConfig, copy$default$3, copy, parseValue, toString, !=, getClass, copy$default$1, doneConnBox, tokenOutXbar, dataVldConnBox, ne, top, argOutConnBox, copy$default$11, dataSwitch, eq, productIterator, ##, finalize, productElement, hashCode.[0m
+./target/streams/compile/compileIncremental/$global/streams/out:76:[0m[[0mdebug[0m] [0m	E, burstSizeBytes, defaultNumLinks, InterconnectHelper, notify, unapply, dot, switches, connectTopUnit, rdata, dirOrder, reverseDir, wait, dataVld, South, $asInstanceOf, xOffset, N, productArity, equals, getDirAssignment, mus, East, connectAll, asInstanceOf, SW, wen, synchronized, $isInstanceOf, rightIO, getNumLinks, numCols, performConnections, regularIO, config_enable, getIdxs, DirectionOps, genMemoryUnits, canEqual, NE, command, NW, productPrefix, config_data, notifyAll, readResolve, wdata, genSwitchArray, isInstanceOf, dataInterconnect, genDataArray, botIO, <init>, topIO, connectCUAndSwitch, SE, connectMUs, apply, leftIO, Plasticine, memoryUnits, ==, connectCUArray, clone, status, getIdxBase, topUnit, addr, $init$, numOutstandingBursts, baseIODirs, copy, toString, isMUSwitch, io, ctrlInterconnect, !=, W, getClass, numMemoryUnits, dramChannel, West, ne, rows, top, connectSwitchArray, computeUnits, yOffset, eq, productIterator, CtrlInterconnectHelper, getValidIO, numRows, cols, ##, getCUInputIdx, finalize, productElement, hashCode, S, cus, North, Direction.[0m
+./target/streams/compile/compileIncremental/$global/streams/out:106:[0m[[0mdebug[0m] [0m	assert, nextIndex, hasExplicitReset, notify, parent, addNode, children, verify, name, printfs, addAssignment, addPin, wait, whenCond, $asInstanceOf, setName, <>, _clock, equals, setModuleName, configIn, bindings, names, resetPin, asInstanceOf, CrossbarReg, verifyWireWrap, switchKeys, addClock, params, synchronized, traversal, markComponent, verilog_parameters, bfs, $isInstanceOf, config_enable, moduleName, addDefaultReset, config, addResetPin, outs, notifyAll, named, resets, configType, CrossbarVecReg, debug, isInstanceOf, ins, dfs, assignments, numOutputs, asserts, v, nindex, configInit, <init>, stripComponent, clocks, reportWireWrap, clock, apply, printf, nodes, ==, reset_=, clone, whenConds, neededWireWraps, addModule$default$2, addModule, reset, hasExplicitClock, toString, io, !=, getClass, findBinding, addPin$default$2, w, _reset, ne, numInputs, hasWhenCond, getPathName, inst, eq, debugs, getPathName$default$1, assert$default$2, wires, ##, finalize, hashCode, level.[0m
+./target/streams/compile/compileIncremental/$global/streams/out:123:[0m[[0mdebug[0m] [0m	assert, nextIndex, fromNode, ^^, hasExplicitReset, elements, addConsumers, notify, parent, flatten, needWidth, addNode, children, sccIndex, review, verify, name, in, printfs, addAssignment, addPin, wait, dataVld, removeTypeNodes, whenCond, checkClone, copy$default$2, $asInstanceOf, comp, setName, hashCodeForCSE, infer, setWidth, <>, sel, componentOf, _clock, productArity, equals, setModuleName, configIn, usesInClockHi, equalsForCSE, isIo_=, toBits, line, asDirectionless, bindings, _id, fromBits, names, litOpt, resetPin, litOf, width_=, asInstanceOf, verifyWireWrap, switchKeys, addClock, canCSE, ctrlIns, isInVCD, params, synchronized, numSelectBits, dblLitValue, traversal, markComponent, verilog_parameters, calcElements, =/=, W0Wtransform, toBool, bfs, forceMatchingWidths, $isInstanceOf, getWidth, assign, config_enable, chiselName, replaceTree, emitIndex, moduleName, checkClone$default$1, addDefaultReset, canEqual, config, isTopLevelIO, isZeroWidth, addResetPin, isIo, _isComplementOf, productPrefix, illegalAssignment, isTypeOnly, notifyAll, out, named, ConnBoxOpcode, resets, configType, debug, isInstanceOf, isDirectionless, sccLowlink, modified, ins, dfs, assignments, asserts, getWidthW, litValue, nindex, isLit, configInit, <init>, checkPort, stripComponent, clocks, isUsedByClockHi, inputs, reportWireWrap, clock, doneTokenIn, apply, printf, ConnBox, prune, cloneType, printTree, nodes, ==, maybeFlatten, reset_=, printTree$default$3, matchWidth, flip, setIsTypeNode, setIsWired, clone, toNode, whenConds, asInput, neededWireWraps, addModule$default$2, getNode, widthW, addModule, nameIt, compOpt, isInObject, inBus, copy, reset, asOutput, colonEquals, ===, hasExplicitClock, toString, consumers, depth, io, +, width_, !=, getClass, floLitValue, initOf, copy$default$1, isTypeNode, findBinding, addPin$default$2, doneConnBox, isKnownWidth, _reset, dataVldConnBox, contains, ne, numInputs, width, hasWhenCond, init, component, :=, argOutConnBox, getPathName, inst, fromMap, eq, debugs, productIterator, isWired, getPathName$default$1, driveRand, litValue$default$1, inferWidth, assert$default$2, wires, ##, finalize, productElement, hashCode, view, level, printTree$default$2.[0m
+./old/tests/sbox/Makefile:1:###############################################################################
+./old/tests/sbox/Makefile:24:###############################################################################
