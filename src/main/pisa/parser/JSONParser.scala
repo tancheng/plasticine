@@ -189,6 +189,7 @@ object Parser {
                                 .map { parseValue(_) }
     val decXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "decXbar"), true)
     val incXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "incXbar"), true)
+    val tokenInXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenInXbar"))
     val doneXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "doneXbar"))
     val enableMux: List[Boolean] = Parser.getFieldList(m, "enableMux")
                                 .asInstanceOf[List[String]]
@@ -197,7 +198,8 @@ object Parser {
                                 .asInstanceOf[List[String]]
                                  .map { parseValue(_) > 0 }
     val syncTokenMux: Int = parseValue(Parser.getFieldString(m, "syncTokenMux"))
-    CUControlBoxConfig(tokenOutLUT, enableLUT, tokenDownLUT, udcInit, decXbar, incXbar, doneXbar, enableMux, tokenOutMux, syncTokenMux)
+    val tokenOutXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenOutXbar"))
+    CUControlBoxConfig(tokenOutLUT, enableLUT, tokenDownLUT, udcInit, decXbar, incXbar, tokenInXbar, doneXbar, enableMux, tokenOutMux, syncTokenMux, tokenOutXbar)
   }
 
   def parseBankingConfig(s: String): BankingConfig = {
@@ -255,10 +257,25 @@ object Parser {
     ScratchpadConfig(wa, ra, wd, wen, banking, numBufs)
   }
 
+  def parseTopUnit(m: Map[Any, Any]): TopUnitConfig = {
+    val doneConnBox = ConnBoxConfig(Parser.getFieldInt(m, "doneConnBox"))
+    val dataVldConnBox = ConnBoxConfig(Parser.getFieldInt(m, "dataVldConnBox"))
+    val argOutConnBox = ConnBoxConfig(Parser.getFieldInt(m, "argOutConnBox"))
+    TopUnitConfig(doneConnBox, dataVldConnBox, argOutConnBox)
+  }
+
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
     val cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(m, "cu")
                                           .map { parseCU(_) }
-    PlasticineConfig(cu)
+    val dataSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "dataSwitch")
+                                          .map { parseCrossbar(_) }
+
+    val controlSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "controlSwitch")
+                                          .map { parseCrossbar(_) }
+
+    val top: TopUnitConfig = parseTopUnit(Parser.getFieldMap(m, "top"))
+
+    PlasticineConfig(cu, dataSwitch, controlSwitch, top)
   }
 
   def parseConfigMap(m: Map[Any, Any]) = {

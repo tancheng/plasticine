@@ -17,10 +17,10 @@ case class MemoryUnitOpcode(config: Option[MemoryUnitConfig] = None) extends Opc
 }
 
 trait RdyVldInterface extends Bundle {
-  val rdyIn = Bool(INPUT)
-  val rdyOut = Bool(OUTPUT)
-  val vldIn = Bool(INPUT)
-  val vldOut = Bool(OUTPUT)
+  val rdyIn = Bool(INPUT)     // rdata
+  val vldOut = Bool(OUTPUT)   // rdata
+  val rdyOut = Bool(OUTPUT)   // Command
+  val vldIn = Bool(INPUT)     // Command
 }
 
 abstract class AbstractMemoryCmdInterface(w: Int, v: Int, dir: IODirection) extends Bundle
@@ -40,6 +40,7 @@ abstract class AbstractMemoryCmdInterface(w: Int, v: Int, dir: IODirection) exte
 class PlasticineMemoryCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPUT) {
   val addr = Vec.fill(v) { UInt(INPUT, width=w) }
   val size = UInt(INPUT, width=w)
+  val dataRdyOut = Bool(OUTPUT)
   val dataVldIn = Bool(INPUT)
 }
 
