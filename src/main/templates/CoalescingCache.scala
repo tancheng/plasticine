@@ -81,9 +81,8 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
     ff
   }
 
-  val freeBitVector = valid.map { ~_.io.data.out }.reduce { Cat(_,_) }
-  val encoded = PriorityEncoder(freeBitVector)
-  writeIdx := OHToUInt(encoded)
+  val freeBitVector = valid.map { ~_.io.data.out }.reverse.reduce { Cat(_,_) }
+  writeIdx := PriorityEncoder(freeBitVector)
 //  val readIdx = OHToUInt(PriorityEncoder(valid.map {_.io.data.out }.reduce { Cat(_,_) }))
   val readIdx = OHToUInt(PriorityEncoder(readHit.map { UInt(_) }.reduce { Cat(_,_) }))
 
@@ -183,21 +182,17 @@ class CoalescingCacheTests(c: CoalescingCache) extends Tester(c) {
 
   // Simple write
   var miss = writeGatherAddr(0x1004, 0)
-//  expect(miss, 1, "Simple Write: Miss signal raised")
-//  step(1)
-//  miss = peek(c.io.miss).toInt
-//  expect(miss, 0, "Simple Write: Miss signal lowered")
 
   // read metadata
   var rmetadata = readMetadata(0x1004)
-//  val parsedMetadata = parseMetadataLine(rmetadata)
-//  println(s"rmetadata: $rmetadata")
-//  println(s"parsed: $parsedMetadata")
 
   // Multiple writes
   val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1000 + math.abs(rnd.nextInt % 0x1000) }
   println(s"Gather vector: $gatherVector")
   gatherVector.zipWithIndex.foreach { case (g, i) => writeGatherAddr(g, i) }
+
+  // Multiple reads
+  gatherVector.foreach { g => readMetadata(g) }
 }
 
 object CoalescingCacheTest {
