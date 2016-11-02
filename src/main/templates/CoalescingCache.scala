@@ -197,10 +197,20 @@ class CoalescingCacheTests(c: CoalescingCache) extends Tester(c) {
     issuedLoads.foreach { addr => readMetadata(addr) }
     issuedLoads.clear
   }
+  // Multiple random addresses
   {
     val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1000 + math.abs(rnd.nextInt % 0x1000) }
     gatherVector.zipWithIndex.foreach { case (g, i) => writeGatherAddr(g, i) }
     issuedLoads.foreach { addr => readMetadata(addr) }
+    issuedLoads.clear
+  }
+  // Fill up cache
+  {
+    val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1000 * 10 * i }
+    gatherVector.zipWithIndex.foreach { case (g, i) => writeGatherAddr(g, i) }
+    expect(c.io.full, 1)
+    issuedLoads.foreach { addr => readMetadata(addr) }
+    expect(c.io.full, 0)
     issuedLoads.clear
   }
 }
