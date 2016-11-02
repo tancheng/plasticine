@@ -5,6 +5,7 @@ import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.HashMap
+import scala.collection.mutable.Set
 /**
  * CoalescingCache memory that supports various banking modes
  * and double buffering
@@ -59,6 +60,7 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   val readHit = Vec.fill(d) { Bool() }
   val writeHit = Vec.fill(d) { Bool() }
   val full = Bool()
+  val miss = Bool()
 
   // Create valid array
   val valid = List.tabulate(d) { i =>
@@ -82,11 +84,12 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   }
 
   val freeBitVector = valid.map { ~_.io.data.out }.reverse.reduce { Cat(_,_) }
-  writeIdx := PriorityEncoder(freeBitVector)
-//  val readIdx = OHToUInt(PriorityEncoder(valid.map {_.io.data.out }.reduce { Cat(_,_) }))
-  val readIdx = OHToUInt(PriorityEncoder(readHit.map { UInt(_) }.reduce { Cat(_,_) }))
+  val writeHitIdx = PriorityEncoder(writeHit.map { UInt(_) }.reverse.reduce { Cat(_,_) })
+  val writeMissIdx = PriorityEncoder(freeBitVector)
+  writeIdx := Mux(miss, writeMissIdx, writeHitIdx)
+  val readIdx = PriorityEncoder(readHit.map { UInt(_) }.reverse.reduce { Cat(_,_) })
 
-  val miss = io.wen & ~(writeHit.reduce {_|_})
+  miss := io.wen & ~(writeHit.reduce {_|_})
   full := valid.map { _.io.data.out }.reduce {_&_}
   io.miss := miss
   io.full := full
@@ -124,6 +127,7 @@ class CoalescingCacheTests(c: CoalescingCache) extends Tester(c) {
   }
 
   val expectedCache = HashMap[Int, ListBuffer[(Int, Int)]]()
+  val issuedLoads = Set[Int]()
 
   def getBurstAddr(addr: Int) = addr / c.burstSizeBytes
   def getWordOffset(addr: Int) = (addr % c.burstSizeBytes) / c.wordSizeBytes
@@ -144,6 +148,7 @@ class CoalescingCacheTests(c: CoalescingCache) extends Tester(c) {
     step(1)
     poke(c.io.wen, 0)
     expect(expectedMiss, miss, s"[writeGatherAddr] addr=$addr, pos=$pos, expectedMiss = $expectedMiss, miss = $miss")
+    if (expectedMiss > 0) issuedLoads += addr
     miss
   }
 
@@ -167,8 +172,8 @@ class CoalescingCacheTests(c: CoalescingCache) extends Tester(c) {
     // => burstSizeWords bytes
     val metadataList = List.tabulate(c.burstSizeWords) { i => ((m >> (i*8)) & 0xFF).toInt }
     metadataList.map { parseMetadata(_) }
-
   }
+
   def parseMetadata(m: Int) = {
     // Metadata is an 8-bit word
     // Last 'wordOffset' bits contain the word offset
@@ -180,19 +185,24 @@ class CoalescingCacheTests(c: CoalescingCache) extends Tester(c) {
     (valid, wordOffset)
   }
 
-  // Simple write
+  // Simple write + read
   var miss = writeGatherAddr(0x1004, 0)
-
-  // read metadata
   var rmetadata = readMetadata(0x1004)
+  issuedLoads.clear
 
-  // Multiple writes
-  val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1000 + math.abs(rnd.nextInt % 0x1000) }
-  println(s"Gather vector: $gatherVector")
-  gatherVector.zipWithIndex.foreach { case (g, i) => writeGatherAddr(g, i) }
-
-  // Multiple reads
-  gatherVector.foreach { g => readMetadata(g) }
+  // Multiple same addresses - should all hit in the cache line
+  {
+    val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1030 }
+    gatherVector.zipWithIndex.foreach { case (g, i) => writeGatherAddr(g, i) }
+    issuedLoads.foreach { addr => readMetadata(addr) }
+    issuedLoads.clear
+  }
+  {
+    val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1000 + math.abs(rnd.nextInt % 0x1000) }
+    gatherVector.zipWithIndex.foreach { case (g, i) => writeGatherAddr(g, i) }
+    issuedLoads.foreach { addr => readMetadata(addr) }
+    issuedLoads.clear
+  }
 }
 
 object CoalescingCacheTest {
