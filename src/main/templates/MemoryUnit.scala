@@ -160,7 +160,7 @@ class MemoryUnit(
   burstTagCounter.io.control.enable := burstVld
   burstCounter.io.control.saturate := UInt(0)
 
-  io.dram.addr := burstAddrs(0) + burstCounter.io.data.out
+  io.dram.addr := Cat((burstAddrs(0) + burstCounter.io.data.out), UInt(0, width=log2Up(burstSizeBytes)))
   io.dram.tagOut := Mux(config.scatterGather, burstAddrs(0), burstTagCounter.io.data.out)
   io.dram.wdata := dataFifo.io.deq
   io.dram.vldOut := burstVld
@@ -278,10 +278,10 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
 
   def updateExpected(addr: Int, size: Int, isWr: Int, data: List[Int]) {
     val dataInBursts = getDataInBursts(data)
-    val baseAddr = addr / burstSizeBytes
+    val baseAddr = addr - (addr % burstSizeBytes)
     val numBursts = getNumBursts(size)
     for (i <- 0 until numBursts) {
-      issueCmd(baseAddr+i, isWr, if (dataInBursts.isEmpty) List() else dataInBursts.dequeue)
+      issueCmd(baseAddr+i*burstSizeBytes, isWr, if (dataInBursts.isEmpty) List() else dataInBursts.dequeue)
     }
   }
 
