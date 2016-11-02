@@ -25,6 +25,7 @@ def main():
     parser.add_option("--verilog", dest="verilog", action="store_true", default=False, help="Generate Verilog RTL")
     parser.add_option("-d", "--dest", action="store", dest="build_dir", default=os.getenv("PWD"), help="output location for generated files")
     parser.add_option("--prep", dest="prep", action="store_true", default=False, help="Generate C++ simulator without compiling")
+    parser.add_option("--prep_4mu", dest="prep_4mu", action="store_true", default=False, help="Generate C++ simulator without compiling, for 4 mus")
     parser.add_option("--runPrep", dest="runPrep", action="store_true", default=False, help="Compile C++ simulator and run. Will generate auxiliary verilog file")
 
     (opts, args) = parser.parse_args()
@@ -56,7 +57,7 @@ def stage(app, params, opts):
         sbt_opts = sbt_opts + " --backend flo"
     if opts.vcd == True:
         sbt_opts = sbt_opts + " --vcd"
-    if opts.prep == True:
+    if opts.prep == True or opts.prep_4mu == True:
         sbt_opts = sbt_opts + " --debug --backend c --genHarness --vcd"
     if opts.runPrep == True:
         sbt_opts = sbt_opts + " --test --backend v"
@@ -71,10 +72,14 @@ def stage(app, params, opts):
     print sbt_cmd
     print("Invoking Chisel...")
     ecode = os.system(sbt_cmd)
-    if opts.prep == True:
+    if opts.prep == True or opts.prep_4mu:
         print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
-        os.system("cp ./dramsimTemplates/libdramsim.so ./dramsimTemplates/DRAMSim.h ./dramsimTemplates/Callback.h ./generated")
-        os.system("cp ./dramsimTemplates/Makefile ./generated/%s" %(app))
+        if opts.prep:
+        	os.system("cp ./dramsimTemplates/libdramsim.so ./dramsimTemplates/DRAMSim.h ./dramsimTemplates/Callback.h ./generated")
+        	os.system("cp ./dramsimTemplates/Makefile ./generated/%s" %(app))
+        elif opts.prep_4mu:
+        	os.system("cp ./dramsimTemplates_4mu/libdramsim.so ./dramsimTemplates_4mu/DRAMSim.h ./dramsimTemplates_4mu/Callback.h ./generated")
+        	os.system("cp ./dramsimTemplates/Makefile ./generated/%s" %(app))
 
     if ecode != 0:
         err("SADL compilation failed")

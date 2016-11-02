@@ -57,22 +57,22 @@ class DRAMSimCmdIn(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPU
   // 33~32: rank number
   // 31~0: address
   //  val chnRanks = Vec(UInt(0), UInt(4), UInt(8), UInt(12)) { UInt(width=4) }
-  //  val addr = UInt(INPUT, width=w)
-  //  val tagIn = UInt(INPUT, width=w)
-  //  val tagOut = UInt(OUTPUT, width=w)
+  val addr = UInt(INPUT, width=w)
+  val tagIn = UInt(INPUT, width=w)
+  val tagOut = UInt(OUTPUT, width=w)
 
   // used for reserving simulation wires
   val addrSimOut = UInt(OUTPUT, width=w)
   val tagInSimOut = UInt(OUTPUT, width=w)
   val isWrSimOut = UInt(OUTPUT, width=1)
-  val wdataSimOut = Vec.fill(burstSizeBytes/wordSize) { UInt(OUTPUT, width=w) }
+  val wdataSimOut = Vec.fill(v) { UInt(OUTPUT, width=w) }
   val vldInSimOut = Bool(OUTPUT)
   val rdyInSimOut = Bool(OUTPUT)
 }
 
 class DRAMSimulator(val w: Int, val burstSizeBytes: Int) extends BlackBox {
   val wordSize = w/8
-  val io = new DRAMCmdIn(w, burstSizeBytes/wordSize)
+  val io = new DRAMSimCmdIn(w, burstSizeBytes/wordSize)
 
   io.addrSimOut := io.addr
   io.tagInSimOut := io.tagIn

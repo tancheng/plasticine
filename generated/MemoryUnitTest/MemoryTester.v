@@ -2625,9 +2625,9 @@ module MemoryUnit(input clk, input reset,
     input  io_config_data,
     input  io_config_enable,
     input  io_interconnect_rdyIn,
+    output io_interconnect_vldOut,
     output io_interconnect_rdyOut,
     input  io_interconnect_vldIn,
-    output io_interconnect_vldOut,
     input [31:0] io_interconnect_wdata_15,
     input [31:0] io_interconnect_wdata_14,
     input [31:0] io_interconnect_wdata_13,
@@ -2678,11 +2678,12 @@ module MemoryUnit(input clk, input reset,
     input [31:0] io_interconnect_addr_1,
     input [31:0] io_interconnect_addr_0,
     input [31:0] io_interconnect_size,
+    //output io_interconnect_dataRdyOut
     input  io_interconnect_dataVldIn,
     //input  io_dram_rdyIn
+    output io_dram_vldOut,
     //output io_dram_rdyOut
     input  io_dram_vldIn,
-    output io_dram_vldOut,
     output[31:0] io_dram_wdata_15,
     output[31:0] io_dram_wdata_14,
     output[31:0] io_dram_wdata_13,
@@ -2786,6 +2787,7 @@ module MemoryUnit(input clk, input reset,
 `ifndef SYNTHESIS
 // synthesis translate_off
 //  assign io_dram_rdyOut = {1{$random}};
+//  assign io_interconnect_dataRdyOut = {1{$random}};
 // synthesis translate_on
 `endif
   assign burstVld = ~ sizeFifo_io_empty;
@@ -2846,11 +2848,11 @@ module MemoryUnit(input clk, input reset,
   assign io_interconnect_rdata_13 = io_dram_rdata_13;
   assign io_interconnect_rdata_14 = io_dram_rdata_14;
   assign io_interconnect_rdata_15 = io_dram_rdata_15;
-  assign io_interconnect_vldOut = io_dram_vldIn;
   assign io_interconnect_rdyOut = T11;
   assign T11 = T13 & T12;
   assign T12 = ~ dataFifo_io_full;
   assign T13 = ~ addrFifo_io_full;
+  assign io_interconnect_vldOut = io_dram_vldIn;
   FIFO_0 addrFifo(.clk(clk), .reset(reset),
        .io_config_data( io_config_data ),
        .io_config_enable( io_config_enable ),
@@ -3050,9 +3052,9 @@ module MemoryTester(input clk, input reset,
     input  io_config_data,
     input  io_config_enable,
     input  io_interconnect_rdyIn,
+    output io_interconnect_vldOut,
     output io_interconnect_rdyOut,
     input  io_interconnect_vldIn,
-    output io_interconnect_vldOut,
     input [31:0] io_interconnect_wdata_15,
     input [31:0] io_interconnect_wdata_14,
     input [31:0] io_interconnect_wdata_13,
@@ -3103,11 +3105,12 @@ module MemoryTester(input clk, input reset,
     input [31:0] io_interconnect_addr_1,
     input [31:0] io_interconnect_addr_0,
     input [31:0] io_interconnect_size,
+    output io_interconnect_dataRdyOut,
     input  io_interconnect_dataVldIn,
     input  io_dram_rdyIn,
+    output io_dram_vldOut,
     output io_dram_rdyOut,
     input  io_dram_vldIn,
-    output io_dram_vldOut,
     output[31:0] io_dram_wdata_15,
     output[31:0] io_dram_wdata_14,
     output[31:0] io_dram_wdata_13,
@@ -3165,8 +3168,8 @@ module MemoryTester(input clk, input reset,
   wire[31:0] DRAMSimulator_io_rdata_1;
   wire[31:0] DRAMSimulator_io_rdata_0;
   wire[31:0] DRAMSimulator_io_tagOut;
-  wire mu_io_interconnect_rdyOut;
   wire mu_io_interconnect_vldOut;
+  wire mu_io_interconnect_rdyOut;
   wire[31:0] mu_io_interconnect_rdata_15;
   wire[31:0] mu_io_interconnect_rdata_14;
   wire[31:0] mu_io_interconnect_rdata_13;
@@ -3208,6 +3211,7 @@ module MemoryTester(input clk, input reset,
 `ifndef SYNTHESIS
 // synthesis translate_off
 //  assign io_dram_rdyOut = {1{$random}};
+//  assign io_interconnect_dataRdyOut = {1{$random}};
 // synthesis translate_on
 `endif
   assign io_dram_tagOut = mu_io_dram_tagOut;
@@ -3246,15 +3250,15 @@ module MemoryTester(input clk, input reset,
   assign io_interconnect_rdata_13 = mu_io_interconnect_rdata_13;
   assign io_interconnect_rdata_14 = mu_io_interconnect_rdata_14;
   assign io_interconnect_rdata_15 = mu_io_interconnect_rdata_15;
-  assign io_interconnect_vldOut = mu_io_interconnect_vldOut;
   assign io_interconnect_rdyOut = mu_io_interconnect_rdyOut;
+  assign io_interconnect_vldOut = mu_io_interconnect_vldOut;
   MemoryUnit mu(.clk(clk), .reset(reset),
        .io_config_data( io_config_data ),
        .io_config_enable( io_config_enable ),
        .io_interconnect_rdyIn( io_interconnect_rdyIn ),
+       .io_interconnect_vldOut( mu_io_interconnect_vldOut ),
        .io_interconnect_rdyOut( mu_io_interconnect_rdyOut ),
        .io_interconnect_vldIn( io_interconnect_vldIn ),
-       .io_interconnect_vldOut( mu_io_interconnect_vldOut ),
        .io_interconnect_wdata_15( io_interconnect_wdata_15 ),
        .io_interconnect_wdata_14( io_interconnect_wdata_14 ),
        .io_interconnect_wdata_13( io_interconnect_wdata_13 ),
@@ -3305,11 +3309,12 @@ module MemoryTester(input clk, input reset,
        .io_interconnect_addr_1( io_interconnect_addr_1 ),
        .io_interconnect_addr_0( io_interconnect_addr_0 ),
        .io_interconnect_size( io_interconnect_size ),
+       //.io_interconnect_dataRdyOut(  )
        .io_interconnect_dataVldIn( io_interconnect_dataVldIn ),
        //.io_dram_rdyIn(  )
+       .io_dram_vldOut( mu_io_dram_vldOut ),
        //.io_dram_rdyOut(  )
        .io_dram_vldIn( DRAMSimulator_io_vldOut ),
-       .io_dram_vldOut( mu_io_dram_vldOut ),
        .io_dram_wdata_15( mu_io_dram_wdata_15 ),
        .io_dram_wdata_14( mu_io_dram_wdata_14 ),
        .io_dram_wdata_13( mu_io_dram_wdata_13 ),
@@ -3350,9 +3355,9 @@ module MemoryTester(input clk, input reset,
   );
   DRAMSimulator DRAMSimulator(
        //.io_rdyIn(  )
+       .io_vldOut( DRAMSimulator_io_vldOut ),
        //.io_rdyOut(  )
        .io_vldIn( mu_io_dram_vldOut ),
-       .io_vldOut( DRAMSimulator_io_vldOut ),
        .io_wdata_15( mu_io_dram_wdata_15 ),
        .io_wdata_14( mu_io_dram_wdata_14 ),
        .io_wdata_13( mu_io_dram_wdata_13 ),
