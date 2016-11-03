@@ -58,7 +58,8 @@ class MemoryUnit(
   val inst: MemoryUnitConfig) extends ConfigurableModule[MemoryUnitOpcode] {
 
   val burstSizeBytes = 64
-
+  val wordSizeBytes = w/8
+  val burstSizeWords = burstSizeBytes / wordSizeBytes
   // The data bus width to DRAM is 1-burst wide
   // While it should be possible in the future to add a write combining buffer
   // and decouple Plasticine's data bus width from the DRAM bus width,
@@ -157,17 +158,75 @@ class MemoryUnit(
   burstTagCounter.io.data.max := UInt(numOutstandingBursts)
   burstTagCounter.io.data.stride := UInt(1)
   burstTagCounter.io.control.reset := UInt(0)
-  burstTagCounter.io.control.enable := burstVld
+  burstTagCounter.io.control.enable := burstVld | ~addrFifo.io.empty
   burstCounter.io.control.saturate := UInt(0)
+  val elementID = burstTagCounter.io.data.out(log2Up(v)-1, 0)
+
+  // Coalescing cache
+  val ccache = Module(new CoalescingCache(w, d, v))
+  ccache.io.raddr := io.dram.tagIn
+  ccache.io.readEn := config.scatterGather & io.dram.vldIn
+  ccache.io.waddr := addrFifo.io.deq(0)
+  ccache.io.wen := config.scatterGather & ~addrFifo.io.empty
+  ccache.io.position := elementID
+  ccache.io.wdata := dataFifo.io.deq(0)
+  ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
+
+  // Parse Metadata line
+  def parseMetadataLine(m: UInt) = {
+    // m is burstSizeWords * 8 wide. Each byte 'i' has the following format:
+    // | 7 6 5 4     | 3    2   1    0     |
+    // | x x x <vld> | <crossbar_config_i> |
+    val validAndConfig = List.tabulate(burstSizeWords) { i =>
+      parseMetadata(m(i*8+8-1, i*8))
+    }
+
+    val valid = validAndConfig.map { _._1 }
+    val crossbarConfig = validAndConfig.map { _._2 }
+    (valid, crossbarConfig)
+  }
+
+  def parseMetadata(m: UInt) = {
+    // m is an 8-bit word. Each byte has the following format:
+    // | 7 6 5 4     | 3    2   1    0     |
+    // | x x x <vld> | <crossbar_config_i> |
+    val valid = m(log2Up(burstSizeWords))
+    val crossbarConfig = m(log2Up(burstSizeWords)-1, 0)
+    (valid, crossbarConfig)
+  }
+
+  val (validMask, crossbarConfig) = parseMetadataLine(ccache.io.rmetaData)
+
+  // Gather crossbar
+  val gatherCrossbar = Module(new CrossbarCore(w, v, v))
+  gatherCrossbar.io.ins := io.dram.rdata
+
+  // Gather buffer
+  val gatherBuffer = List.tabulate(burstSizeWords) { i =>
+    val ff = Module(new FF(w))
+    ff.io.control.enable := validMask(i)
+    ff.io.data.in := gatherCrossbar.io.outs(i)
+    ff
+  }
+  val gatherData = Vec.tabulate(burstSizeWords) { gatherBuffer(_).io.data.out }
+  // Completion mask
+  val completed = UInt()
+  val completionMask = List.tabulate(burstSizeWords) { i =>
+    val ff = Module(new FF(1))
+    ff.io.control.enable := Bool(true)
+    ff.io.data.in := validMask(i)
+    ff
+  }
+  completed := completionMask.map { _.io.data.out }.reduce { _ & _ }
 
   io.dram.addr := Cat((burstAddrs(0) + burstCounter.io.data.out), UInt(0, width=log2Up(burstSizeBytes)))
   io.dram.tagOut := Mux(config.scatterGather, burstAddrs(0), burstTagCounter.io.data.out)
   io.dram.wdata := dataFifo.io.deq
-  io.dram.vldOut := burstVld
+  io.dram.vldOut := Mux(config.scatterGather, ccache.io.miss, burstVld)
   io.dram.isWr := rwFifo.io.deq(0)
 
-  io.interconnect.rdata := io.dram.rdata
-  io.interconnect.vldOut := io.dram.vldIn
+  io.interconnect.rdata := Mux(config.scatterGather, gatherData, io.dram.rdata)
+  io.interconnect.vldOut := Mux(config.scatterGather, completed, io.dram.vldIn)
   io.interconnect.rdyOut := ~addrFifo.io.full & ~dataFifo.io.full
 }
 

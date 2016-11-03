@@ -88,6 +88,26 @@ class CrossbarVecReg(val w: Int, val v: Int, val numInputs: Int, val numOutputs:
 }
 
 /**
+ * Core logic inside a crossbar
+ */
+
+class CrossbarCore(val w: Int, val numInputs: Int, val numOutputs: Int) extends Module {
+  val io = new Bundle {
+    val config_enable = Bool(INPUT)
+    val ins = Vec.fill(numInputs) { Bits(INPUT,  width = w) }
+    val outs = Vec.fill(numOutputs) { Bits(OUTPUT,  width = w) }
+    val config = Vec.fill(numOutputs) { Bits(INPUT, width = log2Up(numInputs)) }
+  }
+
+  io.outs.zipWithIndex.foreach { case(out,i) =>
+    val outMux = Module(new MuxN(numInputs, w))
+    outMux.io.ins := io.ins
+    outMux.io.sel := io.config(i)
+    out := outMux.io.out
+  }
+}
+
+/**
  * Crossbar that connects every input to every output
  */
 class Crossbar(val w: Int, val numInputs: Int, val numOutputs: Int, val inst: CrossbarConfig) extends ConfigurableModule[CrossbarOpcode] {
