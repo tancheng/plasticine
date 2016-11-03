@@ -209,6 +209,7 @@ class MemoryUnit(
     ff
   }
   val gatherData = Vec.tabulate(burstSizeWords) { gatherBuffer(_).io.data.out }
+
   // Completion mask
   val completed = UInt()
   val completionMask = List.tabulate(burstSizeWords) { i =>
@@ -344,6 +345,14 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
     }
   }
 
+  // Scatter-gather issue
+  def updateExpected(addr: List[Int], isWr: Int, data: List[Int]) {
+    val dataInBursts = getDataInBursts(data)
+    val baseAddresses = addr.map { a => a - (a % burstSizeBytes) }
+    val uniqueBaseAddresses = baseAddresses.distinct
+    uniqueBaseAddresses.foreach { a => issueCmd(a, isWr, if (isWr == 0) List() else data) }
+  }
+
   def printFail(msg: String) = println(Console.BLACK + Console.RED_B + s"FAIL: $msg" + Console.RESET)
   def printPass(msg: String) = println(Console.BLACK + Console.GREEN_B + s"PASS: $msg" + Console.RESET)
 
@@ -393,6 +402,23 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
     updateExpected(addr, size, isWr, data)
   }
 
+  def enqueueCmd(addr: List[Int], isWr: Int, data: List[Int]) {
+    poke(c.io.interconnect.vldIn, 1)
+    c.io.interconnect.addr.zip(addr) foreach { case (in, i) => poke(in, i) }
+    poke(c.io.interconnect.isWr, isWr)
+
+    // If it is a write, enqueue first burst
+    if (isWr > 0) {
+      poke(c.io.interconnect.wdata, data)
+      poke(c.io.interconnect.dataVldIn, 1)
+    }
+    observeFor(1)
+    poke(c.io.interconnect.vldIn, 0)
+    poke(c.io.interconnect.dataVldIn, 0)
+    updateExpected(addr, isWr, data)
+  }
+
+
   def enqueueBurstRead(addr: Int, size: Int) {
     enqueueCmd(addr, size, 0)
   }
@@ -401,67 +427,82 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
     enqueueCmd(addr, size, 1, data)
   }
 
-  // Test constants
-  val addr = 0x1000
-  val waddr = 0x2000
-
-  // Test burst mode
-  // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
-  expect(c.io.interconnect.rdyOut, 1)
-
-  // 2b. Smoke test, write: Single burst with a single burst size
-  val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
-  enqueueBurstWrite(waddr, burstSizeBytes, wdata)
-  observeFor(1)
-  check("Single burst write")
-
-  // 2a. Smoke test, read: Single burst with a single burst size
-  enqueueBurstRead(addr, burstSizeBytes)
-  observeFor(1)
-  check("Single burst read")
-
-
-  val numBursts = 10
-  // 3a. Bigger smoke test, read: Single burst address with multi-burst size
-  enqueueBurstRead(waddr, numBursts * burstSizeBytes)
-  observeFor(numBursts+8)
-  check("Single Multi-burst read")
-
-  // 3b. Bigger smoke test, write: Single burst address with multi-burst size
-  val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
-  enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
-  observeFor(numBursts+5)
-  check("Single Multi-burst write")
-
-  // 4. Multiple commands - read
-  val numCommands = c.numOutstandingBursts
-  val maxSizeBursts = 9 // arbitrary
-  val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-  val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-  raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
-  val cyclesToWait = rsizes.map { size =>
-    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-  }.sum
-  observeFor(cyclesToWait*5)
-  check("Multiple multi-burst read")
-
-  // 5. Multiple commands - write
-  val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-  val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-  waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
-    val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
-    enqueueBurstWrite(waddr, wsize, wdata)
+  def enqueueGather(addr: List[Int]) {
+    enqueueCmd(addr, 0, List())
   }
-  val wCyclesToWait = wsizes.map { size =>
-    (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-  }.sum
-  observeFor(wCyclesToWait)
-  check("Multiple multi-burst write")
+
+  def enqueueScatter(addr: List[Int], data: List[Int]) {
+    enqueueCmd(addr, 1, data)
+  }
+
+  def testBurstMode {
+    // Test constants
+    val addr = 0x1000
+    val waddr = 0x2000
+
+    // Test burst mode
+    // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
+    expect(c.io.interconnect.rdyOut, 1)
+
+    // 2b. Smoke test, write: Single burst with a single burst size
+    val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
+    enqueueBurstWrite(waddr, burstSizeBytes, wdata)
+    observeFor(1)
+    check("Single burst write")
+
+    // 2a. Smoke test, read: Single burst with a single burst size
+    enqueueBurstRead(addr, burstSizeBytes)
+    observeFor(1)
+    check("Single burst read")
 
 
-  // 5. Fill up address queue
+    val numBursts = 10
+    // 3a. Bigger smoke test, read: Single burst address with multi-burst size
+    enqueueBurstRead(waddr, numBursts * burstSizeBytes)
+    observeFor(numBursts+8)
+    check("Single Multi-burst read")
 
-  // 6. Fill up data queue
+    // 3b. Bigger smoke test, write: Single burst address with multi-burst size
+    val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
+    enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
+    observeFor(numBursts+5)
+    check("Single Multi-burst write")
+
+    // 4. Multiple commands - read
+    val numCommands = c.numOutstandingBursts
+    val maxSizeBursts = 9 // arbitrary
+    val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+    val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+    raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
+    val cyclesToWait = rsizes.map { size =>
+      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+    }.sum
+    observeFor(cyclesToWait*5)
+    check("Multiple multi-burst read")
+
+    // 5. Multiple commands - write
+    val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+    val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+    waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
+      val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
+      enqueueBurstWrite(waddr, wsize, wdata)
+    }
+    val wCyclesToWait = wsizes.map { size =>
+      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+    }.sum
+    observeFor(wCyclesToWait)
+    check("Multiple multi-burst write")
+
+
+    // 5. Fill up address queue
+
+    // 6. Fill up data queue
+  }
+
+  def testScatterGather {
+  }
+
+  if (c.inst.scatterGather > 0) testScatterGather else testBurstMode
 }
 
 object MemoryUnitTest {
