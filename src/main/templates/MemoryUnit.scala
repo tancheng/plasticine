@@ -221,7 +221,7 @@ class MemoryUnit(
   val completed = UInt()
   val completionMask = List.tabulate(burstSizeWords) { i =>
     val ff = Module(new FF(1))
-    ff.io.control.enable := registeredVld
+    ff.io.control.enable := completed | (validMask(i) & registeredVld)
     ff.io.data.in := validMask(i)
     ff
   }
@@ -532,7 +532,7 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     check("Single gather with same address")
 
     // 2. Single gather, multiple addresses
-    val addrs = List.tabulate(c.v) { i => if (i == 0) 0x1000 else 0x1000 + (rnd.nextInt) % 0x1000 }
+    val addrs = List.tabulate(c.v) { i => if (i == 0) 0x1000 else (0x1000 + (rnd.nextInt) % 0x1000) & ((Integer.MAX_VALUE >> log2Up(c.wordSizeBytes)) << log2Up(c.wordSizeBytes)) }
     val burstData = HashMap[Int, List[Int]]()
     addrs.foreach { a =>
       val baseAddr = a - (a % burstSizeBytes)
@@ -550,15 +550,23 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
       observeFor(1)
     }
     step(10)
+    check("Single gather, multiple addresses")
     val expectedGather = addrs.map { a =>
       val baseAddr = a - (a % burstSizeBytes)
       val burstOffset = a % burstSizeBytes
-      val wordOffset = burstOffset / c.burstSizeWords
+      val wordOffset = burstOffset / c.wordSizeBytes
       val data = burstData(baseAddr)
       data(wordOffset)
     }
     println(s"Expected gather: $expectedGather")
-    check("Single gather, multiple addresses")
+    println(s"Gather addresses")
+    addrs.foreach { a =>
+      val baseAddr = a - (a % burstSizeBytes)
+      val burstOffset = a % burstSizeBytes
+      val wordOffset = burstOffset / c.wordSizeBytes
+      val data = burstData(baseAddr)
+      println(s"addr:$a, base:$baseAddr, wordOffset:$wordOffset, data:$data")
+    }
   }
 
   if (c.inst.scatterGather > 0) testScatterGather else testBurstMode
