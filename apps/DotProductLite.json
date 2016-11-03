@@ -23,7 +23,7 @@
                   "min" : "c0i",
                   "stride" : "c1i",
                   "startDelay" : "0",
-                  "endDelay" : "0"
+                  "endDelay" : "10"
                 },
                 "x",
                 "x",

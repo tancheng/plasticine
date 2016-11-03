@@ -10,19 +10,19 @@
               "outSelect" : ["x","x"]
             },
             "scratchpads": [
-              "x",
-              "x",
-              "x",
               {
                 "ra" : "i2",
                 "wa" : "i0",
-                "wd" : "local",
+                "wd" : "bus3",
                 "wen" : "i0",
                 "banking" : "b1",
                 "numBufs" : 2,
                 "rswap" : "i2",
                 "wswap" : "i1"
-              }
+              },
+              "x",
+              "x",
+              "x"
             ],
             "counterChain" :{
               "chain" : ["1","0","0","0","0","0","0"],
@@ -46,7 +46,7 @@
                   "min" : "c0i",
                   "stride" : "c1i",
                   "startDelay" : "0",
-                  "endDelay" : "0"
+                  "endDelay" : "10"
                 },
                 "x",
                 "x",
@@ -57,11 +57,11 @@
             },
             "pipeStage": [
               {
-                "fwd" : {"r15" : "bus3"}
+                "fwd" : {}
               },
               {
                 "en" : "i2",
-                "opA" : "m3",
+                "opA" : "m0",
                 "opB" : "x",
                 "opC" : "x",
                 "opcode" : "passA",
@@ -224,12 +224,12 @@
                 "outSelect" : ["2","x","2","x"]
               },
               "incXbar" :{
-                "outSelect" : ["15","9","x","x","x","x","x","x"]
+                "outSelect" : ["9","15","x","x","x","x","x","x"]
               },
               "decXbar" :{
                 "outSelect" : ["2","2","x","x","x","x","x","x"]
               },
-              "udcInit" : ["3","2","x","x","x","x","x","x"],
+              "udcInit" : ["2","3","x","x","x","x","x","x"],
               "enableLUT": [
                 {
                   "table" : "x"
@@ -516,7 +516,7 @@
           "x",
           {
             "scalarInXbar" :{
-              "outSelect" : ["x","0"]
+              "outSelect" : ["0","x"]
             },
             "scratchpads": [
               "x",
@@ -561,7 +561,7 @@
               },
               {
                 "en" : "i0",
-                "opA" : "e12",
+                "opA" : "e13",
                 "opB" : "x",
                 "opC" : "x",
                 "opcode" : "passA",

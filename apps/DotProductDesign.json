@@ -10,31 +10,31 @@
               "outSelect" : ["x","x"]
             },
             "scratchpads": [
-              "x",
               {
-                "ra" : "i4",
-                "wa" : "i2",
-                "wd" : "local",
-                "wen" : "i2",
-                "banking" : "b1",
-                "numBufs" : 2,
-                "rswap" : "i4",
-                "wswap" : "i3"
-              },
-              "x",
-              {
-                "ra" : "i4",
+                "ra" : "i2",
                 "wa" : "i0",
-                "wd" : "local",
+                "wd" : "bus3",
                 "wen" : "i0",
                 "banking" : "b1",
                 "numBufs" : 2,
-                "rswap" : "i4",
+                "rswap" : "i2",
                 "wswap" : "i1"
-              }
+              },
+              {
+                "ra" : "i2",
+                "wa" : "i3",
+                "wd" : "bus1",
+                "wen" : "i3",
+                "banking" : "b1",
+                "numBufs" : 2,
+                "rswap" : "i2",
+                "wswap" : "i4"
+              },
+              "x",
+              "x"
             ],
             "counterChain" :{
-              "chain" : ["1","0","1","0","0","0","0"],
+              "chain" : ["1","0","0","1","0","0","0"],
               "counters": [
                 {
                   "max" : "c96i",
@@ -55,17 +55,17 @@
                   "min" : "c0i",
                   "stride" : "c1i",
                   "startDelay" : "0",
-                  "endDelay" : "0"
+                  "endDelay" : "10"
                 },
                 {
-                  "max" : "c1i",
+                  "max" : "c96i",
                   "min" : "c0i",
                   "stride" : "c1i",
                   "startDelay" : "0",
                   "endDelay" : "0"
                 },
                 {
-                  "max" : "c96i",
+                  "max" : "c1i",
                   "min" : "c0i",
                   "stride" : "c1i",
                   "startDelay" : "0",
@@ -78,11 +78,11 @@
             },
             "pipeStage": [
               {
-                "fwd" : {"r13" : "bus1","r15" : "bus3"}
+                "fwd" : {}
               },
               {
-                "en" : "i4",
-                "opA" : "m3",
+                "en" : "i2",
+                "opA" : "m0",
                 "opB" : "m1",
                 "opC" : "x",
                 "opcode" : "*",
@@ -90,7 +90,7 @@
                 "fwd" : {"r0" : "alu"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "x",
                 "opB" : "x",
                 "opC" : "x",
@@ -100,7 +100,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "x",
                 "opB" : "x",
                 "opC" : "x",
@@ -110,7 +110,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "x",
                 "opB" : "x",
                 "opC" : "x",
@@ -120,7 +120,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "t0",
                 "opB" : "t0",
                 "opC" : "x",
@@ -129,7 +129,7 @@
                 "fwd" : {"r0" : "alu"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "t0",
                 "opB" : "t0",
                 "opC" : "x",
@@ -138,7 +138,7 @@
                 "fwd" : {"r0" : "alu"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "t0",
                 "opB" : "t0",
                 "opC" : "x",
@@ -148,7 +148,7 @@
                 "fwd" : {"r0" : "alu"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "t0",
                 "opB" : "x",
                 "opC" : "x",
@@ -157,7 +157,7 @@
                 "fwd" : {"r0" : "alu"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "x",
                 "opB" : "x",
                 "opC" : "x",
@@ -167,7 +167,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "en" : "i4",
+                "en" : "i2",
                 "opA" : "x",
                 "opB" : "x",
                 "opC" : "x",
@@ -242,22 +242,16 @@
                 "outSelect" : ["x","x","x","10","x","x","x","x","x","8","x","x","x","x","x","9"]
               },
               "doneXbar" :{
-                "outSelect" : ["4","x","4","x","4","x"]
+                "outSelect" : ["2","x","2","x","2","x"]
               },
               "incXbar" :{
-                "outSelect" : ["9","3","15","x","x","x","x","x"]
+                "outSelect" : ["3","9","15","x","x","x","x","x"]
               },
               "decXbar" :{
-                "outSelect" : ["4","4","4","x","x","x","x","x"]
+                "outSelect" : ["2","2","2","x","x","x","x","x"]
               },
-              "udcInit" : ["2","4","4","x","x","x","x","x"],
+              "udcInit" : ["4","2","4","x","x","x","x","x"],
               "enableLUT": [
-                {
-                  "table" : "x"
-                },
-                {
-                  "table" : "x"
-                },
                 {
                   "table" : "x"
                 },
@@ -275,11 +269,17 @@
                 },
                 {
                   "table" : "x"
+                },
+                {
+                  "table" : "x"
+                },
+                {
+                  "table" : "x"
                 }
               ],
-              "enableMux" : ["1","x","1","x","0","x","x","x"],
+              "enableMux" : ["1","x","0","1","x","x","x","x"],
               "tokenInXbar" :{
-                "outSelect" : ["14","x","2","x","x","x","x","x"]
+                "outSelect" : ["14","x","x","2","x","x","x","x"]
               }
             }
           },
@@ -537,7 +537,7 @@
           "x",
           {
             "scalarInXbar" :{
-              "outSelect" : ["x","0"]
+              "outSelect" : ["0","x"]
             },
             "scratchpads": [
               "x",
@@ -576,7 +576,7 @@
               },
               {
                 "en" : "i0",
-                "opA" : "e12",
+                "opA" : "e13",
                 "opB" : "x",
                 "opC" : "x",
                 "opcode" : "passA",
