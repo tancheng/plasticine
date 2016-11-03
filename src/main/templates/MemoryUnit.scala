@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import scala.collection.mutable.Queue
+import scala.collection.mutable.HashMap
 import Chisel._
 
 import plasticine.pisa.ir._
@@ -55,9 +56,9 @@ class MemoryUnit(
   val d: Int,
   val v: Int,
   val numOutstandingBursts: Int,
+  val burstSizeBytes: Int,
   val inst: MemoryUnitConfig) extends ConfigurableModule[MemoryUnitOpcode] {
 
-  val burstSizeBytes = 64
   val wordSizeBytes = w/8
   val burstSizeWords = burstSizeBytes / wordSizeBytes
   // The data bus width to DRAM is 1-burst wide
@@ -146,12 +147,10 @@ class MemoryUnit(
   burstCounter.io.data.max := Mux(config.scatterGather, UInt(1), sizeInBursts)
   burstCounter.io.data.stride := UInt(1)
   burstCounter.io.control.reset := UInt(0)
-  burstCounter.io.control.enable := burstVld
+  burstCounter.io.control.enable := Mux(config.scatterGather, ~addrFifo.io.empty, burstVld)
   burstCounter.io.control.saturate := UInt(0)
-  addrFifo.io.deqVld := burstCounter.io.control.done
   sizeFifo.io.deqVld := burstCounter.io.control.done
   rwFifo.io.deqVld := burstCounter.io.control.done
-  dataFifo.io.deqVld := rwFifo.io.deq(0) & burstVld
 
   // Burst Tag counter
   val burstTagCounter = Module(new Counter(log2Up(numOutstandingBursts+1)))
@@ -164,13 +163,17 @@ class MemoryUnit(
 
   // Coalescing cache
   val ccache = Module(new CoalescingCache(w, d, v))
-  ccache.io.raddr := io.dram.tagIn
+  ccache.io.raddr := Cat(io.dram.tagIn, UInt(0, width=log2Up(burstSizeBytes)))
   ccache.io.readEn := config.scatterGather & io.dram.vldIn
   ccache.io.waddr := addrFifo.io.deq(0)
   ccache.io.wen := config.scatterGather & ~addrFifo.io.empty
   ccache.io.position := elementID
   ccache.io.wdata := dataFifo.io.deq(0)
   ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
+
+  addrFifo.io.deqVld := burstCounter.io.control.done & ~ccache.io.full
+  dataFifo.io.deqVld := Mux(config.scatterGather, burstCounter.io.control.done & ~ccache.io.full, rwFifo.io.deq(0) & burstVld)
+
 
   // Parse Metadata line
   def parseMetadataLine(m: UInt) = {
@@ -197,14 +200,18 @@ class MemoryUnit(
 
   val (validMask, crossbarConfig) = parseMetadataLine(ccache.io.rmetaData)
 
+  val registeredData = Vec(io.dram.rdata.map { d => Reg(UInt(width=w), d) })
+  val registeredVld = Reg(UInt(width=1), io.dram.vldIn)
+
   // Gather crossbar
   val gatherCrossbar = Module(new CrossbarCore(w, v, v))
-  gatherCrossbar.io.ins := io.dram.rdata
+  gatherCrossbar.io.ins := registeredData
+  gatherCrossbar.io.config := Vec(crossbarConfig)
 
   // Gather buffer
   val gatherBuffer = List.tabulate(burstSizeWords) { i =>
     val ff = Module(new FF(w))
-    ff.io.control.enable := validMask(i)
+    ff.io.control.enable := registeredVld & validMask(i)
     ff.io.data.in := gatherCrossbar.io.outs(i)
     ff
   }
@@ -214,7 +221,7 @@ class MemoryUnit(
   val completed = UInt()
   val completionMask = List.tabulate(burstSizeWords) { i =>
     val ff = Module(new FF(1))
-    ff.io.control.enable := Bool(true)
+    ff.io.control.enable := registeredVld
     ff.io.data.in := validMask(i)
     ff
   }
@@ -245,7 +252,7 @@ class MemoryTester (
     val dram = new DRAMCmdInterface(w, v) // Should not have to pass vector width; must be DRAM burst width
   }
 
-  val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, inst))
+  val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst))
   mu.io.config_enable := io.config_enable
   mu.io.config_data := io.config_data
   mu.io.interconnect.rdyIn := io.interconnect.rdyIn
@@ -277,7 +284,7 @@ class MemoryTester (
 }
 
 
-class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
+class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
   val size = 64
   val burstSizeBytes = 64
   val wordsPerBurst = burstSizeBytes / (c.w / 8)
@@ -285,6 +292,8 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
   def getDataInBursts(data: List[Int]) = {
     Queue.tabulate(data.size / wordsPerBurst) { i => data.slice(i*wordsPerBurst, i*wordsPerBurst + wordsPerBurst) }
   }
+
+  def getBurstAddr(addr: Int) = addr - (addr % burstSizeBytes)
 
   def poke(port: Vec[UInt], value: Seq[Int]) {
     port.zip(value) foreach { case (in, i) => poke(in, i) }
@@ -331,7 +340,8 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
   def getNumBursts(size: Int) = (size / burstSizeBytes) + (if (size%burstSizeBytes > 0) 1 else 0)
 
   def issueCmd(burstAddr: Int, isWr: Int, data: List[Int]) {
-    val cmd = Cmd(burstAddr, data, isWr, expectedTag)
+    val tag = if (c.inst.scatterGather > 0) burstAddr / burstSizeBytes else expectedTag
+    val cmd = Cmd(burstAddr, data, isWr, tag)
     expectedOrder += cmd
     incTag
   }
@@ -435,6 +445,15 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
     enqueueCmd(addr, 1, data)
   }
 
+  def pokeDramResponse(tag: Int, data: List[Int]) {
+    poke(c.io.dram.tagIn, tag)
+    poke(c.io.dram.vldIn, 1)
+    if (data.size > 0) poke(c.io.dram.rdata, data)
+    observeFor(1)
+    poke(c.io.dram.vldIn, 0)
+  }
+
+
   def testBurstMode {
     // Test constants
     val addr = 0x1000
@@ -499,7 +518,47 @@ class MemoryUnitTests(c: MemoryTester) extends Tester(c) {
     // 6. Fill up data queue
   }
 
+  def getTagFor(addr: Int) = {
+    observedOrder.filter(_.addr == addr).head.tag
+  }
+
   def testScatterGather {
+    // 1. Single gather issue where all addresses are the same
+    val g = List.tabulate(c.v) { i => 0x1000 }
+    val expectedData = 0x2000
+    enqueueGather(g)
+    observeFor(c.v * 2)
+    pokeDramResponse(getTagFor(0x1000), List.fill(c.v) { 0x2000 })
+    check("Single gather with same address")
+
+    // 2. Single gather, multiple addresses
+    val addrs = List.tabulate(c.v) { i => if (i == 0) 0x1000 else 0x1000 + (rnd.nextInt) % 0x1000 }
+    val burstData = HashMap[Int, List[Int]]()
+    addrs.foreach { a =>
+      val baseAddr = a - (a % burstSizeBytes)
+      if (!burstData.contains(baseAddr)) burstData(baseAddr) = List.fill(c.burstSizeWords) { math.abs(rnd.nextInt(0x1000)) }
+    }
+    enqueueGather(addrs)
+    observeFor(c.v * 2) // Checks for issue
+
+    val shuffledAddrs = rnd.shuffle((0 until addrs.size).toList).map { addrs(_) }
+
+    shuffledAddrs.foreach { a =>
+      val baseAddr = a - (a % burstSizeBytes)
+      // Start replying randomly with different addresses
+      pokeDramResponse(getTagFor(baseAddr), burstData(baseAddr))
+      observeFor(1)
+    }
+    step(10)
+    val expectedGather = addrs.map { a =>
+      val baseAddr = a - (a % burstSizeBytes)
+      val burstOffset = a % burstSizeBytes
+      val wordOffset = burstOffset / c.burstSizeWords
+      val data = burstData(baseAddr)
+      data(wordOffset)
+    }
+    println(s"Expected gather: $expectedGather")
+    check("Single gather, multiple addresses")
   }
 
   if (c.inst.scatterGather > 0) testScatterGather else testBurstMode
@@ -511,9 +570,10 @@ object MemoryUnitTest {
   val d = 512
   val numOutstandingBursts = 16
   val burstSizeBytes = 64
+  val scatterGather = 1
 
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new MemoryTester(w, d, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0)))) {
+    chiselMainTest(args, () => Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(1)))) {
       c => new MemoryUnitTests(c)
     }
   }
