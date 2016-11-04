@@ -125,9 +125,11 @@ class MemoryUnit(
   }
 
   // Addr FIFO
-  val addrFifo = Module(new FIFO(w, d, v, FIFOConfig(1-inst.scatterGather, 1)))
-  addrFifo.io.config_enable := io.config_enable
-  addrFifo.io.config_data := io.config_data
+  val addrFifo = Module(new FIFOCore(w, d, v))
+  addrFifo.io.chainRead := UInt(1)
+  addrFifo.io.chainWrite := ~config.scatterGather
+//  addrFifo.io.config_enable := io.config_enable
+//  addrFifo.io.config_data := io.config_data
   addrFifo.io.enq := io.interconnect.addr
   addrFifo.io.enqVld := io.interconnect.vldIn
 
@@ -135,9 +137,11 @@ class MemoryUnit(
   val wordOffsets = addrFifo.io.deq map { extractWordOffset(_) }
 
   // Size FIFO
-  val sizeFifo = Module(new FIFO(w, d, v, FIFOConfig(1, 1)))
-  sizeFifo.io.config_enable := io.config_enable
-  sizeFifo.io.config_data := io.config_data
+  val sizeFifo = Module(new FIFOCore(w, d, v))
+  sizeFifo.io.chainWrite := UInt(1)
+  sizeFifo.io.chainRead := UInt(1)
+//  sizeFifo.io.config_enable := io.config_enable
+//  sizeFifo.io.config_data := io.config_data
   sizeFifo.io.enq := Vec.fill(v) { io.interconnect.size }
   sizeFifo.io.enqVld := io.interconnect.vldIn & ~config.scatterGather
   val burstVld = ~sizeFifo.io.empty
@@ -148,9 +152,11 @@ class MemoryUnit(
   // R/W FIFO
   // TODO: Having a 1-bit FIFO is a bit ridiculous. This bit must be merged in with the
   // address FIFO so that each FIFO entry is a tuple
-  val rwFifo = Module(new FIFO(1, d, v, FIFOConfig(1, 1)))
-  rwFifo.io.config_enable := io.config_enable
-  rwFifo.io.config_data := io.config_data
+  val rwFifo = Module(new FIFOCore(1, d, v))
+  rwFifo.io.chainWrite := UInt(1)
+  rwFifo.io.chainRead := UInt(1)
+//  rwFifo.io.config_enable := io.config_enable
+//  rwFifo.io.config_data := io.config_data
   rwFifo.io.enq := Vec.fill(v) { io.interconnect.isWr }
   rwFifo.io.enqVld := io.interconnect.vldIn
 
@@ -159,9 +165,11 @@ class MemoryUnit(
   // dangerous because there is no guarantee that the data input pins actually contain
   // valid data. The safest approach is to have separate enables for command (addr, size, rdwr)
   // and data.
-  val dataFifo = Module(new FIFO(w, d, v, FIFOConfig(0, 0)))
-  dataFifo.io.config_enable := io.config_enable
-  dataFifo.io.config_data := io.config_data
+  val dataFifo = Module(new FIFOCore(w, d, v))
+  dataFifo.io.chainWrite := UInt(0)
+  dataFifo.io.chainRead := config.scatterGather
+//  dataFifo.io.config_enable := io.config_enable
+//  dataFifo.io.config_data := io.config_data
   dataFifo.io.enq := io.interconnect.wdata
   dataFifo.io.enqVld := io.interconnect.dataVldIn
 
@@ -487,54 +495,53 @@ class MemoryUnitTests(c: AbstractMemoryUnit) extends Tester(c) {
     // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
     expect(c.io.interconnect.rdyOut, 1)
 
-    // 2b. Smoke test, write: Single burst with a single burst size
-    val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
-    enqueueBurstWrite(waddr, burstSizeBytes, wdata)
-    observeFor(1)
-    check("Single burst write")
+//    // 2b. Smoke test, write: Single burst with a single burst size
+//    val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
+//    enqueueBurstWrite(waddr, burstSizeBytes, wdata)
+//    observeFor(1)
+//    check("Single burst write")
 
     // 2a. Smoke test, read: Single burst with a single burst size
     enqueueBurstRead(addr, burstSizeBytes)
     observeFor(1)
     check("Single burst read")
 
+    val numBursts = 10
+    // 3a. Bigger smoke test, read: Single burst address with multi-burst size
+    enqueueBurstRead(waddr, numBursts * burstSizeBytes)
+    observeFor(numBursts+8)
+    check("Single Multi-burst read")
 
-//    val numBursts = 10
-//    // 3a. Bigger smoke test, read: Single burst address with multi-burst size
-//    enqueueBurstRead(waddr, numBursts * burstSizeBytes)
-//    observeFor(numBursts+8)
-//    check("Single Multi-burst read")
-//
-//    // 3b. Bigger smoke test, write: Single burst address with multi-burst size
-//    val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
-//    enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
-//    observeFor(numBursts+5)
-//    check("Single Multi-burst write")
-//
-//    // 4. Multiple commands - read
-//    val numCommands = c.numOutstandingBursts
-//    val maxSizeBursts = 9 // arbitrary
-//    val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-//    val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-//    raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
-//    val cyclesToWait = rsizes.map { size =>
-//      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-//    }.sum
-//    observeFor(cyclesToWait*5)
-//    check("Multiple multi-burst read")
-//
-//    // 5. Multiple commands - write
-//    val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-//    val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-//    waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
-//      val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
-//      enqueueBurstWrite(waddr, wsize, wdata)
-//    }
-//    val wCyclesToWait = wsizes.map { size =>
-//      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-//    }.sum
-//    observeFor(wCyclesToWait)
-//    check("Multiple multi-burst write")
+    // 3b. Bigger smoke test, write: Single burst address with multi-burst size
+    val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
+    enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
+    observeFor(numBursts+5)
+    check("Single Multi-burst write")
+
+    // 4. Multiple commands - read
+    val numCommands = c.numOutstandingBursts
+    val maxSizeBursts = 9 // arbitrary
+    val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+    val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+    raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
+    val cyclesToWait = rsizes.map { size =>
+      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+    }.sum
+    observeFor(cyclesToWait*5)
+    check("Multiple multi-burst read")
+
+    // 5. Multiple commands - write
+    val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+    val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+    waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
+      val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
+      enqueueBurstWrite(waddr, wsize, wdata)
+    }
+    val wCyclesToWait = wsizes.map { size =>
+      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+    }.sum
+    observeFor(wCyclesToWait)
+    check("Multiple multi-burst write")
 
 
     // 5. Fill up address queue
@@ -602,15 +609,16 @@ class MemoryUnitTests(c: AbstractMemoryUnit) extends Tester(c) {
   step(1)
   poke(c.config.scatterGather, 0)
   step(1)
-//  poke(c.config.scatterGather, 1)
-//  step(1)
+  poke(c.config.scatterGather, 1)
+  step(1)
 //  if (c.inst.scatterGather > 0) testScatterGather else testBurstMode
   poke(c.config.scatterGather, 0)
   step(1)
   testBurstMode
-//  poke(c.config.scatterGather, 1)
-//  step(1)
-//  testScatterGather
+  reset(10)
+  poke(c.config.scatterGather, 1)
+  step(1)
+  testScatterGather
 }
 
 object MemoryUnitTest {
