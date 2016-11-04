@@ -144,37 +144,35 @@
                 "opC" : "x",
                 "opcode" : "+",
                 "result" : ["t0"],
-                "accumInit" : "c0i",
                 "fwd" : {"r0" : "alu"}
               },
               {
                 "en" : "i2",
                 "opA" : "t0",
-                "opB" : "x",
+                "opB" : "t0",
                 "opC" : "x",
-                "opcode" : "passA",
+                "opcode" : "+",
                 "result" : ["t0"],
                 "fwd" : {"r0" : "alu"}
               },
               {
                 "en" : "i2",
-                "opA" : "x",
-                "opB" : "x",
+                "opA" : "r0",
+                "opB" : "l0",
                 "opC" : "x",
-                "opcode" : "x",
-                "result" : [],
-                "accumInit" : "x",
-                "fwd" : {"r0" : "r0"}
+                "opcode" : "+",
+                "result" : ["l0"],
+                "accumInit" : "c0i",
+                "fwd" : {"r0" : "alu"}
               },
               {
                 "en" : "i2",
-                "opA" : "x",
+                "opA" : "r0",
                 "opB" : "x",
                 "opC" : "x",
-                "opcode" : "x",
-                "result" : [],
-                "accumInit" : "x",
-                "fwd" : {"r0" : "r0"}
+                "opcode" : "passA",
+                "result" : ["l0"],
+                "fwd" : {"r0" : "alu"}
               }
             ],
             "control" :{
@@ -245,12 +243,12 @@
                 "outSelect" : ["2","x","2","x","2","x"]
               },
               "incXbar" :{
-                "outSelect" : ["3","9","15","x","x","x","x","x"]
+                "outSelect" : ["3","15","9","x","x","x","x","x"]
               },
               "decXbar" :{
                 "outSelect" : ["2","2","2","x","x","x","x","x"]
               },
-              "udcInit" : ["4","2","4","x","x","x","x","x"],
+              "udcInit" : ["4","4","2","x","x","x","x","x"],
               "enableLUT": [
                 {
                   "table" : "x"
@@ -537,7 +535,7 @@
           "x",
           {
             "scalarInXbar" :{
-              "outSelect" : ["0","x"]
+              "outSelect" : ["x","0"]
             },
             "scratchpads": [
               "x",
@@ -576,7 +574,7 @@
               },
               {
                 "en" : "i0",
-                "opA" : "e13",
+                "opA" : "e12",
                 "opB" : "x",
                 "opC" : "x",
                 "opcode" : "passA",

@@ -102,37 +102,35 @@
                 "opC" : "x",
                 "opcode" : "+",
                 "result" : ["t0"],
-                "accumInit" : "c0i",
                 "fwd" : {"r0" : "alu"}
               },
               {
                 "en" : "i0",
                 "opA" : "t0",
-                "opB" : "x",
+                "opB" : "t0",
                 "opC" : "x",
-                "opcode" : "passA",
+                "opcode" : "+",
                 "result" : ["t0"],
                 "fwd" : {"r0" : "alu"}
               },
               {
                 "en" : "i0",
-                "opA" : "x",
-                "opB" : "x",
+                "opA" : "r0",
+                "opB" : "l0",
                 "opC" : "x",
-                "opcode" : "x",
-                "result" : [],
-                "accumInit" : "x",
-                "fwd" : {"r0" : "r0"}
+                "opcode" : "+",
+                "result" : ["l0"],
+                "accumInit" : "c0i",
+                "fwd" : {"r0" : "alu"}
               },
               {
                 "en" : "i0",
-                "opA" : "x",
+                "opA" : "r0",
                 "opB" : "x",
                 "opC" : "x",
-                "opcode" : "x",
-                "result" : [],
-                "accumInit" : "x",
-                "fwd" : {"r0" : "r0"}
+                "opcode" : "passA",
+                "result" : ["l0"],
+                "fwd" : {"r0" : "alu"}
               }
             ],
             "control" :{
