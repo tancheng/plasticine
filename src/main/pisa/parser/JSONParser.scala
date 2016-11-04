@@ -264,6 +264,11 @@ object Parser {
     TopUnitConfig(doneConnBox, dataVldConnBox, argOutConnBox)
   }
 
+  def parseMemoryUnit(m: Map[Any, Any]): MemoryUnitConfig = {
+    val scatterGather = parseValue(Parser.getFieldString(m, "scatteGather"))
+    val isWr = parseValue(Parser.getFieldString(m, "isWr"))
+    MemoryUnitConfig(scatterGather, isWr)
+  }
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
     val cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(m, "cu")
                                           .map { parseCU(_) }
@@ -273,9 +278,12 @@ object Parser {
     val controlSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "controlSwitch")
                                           .map { parseCrossbar(_) }
 
+    val mu: List[MemoryUnitConfig] = Parser.getFieldListOfMaps(m, "mu")
+                                    .map { parseMemoryUnit(_) }
+
     val top: TopUnitConfig = parseTopUnit(Parser.getFieldMap(m, "top"))
 
-    PlasticineConfig(cu, dataSwitch, controlSwitch, top)
+    PlasticineConfig(cu, dataSwitch, controlSwitch, mu, top)
   }
 
   def parseConfigMap(m: Map[Any, Any]) = {

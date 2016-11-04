@@ -123,10 +123,14 @@ case class FIFOConfig (
 ) extends AbstractConfig
 
 case class MemoryUnitConfig (
-  scatterGather: Int
+  scatterGather: Int,
+  isWr: Int
 ) extends AbstractConfig
-
-
+object MemoryUnitConfig {
+  def getRandom = {
+    MemoryUnitConfig(0, 0)
+  }
+}
 case class ComputeUnitConfig(
   counterChain: CounterChainConfig,
   scratchpads: List[ScratchpadConfig],
@@ -235,6 +239,7 @@ case class PlasticineConfig(
   cu: List[ComputeUnitConfig],
   dataSwitch: List[CrossbarConfig],
   controlSwitch: List[CrossbarConfig],
+  mu: List[MemoryUnitConfig],
   top: TopUnitConfig
 ) extends AbstractConfig
 
@@ -246,12 +251,14 @@ object PlasticineConfig {
     numTokenIn: Int,
     numTokenOut: Int,
     numCounters: Int,
-    numScratchpads: Int
+    numScratchpads: Int,
+    numMemoryUnits: Int
   ) = {
     new PlasticineConfig(
       List.tabulate(rows*cols) { i => ComputeUnitConfig.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
       List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
       List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
+      List.tabulate(numMemoryUnits) { i => MemoryUnitConfig.getRandom },
       TopUnitConfig.getRandom(8))
       }
 }
