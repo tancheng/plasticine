@@ -50,8 +50,9 @@ def stage(app, params, opts):
         sbt_opts = sbt_opts + " --vcd"
 
     cp = "../target/scala-2.11/classes"
-    app_prefix = "plasticine.test"
-    sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s\"" %(cp, app_prefix, app, sbt_opts, ' '.join(params))
+    app_prefix = "plasticine.templates"
+    app_args_end = "end"
+    sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s %s\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, sbt_opts)
     print sbt_cmd
     ecode = os.system(sbt_cmd)
     if ecode != 0:
