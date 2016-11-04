@@ -98,7 +98,7 @@ public:
   	TransactionCompleteCB *write_cb = new Callback<emul_api_t, void, unsigned, uint64_t, uint64_t>(this, &emul_api_t::write_complete);
   	mcMem = getMemorySystemInstance("ini/DDR3_micron_64M_8B_x4_sg15.ini", "system.ini", "..", "MultiMemoryUnitTester", 65536);
 
-  	uint64_t cpuClkFreqHz = 622222222;
+  	uint64_t cpuClkFreqHz = 1000000000;// 622222222;
   	mcMem->setCPUClockSpeed(cpuClkFreqHz);
   	mcMem->RegisterCallbacks(read_cb, write_cb, power_callback);
 
@@ -458,7 +458,7 @@ private:
   	  dat_t<32> transTag = pctrl->MultiMemoryUnitTester_DRAMSimulator__io_tagIn;
   	  bool isWR = pctrl->MultiMemoryUnitTester_DRAMSimulator__io_isWr.values[0];
   	  uint64_t addr = pctrl->MultiMemoryUnitTester_DRAMSimulator__io_addr.values[0];
-  	  cout << "channel 0: isWr: writing to addr = " << addr << endl;
+			addr = addr * 64;
   	  tagMap[addr] = transTag;
   	  bool transSuccess = mcMem->addTransaction(isWR, addr);
   	  // TODO: need to take the case where a transaction
@@ -466,6 +466,7 @@ private:
 
   	  if (isWR)
   	  {
+  	  	cout << "channel 0: isWr: writing to addr = " << addr << endl;
   	    cout << ">>>>>>>>>> isWR, channel 0 <<<<<<<<<<" << endl;
   	  	vector<dat_t<32> > wdataVec;
   	  	wdataVec.push_back(pctrl->MultiMemoryUnitTester_DRAMSimulator__io_wdata_0);
@@ -500,8 +501,7 @@ private:
   	  dat_t<32> transTag = pctrl->MultiMemoryUnitTester_DRAMSimulator_1__io_tagIn;
   	  bool isWR = pctrl->MultiMemoryUnitTester_DRAMSimulator_1__io_isWr.values[0];
   	  uint64_t addr = pctrl->MultiMemoryUnitTester_DRAMSimulator_1__io_addr.values[0];
-			addr = addr | 0x400000000;
-  	  cout << "channel 1: isWr: writing to addr = " << addr << endl;
+			addr = addr * 64 | 0x400000000;
   	  tagMap[addr] = transTag;
   	  bool transSuccess = mcMem->addTransaction(isWR, addr);
   	  // TODO: need to take the case where a transaction
@@ -510,6 +510,7 @@ private:
   	  if (isWR)
   	  {
   	    cout << ">>>>>>>>>> isWR, channel 0 <<<<<<<<<<" << endl;
+  	  	cout << "channel 1: isWr: writing to addr = " << addr << endl;
   	  	vector<dat_t<32> > wdataVec;
   	  	wdataVec.push_back(pctrl->MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_0);
   	  	wdataVec.push_back(pctrl->MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_1);
@@ -543,8 +544,7 @@ private:
   	  dat_t<32> transTag = pctrl->MultiMemoryUnitTester_DRAMSimulator_2__io_tagIn;
   	  bool isWR = pctrl->MultiMemoryUnitTester_DRAMSimulator_2__io_isWr.values[0];
   	  uint64_t addr = pctrl->MultiMemoryUnitTester_DRAMSimulator_2__io_addr.values[0];
-			addr = addr | 0x800000000;
-  	  cout << "channel 2: isWr: writing to addr = " << addr << endl;
+			addr = addr * 64 | 0x800000000;
   	  tagMap[addr] = transTag;
   	  bool transSuccess = mcMem->addTransaction(isWR, addr);
   	  // TODO: need to take the case where a transaction
@@ -553,6 +553,7 @@ private:
   	  if (isWR)
   	  {
   	    cout << ">>>>>>>>>> isWR, channel 0 <<<<<<<<<<" << endl;
+  	  	cout << "channel 2: isWr: writing to addr = " << addr << endl;
   	  	vector<dat_t<32> > wdataVec;
   	  	wdataVec.push_back(pctrl->MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_0);
   	  	wdataVec.push_back(pctrl->MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_1);
@@ -587,8 +588,7 @@ private:
   	  bool isWR = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_isWr.values[0];
   	  uint64_t addr = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_addr.values[0];
 			// TODO: warning: somehow channel addr in hardware is not working... need to fix it
-			addr = addr | 0xC00000000;
-  	  cout << "channel 3: isWr: writing to addr = " << addr << endl;
+			addr = addr * 64 | 0xC00000000;
   	  tagMap[addr] = transTag;
   	  bool transSuccess = mcMem->addTransaction(isWR, addr);
   	  // TODO: need to take the case where a transaction
@@ -597,6 +597,7 @@ private:
   	  if (isWR)
   	  {
   	    cout << ">>>>>>>>>> isWR, channel 0 <<<<<<<<<<" << endl;
+  	  	cout << "channel 3: isWr: writing to addr = " << addr << endl;
   	  	vector<dat_t<32> > wdataVec;
   	  	wdataVec.push_back(pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_0);
   	  	wdataVec.push_back(pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_1);

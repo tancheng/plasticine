@@ -60,7 +60,8 @@ def stage(app, params, opts):
     if opts.prep == True or opts.prep_4mu == True:
         sbt_opts = sbt_opts + " --debug --backend c --genHarness --vcd"
     if opts.runPrep == True:
-        sbt_opts = sbt_opts + " --test --backend v"
+						# sbt_opts = sbt_opts + " --test --backend v"
+        sbt_opts = sbt_opts + " --test"
 		# runPrep can only be excuted after you do bin/sadl --prep
         print("Copying system configurations to generated folder")
         os.system("cp -r ./dramsimTemplates/ini ./generated/")

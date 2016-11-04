@@ -86,6 +86,21 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
   val burstSizeBytes = 64
   val wordsPerBurst = burstSizeBytes / (c.w / 8)
 
+  // Test constants
+  val addr1 = 0x1000
+  val waddr1 = 0x2000
+	val addr2 = 0x1000
+	val waddr2 = 0x2000
+  val chan0 = 0
+  val chan1 = 1
+	val chan2 = 2
+	val chan3 = 3
+  val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
+  val numCmds = 500
+  val numChans = 4
+  // Test var
+  var numTransCompleted = 0
+
   def getDataInBursts(data: List[Int]) = {
     Queue.tabulate(data.size / wordsPerBurst) { i => data.slice(i*wordsPerBurst, i*wordsPerBurst + wordsPerBurst) }
   }
@@ -125,6 +140,16 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
         val tag = peek(c.io.dramChannel(chan).tagOut).toInt
         observedOrder += Cmd(chan, issuedAddr, data, wr, tag)
       }
+      step(1)
+    }
+  }
+
+  def observeAllForOneCycle() {
+    for (chan <- 0 until numChans) {
+      if (peek(c.io.dramChannel(chan).vldOut) > 0) {
+        numTransCompleted = numTransCompleted + 1
+      }
+
       step(1)
     }
   }
@@ -187,14 +212,17 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
       poke(c.io.interconnects(chan).wdata, dataInBursts.dequeue)
       poke(c.io.interconnects(chan).dataVldIn, 1)
     }
-    observeFor(chan, 1)
+//    observeFor(chan, 1)
+    observeAllForOneCycle()
     poke(c.io.interconnects(chan).vldIn, 0)
     if (isWr > 0) {
       while (!dataInBursts.isEmpty) {
         poke(c.io.interconnects(chan).wdata, dataInBursts.dequeue)
-        observeFor(chan, 1)
+//        observeFor(chan, 1)
+          observeAllForOneCycle()
       }
     }
+
     poke(c.io.interconnects(chan).dataVldIn, 0)
     updateExpected(chan, addr, size, isWr, data)
   }
@@ -207,23 +235,13 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
     enqueueCmd(chan, addr, size, 1, data)
   }
 
-  // Test constants
-  val addr1 = 0x1000
-  val waddr1 = 0x2000
-	val addr2 = 0x1000
-	val waddr2 = 0x2000
-  val chan0 = 0
-  val chan1 = 1
-	val chan2 = 2
-	val chan3 = 3
-  val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
   // Test burst mode
-  // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
-  expect(c.io.interconnects(0).rdyOut, 1)
-  expect(c.io.interconnects(1).rdyOut, 1)
-  expect(c.io.interconnects(2).rdyOut, 1)
-  expect(c.io.interconnects(3).rdyOut, 1)
-	step(1)
+//  // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
+//  expect(c.io.interconnects(0).rdyOut, 1)
+//  expect(c.io.interconnects(1).rdyOut, 1)
+//  expect(c.io.interconnects(2).rdyOut, 1)
+//  expect(c.io.interconnects(3).rdyOut, 1)
+//	step(1)
 
 //	// 2. Issue three cmds (read write read write) in one clock cycle
 //  enqueueBurstRead(chan0, addr1, burstSizeBytes)
@@ -247,56 +265,68 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
 //	enqueueBurstRead(chan3, waddr2, burstSizeBytes)
 //  step(50)
 
-  // 5. Sequential read (500)
-//  for (x <- 0 to 499) {
+  // 5. Sequential read (500 per channel)
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstRead(chan0, addr1 + x, burstSizeBytes)
 //  }
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstRead(chan1, addr1 + x, burstSizeBytes)
 //  }
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstRead(chan2, addr1 + x, burstSizeBytes)
 //  }
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstRead(chan3, addr1 + x, burstSizeBytes)
 //  }
 //
-//  step(600)
+//  while (numTransCompleted != numCmds * numChans) {
+//    print("num of transaction completed = ");
+//    print(numTransCompleted);
+//    print(", num of transaction issued = ");
+//    println(numCmds * numChans + 1)
+//    step(1)
+//  }
 
   // 6. Sequential write (500)
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstWrite(chan0, waddr1 + x, burstSizeBytes, wdata)
 //  }
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstWrite(chan1, waddr1 + x, burstSizeBytes, wdata)
 //  }
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstWrite(chan2, waddr1 + x, burstSizeBytes, wdata)
 //  }
-//  for (x <- 0 to 499) {
-//    enqueueBurstWrite(chan3, waddr1 + x, burstSizeBytes, wdata)
-//  }
-//
-//  step(600)
+  for (x <- 0 to numCmds - 1) {
+    enqueueBurstWrite(chan3, waddr1 + x, burstSizeBytes, wdata)
+  }
+
+  while (numTransCompleted != numCmds) {
+    print("num of transaction completed = ");
+    print(numTransCompleted);
+    print(", num of transaction issued = ");
+    println(numCmds * numChans + 1)
+    step(1)
+  }
 
 
   // 7. Sequential read + write (500)
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstWrite(chan0, addr1 + x, burstSizeBytes, wdata)
 //    enqueueBurstRead(chan0, addr1 + x, burstSizeBytes)
 //  }
 //
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstWrite(chan1, addr1 + x, burstSizeBytes, wdata)
 //    enqueueBurstRead(chan1, addr1 + x, burstSizeBytes)
 //  }
 //
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstWrite(chan1, addr1 + x, burstSizeBytes, wdata)
 //    enqueueBurstRead(chan1, addr1 + x, burstSizeBytes)
 //  }
 //
-//  for (x <- 0 to 499) {
+//  for (x <- 0 to numCmds - 1) {
 //    enqueueBurstWrite(chan1, addr1 + x, burstSizeBytes, wdata)
 //    enqueueBurstRead(chan1, addr1 + x, burstSizeBytes)
 //  }
@@ -304,24 +334,24 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
 //  step(600)
 
   // 8. Randomized read + write (alternating, 250)
-  val r = scala.util.Random
-  for (x <- 0 to 499) {
-    val randomChan = r.nextInt(4)
-    val randomAddr = r.nextInt(500)
-    val randomRorW = r.nextInt(2)
-
-    if (randomRorW == 0)
-    {
-      enqueueBurstRead(randomChan, addr1 + randomAddr, burstSizeBytes)
-    }
-    else
-    {
-      enqueueBurstWrite(randomChan, addr1 + randomAddr, burstSizeBytes, wdata)
-    }
-  }
-
-  step(600)
-
+//  val r = scala.util.Random
+//  for (x <- 0 to 499) {
+//    val randomChan = r.nextInt(4)
+//    val randomAddr = r.nextInt(500)
+//    val randomRorW = r.nextInt(2)
+//
+//    if (randomRorW == 0)
+//    {
+//      enqueueBurstRead(randomChan, addr1 + randomAddr, burstSizeBytes)
+//    }
+//    else
+//    {
+//      enqueueBurstWrite(randomChan, addr1 + randomAddr, burstSizeBytes, wdata)
+//    }
+//  }
+//
+//  step(600)
+//
 }
 
 object MultiMemoryUnitTest {
