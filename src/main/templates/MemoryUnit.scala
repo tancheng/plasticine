@@ -569,6 +569,17 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     }
   }
 
+    // Can I poke random values inside c?
+    poke(c.config.scatterGather, 1)
+    step(1)
+    poke(c.config.scatterGather, 0)
+    step(1)
+    poke(c.config.scatterGather, 1)
+    step(1)
+    poke(c.config.scatterGather, 0)
+    step(1)
+    poke(c.config.scatterGather, 1)
+    step(1)
   if (c.inst.scatterGather > 0) testScatterGather else testBurstMode
 }
 
