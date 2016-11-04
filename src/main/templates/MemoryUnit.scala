@@ -51,7 +51,7 @@ class DRAMCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, 
   val tagOut = UInt(OUTPUT, width=w)
 }
 
-class MemoryUnit(
+abstract class AbstractMemoryUnit(
   val w: Int,
   val d: Int,
   val v: Int,
@@ -61,13 +61,6 @@ class MemoryUnit(
 
   val wordSizeBytes = w/8
   val burstSizeWords = burstSizeBytes / wordSizeBytes
-  // The data bus width to DRAM is 1-burst wide
-  // While it should be possible in the future to add a write combining buffer
-  // and decouple Plasticine's data bus width from the DRAM bus width,
-  // this is currently left out as a wishful todo.
-  // Check and error out if the data bus width does not match DRAM burst size
-  Predef.assert(w/8*v == 64,
-  s"Unsupported combination of w=$w and v=$v; data bus width must equal DRAM burst size ($burstSizeBytes bytes)")
 
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
@@ -84,6 +77,36 @@ class MemoryUnit(
   } .otherwise {
     configIn := config
   }
+
+}
+
+class MemoryUnitSim(
+  override val w: Int,
+  override val d: Int,
+  override val v: Int,
+  override val numOutstandingBursts: Int,
+  override val burstSizeBytes: Int,
+  override val inst: MemoryUnitConfig) extends AbstractMemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst) {
+
+  // Empty module
+  this.name = "MemoryUnit"
+}
+
+class MemoryUnit(
+  override val w: Int,
+  override val d: Int,
+  override val v: Int,
+  override val numOutstandingBursts: Int,
+  override val burstSizeBytes: Int,
+  override val inst: MemoryUnitConfig) extends AbstractMemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst) {
+
+  // The data bus width to DRAM is 1-burst wide
+  // While it should be possible in the future to add a write combining buffer
+  // and decouple Plasticine's data bus width from the DRAM bus width,
+  // this is currently left out as a wishful todo.
+  // Check and error out if the data bus width does not match DRAM burst size
+  Predef.assert(w/8*v == 64,
+  s"Unsupported combination of w=$w and v=$v; data bus width must equal DRAM burst size ($burstSizeBytes bytes)")
 
   def extractBurstAddr(addr: UInt) = {
     val burstOffset = log2Up(burstSizeBytes)
@@ -284,7 +307,7 @@ class MemoryTester (
 }
 
 
-class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
+class MemoryUnitTests(c: AbstractMemoryUnit) extends Tester(c) {
   val size = 64
   val burstSizeBytes = 64
   val wordsPerBurst = burstSizeBytes / (c.w / 8)
@@ -340,7 +363,8 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
   def getNumBursts(size: Int) = (size / burstSizeBytes) + (if (size%burstSizeBytes > 0) 1 else 0)
 
   def issueCmd(burstAddr: Int, isWr: Int, data: List[Int]) {
-    val tag = if (c.inst.scatterGather > 0) burstAddr / burstSizeBytes else expectedTag
+    val scMode = peek(c.config.scatterGather).toInt
+    val tag = if (scMode > 0) burstAddr / burstSizeBytes else expectedTag
     val cmd = Cmd(burstAddr, data, isWr, tag)
     expectedOrder += cmd
     incTag
@@ -475,42 +499,42 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     check("Single burst read")
 
 
-    val numBursts = 10
-    // 3a. Bigger smoke test, read: Single burst address with multi-burst size
-    enqueueBurstRead(waddr, numBursts * burstSizeBytes)
-    observeFor(numBursts+8)
-    check("Single Multi-burst read")
-
-    // 3b. Bigger smoke test, write: Single burst address with multi-burst size
-    val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
-    enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
-    observeFor(numBursts+5)
-    check("Single Multi-burst write")
-
-    // 4. Multiple commands - read
-    val numCommands = c.numOutstandingBursts
-    val maxSizeBursts = 9 // arbitrary
-    val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-    val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-    raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
-    val cyclesToWait = rsizes.map { size =>
-      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-    }.sum
-    observeFor(cyclesToWait*5)
-    check("Multiple multi-burst read")
-
-    // 5. Multiple commands - write
-    val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
-    val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-    waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
-      val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
-      enqueueBurstWrite(waddr, wsize, wdata)
-    }
-    val wCyclesToWait = wsizes.map { size =>
-      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
-    }.sum
-    observeFor(wCyclesToWait)
-    check("Multiple multi-burst write")
+//    val numBursts = 10
+//    // 3a. Bigger smoke test, read: Single burst address with multi-burst size
+//    enqueueBurstRead(waddr, numBursts * burstSizeBytes)
+//    observeFor(numBursts+8)
+//    check("Single Multi-burst read")
+//
+//    // 3b. Bigger smoke test, write: Single burst address with multi-burst size
+//    val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
+//    enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
+//    observeFor(numBursts+5)
+//    check("Single Multi-burst write")
+//
+//    // 4. Multiple commands - read
+//    val numCommands = c.numOutstandingBursts
+//    val maxSizeBursts = 9 // arbitrary
+//    val raddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+//    val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+//    raddrs.zip(rsizes) foreach { case (raddr, rsize) => enqueueBurstRead(raddr, rsize) }
+//    val cyclesToWait = rsizes.map { size =>
+//      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+//    }.sum
+//    observeFor(cyclesToWait*5)
+//    check("Multiple multi-burst read")
+//
+//    // 5. Multiple commands - write
+//    val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
+//    val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
+//    waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
+//      val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
+//      enqueueBurstWrite(waddr, wsize, wdata)
+//    }
+//    val wCyclesToWait = wsizes.map { size =>
+//      (size / burstSizeBytes) + (if ((size % burstSizeBytes) > 0) 1 else 0)
+//    }.sum
+//    observeFor(wCyclesToWait)
+//    check("Multiple multi-burst write")
 
 
     // 5. Fill up address queue
@@ -570,17 +594,23 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
   }
 
     // Can I poke random values inside c?
-    poke(c.config.scatterGather, 1)
-    step(1)
-    poke(c.config.scatterGather, 0)
-    step(1)
-    poke(c.config.scatterGather, 1)
-    step(1)
-    poke(c.config.scatterGather, 0)
-    step(1)
-    poke(c.config.scatterGather, 1)
-    step(1)
-  if (c.inst.scatterGather > 0) testScatterGather else testBurstMode
+  poke(c.config.scatterGather, 1)
+  step(1)
+  poke(c.config.scatterGather, 0)
+  step(1)
+  poke(c.config.scatterGather, 1)
+  step(1)
+  poke(c.config.scatterGather, 0)
+  step(1)
+//  poke(c.config.scatterGather, 1)
+//  step(1)
+//  if (c.inst.scatterGather > 0) testScatterGather else testBurstMode
+  poke(c.config.scatterGather, 0)
+  step(1)
+  testBurstMode
+//  poke(c.config.scatterGather, 1)
+//  step(1)
+//  testScatterGather
 }
 
 object MemoryUnitTest {
@@ -592,8 +622,15 @@ object MemoryUnitTest {
   val scatterGather = 1
 
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(1)))) {
-      c => new MemoryUnitTests(c)
+    val testMode = args.contains("--test")
+    if (testMode) {
+      chiselMainTest(args, () => Module(new MemoryUnitSim(w, d, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0))).asInstanceOf[AbstractMemoryUnit]) {
+            c => { new MemoryUnitTests(c) }
+      }
+    } else {
+      chiselMainTest(args, () => Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0))).asInstanceOf[AbstractMemoryUnit]) {
+            c => { new MemoryUnitTests(c) }
+      }
     }
   }
 }
