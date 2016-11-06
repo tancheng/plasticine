@@ -172,7 +172,7 @@ function processInitSimDataFile () {
     f=`echo $file | cut -f1 -d'.'`
     sed -i "1i #include \"${EXE}.h\"" $file
     sed -i "2i #include \"${GLOBALS}\"" $file
-    sed -i "3i void MemoryUnit_api_t::$f($argType $argName) {" $file
+    sed -i "3i void ${EXE}_api_t::$f($argType $argName) {" $file
     echo "}" >> $file
     echo "$f($argName);" >> $METHODS
     sed -i "${headerLine} i void $f($argType $argName);" $HEADER
