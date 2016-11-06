@@ -229,7 +229,7 @@ function min() {
   echo $(($1<$2?$1:$2));
 }
 
-maxLabelsPerFile=1000
+maxLabelsPerFile=5000
 function processKLCommon() {
   file=$1
   num=$2
@@ -358,13 +358,9 @@ funcs=(init clock_lo clock_hi dump_init dump init_sim_data)
 offsets=(1 0 0 0 2 5)
 namespace=("" "" "" "" "" "api_")
 
-funcs=(init clock_lo clock_hi dump_init dump) # init_sim_data)
-offsets=(1 0 0 0 2) # 5)
-namespace=("" "" "" "" "") # "api_")
-
-funcs=(init clock_lo clock_hi dump_init init_sim_data dump)
-offsets=(1 0 0 0 5 2)
-namespace=("" "" "" "" "api_" "")
+funcs=(init clock_lo clock_hi dump_init init_sim_data)
+offsets=(1 0 0 0 5)
+namespace=("" "" "" "" "api_")
 
 #funcs=(dump) # init_sim_data)
 #offsets=(2) # 5)
@@ -381,5 +377,5 @@ processInitFile
 processDumpInitFile
 processClockLoFile
 processClockHiFile
+#processDumpFile
 processInitSimDataFile
-processDumpFile
