@@ -152,6 +152,37 @@ function processDumpInitFile() {
   chopCommon "dump_init" "FILE*" "f"
 }
 
+function processInitSimDataFile () {
+#  chopCommon "init_sim_data" "${EXE}_t*" "mod"
+  funcName=init_sim_data
+  argType=${EXE}_t*
+  argName=mod
+
+  ## Chop up file into several pieces
+  split -l ${NUM} --additional-suffix="${funcName}.cpp" --numeric-suffixes ${funcName}.txt
+
+  ## Append common header files, method call names for each file
+  ## Insert method calls in place (don't forget semicolons)
+  METHODS=methods.txt
+  HEADER=${EXE}.h
+  headerLine=$(grep -n "${funcName}()" $HEADER | cut -f1 -d':')
+  headerLine=$(expr $headerLine + 1)
+  rm -f $METHODS
+  for file in `ls x[0-9]*${funcName}.cpp`; do
+    f=`echo $file | cut -f1 -d'.'`
+    sed -i "1i #include \"${EXE}.h\"" $file
+    sed -i "2i #include \"${GLOBALS}\"" $file
+    sed -i "3i void MemoryUnit_api_t::$f($argType $argName) {" $file
+    echo "}" >> $file
+    echo "$f($argName);" >> $METHODS
+    sed -i "${headerLine} i void $f($argType $argName);" $HEADER
+    headerLine=$(expr $headerLine + 1)
+  done
+
+  sed -i "/\/\/${funcName}Splitter/r ${METHODS}" ${FILE}
+
+}
+
 function processClockLoFile() {
   ## Move "val_t T<num>;" declarations into a global header file
   CLOCKLO_GLOBALS=clock_loGlobals.h
@@ -323,9 +354,9 @@ function processDumpFile() {
 
 processGlobals
 
-funcs=(init clock_lo clock_hi dump_init dump) # init_sim_data)
-offsets=(1 0 0 0 2) # 5)
-namespace=("" "" "" "" "") # "api_")
+funcs=(init clock_lo clock_hi dump_init dump init_sim_data)
+offsets=(1 0 0 0 2 5)
+namespace=("" "" "" "" "" "api_")
 
 #funcs=(dump) # init_sim_data)
 #offsets=(2) # 5)
@@ -343,3 +374,4 @@ processDumpInitFile
 processClockLoFile
 processClockHiFile
 processDumpFile
+processInitSimDataFile
