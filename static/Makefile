@@ -20,7 +20,7 @@ $(EXE): $(OBJECTS)
 
 
 clean:
-	rm -f $(OBJECTS) $(EXE) *.txt
+	rm -f $(OBJECTS) $(EXE) $(SIM)
 
 nuke: clean
 	rm -f *.h *.cpp
