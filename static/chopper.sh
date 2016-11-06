@@ -172,7 +172,7 @@ function processInitSimDataFile () {
     f=`echo $file | cut -f1 -d'.'`
     sed -i "1i #include \"${EXE}.h\"" $file
     sed -i "2i #include \"${GLOBALS}\"" $file
-    sed -i "3i void MemoryUnit_api_t::$f($argType $argName) {" $file
+    sed -i "3i void ${EXE}_api_t::$f($argType $argName) {" $file
     echo "}" >> $file
     echo "$f($argName);" >> $METHODS
     sed -i "${headerLine} i void $f($argType $argName);" $HEADER
@@ -358,6 +358,14 @@ funcs=(init clock_lo clock_hi dump_init dump init_sim_data)
 offsets=(1 0 0 0 2 5)
 namespace=("" "" "" "" "" "api_")
 
+funcs=(init clock_lo clock_hi dump_init dump) # init_sim_data)
+offsets=(1 0 0 0 2) # 5)
+namespace=("" "" "" "" "") # "api_")
+
+funcs=(init clock_lo clock_hi dump_init init_sim_data dump)
+offsets=(1 0 0 0 5 2)
+namespace=("" "" "" "" "api_" "")
+
 #funcs=(dump) # init_sim_data)
 #offsets=(2) # 5)
 #namespace=("") # "api_")
@@ -373,5 +381,5 @@ processInitFile
 processDumpInitFile
 processClockLoFile
 processClockHiFile
-processDumpFile
 processInitSimDataFile
+processDumpFile
