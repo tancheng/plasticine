@@ -19,7 +19,7 @@ object Opcodes {
     ("+" , (a,b)    => a+b),
     ("-" , (a,b)    => a-b),
     ("*" , (a,b)    => a*b),
-    ("/" , (a,b)    => a/b),
+    ("/" , (a,b)    => a*b),  // No divider temporarily
     ("&" , (a,b)    => a&b),
     ("|" , (a,b)    => a|b),
     ("==" , (a,b)   => a===b),
@@ -31,6 +31,7 @@ object Opcodes {
     ("f==" , (a,b)  => UInt(0)),
     ("f>" , (a,b) => UInt(0)),
     ("f*" , (a,b) => UInt(0)),
+    ("f+" , (a,b) => UInt(0)),
     ("passA" , (a,b) => a),
     ("passB" , (a,b) => b)
   )
@@ -82,22 +83,13 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
 
   // FMA
   val fmaOut = UInt(width=w)
-  if (useFMA) {
-    val fma = Module(new MulAddRecFN(8, 24))
-    fma.io.a := io.a
-    fma.io.b := io.b
-    fma.io.c := io.b
-    fmaOut := fma.io.out
-  } else {
-    fmaOut := UInt(0, width=w)
-  }
 
   // Populate opcode table
   Opcodes.opcodes = List[(String, (UInt, UInt) => UInt)](
     ("+" , (a,b)    => a+b),
     ("-" , (a,b)    => a-b),
     ("*" , (a,b)    => a*b),
-    ("/" , (a,b)    => a/b),
+    ("/" , (a,b)    => a*b),  // No divider temporarily
     ("&" , (a,b)    => a&b),
     ("|" , (a,b)    => a|b),
     ("==" , (a,b)   => a===b),
@@ -109,9 +101,22 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
     ("f==" , (a,b)  => fpEq),
     ("f>" , (a,b) => fpGt),
     ("f*" , (a,b) => fmaOut),
+    ("f+" , (a,b) => fmaOut),
     ("passA" , (a,b) => a),
     ("passB" , (a,b) => b)
   )
+
+  if (useFMA) {
+    val fmulCode = UInt(Opcodes.getCode("f*"))
+    val faddCode = UInt(Opcodes.getCode("f+"))
+    val fma = Module(new MulAddRecFN(8, 24))
+    fma.io.a := recFNFromFN(8, 24, io.a)
+    fma.io.b := recFNFromFN(8, 24, Mux(fmulCode === io.opcode, io.b, Flo(1.0f)))
+    fma.io.c := recFNFromFN(8, 24, Mux(faddCode === io.opcode, io.b, Flo(1.0f)))
+    fmaOut := fNFromRecFN(8, 24, fma.io.out)
+  } else {
+    fmaOut := UInt(0, width=w)
+  }
 
   // Instantiate result mux
   val ins = Vec.tabulate(Opcodes.opcodes.size) { i =>
