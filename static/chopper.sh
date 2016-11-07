@@ -229,7 +229,7 @@ function min() {
   echo $(($1<$2?$1:$2));
 }
 
-maxLabelsPerFile=5000
+maxLabelsPerFile=200
 function processKLCommon() {
   file=$1
   num=$2

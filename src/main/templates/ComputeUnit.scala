@@ -477,11 +477,11 @@ object ComputeUnitTest {
     val bitwidth = 32
     val startDelayWidth = 4
     val endDelayWidth = 4
-    val d = 9
-    val v = 4
+    val d = 10
+    val v = 16
     val l = 0
-    val r = 12
-    val rwStages = 4
+    val r = 16
+    val rwStages = 3
     val numTokens = 8
     val m = 64
     val numScratchpads = 4
