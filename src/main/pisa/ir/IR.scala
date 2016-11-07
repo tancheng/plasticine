@@ -133,6 +133,7 @@ object MemoryUnitConfig {
 }
 case class ComputeUnitConfig(
   counterChain: CounterChainConfig,
+  scalarXbar: CrossbarConfig,
   scratchpads: List[ScratchpadConfig],
   pipeStage: List[PipeStageConfig],
   control: CUControlBoxConfig
@@ -142,6 +143,7 @@ object ComputeUnitConfig {
   def getRandom(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
     new ComputeUnitConfig (
       CounterChainConfig.getRandom(numCounters),
+      CrossbarConfig.getRandom(2),
       List.tabulate(numScratchpads) { i => ScratchpadConfig.getRandom },
       List.tabulate(d) { i => PipeStageConfig.getRandom },
       CUControlBoxConfig.getRandom(numTokenIn, numTokenOut, numCounters)
