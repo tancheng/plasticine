@@ -155,6 +155,7 @@ object Parser {
 
   def parseCU(m: Map[Any, Any]): ComputeUnitConfig = {
     val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
+    val scalarXbar = parseCrossbar(Parser.getFieldMap(m, "scalarXbar"))
 
     val scratchpads =  Parser.getFieldListOfMaps(m, "scratchpads")
                                       .map { parseScratchpad(_) }
@@ -165,8 +166,7 @@ object Parser {
 
     val control = parseControlBox(Parser.getFieldMap(m, "control"))
 
-//    val dataInXbar = parseCrossbar(Parser.getFieldMap(m, "dataInXbar"))
-    ComputeUnitConfig(counterChain, scratchpads, pipeStage, control)
+    ComputeUnitConfig(counterChain, scalarXbar, scratchpads, pipeStage, control)
   }
 
   def parseCrossbar(m: Map[Any, Any], incByOne: Boolean = false): CrossbarConfig = {
