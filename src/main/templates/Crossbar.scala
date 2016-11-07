@@ -198,3 +198,25 @@ object CrossbarTest {
     }
   }
 }
+
+class CrossbarVecTests(c: CrossbarVecReg) extends PlasticineTester(c) { }
+object CrossbarVecTest {
+  def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    if (appArgs.size != 4) {
+      println("Usage: bin/sadl CrossbarTest <pisa config>")
+      sys.exit(-1)
+    }
+
+    val w = appArgs(0).toInt
+    val v = appArgs(1).toInt
+    val inputs = appArgs(2).toInt
+    val outputs = appArgs(3).toInt
+
+    val configObj = CrossbarConfig.getRandom(outputs)
+    chiselMainTest(args, () => Module(new CrossbarVecReg(w, v, inputs, outputs, configObj))) {
+      c => new CrossbarVecTests(c)
+    }
+  }
+}
