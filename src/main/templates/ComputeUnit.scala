@@ -132,9 +132,10 @@ class ComputeUnit(
   // Currently, numCounters == numTokens
   val numCounters = numTokens
 
-//  val numScratchpads = 4 // TODO: Remove hardcoded number!
-//  val numStagesAfterReduction = 2
   val numReduceStages = log2Up(v)
+
+  // Which stages contain the fused multiply-add (FMA) unit?
+  val fmaStages = (d/2 until d).toList
 
   // Sanity check parameters for validity
   // numStagesAfterReduction: Must be at least 1, where the accumulation happens.
@@ -297,7 +298,7 @@ class ComputeUnit(
   // Reduction stages
   val reduceStages = (0 until d).dropRight(numStagesAfterReduction).takeRight(numReduceStages)
   for (i <- 0 until d) {
-    val stage = List.fill(v) { Module(new IntFU(w)) }
+    val stage = List.fill(v) { Module(new IntFU(w, fmaStages.contains(i), true)) }
     val regblockStage = List.fill(v) { Module(new RegisterBlock(w, l, r)) }
     val stageConfig = config.pipeStage(i)
 
@@ -312,7 +313,7 @@ class ComputeUnit(
     reduceLanes.foreach { r =>
       fwdLaneMap(r) = r + (1 << reduceStageNum)
     }
-    println(s"stage $i: fwdLaneMap $fwdLaneMap")
+//    println(s"stage $i: fwdLaneMap $fwdLaneMap")
     (0 until v) foreach { ii =>
       val fu = stage(ii)
       val regblock = regblockStage(ii)
@@ -483,7 +484,7 @@ object ComputeUnitTest {
     val r = 16
     val rwStages = 3
     val numTokens = 8
-    val m = 64
+    val m = 2048  // words per scratchpad
     val numScratchpads = 4
     val numStagesAfterReduction = 2
 
