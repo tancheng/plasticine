@@ -21,6 +21,56 @@ case class CrossbarOpcode(val w: Int, val numInputs: Int, val numOutputs: Int, c
   }
 }
 
+/**
+ * Core logic inside a crossbar
+ */
+class CrossbarCore(val w: Int, val numInputs: Int, val numOutputs: Int) extends Module {
+  val io = new Bundle {
+    val config_enable = Bool(INPUT)
+    val ins = Vec.fill(numInputs) { Bits(INPUT,  width = w) }
+    val outs = Vec.fill(numOutputs) { Bits(OUTPUT,  width = w) }
+    val config = Vec.fill(numOutputs) { Bits(INPUT, width = log2Up(numInputs)) }
+  }
+
+  io.outs.zipWithIndex.foreach { case(out,i) =>
+    val outMux = Module(new MuxN(numInputs, w))
+    outMux.io.ins := io.ins
+    outMux.io.sel := io.config(i)
+    out := outMux.io.out
+  }
+}
+
+/**
+ * Crossbar that connects every input to every output
+ */
+class Crossbar(val w: Int, val numInputs: Int, val numOutputs: Int, val inst: CrossbarConfig) extends ConfigurableModule[CrossbarOpcode] {
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
+    val ins = Vec.fill(numInputs) { Bits(INPUT,  width = w) }
+    val outs = Vec.fill(numOutputs) { Bits(OUTPUT,  width = w) }
+  }
+
+  val configType = CrossbarOpcode(w, numInputs, numOutputs)
+  val configIn = CrossbarOpcode(w, numInputs, numOutputs)
+  val configInit = CrossbarOpcode(w, numInputs, numOutputs, Some(inst))
+  val config = Reg(configType, configIn, configInit)
+  when (io.config_enable) {
+    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
+  } .otherwise {
+    configIn := config
+  }
+
+  io.outs.zipWithIndex.foreach { case(out,i) =>
+//    val outMux = Module(new MuxN(numInputs, w))
+    val outMux = if (Globals.noModule) new MuxNL(numInputs, w) else Module(new MuxN(numInputs, w))
+    outMux.io.ins := io.ins
+    outMux.io.sel := config.outSelect(i)
+    out := outMux.io.out
+  }
+}
+
+
+
 
 /**
  * Crossbar of Vecs that connects every input to every output
@@ -87,55 +137,6 @@ class CrossbarVecReg(val w: Int, val v: Int, val numInputs: Int, val numOutputs:
   }
 }
 
-/**
- * Core logic inside a crossbar
- */
-
-class CrossbarCore(val w: Int, val numInputs: Int, val numOutputs: Int) extends Module {
-  val io = new Bundle {
-    val config_enable = Bool(INPUT)
-    val ins = Vec.fill(numInputs) { Bits(INPUT,  width = w) }
-    val outs = Vec.fill(numOutputs) { Bits(OUTPUT,  width = w) }
-    val config = Vec.fill(numOutputs) { Bits(INPUT, width = log2Up(numInputs)) }
-  }
-
-  io.outs.zipWithIndex.foreach { case(out,i) =>
-    val outMux = Module(new MuxN(numInputs, w))
-    outMux.io.ins := io.ins
-    outMux.io.sel := io.config(i)
-    out := outMux.io.out
-  }
-}
-
-/**
- * Crossbar that connects every input to every output
- */
-class Crossbar(val w: Int, val numInputs: Int, val numOutputs: Int, val inst: CrossbarConfig) extends ConfigurableModule[CrossbarOpcode] {
-  val io = new ConfigInterface {
-    val config_enable = Bool(INPUT)
-    val ins = Vec.fill(numInputs) { Bits(INPUT,  width = w) }
-    val outs = Vec.fill(numOutputs) { Bits(OUTPUT,  width = w) }
-  }
-
-  val configType = CrossbarOpcode(w, numInputs, numOutputs)
-  val configIn = CrossbarOpcode(w, numInputs, numOutputs)
-  val configInit = CrossbarOpcode(w, numInputs, numOutputs, Some(inst))
-  val config = Reg(configType, configIn, configInit)
-  when (io.config_enable) {
-    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
-  } .otherwise {
-    configIn := config
-  }
-
-  io.outs.zipWithIndex.foreach { case(out,i) =>
-//    val outMux = Module(new MuxN(numInputs, w))
-    val outMux = if (Globals.noModule) new MuxNL(numInputs, w) else Module(new MuxN(numInputs, w))
-    outMux.io.ins := io.ins
-    outMux.io.sel := config.outSelect(i)
-    out := outMux.io.out
-  }
-}
-
 class CrossbarReg(val w: Int, val numInputs: Int, val numOutputs: Int, val inst: CrossbarConfig) extends ConfigurableModule[CrossbarOpcode] {
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
@@ -194,6 +195,28 @@ object CrossbarTest {
 
     chiselMainTest(args, () => Module(new Crossbar(bitwidth, inputs, outputs, configObj))) {
       c => new CrossbarTests(c)
+    }
+  }
+}
+
+class CrossbarVecTests(c: CrossbarVecReg) extends PlasticineTester(c) { }
+object CrossbarVecTest {
+  def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    if (appArgs.size != 4) {
+      println("Usage: bin/sadl CrossbarTest <pisa config>")
+      sys.exit(-1)
+    }
+
+    val w = appArgs(0).toInt
+    val v = appArgs(1).toInt
+    val inputs = appArgs(2).toInt
+    val outputs = appArgs(3).toInt
+
+    val configObj = CrossbarConfig.getRandom(outputs)
+    chiselMainTest(args, () => Module(new CrossbarVecReg(w, v, inputs, outputs, configObj))) {
+      c => new CrossbarVecTests(c)
     }
   }
 }

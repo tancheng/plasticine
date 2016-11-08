@@ -602,11 +602,11 @@ class Plasticine(val w: Int,
   val m: Int,
   val numScratchpads: Int,
   val numStagesAfterReduction: Int,
- inst: PlasticineConfig) extends Module with DirectionOps {
+  val numMemoryUnits: Int,
+  inst: PlasticineConfig) extends Module with DirectionOps {
 
   val numRows = 4
   val numCols = 4
-  val numMemoryUnits = 4
   val burstSizeBytes = 64
 
   val io = new ConfigInterface {
@@ -627,7 +627,7 @@ class Plasticine(val w: Int,
   val numOutstandingBursts = 16
   def genMemoryUnits = {
     List.tabulate(numMemoryUnits) { i =>
-      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0)))
+      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, burstSizeBytes, inst.mu(i)))
       mu.io.config_enable := io.config_enable
       mu.io.config_data := io.config_data
 
@@ -747,8 +747,9 @@ object PlasticineTest {
     val numStagesAfterReduction = 2
     val rows = 4
     val cols = 4
-    val configObj = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads)
-    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, configObj))) {
+    val numMemoryUnits = 4
+    val configObj = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
+    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, configObj))) {
       c => new PlasticineTests(c)
     }
   }

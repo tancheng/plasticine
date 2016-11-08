@@ -19,6 +19,7 @@ def main():
     usage = "usage: %prog <application runner> [staging args] [options]"
     parser = OptionParser(usage)
     parser.add_option("--sim", dest="sim", action="store_true", default=False, help="Generate C++ simulator")
+    parser.add_option("--test", dest="test", action="store_true", default=False, help="Run simulator (should have generated simulator using --sim first)")
     parser.add_option("--dot", dest="dot", action="store_true", default=False, help="Generate dot output")
     parser.add_option("--hex", dest="hex", action="store_true", default=False, help="Generate hex output")
     parser.add_option("--vcd", dest="vcd", action="store_true", default=False, help="Generate waveform")
@@ -37,11 +38,6 @@ def stage(app, params, opts):
 
     build_dir = opts.build_dir + os.sep + "generated" + os.sep + app + os.sep
     static_dir = os.getenv("PWD") + os.sep + "static"
-
-#    if not opts.runPrep:
-#        print("Clearing build directory %s..." %(build_dir))
-#        os.system("rm -rf %s" %(build_dir))
-
     sbt_opts = sbt_opts + " --targetDir " + build_dir
     if (opts.sim == True | opts.hex == True | opts.verilog == True):
         sbt_opts = sbt_opts + " --genHarness"
@@ -49,20 +45,22 @@ def stage(app, params, opts):
         sbt_opts = sbt_opts + " --backend dot"
     if opts.sim == True:
         sbt_opts = sbt_opts + " --debug --backend c" #--compile --test
+        print("Clearing build directory %s..." %(build_dir))
+        os.system("rm -rf %s" %(build_dir))
     if opts.verilog == True:
         sbt_opts = sbt_opts + " --backend v"
     if opts.hex == True:
         sbt_opts = sbt_opts + " --backend flo"
     if opts.vcd == True:
         sbt_opts = sbt_opts + " --vcd"
-#    if opts.prep == True or opts.prep_4mu == True:
-#        sbt_opts = sbt_opts + " --debug --backend c --genHarness --vcd"
     if opts.dramSim == True:
         sbt_opts = sbt_opts + " --debug --backend c --genHarness"
         os.system("cp -r ./dramsimTemplates_4mu_plasticineTop/ini ../")
         os.system("cp -r ./dramsimTemplates_4mu_plasticineTop/ini ../")
         os.system("cp ./dramsimTemplates_4mu_plasticineTop/system.ini ../")
         os.system("cp ./dramsimTemplates_4mu_plasticineTop/libdramsim.so ../")
+    if opts.test == True:
+        sbt_opts = sbt_opts + " --backend null --test --testCommand %s/Simulator" %(build_dir)
 
     cp = "../target/scala-2.11/classes"
     app_prefix = "plasticine.templates"

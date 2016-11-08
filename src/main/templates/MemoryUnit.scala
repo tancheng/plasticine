@@ -11,6 +11,7 @@ import plasticine.pisa.ir._
  */
 case class MemoryUnitOpcode(config: Option[MemoryUnitConfig] = None) extends OpcodeT {
   val scatterGather = if (config.isDefined) Bool(config.get.scatterGather > 0) else Bool()
+  val isWr = if (config.isDefined) Bool(config.get.isWr > 0) else Bool()
 
   override def cloneType(): this.type = {
     new MemoryUnitOpcode(config).asInstanceOf[this.type]
@@ -34,7 +35,6 @@ abstract class AbstractMemoryCmdInterface(w: Int, v: Int, dir: IODirection) exte
 
   val addr: Data // Can be 1 (for output) or Vec(v) (for input)
   val wdata = Vec.fill(v) { UInt(dir, width=w) } // v
-  val isWr = Bool(dir) // 1
   val rdata = Vec.fill(v) { UInt(reverseDir, width=w) } // v
 }
 
@@ -47,6 +47,7 @@ class PlasticineMemoryCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInte
 
 class DRAMCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, OUTPUT) {
   val addr = UInt(OUTPUT, width=w)
+  val isWr = Bool(OUTPUT) // 1
   val tagIn = UInt(INPUT, width=w)
   val tagOut = UInt(OUTPUT, width=w)
 }
@@ -83,7 +84,7 @@ class DRAMSimulator(val w: Int, val burstSizeBytes: Int) extends BlackBox {
   io.rdyInSimOut := io.rdyIn
 }
 
-class MemoryUnit(
+abstract class AbstractMemoryUnit(
   val w: Int,
   val d: Int,
   val v: Int,
@@ -93,13 +94,6 @@ class MemoryUnit(
 
   val wordSizeBytes = w/8
   val burstSizeWords = burstSizeBytes / wordSizeBytes
-  // The data bus width to DRAM is 1-burst wide
-  // While it should be possible in the future to add a write combining buffer
-  // and decouple Plasticine's data bus width from the DRAM bus width,
-  // this is currently left out as a wishful todo.
-  // Check and error out if the data bus width does not match DRAM burst size
-  Predef.assert(w/8*v == 64,
-  s"Unsupported combination of w=$w and v=$v; data bus width must equal DRAM burst size ($burstSizeBytes bytes)")
 
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
@@ -122,6 +116,36 @@ class MemoryUnit(
     configIn := config
   }
 
+}
+
+class MemoryUnitSim(
+  override val w: Int,
+  override val d: Int,
+  override val v: Int,
+  override val numOutstandingBursts: Int,
+  override val burstSizeBytes: Int,
+  override val inst: MemoryUnitConfig) extends AbstractMemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst) {
+
+  // Empty module
+  this.name = "MemoryUnit"
+}
+
+class MemoryUnit(
+  override val w: Int,
+  override val d: Int,
+  override val v: Int,
+  override val numOutstandingBursts: Int,
+  override val burstSizeBytes: Int,
+  override val inst: MemoryUnitConfig) extends AbstractMemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst) {
+
+  // The data bus width to DRAM is 1-burst wide
+  // While it should be possible in the future to add a write combining buffer
+  // and decouple Plasticine's data bus width from the DRAM bus width,
+  // this is currently left out as a wishful todo.
+  // Check and error out if the data bus width does not match DRAM burst size
+  Predef.assert(w/8*v == 64,
+  s"Unsupported combination of w=$w and v=$v; data bus width must equal DRAM burst size ($burstSizeBytes bytes)")
+
   def extractBurstAddr(addr: UInt) = {
     val burstOffset = log2Up(burstSizeBytes)
     addr(addr.getWidth-1, burstOffset)
@@ -139,9 +163,9 @@ class MemoryUnit(
   }
 
   // Addr FIFO
-  val addrFifo = Module(new FIFO(w, d, v, FIFOConfig(1-inst.scatterGather, 1)))
-  addrFifo.io.config_enable := io.config_enable
-  addrFifo.io.config_data := io.config_data
+  val addrFifo = Module(new FIFOCore(w, d, v))
+  addrFifo.io.chainRead := UInt(1)
+  addrFifo.io.chainWrite := ~config.scatterGather
   addrFifo.io.enq := io.interconnect.addr
   addrFifo.io.enqVld := io.interconnect.vldIn
 
@@ -149,9 +173,9 @@ class MemoryUnit(
   val wordOffsets = addrFifo.io.deq map { extractWordOffset(_) }
 
   // Size FIFO
-  val sizeFifo = Module(new FIFO(w, d, v, FIFOConfig(1, 1)))
-  sizeFifo.io.config_enable := io.config_enable
-  sizeFifo.io.config_data := io.config_data
+  val sizeFifo = Module(new FIFOCore(w, d, v))
+  sizeFifo.io.chainWrite := UInt(1)
+  sizeFifo.io.chainRead := UInt(1)
   sizeFifo.io.enq := Vec.fill(v) { io.interconnect.size }
   sizeFifo.io.enqVld := io.interconnect.vldIn & ~config.scatterGather
   val burstVld = ~sizeFifo.io.empty
@@ -159,23 +183,14 @@ class MemoryUnit(
   val sizeTop = sizeFifo.io.deq(0)
   val sizeInBursts = extractBurstAddr(sizeTop) + orR(extractBurstOffset(sizeTop))
 
-  // R/W FIFO
-  // TODO: Having a 1-bit FIFO is a bit ridiculous. This bit must be merged in with the
-  // address FIFO so that each FIFO entry is a tuple
-  val rwFifo = Module(new FIFO(1, d, v, FIFOConfig(1, 1)))
-  rwFifo.io.config_enable := io.config_enable
-  rwFifo.io.config_data := io.config_data
-  rwFifo.io.enq := Vec.fill(v) { io.interconnect.isWr }
-  rwFifo.io.enqVld := io.interconnect.vldIn
-
   // Data FIFO
   // Deriving the 'enqVld' signal from the other FIFO states is potentially
   // dangerous because there is no guarantee that the data input pins actually contain
   // valid data. The safest approach is to have separate enables for command (addr, size, rdwr)
   // and data.
-  val dataFifo = Module(new FIFO(w, d, v, FIFOConfig(0, 0)))
-  dataFifo.io.config_enable := io.config_enable
-  dataFifo.io.config_data := io.config_data
+  val dataFifo = Module(new FIFOCore(w, d, v))
+  dataFifo.io.chainWrite := UInt(0)
+  dataFifo.io.chainRead := config.scatterGather
   dataFifo.io.enq := io.interconnect.wdata
   dataFifo.io.enqVld := io.interconnect.dataVldIn
 
@@ -187,7 +202,6 @@ class MemoryUnit(
   burstCounter.io.control.enable := Mux(config.scatterGather, ~addrFifo.io.empty, burstVld)
   burstCounter.io.control.saturate := UInt(0)
   sizeFifo.io.deqVld := burstCounter.io.control.done
-  rwFifo.io.deqVld := burstCounter.io.control.done
 
   // Burst Tag counter
   val burstTagCounter = Module(new Counter(log2Up(numOutstandingBursts+1)))
@@ -209,7 +223,7 @@ class MemoryUnit(
   ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
 
   addrFifo.io.deqVld := burstCounter.io.control.done & ~ccache.io.full
-  dataFifo.io.deqVld := Mux(config.scatterGather, burstCounter.io.control.done & ~ccache.io.full, rwFifo.io.deq(0) & burstVld)
+  dataFifo.io.deqVld := Mux(config.scatterGather, burstCounter.io.control.done & ~ccache.io.full, config.isWr & burstVld)
 
 
   // Parse Metadata line
@@ -268,7 +282,7 @@ class MemoryUnit(
   io.dram.tagOut := Mux(config.scatterGather, burstAddrs(0), burstTagCounter.io.data.out)
   io.dram.wdata := dataFifo.io.deq
   io.dram.vldOut := Mux(config.scatterGather, ccache.io.miss, burstVld)
-  io.dram.isWr := rwFifo.io.deq(0)
+  io.dram.isWr := config.isWr
 
   io.interconnect.rdata := Mux(config.scatterGather, gatherData, io.dram.rdata)
   io.interconnect.vldOut := Mux(config.scatterGather, completed, io.dram.vldIn)
@@ -299,7 +313,6 @@ class MemoryTester (
   io.interconnect.vldOut := mu.io.interconnect.vldOut
   mu.io.interconnect.addr := io.interconnect.addr
   mu.io.interconnect.wdata := io.interconnect.wdata
-  mu.io.interconnect.isWr := io.interconnect.isWr
   mu.io.interconnect.dataVldIn := io.interconnect.dataVldIn
   mu.io.interconnect.size := io.interconnect.size
   io.interconnect.rdata := mu.io.interconnect.rdata
@@ -331,7 +344,12 @@ class MemoryTester (
   mu.io.dram.tagIn := DRAMSimulator.io.tagOut
 }
 
+<<<<<<< HEAD
 class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
+=======
+
+class MemoryUnitTests(c: AbstractMemoryUnit) extends Tester(c) {
+>>>>>>> 31b7d48c9be20fafc7b34114f26033f6c5bd1183
   val size = 64
   val burstSizeBytes = 64
   val wordsPerBurst = burstSizeBytes / (c.w / 8)
@@ -385,28 +403,36 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
   }
 
   def getNumBursts(size: Int) = (size / burstSizeBytes) + (if (size%burstSizeBytes > 0) 1 else 0)
+  def writeMode = peek(c.config.isWr).toInt
+  def sgMode = peek(c.config.scatterGather).toInt
+  def resetAll {
+    reset(10)
+    expectedTag = 0
+  }
 
   def issueCmd(burstAddr: Int, isWr: Int, data: List[Int]) {
-    val tag = if (c.inst.scatterGather > 0) burstAddr / burstSizeBytes else expectedTag
+    val tag = if (sgMode > 0) burstAddr / burstSizeBytes else expectedTag
     val cmd = Cmd(burstAddr, data, isWr, tag)
     expectedOrder += cmd
     incTag
   }
 
-  def updateExpected(addr: Int, size: Int, isWr: Int, data: List[Int]) {
+  def updateExpected(addr: Int, size: Int, data: List[Int]) {
     val dataInBursts = getDataInBursts(data)
     val baseAddr = addr - (addr % burstSizeBytes)
     val numBursts = getNumBursts(size)
+    val isWr = writeMode
     for (i <- 0 until numBursts) {
       issueCmd(baseAddr+i*burstSizeBytes, isWr, if (dataInBursts.isEmpty) List() else dataInBursts.dequeue)
     }
   }
 
   // Scatter-gather issue
-  def updateExpected(addr: List[Int], isWr: Int, data: List[Int]) {
+  def updateExpected(addr: List[Int], data: List[Int]) {
     val dataInBursts = getDataInBursts(data)
     val baseAddresses = addr.map { a => a - (a % burstSizeBytes) }
     val uniqueBaseAddresses = baseAddresses.distinct
+    val isWr = writeMode
     uniqueBaseAddresses.foreach { a => issueCmd(a, isWr, if (isWr == 0) List() else data) }
   }
 
@@ -435,12 +461,11 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     case _ => printFail(s)
   }
 
-  def enqueueCmd(addr: Int, size: Int, isWr: Int, data: List[Int] = List[Int]()) {
+  def enqueueCmd(addr: Int, size: Int, data: List[Int] = List[Int]()) {
     poke(c.io.interconnect.vldIn, 1)
     poke(c.io.interconnect.addr(0), addr)
     poke(c.io.interconnect.size, size)
-    poke(c.io.interconnect.isWr, isWr)
-
+    val isWr = writeMode
     // If it is a write, enqueue first burst
     val dataInBursts = getDataInBursts(data)
     if (isWr > 0) {
@@ -456,13 +481,13 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
       }
     }
     poke(c.io.interconnect.dataVldIn, 0)
-    updateExpected(addr, size, isWr, data)
+    updateExpected(addr, size, data)
   }
 
-  def enqueueCmd(addr: List[Int], isWr: Int, data: List[Int]) {
+  def enqueueCmd(addr: List[Int], data: List[Int]) {
+    val isWr = writeMode
     poke(c.io.interconnect.vldIn, 1)
     c.io.interconnect.addr.zip(addr) foreach { case (in, i) => poke(in, i) }
-    poke(c.io.interconnect.isWr, isWr)
 
     // If it is a write, enqueue first burst
     if (isWr > 0) {
@@ -472,24 +497,24 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     observeFor(1)
     poke(c.io.interconnect.vldIn, 0)
     poke(c.io.interconnect.dataVldIn, 0)
-    updateExpected(addr, isWr, data)
+    updateExpected(addr, data)
   }
 
 
   def enqueueBurstRead(addr: Int, size: Int) {
-    enqueueCmd(addr, size, 0)
+    enqueueCmd(addr, size)
   }
 
   def enqueueBurstWrite(addr: Int, size: Int, data: List[Int]) {
-    enqueueCmd(addr, size, 1, data)
+    enqueueCmd(addr, size, data)
   }
 
   def enqueueGather(addr: List[Int]) {
-    enqueueCmd(addr, 0, List())
+    enqueueCmd(addr, List())
   }
 
   def enqueueScatter(addr: List[Int], data: List[Int]) {
-    enqueueCmd(addr, 1, data)
+    enqueueCmd(addr, data)
   }
 
   def pokeDramResponse(tag: Int, data: List[Int]) {
@@ -500,38 +525,30 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     poke(c.io.dram.vldIn, 0)
   }
 
+<<<<<<< HEAD
   def testBurstMode {
+=======
+
+  def testBurstRead {
+    resetAll
+    poke(c.config.scatterGather, 0)
+    poke(c.config.isWr, 0)
+
+>>>>>>> 31b7d48c9be20fafc7b34114f26033f6c5bd1183
     // Test constants
     val addr = 0x1000
     val waddr = 0x2000
-
-    // Test burst mode
-    // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
-    expect(c.io.interconnect.rdyOut, 1)
-
-    // 2b. Smoke test, write: Single burst with a single burst size
-    val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
-    enqueueBurstWrite(waddr, burstSizeBytes, wdata)
-    observeFor(1)
-    check("Single burst write")
 
     // 2a. Smoke test, read: Single burst with a single burst size
     enqueueBurstRead(addr, burstSizeBytes)
     observeFor(1)
     check("Single burst read")
 
-
     val numBursts = 10
     // 3a. Bigger smoke test, read: Single burst address with multi-burst size
     enqueueBurstRead(waddr, numBursts * burstSizeBytes)
     observeFor(numBursts+8)
     check("Single Multi-burst read")
-
-    // 3b. Bigger smoke test, write: Single burst address with multi-burst size
-    val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
-    enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
-    observeFor(numBursts+5)
-    check("Single Multi-burst write")
 
     // 4. Multiple commands - read
     val numCommands = c.numOutstandingBursts
@@ -544,11 +561,36 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     }.sum
     observeFor(cyclesToWait*5)
     check("Multiple multi-burst read")
+  }
+
+  def testBurstWrite {
+    resetAll
+    poke(c.config.scatterGather, 0)
+    poke(c.config.isWr, 1)
+
+    // Test constants
+    val addr = 0x1000
+    val waddr = 0x2000
+
+    // 2b. Smoke test, write: Single burst with a single burst size
+    val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
+    enqueueBurstWrite(waddr, burstSizeBytes, wdata)
+    observeFor(1)
+    check("Single burst write")
+
+    val numBursts = 10
+    // 3b. Bigger smoke test, write: Single burst address with multi-burst size
+    val bigWdata = List.tabulate(numBursts * wordsPerBurst) { i => 0xf00d + i }
+    enqueueBurstWrite(waddr, numBursts * burstSizeBytes, bigWdata)
+    observeFor(numBursts+5)
+    check("Single Multi-burst write")
 
     // 5. Multiple commands - write
+    val numCommands = c.numOutstandingBursts
+    val maxSizeBursts = 9 // arbitrary
     val waddrs = List.tabulate(numCommands) { i => addr + i * 0x1000 }
     val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * (math.abs(rnd.nextInt) % maxSizeBursts + 1) }
-    waddrs.zip(rsizes) foreach { case (waddr, wsize) =>
+    waddrs.zip(wsizes) foreach { case (waddr, wsize) =>
       val wdata = List.tabulate(wsize / (c.w/8)) { i => i }
       enqueueBurstWrite(waddr, wsize, wdata)
     }
@@ -557,18 +599,30 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     }.sum
     observeFor(wCyclesToWait)
     check("Multiple multi-burst write")
+  }
 
+  def testBurstMode {
+    // Test burst mode
+    // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
+    expect(c.io.interconnect.rdyOut, 1)
+
+    testBurstRead
+    testBurstWrite
 
     // 5. Fill up address queue
 
     // 6. Fill up data queue
   }
 
-  def getTagFor(addr: Int) = {
-    observedOrder.filter(_.addr == addr).head.tag
-  }
+  def testGather {
+    resetAll
+    poke(c.config.scatterGather, 1)
+    poke(c.config.isWr, 0)
 
-  def testScatterGather {
+    def getTagFor(addr: Int) = {
+      observedOrder.filter(_.addr == addr).head.tag
+    }
+
     // 1. Single gather issue where all addresses are the same
     val g = List.tabulate(c.v) { i => 0x1000 }
     val expectedData = 0x2000
@@ -615,7 +669,9 @@ class MemoryUnitTests(c: MemoryUnit) extends Tester(c) {
     }
   }
 
-  if (c.inst.scatterGather > 0) testScatterGather else testBurstMode
+  testBurstRead
+  testBurstWrite
+  testGather
 }
 
 object MemoryUnitTest {
@@ -625,10 +681,18 @@ object MemoryUnitTest {
   val numOutstandingBursts = 16
   val burstSizeBytes = 64
   val scatterGather = 1
-
+  val isWr = 0
+  val config = MemoryUnitConfig(scatterGather, isWr)
   def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(1)))) {
-      c => new MemoryUnitTests(c)
+    val testMode = args.contains("--test")
+    if (testMode) {
+      chiselMainTest(args, () => Module(new MemoryUnitSim(w, d, v, numOutstandingBursts, burstSizeBytes, config)).asInstanceOf[AbstractMemoryUnit]) {
+            c => { new MemoryUnitTests(c) }
+      }
+    } else {
+      chiselMainTest(args, () => Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, config)).asInstanceOf[AbstractMemoryUnit]) {
+            c => { new MemoryUnitTests(c) }
+      }
     }
   }
 }
