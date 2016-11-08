@@ -627,7 +627,7 @@ class Plasticine(val w: Int,
   val numOutstandingBursts = 16
   def genMemoryUnits = {
     List.tabulate(numMemoryUnits) { i =>
-      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, MemoryUnitConfig(0)))
+      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0)))
       mu.io.config_enable := io.config_enable
       mu.io.config_data := io.config_data
 

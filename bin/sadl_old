@@ -38,9 +38,9 @@ def stage(app, params, opts):
     build_dir = opts.build_dir + os.sep + "generated" + os.sep + app + os.sep
     static_dir = os.getenv("PWD") + os.sep + "static"
 
-#    if not opts.runPrep:
-#        print("Clearing build directory %s..." %(build_dir))
-#        os.system("rm -rf %s" %(build_dir))
+    if not opts.runPrep:
+		print("Clearing build directory %s..." %(build_dir))
+		os.system("rm -rf %s" %(build_dir))
 
     sbt_opts = sbt_opts + " --targetDir " + build_dir
     if (opts.sim == True | opts.hex == True | opts.verilog == True):
@@ -59,10 +59,10 @@ def stage(app, params, opts):
 #        sbt_opts = sbt_opts + " --debug --backend c --genHarness --vcd"
     if opts.dramSim == True:
         sbt_opts = sbt_opts + " --debug --backend c --genHarness"
-        os.system("cp -r ./dramsimTemplates_4mu_plasticineTop/ini ../")
-        os.system("cp -r ./dramsimTemplates_4mu_plasticineTop/ini ../")
-        os.system("cp ./dramsimTemplates_4mu_plasticineTop/system.ini ../")
-        os.system("cp ./dramsimTemplates_4mu_plasticineTop/libdramsim.so ../")
+        os.system("cp -r ./dramSimTemplates_4mu_plasticineTop/ini ../")
+		os.system("cp -r ./dramSimTemplates_4mu_plasticineTop/ini ../")
+		os.system("cp ./dramSimTemplates_4mu_plasticineTop/system.ini ../")
+		os.system("cp ./dramSimTemplates_4mu_plasticineTop/libdramsim.so ../")
 
     cp = "../target/scala-2.11/classes"
     app_prefix = "plasticine.templates"
@@ -74,18 +74,16 @@ def stage(app, params, opts):
 
     if opts.dramSim == True:
         print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
-        os.system("cp ./dramsimTemplates_4mu_plasticineTop/libdramsim.so ./dramsimTemplates_4mu_plasticineTop/DRAMSim.h ./dramsimTemplates_4mu_plasticineTop/Callback.h ./generated")
-        os.system("cp ./dramsimTemplates_4mu_plasticineTop/Makefile ./dramsimTemplates_4mu_plasticineTop/chopper.sh ./dramsimTemplates_4mu_plasticineTop/dramInit.txt ./dramsimTemplates_4mu_plasticineTop/dramRandInit.txt ./dramsimTemplates_4mu_plasticineTop/comment.sh ./dramsimTemplates_4mu_plasticineTop/emul_api.h ./generated/%s" %(app))
-        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh MultiMemoryUnitTester.cpp  && make -j32" %(app))
-        os.system("cd ../../")
-        print("Running test...")
-        sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test --backend v \"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
+        os.system("cp ./dramSimTemplates_4mu_plasticineTop/libdramsim.so ./dramSimTemplates_4mu_plasticineTop/DRAMSim.h ./dramSimTemplates_4mu_plasticineTop/Callback.h ./generated")
+        os.system("cp ./dramsimTemplates_4mu_plasticineTop/Makefile ./dramsimTemplates_4mu_plasticineTop/chopper.sh ./dramsimTemplates_4mu_plasticineTop/dramInit.txt ./dramsimTemplates_4mu_plasticineTop/dramRandInt.txt ./dramSimTemplates_4mu_plasticineTop/comment.sh ./dramSimTemplates_4mu_plasticineTop/emul_api.h ./generated/%s" %(app))
+		os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh PlasticineTop.cpp  && make -j32" %(app))
+		os.system("cd ../../")
+		print("Running test...")
+        sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
         print sbt_cmd
         ecode = os.system(sbt_cmd)
         if ecode != 0:
             err("SADL compilation failed")
-				os.system("mkdir dramLogs")
-				os.system("cp *.log dramLogs/")
 
     if ecode != 0:
         err("SADL compilation failed")

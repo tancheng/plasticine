@@ -407,8 +407,9 @@ class ComputeUnit(
   // Connect scratchpad raddr, waddr, wdata ports
   val rwStagesOut = pipeStages.take(rwStages) map { getStageOut(_) }
   val wStagesOut = getStageOut(pipeStages.last)
-  val lastStageWaddr = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(0) }  // r0 in last stage is local waddr
-  val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(1) }  // r1 in last stage in local wdata
+  val lastStageWaddr = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(8) }  // r8 in last stage is local waddr
+  val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(9) }  // r9 in last stage in local wdata
+  val vecOut = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(0) }  // r0 in last stage is sent out of CU
 //  val countersAsVecs = counters map { c => Vec.fill(v) {c} }  // TODO: Fix when vectorization is enabled
 
   // Wire stage outputs into scratchpad address and data
@@ -431,7 +432,7 @@ class ComputeUnit(
     }
   }
 
-  io.dataOut := lastStageWdata
+  io.dataOut := vecOut
 }
 
 /**

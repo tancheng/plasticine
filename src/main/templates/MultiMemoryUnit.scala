@@ -25,7 +25,7 @@ class MultiMemoryUnitTester (
 
   def genMemoryUnits = {
     List.tabulate(numMemoryUnits) { i =>
-      val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, MemoryUnitConfig(0)))
+      val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, MemoryUnitConfig(0)))
       mu.io.config_enable := io.config_enable
       mu.io.config_data := io.config_data
       mu.io.interconnect.rdyIn := io.interconnects(i).rdyIn
