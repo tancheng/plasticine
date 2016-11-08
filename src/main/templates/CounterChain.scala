@@ -21,6 +21,62 @@ case class CounterChainOpcode(val w: Int, val numCounters: Int, config: Option[C
   }
 }
 
+class CounterChainCore(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, val numCounters: Int, counterConfigs: List[CounterRCConfig], val harden: Boolean = false) extends Module {
+  val io = new ConfigInterface {
+    val config_enable = Bool(INPUT)
+    val chain = Vec.fill(numCounters-1) { Bool(INPUT) }
+    val data = Vec.fill(numCounters) { new Bundle {
+        val max      = UInt(INPUT,  w)
+        val stride   = UInt(INPUT,  w)
+        val out      = UInt(OUTPUT, w)
+        val next     = UInt(OUTPUT, w)
+      }
+    }
+    val control = Vec.fill(numCounters) { new Bundle {
+        val enable = Bool(INPUT)
+        val done   = Bool(OUTPUT)
+      }
+    }
+  }
+
+  val counterInsn = counterConfigs
+  val startWidth = if (harden) 0 else startDelayWidth
+  val endWidth = if (harden) 0 else endDelayWidth
+  val counters = (0 until numCounters) map { i =>
+    val c = Module(new CounterRC(w, startWidth, endWidth, counterInsn(i), harden))
+    c.io.config_enable := io.config_enable
+    c.io.config_data := io.config_data
+    c.io.data.max := io.data(i).max
+    c.io.data.stride := io.data(i).stride
+    io.data(i).out := c.io.data.out
+    io.data(i).next := c.io.data.next
+    c
+  }
+
+  // Create chain reconfiguration logic
+  (0 until numCounters) foreach { i: Int =>
+    // Enable-done chain
+    if (i == 0) {
+      counters(i).io.control.enable := io.control(i).enable
+    } else {
+      counters(i).io.control.enable := Mux(io.chain(i-1),
+        counters(i-1).io.control.done,
+        io.control(i).enable)
+    }
+
+    // waitIn - waitOut chain
+    if (i == numCounters-1) {
+      counters(i).io.control.waitIn := Bool(false)
+    } else {
+      counters(i).io.control.waitIn := Mux(io.chain(i),
+                                      counters(i+1).io.control.waitOut,
+                                      Bool(false))
+    }
+    io.control(i).done := counters(i).io.control.done
+  }
+}
+
+
 /**
  * CounterChain: Chain of perfectly nested counters.
  * @param w: Word width

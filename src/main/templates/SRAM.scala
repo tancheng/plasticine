@@ -2,7 +2,7 @@ package plasticine.templates
 
 import Chisel._
 
-class SRAM(val w: Int, val d: Int) extends BlackBox {
+class SRAM(val w: Int, val d: Int) extends Module {
   val addrWidth = log2Up(d)
   val io = new Bundle {
     val raddr = UInt(INPUT, width = addrWidth)
@@ -112,8 +112,8 @@ class SRAMByteEnableTests(c: SRAMByteEnable) extends Tester(c) {
 
 
 object SRAMTest {
-  val w = 4
-  val d = 8
+  val w = 32
+  val d = 512
 
   def main(args: Array[String]): Unit = {
     chiselMainTest(args, () => Module(new SRAM(w, d))) {
