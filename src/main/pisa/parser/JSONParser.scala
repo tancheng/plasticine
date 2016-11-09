@@ -114,6 +114,15 @@ object Parser {
   }
 
   def parseOperandConfig(s: String): OperandConfig = {
+    // (0..rwStages-1)
+    // x l r c i m e
+    // (rwStages)
+    // x l r c - m e
+    // (normal stages)
+    // x l r c
+    // (reduction stages)
+    // x l r c t
+
     def getDataSrc = s(0) match {
       case 'x' => 0 // Don't care (must eventually be turned off)
       case 'l' => 0 // Local register
@@ -122,6 +131,7 @@ object Parser {
       case 'i' => 3 // Iterator / counter
       case 't' => 3 // Cross-stage value for reduction tree
       case 'm' => 4 // Memory
+      case 'e' => 5 // Empty stage
       case _ => throw new Exception(s"Unknown data source '${s(0)}'. Must be l, r, c, i, or m")
     }
     val dataSrc = getDataSrc
@@ -161,20 +171,23 @@ object Parser {
     PipeStageConfig(opA, opB, opcode, result, fwd)
   }
 
-  def parseCU(m: Map[Any, Any]): ComputeUnitConfig = {
-    val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
-    val scalarXbar = parseCrossbar(Parser.getFieldMap(m, "scalarInXbar"))
+  def parseCU(m: Map[Any, Any]): ComputeUnitConfig = isDontCare(m) match {
+    case true =>
+      ComputeUnitConfig.zeroes(10, 8, 8, 8, 4) // hardcoded config values
+    case false =>
+      val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
+      val scalarXbar = parseCrossbar(Parser.getFieldMap(m, "scalarInXbar"))
 
-    val scratchpads =  Parser.getFieldListOfMaps(m, "scratchpads")
-                                      .map { parseScratchpad(_) }
+      val scratchpads =  Parser.getFieldListOfMaps(m, "scratchpads")
+                                        .map { parseScratchpad(_) }
 
-    val pipeStage = Parser.getFieldListOfMaps(m, "pipeStage")
-                              .drop(1)
-                              .map { h => parsePipeStage(h) }
+      val pipeStage = Parser.getFieldListOfMaps(m, "pipeStage")
+                                .drop(1)
+                                .map { h => parsePipeStage(h) }
 
-    val control = parseControlBox(Parser.getFieldMap(m, "control"))
+      val control = parseControlBox(Parser.getFieldMap(m, "control"))
 
-    ComputeUnitConfig(counterChain, scalarXbar, scratchpads, pipeStage, control)
+      ComputeUnitConfig(counterChain, scalarXbar, scratchpads, pipeStage, control)
   }
 
   def parseCrossbar(m: Map[Any, Any], incByOne: Boolean = false): CrossbarConfig = {
