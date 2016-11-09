@@ -8,7 +8,7 @@ import plasticine.pisa.ir._
 /**
  * CUControlBox config register format
  */
-case class CUControlBoxOpcode(val numTokens: Int, config: Option[CUControlBoxConfig] = None) extends OpcodeT {
+case class CUControlBoxOpcode(val numTokens: Int, val numTokenDownLUTs: Int, config: Option[CUControlBoxConfig] = None) extends OpcodeT {
 
   val udcInit = Vec.tabulate(numTokens) { i =>
     if (config.isDefined) {
@@ -26,17 +26,12 @@ case class CUControlBoxOpcode(val numTokens: Int, config: Option[CUControlBoxCon
     }
   }
 
-  val tokenOutMux = Vec.tabulate(numTokens) { i =>
-    if (config.isDefined) {
-      Bool(config.get.tokenOutMux(i))
-    } else {
-      Bool()
-    }
+  val syncTokenMux = Vec.tabulate(numTokenDownLUTs) { i =>
+    if (config.isDefined) UInt(config.get.syncTokenMux(i), width=log2Up(numTokens))
+    else UInt(width=log2Up(numTokens))
   }
-
-  val syncTokenMux = if (config.isDefined) UInt(config.get.syncTokenMux, width=log2Up(numTokens)) else UInt(width=log2Up(numTokens))
   override def cloneType(): this.type = {
-    new CUControlBoxOpcode(numTokens, config).asInstanceOf[this.type]
+    new CUControlBoxOpcode(numTokens, numTokenDownLUTs, config).asInstanceOf[this.type]
   }
 }
 
@@ -47,6 +42,8 @@ case class CUControlBoxOpcode(val numTokens: Int, config: Option[CUControlBoxCon
  */
 class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends ConfigurableModule[CUControlBoxOpcode] {
   val udctrWidth = 4
+  val numTokenDownLUTs = 1
+
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
     /* Input tokens */
@@ -58,9 +55,10 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
     /* Output 'enable' signals */
    val enable = Vec.fill(numTokens) { Bool(OUTPUT)}
   }
-  val configType = CUControlBoxOpcode(numTokens)
-  val configIn = CUControlBoxOpcode(numTokens)
-  val configInit = CUControlBoxOpcode(numTokens, Some(inst))
+
+  val configType = CUControlBoxOpcode(numTokens, numTokenDownLUTs)
+  val configIn = CUControlBoxOpcode(numTokens, numTokenDownLUTs)
+  val configInit = CUControlBoxOpcode(numTokens, numTokenDownLUTs, Some(inst))
   val config = Reg(configType, configIn, configInit)
   when (io.config_enable) {
     configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
@@ -124,19 +122,22 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   // TokenDown LUT: Used to handle route-through tokens from parents to children,
   // as well as barrier cases where more than one token must be received before sending
   // a token out
-  val syncTokenMux = Module(new MuxN(numTokens, 1))
-  syncTokenMux.io.ins := io.tokenIns
-  syncTokenMux.io.sel := config.syncTokenMux
-  val syncToken = syncTokenMux.io.out
-  val tokenDownLUT = Module(new LUT(1, 1 << (numTokens+1), inst.tokenDownLUT(0)))
-  tokenDownLUT.io.config_enable := io.config_enable
-  tokenDownLUT.io.config_data := io.config_data
-  tokenDownLUT.io.ins.zipWithIndex.foreach { case (in, i) =>
-    if (i == 0) in := syncToken
-    else in := gtzs(i-1)
+  val tokenDownPulser = List.tabulate(numTokenDownLUTs) { lutIdx =>
+    val mux = Module(new MuxN(numTokens, 1))
+    mux.io.ins := io.tokenIns
+    mux.io.sel := config.syncTokenMux(lutIdx)
+
+    val lut = Module(new LUT(1, 1 << (numTokens+1), inst.tokenDownLUT(0)))
+    lut.io.config_enable := io.config_enable
+    lut.io.config_data := io.config_data
+    lut.io.ins.zipWithIndex.foreach { case (in, i) =>
+      if (i == 0) in := mux.io.out
+      else in := gtzs(i-1)
+    }
+    val pulser = Module(new Pulser())
+    pulser.io.in := lut.io.out
+    pulser.io.out
   }
-  val pulser = Module(new Pulser())
-  pulser.io.in := tokenDownLUT.io.out
 
   // Enable Mux
   val enableLUTs = List.tabulate(numTokens) { i =>
@@ -150,14 +151,19 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   io.enable.zip(enableMux) foreach { case (en, mux) => en := mux }
 
   // Token out xbar
-  val tokenOutXbar = Module(new Crossbar(1, 2*numTokens, numTokens, inst.tokenOutXbar))
+  // Order: 0: 0,
+  // 1..numTokenDownLUTs: pulser(i).io.out,
+  // (numTokenDownLUTs+1)..(numTokenDownLUTs+1+numTokens-1): tokenOutLUTs(i-numTokenDownLUTs-1)
+  val tokenOutXbarIns = Vec(
+        List(UInt(0, width=1)) ++
+        tokenDownPulser ++
+        tokenOutLUTs.map {_.io.out} ++
+        enableLUTs.map {_.io.out}
+      )
+  val tokenOutXbar = Module(new Crossbar(1, tokenOutXbarIns.size, numTokens, inst.tokenOutXbar))
   tokenOutXbar.io.config_enable := io.config_enable
   tokenOutXbar.io.config_data := io.config_data
-  tokenOutXbar.io.ins := Vec.tabulate(2*numTokens) { i =>
-    if (i == 0) pulser.io.out
-    else if (i < numTokens) tokenOutLUTs(i-1).io.out
-    else enableLUTs(i-numTokens).io.out
-  }
+  tokenOutXbar.io.ins := tokenOutXbarIns
 
   io.enable.zip(enableMux) foreach { case (en, mux) => en := mux }
   io.tokenOuts.zip(tokenOutXbar.io.outs) foreach { case (tout, out) => tout := out }

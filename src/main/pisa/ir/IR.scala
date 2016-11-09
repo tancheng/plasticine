@@ -198,8 +198,7 @@ case class CUControlBoxConfig(
   tokenInXbar: CrossbarConfig,
   doneXbar: CrossbarConfig,
   enableMux: List[Boolean],
-  tokenOutMux: List[Boolean],
-  syncTokenMux: Int,
+  syncTokenMux: List[Int],
   tokenOutXbar: CrossbarConfig
 ) extends AbstractConfig
 object CUControlBoxConfig {
@@ -214,8 +213,7 @@ object CUControlBoxConfig {
         CrossbarConfig.getRandom(numCounters), // tokenInXbar,
         CrossbarConfig.getRandom(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
-        List.fill(numTokenOut) { math.abs(Random.nextInt) % 2 == 0}, // tokenOutMux,
-        math.abs(Random.nextInt) % 2, // syncTokenMux
+        List.fill(2) { math.abs(Random.nextInt) % 2 }, // syncTokenMux
         CrossbarConfig.getRandom(numCounters) // tokenOutXbar,
       )
   }
@@ -230,8 +228,7 @@ object CUControlBoxConfig {
         CrossbarConfig.zeroes(numCounters), // tokenInXbar,
         CrossbarConfig.zeroes(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
-        List.fill(numTokenOut) { math.abs(Random.nextInt) % 2 == 0}, // tokenOutMux,
-        math.abs(Random.nextInt) % 2, // syncTokenMux
+        List.fill(2) { 0 }, // syncTokenMux
         CrossbarConfig.zeroes(numCounters) // tokenOutXbar,
       )
   }

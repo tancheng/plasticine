@@ -38,36 +38,42 @@ object Parser {
   }
 
   def parseCounterRC(m: Map[Any, Any]): CounterRCConfig = {
-    val maxStr = Parser.getFieldString(m, "max")
-    val strideStr = Parser.getFieldString(m, "stride")
+    isDontCare(m) match {
+      case true =>
+        CounterRCConfig.zeroes
+      case false =>
+        val maxStr = Parser.getFieldString(m, "max")
+        val strideStr = Parser.getFieldString(m, "stride")
 
-    def checkAndCastToInt(s: String): Int = s.last match {
-      case 'i' => s.dropRight(1).toInt
-      case _ => throw new Exception(s"Invalid const type ${s.last}")
+        def checkAndCastToInt(s: String): Int = s.last match {
+          case 'i' => s.dropRight(1).toInt
+          case _ => throw new Exception(s"Invalid const type ${s.last}")
+        }
+
+        def parseSrcValue(s: String) = {
+          s(0) match {
+            case 'x' => (0, 0)   // Don't care
+            case 'c' => (checkAndCastToInt(s.drop(1)), 1) // Constant value
+            case 'e' => (checkAndCastToInt(s.drop(1)), 0) // From empty stage
+            case _ => throw new Exception("Unknown source for max/stride " + s(0))
+          }
+        }
+
+        val (max, maxConst) = parseSrcValue(maxStr)
+        val (stride, strideConst) = parseSrcValue(strideStr)
+
+        val startDelay: Int = Parser.getFieldString(m, "startDelay") match {
+          case "x" => 0 // Don't care
+          case n@_ => 1 + n.toInt
+        }
+
+        val endDelay: Int = Parser.getFieldString(m, "endDelay") match {
+          case "x" => 0 // Don't care
+          case n@_ => 1 + n.toInt
+        }
+        CounterRCConfig(max, stride, maxConst, strideConst, startDelay, endDelay)
     }
 
-    def parseSrcValue(s: String) = {
-      s(0) match {
-        case 'x' => (0, 0)   // Don't care
-        case 'c' => (checkAndCastToInt(s.drop(1)), 1) // Constant value
-        case 'e' => (checkAndCastToInt(s.drop(1)), 0) // From empty stage
-        case _ => throw new Exception("Unknown source for max/stride " + s(0))
-      }
-    }
-
-    val (max, maxConst) = parseSrcValue(maxStr)
-    val (stride, strideConst) = parseSrcValue(strideStr)
-
-    val startDelay: Int = Parser.getFieldString(m, "startDelay") match {
-      case "x" => 0 // Don't care
-      case n@_ => 1 + n.toInt
-    }
-
-    val endDelay: Int = Parser.getFieldString(m, "endDelay") match {
-      case "x" => 0 // Don't care
-      case n@_ => 1 + n.toInt
-    }
-    CounterRCConfig(max, stride, maxConst, strideConst, startDelay, endDelay)
   }
 
   def parseCounterChain(m: Map[Any, Any]): CounterChainConfig = {
@@ -98,11 +104,13 @@ object Parser {
   }
 
 
-  def parseLUT(m: Map[Any, Any]): LUTConfig = {
-    val table: List[Int] = Parser.getFieldList(m, "table")
-                                        .asInstanceOf[List[String]]
-                                        .map { parseValue(_) }
-    LUTConfig(table)
+  def parseLUT(m: Map[Any, Any]): LUTConfig = isDontCare(m) match {
+    case true => LUTConfig.zeroes(10) // Some random hardcoded number
+    case false =>
+      val table: List[Int] = Parser.getFieldList(m, "table")
+                                          .asInstanceOf[List[String]]
+                                          .map { s => if (isDontCare(s)) 0 else parseValue(s) }
+      LUTConfig(table)
   }
 
   def parseOperandConfig(s: String): OperandConfig = {
@@ -194,12 +202,15 @@ object Parser {
     val enableMux: List[Boolean] = Parser.getFieldList(m, "enableMux")
                                 .asInstanceOf[List[String]]
                                 .map { parseValue(_) > 0 }
-    val tokenOutMux: List[Boolean] = Parser.getFieldList(m, "tokenOutMux")
-                                .asInstanceOf[List[String]]
-                                 .map { parseValue(_) > 0 }
-    val syncTokenMux: Int = parseValue(Parser.getFieldString(m, "syncTokenMux"))
-    val tokenOutXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenOutXbar"))
-    CUControlBoxConfig(tokenOutLUT, enableLUT, tokenDownLUT, udcInit, decXbar, incXbar, tokenInXbar, doneXbar, enableMux, tokenOutMux, syncTokenMux, tokenOutXbar)
+
+    val syncTokenMux: List[Int] = Parser.getFieldListOfMaps(m, "tokenDownLUT")
+      .map { tokenDownMap => isDontCare(tokenDownMap) match {
+          case true => parseValue("x")
+          case false => parseValue(Parser.getFieldString(tokenDownMap, "mux"))
+        }
+      }
+    val tokenOutXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenOutXbar"), true)
+    CUControlBoxConfig(tokenOutLUT, enableLUT, tokenDownLUT, udcInit, decXbar, incXbar, tokenInXbar, doneXbar, enableMux, syncTokenMux, tokenOutXbar)
   }
 
   def parseBankingConfig(s: String): BankingConfig = {
