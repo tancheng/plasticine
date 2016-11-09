@@ -155,7 +155,7 @@ object Parser {
 
   def parseCU(m: Map[Any, Any]): ComputeUnitConfig = {
     val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
-    val scalarXbar = parseCrossbar(Parser.getFieldMap(m, "scalarXbar"))
+    val scalarXbar = parseCrossbar(Parser.getFieldMap(m, "scalarInXbar"))
 
     val scratchpads =  Parser.getFieldListOfMaps(m, "scratchpads")
                                       .map { parseScratchpad(_) }
@@ -221,40 +221,53 @@ object Parser {
     BankingConfig(mode, strideLog2)
   }
 
+  def isDontCare(value: Any): Boolean = value match {
+    case m: Map[Any,Any] => m.get("dontCare") match {
+      case Some(field) => true
+      case _ => false
+    }
+    case l: List[Any] => l.contains("dontCare")
+    case s: String => s == "dontCare"
+    case _ => throw new Exception(s"Don't know how to check don't care for value $value")
+  }
+
   def parseScratchpad(m: Map[Any, Any]): ScratchpadConfig = {
-    // Banking stride
-    def parseAddrSource(x: String) = {
-      val src = x(0) match {
-        case 'x' => 0  // Don't care
-        case 's' => 0  // Stage
-        case 'i' => 1  // Iterator
-        case 'l' => 2  // Last stage - only for write addr. TODO: Error out for reads
-        case _ => throw new Exception(s"Unknwon address source ${x(0)}; must be one of s, i, or l")
-     }
-     SrcValueTuple(src, if (x == "x") 0 else x.drop(1).toInt)
+    isDontCare(m) match {
+      case true =>
+        ScratchpadConfig.zeroes
+      case false =>
+        // Banking stride
+        def parseAddrSource(x: String) = {
+          val src = x(0) match {
+            case 'x' => 0  // Don't care
+            case 's' => 0  // Stage
+            case 'i' => 1  // Iterator
+            case 'l' => 2  // Last stage - only for write addr. TODO: Error out for reads
+            case _ => throw new Exception(s"Unknwon address source ${x(0)}; must be one of s, i, or l")
+         }
+         SrcValueTuple(src, if (x == "x") 0 else x.drop(1).toInt)
+        }
+
+        val wa = parseAddrSource(Parser.getFieldString(m, "wa"))
+
+        val ra = parseAddrSource(Parser.getFieldString(m, "ra"))
+
+        val wd = Parser.getFieldString(m, "wd") match {
+          case "x" => 0 // Don't care
+          case "local" => 0
+          case "remote" => 1
+          case _ => throw new Exception(s"Unknown write data source; must be either local or remote")
+        }
+
+        val wen = Parser.getFieldString(m, "wen") match {
+          case "x" => 0
+          case n@_ => n.drop(1).toInt + 1
+        }
+
+        val banking = parseBankingConfig(Parser.getFieldString(m, "banking"))
+        val numBufs = Parser.getFieldInt(m, "numBufs")
+        ScratchpadConfig(wa, ra, wd, wen, banking, numBufs)
     }
-
-    val wa = parseAddrSource(Parser.getFieldString(m, "wa"))
-
-    val ra = parseAddrSource(Parser.getFieldString(m, "ra"))
-
-    val wd = Parser.getFieldString(m, "wd") match {
-      case "x" => 0 // Don't care
-      case "local" => 0
-      case "remote" => 1
-      case _ => throw new Exception(s"Unknown write data source; must be either local or remote")
-    }
-
-    val wen = Parser.getFieldString(m, "wen") match {
-      case "x" => 0
-      case n@_ => n.drop(1).toInt + 1
-    }
-
-    val banking = parseBankingConfig(Parser.getFieldString(m, "banking"))
-
-    val numBufs = Parser.getFieldInt(m, "numBufs")
-
-    ScratchpadConfig(wa, ra, wd, wen, banking, numBufs)
   }
 
   def parseTopUnit(m: Map[Any, Any]): TopUnitConfig = {
@@ -339,6 +352,7 @@ object Parser {
     map.get(field) match {
       case Some(field) => field match {
         case list: Seq[Any] => list.toList
+        case s: String => List("dontCare")
         case err@_ => listNotFound(err)
       }
       case None => fieldNotFound(field, map)
@@ -350,6 +364,7 @@ object Parser {
     l.map { m => m match {
         case map: Map[Any,Any] => map
         case hmap: HashMap[Any, Any] => hmap.toMap
+        case s: String => Map("dontCare" -> "dontCare").asInstanceOf[Map[Any, Any]]
         case err@_ => listNotFound(err)
       }
     }
@@ -359,6 +374,7 @@ object Parser {
     map.get(field) match {
       case Some(field) => field match {
         case map: Map[Any,Any] => map
+        case s: String => Map("dontCare" -> "dontCare")
         case err@_ => mapNotFound(err)
       }
       case None => fieldNotFound(field, map)

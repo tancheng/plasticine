@@ -35,7 +35,13 @@ case class TREE() extends DataSource
 /**
  * Parsed config information for a single counter
  */
-case class CounterRCConfig(max: Int, stride: Int, maxConst: Int, strideConst: Int, startDelay: Int, endDelay: Int) extends AbstractConfig
+case class CounterRCConfig(
+  max: Int = 0,
+  stride: Int = 0,
+  maxConst: Int = 0,
+  strideConst: Int = 0,
+  startDelay: Int = 0,
+  endDelay: Int = 0) extends AbstractConfig
 object CounterRCConfig {
   def getRandom = {
     new CounterRCConfig(
@@ -46,6 +52,9 @@ object CounterRCConfig {
         Random.nextInt(16),
         Random.nextInt(16)
       )
+  }
+  def zeroes = {
+    new CounterRCConfig()
   }
 }
 
@@ -60,21 +69,31 @@ object CounterChainConfig {
       List.fill(numCounters) { CounterRCConfig.getRandom }
       )
   }
+  def zeroes(numCounters: Int) = {
+    new CounterChainConfig(
+      List.fill(numCounters) { 0 },
+      List.fill(numCounters) { CounterRCConfig.zeroes }
+      )
+  }
 }
 
-case class OperandConfig(dataSrc: Int, value: Int) extends AbstractConfig
+case class OperandConfig(dataSrc: Int = 0, value: Int = 0) extends AbstractConfig
 object OperandConfig {
   def getRandom = {
     new OperandConfig(math.abs(Random.nextInt) % 4, math.abs(Random.nextInt) % 4)
   }
+  def zeroes = {
+    new OperandConfig()
+  }
+
 }
 
 case class PipeStageConfig(
-  opA: OperandConfig,
-  opB: OperandConfig,
-  opcode: Int,
-  result: Int,
-  fwd: Map[Int, Int]
+  opA: OperandConfig = OperandConfig(),
+  opB: OperandConfig = OperandConfig(),
+  opcode: Int = 0,
+  result: Int = 0,
+  fwd: Map[Int, Int] = Map[Int, Int]()
 ) extends AbstractConfig
 object PipeStageConfig {
   def getRandom = {
@@ -86,6 +105,9 @@ object PipeStageConfig {
         Map[Int,Int]()
       )
   }
+  def zeroes = {
+    new PipeStageConfig()
+  }
 }
 
 /**
@@ -93,17 +115,17 @@ object PipeStageConfig {
  * to hold scratchpad config info.
  * TODO: Use this to hold operand info as well
  */
-case class SrcValueTuple(val src: Int, val value: Int)
+case class SrcValueTuple(val src: Int = 0, val value: Int = 0)
 
-case class BankingConfig(mode: Int, strideLog2: Int) extends AbstractConfig
+case class BankingConfig(mode: Int = 0, strideLog2: Int = 0) extends AbstractConfig
 
 case class ScratchpadConfig(
-  wa: SrcValueTuple,
-  ra: SrcValueTuple,
-  wd: Int,
-  wen: Int,
-  banking: BankingConfig,
-  numBufs: Int
+  wa: SrcValueTuple = SrcValueTuple(),
+  ra: SrcValueTuple = SrcValueTuple(),
+  wd: Int = 0,
+  wen: Int = 0,
+  banking: BankingConfig = BankingConfig(),
+  numBufs: Int = 0
 ) extends AbstractConfig
 object ScratchpadConfig {
   def getRandom = {
@@ -116,19 +138,25 @@ object ScratchpadConfig {
       1
     )
   }
+  def zeroes = {
+    new ScratchpadConfig()
+  }
 }
 case class FIFOConfig (
-  chainWrite: Int,
-  chainRead: Int
+  chainWrite: Int = 0,
+  chainRead: Int = 0
 ) extends AbstractConfig
 
 case class MemoryUnitConfig (
-  scatterGather: Int,
-  isWr: Int
+  scatterGather: Int = 0,
+  isWr: Int = 0
 ) extends AbstractConfig
 object MemoryUnitConfig {
   def getRandom = {
     MemoryUnitConfig(0, 0)
+  }
+  def zeroes = {
+    new MemoryUnitConfig()
   }
 }
 case class ComputeUnitConfig(
@@ -149,6 +177,16 @@ object ComputeUnitConfig {
       CUControlBoxConfig.getRandom(numTokenIn, numTokenOut, numCounters)
       )
   }
+  def zeroes(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
+    new ComputeUnitConfig (
+      CounterChainConfig.zeroes(numCounters),
+      CrossbarConfig.zeroes(2),
+      List.tabulate(numScratchpads) { i => ScratchpadConfig.zeroes },
+      List.tabulate(d) { i => PipeStageConfig.zeroes },
+      CUControlBoxConfig.zeroes(numTokenIn, numTokenOut, numCounters)
+      )
+  }
+
 }
 case class CUControlBoxConfig(
   tokenOutLUT: List[LUTConfig],
@@ -181,6 +219,22 @@ object CUControlBoxConfig {
         CrossbarConfig.getRandom(numCounters) // tokenOutXbar,
       )
   }
+  def zeroes(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
+    new CUControlBoxConfig(
+        List.fill(numTokenOut-1) { LUTConfig.zeroes(2) }, // tokenOutLUT
+        List.fill(numCounters) { LUTConfig.zeroes(numCounters)}, // enableLUT
+        List.fill(2) { LUTConfig.zeroes(numCounters+1) }, // tokenDownLUT,
+        List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
+        CrossbarConfig.zeroes(numCounters), // decXbar,
+        CrossbarConfig.zeroes(2*numCounters), // incXbar,
+        CrossbarConfig.zeroes(numCounters), // tokenInXbar,
+        CrossbarConfig.zeroes(2*numCounters), // doneXbar,
+        List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
+        List.fill(numTokenOut) { math.abs(Random.nextInt) % 2 == 0}, // tokenOutMux,
+        math.abs(Random.nextInt) % 2, // syncTokenMux
+        CrossbarConfig.zeroes(numCounters) // tokenOutXbar,
+      )
+  }
 }
 /**
  * Crossbar config information
@@ -193,6 +247,9 @@ object CrossbarConfig {
   def getRandom(numOutputs: Int) = {
     new CrossbarConfig(List.fill(1+numOutputs) { math.abs(Random.nextInt) % 2 })
   }
+  def zeroes(numOutputs: Int) = {
+    new CrossbarConfig(List.fill(1+numOutputs) { 0 })
+  }
 }
 
 /**
@@ -203,15 +260,21 @@ object LUTConfig {
   def getRandom(numInputs: Int) = {
     new LUTConfig(List.tabulate(1 << numInputs) { i => math.abs(Random.nextInt(2)) })
   }
+  def zeroes(numInputs: Int) = {
+    new LUTConfig(List.fill(1 << numInputs) { 0 })
+  }
 }
 
 /**
  * Connection box config information
  */
-case class ConnBoxConfig(sel: Int) extends AbstractConfig
+case class ConnBoxConfig(sel: Int = 0) extends AbstractConfig
 object ConnBoxConfig {
   def getRandom(numInputs: Int) = {
     new ConnBoxConfig(math.abs(Random.nextInt(numInputs)))
+  }
+  def zeroes(numInputs: Int) = {
+    new ConnBoxConfig()
   }
 }
 
@@ -229,6 +292,13 @@ object TopUnitConfig {
       ConnBoxConfig.getRandom(numInputs),
       ConnBoxConfig.getRandom(numInputs),
       ConnBoxConfig.getRandom(numInputs)
+      )
+  }
+  def zeroes(numInputs: Int) = {
+    new TopUnitConfig(
+      ConnBoxConfig.zeroes(numInputs),
+      ConnBoxConfig.zeroes(numInputs),
+      ConnBoxConfig.zeroes(numInputs)
       )
   }
 }
@@ -262,5 +332,23 @@ object PlasticineConfig {
       List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
       List.tabulate(numMemoryUnits) { i => MemoryUnitConfig.getRandom },
       TopUnitConfig.getRandom(8))
+      }
+
+  def zeroes(
+    d: Int,
+    rows: Int,
+    cols: Int,
+    numTokenIn: Int,
+    numTokenOut: Int,
+    numCounters: Int,
+    numScratchpads: Int,
+    numMemoryUnits: Int
+  ) = {
+    new PlasticineConfig(
+      List.tabulate(rows*cols) { i => ComputeUnitConfig.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(8) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(8) },
+      List.tabulate(numMemoryUnits) { i => MemoryUnitConfig.zeroes },
+      TopUnitConfig.zeroes(8))
       }
 }

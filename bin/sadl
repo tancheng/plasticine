@@ -23,6 +23,7 @@ def main():
     parser.add_option("--dot", dest="dot", action="store_true", default=False, help="Generate dot output")
     parser.add_option("--hex", dest="hex", action="store_true", default=False, help="Generate hex output")
     parser.add_option("--vcd", dest="vcd", action="store_true", default=False, help="Generate waveform")
+    parser.add_option("--parserTest", dest="parserTest", action="store_true", default=False, help="Test JSON parser")
     parser.add_option("--verilog", dest="verilog", action="store_true", default=False, help="Generate Verilog RTL")
     parser.add_option("-d", "--dest", action="store", dest="build_dir", default=os.getenv("PWD"), help="output location for generated files")
 
@@ -38,6 +39,7 @@ def stage(app, params, opts):
     build_dir = opts.build_dir + os.sep + "generated" + os.sep + app + os.sep
     static_dir = os.getenv("PWD") + os.sep + "static"
 
+    app_prefix = "plasticine.templates"
     sbt_opts = sbt_opts + " --targetDir " + build_dir
     if (opts.sim == True | opts.hex == True | opts.verilog == True):
         sbt_opts = sbt_opts + " --genHarness"
@@ -53,11 +55,12 @@ def stage(app, params, opts):
         sbt_opts = sbt_opts + " --backend flo"
     if opts.vcd == True:
         sbt_opts = sbt_opts + " --vcd"
+    if opts.parserTest == True:
+        app_prefix = "plasticine.pisa"
     if opts.test == True:
         sbt_opts = sbt_opts + " --backend null --test --testCommand %s/Simulator" %(build_dir)
 
     cp = "../target/scala-2.11/classes"
-    app_prefix = "plasticine.templates"
     app_args_end = "end"
     sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s %s\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, sbt_opts)
     print sbt_cmd
