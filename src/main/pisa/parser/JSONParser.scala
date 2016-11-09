@@ -294,18 +294,25 @@ object Parser {
     }
   }
 
-  def parseTopUnit(m: Map[Any, Any]): TopUnitConfig = {
-    val doneConnBox = ConnBoxConfig(Parser.getFieldInt(m, "doneConnBox"))
-    val dataVldConnBox = ConnBoxConfig(Parser.getFieldInt(m, "dataVldConnBox"))
-    val argOutConnBox = ConnBoxConfig(Parser.getFieldInt(m, "argOutConnBox"))
-    TopUnitConfig(doneConnBox, dataVldConnBox, argOutConnBox)
+  def parseTopUnit(m: Map[Any, Any]): TopUnitConfig = isDontCare(m) match {
+    case true =>
+      TopUnitConfig.zeroes(10) // Some random number
+    case false =>
+      val doneConnBox = ConnBoxConfig(Parser.getFieldInt(m, "doneConnBox"))
+      val dataVldConnBox = ConnBoxConfig(Parser.getFieldInt(m, "dataVldConnBox"))
+      val argOutConnBox = ConnBoxConfig(Parser.getFieldInt(m, "argOutConnBox"))
+      TopUnitConfig(doneConnBox, dataVldConnBox, argOutConnBox)
   }
 
-  def parseMemoryUnit(m: Map[Any, Any]): MemoryUnitConfig = {
-    val scatterGather = parseValue(Parser.getFieldString(m, "scatteGather"))
-    val isWr = parseValue(Parser.getFieldString(m, "isWr"))
-    MemoryUnitConfig(scatterGather, isWr)
+  def parseMemoryUnit(m: Map[Any, Any]): MemoryUnitConfig = isDontCare(m) match {
+    case true =>
+      MemoryUnitConfig.zeroes
+    case false =>
+      val scatterGather = parseValue(Parser.getFieldString(m, "scatteGather"))
+      val isWr = parseValue(Parser.getFieldString(m, "isWr"))
+      MemoryUnitConfig(scatterGather, isWr)
   }
+
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
     val cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(m, "cu")
                                           .map { parseCU(_) }
