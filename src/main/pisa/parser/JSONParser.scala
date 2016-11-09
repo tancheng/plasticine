@@ -114,6 +114,7 @@ object Parser {
   }
 
   def parseOperandConfig(s: String): OperandConfig = {
+
     // (0..rwStages-1)
     // x l r c i m e
     // (rwStages)
@@ -122,7 +123,6 @@ object Parser {
     // x l r c
     // (reduction stages)
     // x l r c t
-
     def getDataSrc = s(0) match {
       case 'x' => 0 // Don't care (must eventually be turned off)
       case 'l' => 0 // Local register

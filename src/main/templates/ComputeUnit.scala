@@ -276,6 +276,9 @@ class ComputeUnit(
     regBlock.io.writeData := UInt(0) // Not connected to any ALU output
     regBlock.io.readLocalASel := UInt(0) // No local reads
     regBlock.io.readLocalBSel := UInt(0) // No local reads
+    regBlock.io.readRemoteASel := UInt(0) // No remote reads
+    regBlock.io.readRemoteBSel := UInt(0) // No remote reads
+
     regBlock.io.passData.zipWithIndex.foreach { case (in, i) =>
       val input = if (i < remotesList.size) remotesList(i)
                   else UInt(0)
@@ -318,24 +321,37 @@ class ComputeUnit(
       val fu = stage(ii)
       val regblock = regblockStage(ii)
 
+      // Empty stage
+      val emptyStageRegs = pipeRegs(0)(ii)
+
       // Local and remote (previous pipe stage) registers
       val localA = regblock.io.readLocalA
       val rA = pipeRegs.last(ii).io.readRemoteA
 
+      // First 'rwStages+1' stages: Support the following inputs:
+      // x (don't care), l (local), r (remote), c (constant), i (counter), m (memory), e (empty)
       val dataSrcA = if (i <= rwStages) {
         // Forwarded memories
         val memAMux = if (Globals.noModule) new MuxNL(numScratchpads, w) else Module(new MuxN(numScratchpads, w))
         memAMux.io.ins := Vec(rdata map {_(ii)}) // Get the ii'th element from each Scratchpad's rdata vector
         memAMux.io.sel := stageConfig.opA.value
 
+        val emptyStageMux = Module(new MuxN(r, w))
+        emptyStageMux.io.ins := emptyStageRegs.io.passDataOut
+        emptyStageMux.io.sel := stageConfig.opA.value
+
+        // For stage 0, remote read and emptyStage read are the same
+        val remoteA = if (i == 0) emptyStageMux.io.out else rA
+
         if (i == rwStages) {
-          Vec(localA, rA, stageConfig.opA.value, UInt(0, width=w), memAMux.io.out)
+          Vec(localA, remoteA, stageConfig.opA.value, UInt(0, width=w), memAMux.io.out, emptyStageMux.io.out)
         } else {
           // Forwarded counters
           val counterAMux = if (Globals.noModule) new MuxNL(numCounters, w) else Module(new MuxN(numCounters, w))
           counterAMux.io.ins := Vec(counterVecs(ii))
           counterAMux.io.sel := stageConfig.opA.value
-          Vec(localA, rA, stageConfig.opA.value, counterAMux.io.out, memAMux.io.out)
+
+          Vec(localA, remoteA, stageConfig.opA.value, counterAMux.io.out, memAMux.io.out, emptyStageMux.io.out)
         }
       } else {
         Vec(localA, rA, stageConfig.opA.value)
@@ -349,14 +365,21 @@ class ComputeUnit(
         memBMux.io.ins := Vec(rdata map {_(ii)}) // Get the ii'th element from each Scratchpad's rdata vector
         memBMux.io.sel := stageConfig.opB.value
 
+        val emptyStageMux = Module(new MuxN(r, w))
+        emptyStageMux.io.ins := emptyStageRegs.io.passDataOut
+        emptyStageMux.io.sel := stageConfig.opB.value
+
+        // For stage 0, remote read and emptyStage read are the same
+        val remoteB = if (i == 0) emptyStageMux.io.out else rB
+
         if (i == rwStages) {
-          Vec(localB, rB, stageConfig.opB.value, UInt(0, width=w), memBMux.io.out)
+          Vec(localB, remoteB, stageConfig.opB.value, UInt(0, width=w), memBMux.io.out, emptyStageMux.io.out)
         } else {
           // Forwarded counters
           val counterBMux = if (Globals.noModule) new MuxNL(numCounters, w) else Module(new MuxN(numCounters, w))
           counterBMux.io.ins := Vec(counterVecs(ii))
           counterBMux.io.sel := stageConfig.opB.value
-          Vec(localB, rB, stageConfig.opB.value, counterBMux.io.out, memBMux.io.out)
+          Vec(localB, remoteB, stageConfig.opB.value, counterBMux.io.out, memBMux.io.out, emptyStageMux.io.out)
         }
       } else if (isReduceStage && fwdLaneMap.contains(ii)) {
         val prevRegBlock = pipeRegs.last(fwdLaneMap(ii))
@@ -396,8 +419,8 @@ class ComputeUnit(
       regblock.io.writeSel := stageConfig.result
       regblock.io.readLocalASel := stageConfig.opA.value
       regblock.io.readLocalBSel := stageConfig.opB.value
-      pipeRegs.last(ii).io.readRemoteASel := stageConfig.opA.value
-      pipeRegs.last(ii).io.readRemoteBSel := stageConfig.opB.value
+      pipeRegs.last(ii).io.readRemoteASel := (if (i == 0) UInt(0) else stageConfig.opA.value) // No remote read for stage 0
+      pipeRegs.last(ii).io.readRemoteBSel := (if (i == 0) UInt(0) else stageConfig.opB.value) // No remote read for stage 0
     }
     pipeStages.append(stage)
     pipeRegs.append(regblockStage)
