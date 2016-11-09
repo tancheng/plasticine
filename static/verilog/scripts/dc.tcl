@@ -28,15 +28,24 @@ read_verilog -rtl $VERILOG_LIST
 analyze -format verilog $VERILOG_LIST
 
 # remove SRAM as we don't need to elaborate the interface
-remove_design [list SRAM]
-set_dont_touch SRAM
+## [raghu] # remove_design [list SRAM]
+#set_dont_touch SRAM
+
+## SRAMs are in the Scratchpad module, set_dont_touch them
+current_design ComputeUnit
+current_design Scratchpad
+set srams [get_instances SRAM]
+foreach sram $srams {
+  set_dont_touch $sram
+}
+
 list_designs
 
 # set top level design
 current_design $PROJECT_NAME
 elaborate $PROJECT_NAME
 link
-uniquify
+# uniquify
 
 #set_operating_conditions WCCOM
 set_dont_use tcbn45gsbwpml/*D0BWP

@@ -5,8 +5,12 @@ SOURCES=$(wildcard *.cpp)
 OBJECTS=$(SOURCES:.cpp=.o)
 
 EXE := $(shell grep -o "public mod_t" *.h -r | cut -f1 -d'.')
+SIM="Simulator"
 
-all: $(EXE)
+all: $(SIM)
+
+$(SIM): $(EXE)
+	ln -sf $(EXE) $(SIM)
 
 $(EXE): $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS)
@@ -16,7 +20,7 @@ $(EXE): $(OBJECTS)
 
 
 clean:
-	rm -f $(OBJECTS) $(EXE) *.txt
+	rm -f $(OBJECTS) $(EXE) $(SIM)
 
 nuke: clean
 	rm -f *.h *.cpp

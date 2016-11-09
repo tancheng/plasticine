@@ -132,9 +132,10 @@ class ComputeUnit(
   // Currently, numCounters == numTokens
   val numCounters = numTokens
 
-//  val numScratchpads = 4 // TODO: Remove hardcoded number!
-//  val numStagesAfterReduction = 2
   val numReduceStages = log2Up(v)
+
+  // Which stages contain the fused multiply-add (FMA) unit?
+  val fmaStages = (d/2 until d).toList
 
   // Sanity check parameters for validity
   // numStagesAfterReduction: Must be at least 1, where the accumulation happens.
@@ -258,13 +259,19 @@ class ComputeUnit(
   counterEnables := controlBlock.io.enable
   io.tokenOuts := controlBlock.io.tokenOuts
 
+  // Scalar crossbar: (numInputs * 2) x 2
+  val numInputWordsPerBus = 2
+  val scalarXbar = Module(new Crossbar(w, numScratchpads * numInputWordsPerBus, 2, inst.scalarXbar))
+  scalarXbar.io.ins := Vec(io.dataIn.map { _.take(numInputWordsPerBus) }.flatten)
+  val scalarIns = scalarXbar.io.outs
+
   // Empty pipe stage generation for each lane
   // Values passed in - Currently it is counters ++ first element of all dataIn buses
   val counterVecs = List.tabulate(v) { i =>
     counters.map { c => c + UInt(i) }
   }
   val initRegblocks = List.tabulate(v) { i =>
-    val remotesList =  counterVecs(i) ++ io.dataIn.map { _(i) }
+    val remotesList =  counterVecs(i) ++ scalarIns
     val regBlock = Module(new RegisterBlock(w, 0 /*local*/,  r /*remote*/))
     regBlock.io.writeData := UInt(0) // Not connected to any ALU output
     regBlock.io.readLocalASel := UInt(0) // No local reads
@@ -277,21 +284,21 @@ class ComputeUnit(
     regBlock
   }
 
-  // TODO: Get counter maxs and strides from the first lane's empty stage
-  counterChain.io.data.zipWithIndex.foreach { case (c, i) =>
-    c.max    := UInt(0, w)
-    c.stride := UInt(0,w)
-  }
-
   // Pipe stages generation
   val pipeStages = ListBuffer[List[IntFU]]()
   val pipeRegs = ListBuffer[List[RegisterBlock]]()
   pipeRegs.append(initRegblocks)
 
+  // TODO: Get counter strides from the first lane's empty stage
+  counterChain.io.data.zipWithIndex.foreach { case (c, i) =>
+    c.max    := UInt(pipeRegs.last(0).io.passDataOut(i), w)
+    c.stride := UInt(0,w)
+  }
+
   // Reduction stages
   val reduceStages = (0 until d).dropRight(numStagesAfterReduction).takeRight(numReduceStages)
   for (i <- 0 until d) {
-    val stage = List.fill(v) { Module(new IntFU(w)) }
+    val stage = List.fill(v) { Module(new IntFU(w, fmaStages.contains(i), true)) }
     val regblockStage = List.fill(v) { Module(new RegisterBlock(w, l, r)) }
     val stageConfig = config.pipeStage(i)
 
@@ -306,7 +313,7 @@ class ComputeUnit(
     reduceLanes.foreach { r =>
       fwdLaneMap(r) = r + (1 << reduceStageNum)
     }
-    println(s"stage $i: fwdLaneMap $fwdLaneMap")
+//    println(s"stage $i: fwdLaneMap $fwdLaneMap")
     (0 until v) foreach { ii =>
       val fu = stage(ii)
       val regblock = regblockStage(ii)
@@ -407,8 +414,9 @@ class ComputeUnit(
   // Connect scratchpad raddr, waddr, wdata ports
   val rwStagesOut = pipeStages.take(rwStages) map { getStageOut(_) }
   val wStagesOut = getStageOut(pipeStages.last)
-  val lastStageWaddr = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(0) }  // r0 in last stage is local waddr
-  val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(1) }  // r1 in last stage in local wdata
+  val lastStageWaddr = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(8) }  // r8 in last stage is local waddr
+  val lastStageWdata = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(9) }  // r9 in last stage in local wdata
+  val vecOut = Vec.tabulate(v) { i => pipeRegs.last(i).io.passDataOut(0) }  // r0 in last stage is sent out of CU
 //  val countersAsVecs = counters map { c => Vec.fill(v) {c} }  // TODO: Fix when vectorization is enabled
 
   // Wire stage outputs into scratchpad address and data
@@ -431,7 +439,7 @@ class ComputeUnit(
     }
   }
 
-  io.dataOut := lastStageWdata
+  io.dataOut := vecOut
 }
 
 /**
@@ -459,26 +467,29 @@ object ComputeUnitTest {
 
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-    if (appArgs.size != 1) {
-      println("Usage: bin/sadl ComputeUnitTest <pisa config>")
-      sys.exit(-1)
-    }
-
-    val pisaFile = appArgs(0)
-    val configObj = Parser(pisaFile).asInstanceOf[ComputeUnitConfig]
+//    if (appArgs.size != 1) {
+//      println("Usage: bin/sadl ComputeUnitTest <pisa config>")
+//      sys.exit(-1)
+//    }
+//
+//    val pisaFile = appArgs(0)
+//    val configObj = Parser(pisaFile).asInstanceOf[ComputeUnitConfig]
 
     val bitwidth = 32
     val startDelayWidth = 4
     val endDelayWidth = 4
-    val d = 9
-    val v = 4
+    val d = 10
+    val v = 16
     val l = 0
-    val r = 12
-    val rwStages = 4
+    val r = 16
+    val rwStages = 3
     val numTokens = 8
-    val m = 64
+    val m = 2048  // words per scratchpad
     val numScratchpads = 4
     val numStagesAfterReduction = 2
+
+    val configObj = ComputeUnitConfig.getRandom(d, numTokens, numTokens, numTokens, numScratchpads)
+
     chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, configObj))) {
       c => new ComputeUnitTests(c)
     }
