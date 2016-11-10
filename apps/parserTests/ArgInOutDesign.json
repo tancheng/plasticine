@@ -218,10 +218,10 @@
                 "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","0"]
               },
               "doneXbar" :{
-                "outSelect" : ["x","x","x","x","x","x","x","x"]
+                "outSelect" : ["x","x","x","x","x","x","x","x", "x", "x", "x", "x", "x", "x"]
               },
               "incXbar" :{
-                "outSelect" : ["x","x","x","x","x","x","x","x"]
+                "outSelect" : ["x","x","x","x","x","x","x","x", "x","x","x","x","x","x","x","x"]
               },
               "decXbar" :{
                 "outSelect" : ["0","1","x","x","x","x","x","x"]
