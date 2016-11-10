@@ -66,7 +66,7 @@ def stage(app, params, opts):
         os.system("cp ./dramsimTemplates_4mu_plasticineTop/libdramsim.so ../")
     if opts.runDramSim == True:
 						# sbt_opts = sbt_opts + " --test --backend v"
-        sbt_opts = sbt_opts + " --test --backend null --testCommand %s/PlasticineTop" %(build_dir)
+        sbt_opts = sbt_opts + " --test --backend null --testCommand %s/MultiMemoryUnitTester" %(build_dir)
 
     cp = "../target/scala-2.11/classes"
     app_prefix = "plasticine.templates"
@@ -88,7 +88,7 @@ def stage(app, params, opts):
         print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
         os.system("cp ./dramsimTemplates_4mu_plasticineTop/libdramsim.so ./dramsimTemplates_4mu_plasticineTop/DRAMSim.h ./dramsimTemplates_4mu_plasticineTop/Callback.h ./generated")
         os.system("cp ./dramsimTemplates_4mu_plasticineTop/Makefile ./dramsimTemplates_4mu_plasticineTop/chopper.sh ./dramsimTemplates_4mu_plasticineTop/dramInit.txt ./dramsimTemplates_4mu_plasticineTop/dramRandInit.txt ./dramsimTemplates_4mu_plasticineTop/comment.sh ./dramsimTemplates_4mu_plasticineTop/emul_api.h ./generated/%s" %(app))
-        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh PlasticineTop.cpp  && make -j32" %(app))
+        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh MultiMemoryUnitTester.cpp  && make -j32" %(app))
         os.system("cd ../../")
 
         if ecode != 0:
