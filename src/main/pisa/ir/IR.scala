@@ -331,6 +331,42 @@ object PlasticineConfig {
       TopUnitConfig.getRandom(8))
       }
 
+  def getReadNoScatterGatherConfig(
+    d: Int,
+    rows: Int,
+    cols: Int,
+    numTokenIn: Int,
+    numTokenOut: Int,
+    numCounters: Int,
+    numScratchpads: Int,
+    numMemoryUnits: Int
+  ) = {
+    new PlasticineConfig(
+      List.tabulate(rows*cols) { i => ComputeUnitConfig.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
+      List.tabulate(numMemoryUnits) { i => MemoryUnitConfig(0,0) },
+      TopUnitConfig.getRandom(8))
+      }
+
+  def getWriteNoScatterGatherConfig(
+    d: Int,
+    rows: Int,
+    cols: Int,
+    numTokenIn: Int,
+    numTokenOut: Int,
+    numCounters: Int,
+    numScratchpads: Int,
+    numMemoryUnits: Int
+  ) = {
+    new PlasticineConfig(
+      List.tabulate(rows*cols) { i => ComputeUnitConfig.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
+      List.tabulate(numMemoryUnits) { i => MemoryUnitConfig(0,1) },
+      TopUnitConfig.getRandom(8))
+      }
+
   def zeroes(
     d: Int,
     rows: Int,

@@ -9,7 +9,8 @@ abstract class AbstractPlasticineTop (
 	val startDelayWidth: Int,
 	val endDelayWidth: Int,
 	val d: Int,
-	val v: Int, rwStages: Int,
+	val v: Int,
+  val rwStages: Int,
 	val numTokens: Int,
 	val l: Int,
 	val r: Int,
@@ -41,7 +42,8 @@ class PlasticineTopSim(
 	override val startDelayWidth: Int,
 	override val endDelayWidth: Int,
 	override val d: Int,
-	override val v: Int, rwStages: Int,
+	override val v: Int,
+  override val rwStages: Int,
 	override val numTokens: Int,
 	override val l: Int,
 	override val r: Int,
@@ -49,7 +51,7 @@ class PlasticineTopSim(
 	override val numScratchpads: Int,
 	override val numStagesAfterReduction: Int,
   override val numMemoryUnits: Int,
-  override val inst: PlasticineConfig) extends AbstractPlasticineTop (w, startDelayWidth, endDelayWidth, d, v, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst) {
+  override val inst: PlasticineConfig) extends AbstractPlasticineTop (w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst) {
     this.name = "PlasticineTop"
 }
 
@@ -58,7 +60,8 @@ class PlasticineTop(
 	override val startDelayWidth: Int,
 	override val endDelayWidth: Int,
 	override val d: Int,
-	override val v: Int, rwStages: Int,
+	override val v: Int,
+  override val rwStages: Int,
 	override val numTokens: Int,
 	override val l: Int,
 	override val r: Int,
@@ -66,7 +69,7 @@ class PlasticineTop(
 	override val numScratchpads: Int,
 	override val numStagesAfterReduction: Int,
   override val numMemoryUnits: Int,
-  override val inst: PlasticineConfig) extends AbstractPlasticineTop (w, startDelayWidth, endDelayWidth, d, v, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst) {
+  override val inst: PlasticineConfig) extends AbstractPlasticineTop (w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst) {
 
   def genDRAMSims = {
     List.tabulate(numMemoryUnits) { j =>
@@ -78,7 +81,7 @@ class PlasticineTop(
 
 	val sims = genDRAMSims
   val chnRanksIdBits = Vec(UInt(0), UInt(4), UInt(8), UInt(12)) { UInt(width=4) }
-	val pl = Module(new Plasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, inst))
+	val pl = Module(new Plasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst))
 	for (id <- 0 to numMemoryUnits - 1) {
     sims(id).io.addr := Cat(chnRanksIdBits(id), pl.io.dramChannel(id).addr)
     sims(id).io.wdata := pl.io.dramChannel(id).wdata
@@ -98,7 +101,6 @@ class PlasticineTopTests(c: AbstractPlasticineTop) extends PlasticineTester(c) {
 }
 
 object PlasticineTopTest {
-  val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
   val bitwidth = 32
   val startDelayWidth = 4
   val endDelayWidth = 4
@@ -114,10 +116,10 @@ object PlasticineTopTest {
   val rows = 4
   val cols = 4
   val numMemoryUnits = 4
-  val configObj = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
-  for (i <- 0 until numMemoryUnits - 1) { configObj.mu(i).scatterGather = 0 }
+  val configObj = PlasticineConfig.getReadNoScatterGatherConfig(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
 
   def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
     val testMode = args.contains("--test")
     if (testMode) {
       println("In test mode")
@@ -127,6 +129,7 @@ object PlasticineTopTest {
     } else {
       chiselMainTest(args, () => Module(new PlasticineTop(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, configObj)).asInstanceOf[AbstractPlasticineTop]) {
         c => { new PlasticineTopTests(c) }
+      }
     }
   }
 }
