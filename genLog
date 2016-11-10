@@ -1,0 +1,60 @@
+[0m[[0minfo[0m] [0mLoading project definition from /local/ssd/home/tianzhao/DRAMSimulator/plasticine_merge_with_r/plasticine/project[0m
+[0m[[0minfo[0m] [0mSet current project to plasticine (in build file:/local/ssd/home/tianzhao/DRAMSimulator/plasticine_merge_with_r/plasticine/)[0m
+[0m[[0minfo[0m] [0mRunning plasticine.templates.MultiMemoryUnitTest end --targetDir /home/tianzhao/DRAMSimulator/plasticine_merge_with_r/plasticine/generated/MultiMemoryUnitTest/ --debug --backend c --genHarness[0m
+CPP elaborate
+[[35minfo[0m] [4.011] // COMPILING < (class plasticine.templates.MultiMemoryUnitTester)>(8)
+[[35minfo[0m] [5.228] giving names
+[[35minfo[0m] [7.176] executing custom transforms
+[[35minfo[0m] [7.177] convert masked writes of inline mems
+[[35minfo[0m] [7.511] adding clocks and resets
+[[35minfo[0m] [8.096] inferring widths
+[[35minfo[0m] [9.252] checking widths
+[[35minfo[0m] [9.604] lowering complex nodes to primitives
+[[35minfo[0m] [9.605] removing type nodes
+[[35minfo[0m] [9.969] compiling 115237 nodes
+[[35minfo[0m] [9.970] computing memory ports
+[[35minfo[0m] [10.499] resolving nodes to the components
+[[35minfo[0m] [12.618] creating clock domains
+[[35minfo[0m] [12.790] pruning unconnected IOs
+[[35minfo[0m] [12.855] checking for combinational loops
+[[35minfo[0m] [13.442] NO COMBINATIONAL LOOP FOUND
+[[35minfo[0m] [13.971] populating clock domains
+CppBackend::elaborate: need 120, redundant 4508 shadow registers
+[[35minfo[0m] [15.370] generating cpp files
+CppBackend: createCppFile MultiMemoryUnitTester.cpp
+[[33mwarn[0m] MultiMemoryUnit.scala:294: 'end' is an unknown argument. in class plasticine.templates.MultiMemoryUnitTest$
+[0m[[32msuccess[0m] [0mTotal time: 18 s, completed Nov 9, 2016 4:29:04 PM[0m
+change init rand
+finished changing init rand
+start adding init declarations for DRAMSimulator outputs
+init-ed
+start modifying line connections going out of DRAMSimulator module
+line connections rerouted
+Extracting function init
+[extractRange] output = init.txt
+Extracting function clock_lo
+[extractRange] output = clock_lo.txt
+Extracting function clock_hi
+[extractRange] output = clock_hi.txt
+Extracting function init_sim_data
+[extractRange] output = init_sim_data.txt
+g++ -g -c -o MultiMemoryUnitTester.o  -I../ -I/csrc/ MultiMemoryUnitTester.cpp
+g++ -g -c -o MultiMemoryUnitTester-emulator.o  -I../ -I/csrc/ MultiMemoryUnitTester-emulator.cpp
+g++ -g -c -o x00clock_hi.o  -I../ -I/csrc/ x00clock_hi.cpp
+g++ -g -c -o x00clock_lo.o  -I../ -I/csrc/ x00clock_lo.cpp
+g++ -g -c -o x00init.o  -I../ -I/csrc/ x00init.cpp
+g++ -g -c -o x00init_sim_data.o  -I../ -I/csrc/ x00init_sim_data.cpp
+g++ -g -c -o x01clock_lo.o  -I../ -I/csrc/ x01clock_lo.cpp
+g++ -g -c -o x01init_sim_data.o  -I../ -I/csrc/ x01init_sim_data.cpp
+g++ -g -c -o x02clock_lo.o  -I../ -I/csrc/ x02clock_lo.cpp
+g++ -g -c -o x02init_sim_data.o  -I../ -I/csrc/ x02init_sim_data.cpp
+g++ -g -c -o x03clock_lo.o  -I../ -I/csrc/ x03clock_lo.cpp
+g++ -g -c -o x03init_sim_data.o  -I../ -I/csrc/ x03init_sim_data.cpp
+g++ -g -c -o x04clock_lo.o  -I../ -I/csrc/ x04clock_lo.cpp
+g++ -g -c -o x05clock_lo.o  -I../ -I/csrc/ x05clock_lo.cpp
+g++ -g -c -o x06clock_lo.o  -I../ -I/csrc/ x06clock_lo.cpp
+g++ -g -c -o x07clock_lo.o  -I../ -I/csrc/ x07clock_lo.cpp
+g++ -g -o MultiMemoryUnitTester MultiMemoryUnitTester.o MultiMemoryUnitTester-emulator.o x00clock_hi.o x00clock_lo.o x00init.o x00init_sim_data.o x01clock_lo.o x01init_sim_data.o x02clock_lo.o x02init_sim_data.o x03clock_lo.o x03init_sim_data.o x04clock_lo.o x05clock_lo.o x06clock_lo.o x07clock_lo.o -I../ -L../ -ldramsim -Wl,-rpath=../
+CLASSPATH=../target/scala-2.11/classes:$CLASSPATH sbt "; run-main plasticine.templates.MultiMemoryUnitTest  end  --targetDir /home/tianzhao/DRAMSimulator/plasticine_merge_with_r/plasticine/generated/MultiMemoryUnitTest/ --debug --backend c --genHarness"
+Invoking Chisel...
+Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder
