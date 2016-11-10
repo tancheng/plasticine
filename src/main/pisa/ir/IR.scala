@@ -91,6 +91,7 @@ object OperandConfig {
 case class PipeStageConfig(
   opA: OperandConfig = OperandConfig(),
   opB: OperandConfig = OperandConfig(),
+  opC: OperandConfig = OperandConfig(),
   opcode: Int = 0,
   result: Int = 0,
   fwd: Map[Int, Int] = Map[Int, Int]()
@@ -98,6 +99,7 @@ case class PipeStageConfig(
 object PipeStageConfig {
   def getRandom = {
     new PipeStageConfig(
+        OperandConfig.getRandom,
         OperandConfig.getRandom,
         OperandConfig.getRandom,
         math.abs(Random.nextInt) % Opcodes.size,

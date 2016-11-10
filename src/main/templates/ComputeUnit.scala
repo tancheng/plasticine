@@ -54,6 +54,8 @@ class OperandBundle(l: Int, r: Int, w: Int, config: Option[OperandConfig] = None
 class PipeStageBundle(l: Int, r: Int, w: Int, config: Option[PipeStageConfig] = None) extends Bundle {
   var opA = if (config.isDefined) new OperandBundle(l, r, w, Some(config.get.opA)) else new OperandBundle(l, r, w)
   var opB = if (config.isDefined) new OperandBundle(l, r, w, Some(config.get.opB)) else new OperandBundle(l, r, w)
+  var opC = if (config.isDefined) new OperandBundle(l, r, w, Some(config.get.opC)) else new OperandBundle(l, r, w)
+
   var opcode = if (config.isDefined) UInt(config.get.opcode, width=log2Up(Opcodes.size)) else UInt(width=log2Up(Opcodes.size))
   var result = if (config.isDefined) UInt(config.get.result, width=l+r) else UInt(width=l+r) // One-hot encoded
   var fwd = if (config.isDefined) {
@@ -324,6 +326,9 @@ class ComputeUnit(
       // Empty stage
       val emptyStageRegs = pipeRegs(0)(ii)
 
+      ///////////////////////////////////////////////////
+      //////////   Operand A ////////////////////////////
+      ///////////////////////////////////////////////////
       // Local and remote (previous pipe stage) registers
       val localA = regblock.io.readLocalA
       val rA = pipeRegs.last(ii).io.readRemoteA
@@ -357,6 +362,9 @@ class ComputeUnit(
         Vec(localA, rA, stageConfig.opA.value)
       }
 
+      ///////////////////////////////////////////////////
+      //////////   Operand B ////////////////////////////
+      ///////////////////////////////////////////////////
       val rB = pipeRegs.last(ii).io.readRemoteB
       val localB = regblock.io.readLocalB
       val dataSrcB = if (i <= rwStages) {
@@ -389,17 +397,30 @@ class ComputeUnit(
         Vec(localB, rB, stageConfig.opB.value)
       }
 
+      ///////////////////////////////////////////////////
+      //////////   Operand C ////////////////////////////
+      ///////////////////////////////////////////////////
+      val rC = pipeRegs.last(ii).io.readRemoteC
+      val localC = regblock.io.readLocalC
+      val dataSrcC = Vec(localC, rC, stageConfig.opC.value)
+
       val dataSrcAMux = if (Globals.noModule) new MuxNL(dataSrcA.size, w) else Module(new MuxN(dataSrcA.size, w))
       dataSrcAMux.io.ins := dataSrcA
       dataSrcAMux.io.sel := stageConfig.opA.dataSrc
       val dataSrcBMux = if (Globals.noModule) new MuxNL(dataSrcB.size, w) else Module(new MuxN(dataSrcB.size, w))
       dataSrcBMux.io.ins := dataSrcB
       dataSrcBMux.io.sel := stageConfig.opB.dataSrc
+      val dataSrcCMux = if (Globals.noModule) new MuxNL(dataSrcC.size, w) else Module(new MuxN(dataSrcC.size, w))
+      dataSrcCMux.io.ins := dataSrcC
+      dataSrcCMux.io.sel := stageConfig.opB.dataSrc
+
 
       val inA = dataSrcAMux.io.out
       val inB = dataSrcBMux.io.out
+      val inC = dataSrcCMux.io.out
       fu.io.a := inA
       fu.io.b := inB
+      fu.io.c := inC
       fu.io.opcode := stageConfig.opcode
       regblock.io.writeData := fu.io.out
 
@@ -419,8 +440,10 @@ class ComputeUnit(
       regblock.io.writeSel := stageConfig.result
       regblock.io.readLocalASel := stageConfig.opA.value
       regblock.io.readLocalBSel := stageConfig.opB.value
+      regblock.io.readLocalCSel := stageConfig.opC.value
       pipeRegs.last(ii).io.readRemoteASel := (if (i == 0) UInt(0) else stageConfig.opA.value) // No remote read for stage 0
       pipeRegs.last(ii).io.readRemoteBSel := (if (i == 0) UInt(0) else stageConfig.opB.value) // No remote read for stage 0
+      pipeRegs.last(ii).io.readRemoteCSel := (if (i == 0) UInt(0) else stageConfig.opC.value) // No remote read for stage 0
     }
     pipeStages.append(stage)
     pipeRegs.append(regblockStage)

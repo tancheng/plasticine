@@ -142,6 +142,7 @@ object Parser {
   def parsePipeStage(m: Map[Any, Any]): PipeStageConfig = {
     val opA = parseOperandConfig(Parser.getFieldString(m, "opA"))
     val opB = parseOperandConfig(Parser.getFieldString(m, "opB"))
+    val opC = parseOperandConfig(Parser.getFieldString(m, "opC"))
     val opcode = {
       val o = Parser.getFieldString(m, "opcode")
       if (o == "x") 0 else Opcodes.getCode(o)
@@ -168,7 +169,7 @@ object Parser {
       }
       t.toMap
     }
-    PipeStageConfig(opA, opB, opcode, result, fwd)
+    PipeStageConfig(opA, opB, opC, opcode, result, fwd)
   }
 
   def parseCU(m: Map[Any, Any]): ComputeUnitConfig = isDontCare(m) match {
