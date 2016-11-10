@@ -578,20 +578,8 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
   }
 }
 
-/**
- * Plasticine Top
- * @param w: Word width
- * @param startDelayWidth: Start delay width
- * @param endDelayWidth: End delay width
- * @param d: Pipeline depth
- * @param v: Vector length
- * @param rwStages: Read-write stages (at the beginning)
- * @param numTokens: Number of input (and output) tokens
- * @param l: Number of local pipeline registers
- * @param r: Number of remote pipeline registers
- * @param m: Scratchpad size in words
- */
-class Plasticine(val w: Int,
+
+class AbstractPlasticine(val w: Int,
   val startDelayWidth: Int,
   val endDelayWidth: Int,
   val d: Int,
@@ -603,11 +591,8 @@ class Plasticine(val w: Int,
   val numScratchpads: Int,
   val numStagesAfterReduction: Int,
   val numMemoryUnits: Int,
-  inst: PlasticineConfig) extends Module with DirectionOps {
-
-  val numRows = 4
-  val numCols = 4
-  val burstSizeBytes = 64
+  inst: PlasticineConfig)
+extends Module {
 
   val io = new ConfigInterface {
     /* Configuration interface */
@@ -623,6 +608,62 @@ class Plasticine(val w: Int,
     /* Memory interface */
     val dramChannel = Vec.fill(numMemoryUnits) { new DRAMCmdInterface(w, v) }
   }
+
+
+
+}
+
+
+class PlasticineSim(override val w: Int,
+  override val startDelayWidth: Int,
+  override val endDelayWidth: Int,
+  override val d: Int,
+  override val v: Int, rwStages: Int,
+  override val numTokens: Int,
+  override val l: Int,
+  override val r: Int,
+  override val m: Int,
+  override val numScratchpads: Int,
+  override val numStagesAfterReduction: Int,
+  override val numMemoryUnits: Int,
+  inst: PlasticineConfig)
+extends AbstractPlasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst) {
+
+  // Empty module
+  this.name = "Plasticine"
+}
+
+/**
+ * Plasticine Top
+ * @param w: Word width
+ * @param startDelayWidth: Start delay width
+ * @param endDelayWidth: End delay width
+ * @param d: Pipeline depth
+ * @param v: Vector length
+ * @param rwStages: Read-write stages (at the beginning)
+ * @param numTokens: Number of input (and output) tokens
+ * @param l: Number of local pipeline registers
+ * @param r: Number of remote pipeline registers
+ * @param m: Scratchpad size in words
+ */
+class Plasticine(override val w: Int,
+  override val startDelayWidth: Int,
+  override val endDelayWidth: Int,
+  override val d: Int,
+  override val v: Int, rwStages: Int,
+  override val numTokens: Int,
+  override val l: Int,
+  override val r: Int,
+  override val m: Int,
+  override val numScratchpads: Int,
+  override val numStagesAfterReduction: Int,
+  override val numMemoryUnits: Int,
+  inst: PlasticineConfig) extends AbstractPlasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst)
+with DirectionOps {
+
+  val numRows = 4
+  val numCols = 4
+  val burstSizeBytes = 64
 
   val numOutstandingBursts = 16
   def genMemoryUnits = {
@@ -701,7 +742,7 @@ class Plasticine(val w: Int,
 /**
  * ComputeUnit test harness
  */
-class PlasticineTests(c: Plasticine) extends PlasticineTester(c) {
+class PlasticineTests(c: AbstractPlasticine) extends PlasticineTester(c) {
   var numCycles = 0
 
   val a = Array.tabulate(c.m) { i => i }
@@ -721,6 +762,23 @@ class PlasticineTests(c: Plasticine) extends PlasticineTester(c) {
 
 
 object PlasticineTest {
+
+  val bitwidth = 32
+  val startDelayWidth = 4
+  val endDelayWidth = 4
+  val d = 10
+  val v = 16
+  val l = 0
+  val r = 16
+  val rwStages = 3
+  val numTokens = 8
+  val m = 64
+  val numScratchpads = 4
+  val numStagesAfterReduction = 2
+  val rows = 2
+  val cols = 2
+  val numMemoryUnits = 2
+
   def main(args: Array[String]): Unit = {
 
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
@@ -733,24 +791,20 @@ object PlasticineTest {
 //    val pisaFile = appArgs(0)
 //    val configObj = Parser(pisaFile).asInstanceOf[PlasticineConfig]
 
-    val bitwidth = 32
-    val startDelayWidth = 4
-    val endDelayWidth = 4
-    val d = 10
-    val v = 16
-    val l = 0
-    val r = 16
-    val rwStages = 3
-    val numTokens = 8
-    val m = 64
-    val numScratchpads = 4
-    val numStagesAfterReduction = 2
-    val rows = 4
-    val cols = 4
-    val numMemoryUnits = 4
-    val configObj = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
-    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, configObj))) {
-      c => new PlasticineTests(c)
+    val config = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
+
+    val testMode = args.contains("--test")
+
+    if (testMode) {
+      chiselMainTest(chiselArgs, () => Module(new PlasticineSim(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, config)).asInstanceOf[AbstractPlasticine]) {
+        c => new PlasticineTests(c)
+      }
+    } else {
+      chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, config)).asInstanceOf[AbstractPlasticine]) {
+        c => new PlasticineTests(c)
+      }
     }
+
+
   }
 }
