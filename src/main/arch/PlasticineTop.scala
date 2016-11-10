@@ -97,8 +97,35 @@ class PlasticineTop(
 }
 
 class PlasticineTopTests(c: AbstractPlasticineTop) extends PlasticineTester(c) {
-  println("IN TEST!!!")
+  val config_enable = 1
+  val w = 32
+  val size = 64
+  val burstSizeBytes = 64
+  val wordsPerBurst = burstSizeBytes / (w / 8)
+  val addr1 = 0x1000
+//  val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }  
+  val wdata = 0xcafe
 
+  step(1)
+  poke(c.io.dataVld, 1)
+  poke(c.io.wen, 1)
+  poke(c.io.wdata, wdata)
+
+  step(0)
+  poke(c.io.dataVld, 0)
+  poke(c.io.wen, 0)
+  poke(c.io.wdata, 0x0000)
+
+  step(100)
+
+//  for (s <- 0 until 99) {
+//    val vldSig = peek(c.asInstanceOf[PlasticineTop].pl.io.dramChannel(2).vldOut).toInt
+//    if (vldSig > 0) {
+//      println(">>>>>>>>>> vld signal at channel 2")
+//    }
+//
+//    step(1)
+//  }
 }
 
 object PlasticineTopTest {

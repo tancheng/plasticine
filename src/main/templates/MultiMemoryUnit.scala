@@ -167,7 +167,6 @@ class MultiMemoryUnitTests(c: AbstractMultiMemoryUnitTester) extends Tester(c) {
       if (peek(c.io.dramChannel(chan).vldOut) > 0) {
         numTransCompleted = numTransCompleted + 1
       }
-
 //      step(1)
     }
 
