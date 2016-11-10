@@ -7,7 +7,7 @@
         "cu": [
           {
             "scalarInXbar" :{
-              "outSelect" : ["x","13"]
+              "outSelect" : ["x","12"]
             },
             "scratchpads": [
               "x",
@@ -249,7 +249,7 @@
           "x",
           {
             "scalarInXbar" :{
-              "outSelect" : ["x","12"]
+              "outSelect" : ["x","13"]
             },
             "scratchpads": [
               {
@@ -444,7 +444,7 @@
                   "table" : ["0","0","1","0"]
                 },
                 {
-                  "table" : "x"
+                  "table" : ["0","0","1","1"]
                 },
                 {
                   "table" : "x"
@@ -466,10 +466,10 @@
                 }
               ],
               "tokenOutXbar" :{
-                "outSelect" : ["0","8","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+                "outSelect" : ["0","8","x","x","x","x","x","x","x","x","x","x","x","x","x","9"]
               },
               "doneXbar" :{
-                "outSelect" : ["1","2","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+                "outSelect" : ["1","2","2","x","x","x","x","x","x","x","x","x","x","x","x","x"]
               },
               "incXbar" :{
                 "outSelect" : ["1","x","x","x","x","x","x","x"]
@@ -555,7 +555,7 @@
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
-          "outSelect" : ["x","x","x","x","x","x","12","12","x","x","x","x","x","x","x","x"],
+          "outSelect" : ["x","x","x","x","x","x","12","12","x","x","x","x","x","7","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],

@@ -682,7 +682,7 @@
               ],
               "tokenOutLUT": [
                 {
-                  "table" : "x"
+                  "table" : ["0","0","1","1"]
                 },
                 {
                   "table" : "x"
@@ -707,10 +707,10 @@
                 }
               ],
               "tokenOutXbar" :{
-                "outSelect" : ["x","25","x","x","x","x","x","x","x","x","x","x","x","x","24","0"]
+                "outSelect" : ["x","25","x","x","x","x","x","x","x","x","x","8","x","x","24","0"]
               },
               "doneXbar" :{
-                "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+                "outSelect" : ["0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
               },
               "incXbar" :{
                 "outSelect" : ["x","x","x","x","x","x","x","x"]
@@ -800,8 +800,8 @@
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
-          "outSelect" : ["x","x","x","x","x","12","x","x","x","x","x","x","x","x","x","x"],
-          "outSelect" : ["x","x","x","13","x","x","x","x","x","x","x","x","x","x","x","x"],
+          "outSelect" : ["x","x","x","x","x","12","x","x","x","x","x","x","x","5","x","x"],
+          "outSelect" : ["x","x","x","13","x","x","x","x","x","x","x","x","x","3","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
