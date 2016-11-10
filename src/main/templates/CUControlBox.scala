@@ -67,7 +67,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   }
 
   // Done crossbar - connects done signals from counter chains to LUTs
-  val doneXbar = Module(new Crossbar(1, numTokens, 2*numTokens, inst.doneXbar))
+  val doneXbar = Module(new Crossbar(1, numTokens, 2*(numTokens - numTokenDownLUTs), inst.doneXbar))
   doneXbar.io.config_enable := io.config_enable
   doneXbar.io.config_data := io.config_data
   doneXbar.io.ins.zip(io.done.reverse).foreach { case (in, done) => in := done } // MSB must be in position 0
@@ -122,7 +122,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   // TokenDown LUT: Used to handle route-through tokens from parents to children,
   // as well as barrier cases where more than one token must be received before sending
   // a token out
-  val tokenDownPulser = List.tabulate(numTokenDownLUTs) { lutIdx =>
+  val tokenDownLUTs = List.tabulate(numTokenDownLUTs) { lutIdx =>
     val mux = Module(new MuxN(numTokens, 1))
     mux.io.ins := io.tokenIns
     mux.io.sel := config.syncTokenMux(lutIdx)
@@ -134,11 +134,14 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
       if (i == 0) in := mux.io.out
       else in := gtzs(i-1)
     }
+    lut
+  }
+
+  val tokenDownPulser = tokenDownLUTs.map { lut =>
     val pulser = Module(new Pulser())
     pulser.io.in := lut.io.out
     pulser.io.out
   }
-
   // Enable Mux
   val enableLUTs = List.tabulate(numTokens) { i =>
     val m = Module(new LUT(1, 1 << gtzs.size, inst.enableLUT(i)))

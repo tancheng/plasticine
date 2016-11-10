@@ -107,10 +107,15 @@ object Parser {
   def parseLUT(m: Map[Any, Any]): LUTConfig = isDontCare(m) match {
     case true => LUTConfig.zeroes(10) // Some random hardcoded number
     case false =>
-      val table: List[Int] = Parser.getFieldList(m, "table")
-                                          .asInstanceOf[List[String]]
-                                          .map { s => if (isDontCare(s)) 0 else parseValue(s) }
-      LUTConfig(table)
+      val values = Parser.getFieldList(m, "table")
+      isDontCare(values) match {
+        case true => LUTConfig.zeroes(10) // Some random hardcoded number
+        case false =>
+          val table: List[Int] = values.asInstanceOf[List[String]]
+                                       .map { s => if (isDontCare(s)) 0 else parseValue(s) }
+          LUTConfig(table)
+
+      }
   }
 
   def parseOperandConfig(s: String): OperandConfig = {

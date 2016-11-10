@@ -19,7 +19,9 @@ case class ScratchpadOpcode(val d: Int, val v: Int, config: Option[ScratchpadCon
     // If bufSize is 1, the Scratchpad is configured as a FIFO
     // The JSON specifies the "numBufs" field - this should be set to at least (d/v) to configure scratchpad as FIFO
     // It can be set to an outrageous number (say INT_MAX) to be safe
-    UInt(math.max(1, d / (v*config.get.numBufs)), width=log2Up(d/v)+1)
+    if (config.get.numBufs == 0) {
+      UInt(1, width=log2Up(d/v)+1)
+    } else UInt(math.max(1, d / (v*config.get.numBufs)), width=log2Up(d/v)+1)
   } else UInt(width = log2Up(d/v))
 
   override def cloneType(): this.type = {
@@ -171,7 +173,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
   val empty = size === UInt(0)
   val full = sizeUDC.io.isMax
   sizeUDC.io.initval := UInt(0)
-  sizeUDC.io.max := UInt(d - v * (bankSize % inst.numBufs))
+  sizeUDC.io.max := (if (inst.numBufs == 0) UInt(0) else UInt(d - v * (bankSize % inst.numBufs)))
   sizeUDC.io.init := UInt(0)
 //  sizeUDC.io.strideInc := Mux(config.chainWrite, UInt(1), UInt(v))
   sizeUDC.io.strideInc := UInt(v)
@@ -190,7 +192,8 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
       List(0), //  List(inst.chainWrite),
       List.tabulate(2) { i => i match {
         case 1 => // Localaddr: max = bankSize, stride = 1
-          CounterRCConfig(bankSize - (bankSize % inst.numBufs), 1, 1, 0, 0, 0)
+          val ctrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+          CounterRCConfig(ctrMax, 1, 1, 0, 0, 0)
         case 0 => // Bankaddr: max = v, stride = 1
           CounterRCConfig(v, 1, 1, 1, 0, 0)
       }}
@@ -200,7 +203,8 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
       List(0), // List(inst.chainRead),
       List.tabulate(2) { i => i match {
         case 1 => // Localaddr: max = bankSize, stride = 1
-          CounterRCConfig(bankSize - (bankSize % inst.numBufs), 1, 1, 0, 0, 0)
+          val ctrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+          CounterRCConfig(ctrMax, 1, 1, 0, 0, 0)
         case 0 => // Bankaddr: max = v, stride = 1
           CounterRCConfig(v, 1, 1, 1, 0, 0)
       }}

@@ -658,11 +658,13 @@ class Plasticine(override val w: Int,
   override val numScratchpads: Int,
   override val numStagesAfterReduction: Int,
   override val numMemoryUnits: Int,
+  val numRows: Int,
+  val numCols: Int,
   inst: PlasticineConfig) extends AbstractPlasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst)
 with DirectionOps {
 
-  val numRows = 4
-  val numCols = 4
+//  val numRows = 2
+//  val numCols = 2
   val burstSizeBytes = 64
 
   val numOutstandingBursts = 16
@@ -724,6 +726,7 @@ with DirectionOps {
     val switches = genSwitchArray(w, v, inst.dataSwitch)
   }
   dataInterconnect.connectAll
+  val dataSwitch = dataInterconnect.switches
 
   val ctrlInterconnect = new CtrlInterconnectHelper {
     val rows = numRows
@@ -737,6 +740,7 @@ with DirectionOps {
     val switches = genSwitchArray(1, 1, inst.controlSwitch)
   }
   ctrlInterconnect.connectAll
+  val controlSwitch = ctrlInterconnect.switches
 }
 
 /**
@@ -775,36 +779,29 @@ object PlasticineTest {
   val m = 64
   val numScratchpads = 4
   val numStagesAfterReduction = 2
-  val rows = 2
-  val cols = 2
+  val numRows = 2
+  val numCols = 2
   val numMemoryUnits = 2
 
   def main(args: Array[String]): Unit = {
 
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-//    if (appArgs.size != 1) {
-//      println("Usage: bin/sadl PlasticineTest <pisa config>")
-//      sys.exit(-1)
-//    }
-//
-//    val pisaFile = appArgs(0)
-//    val configObj = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+    if (appArgs.size != 1) {
+      println("Usage: bin/sadl PlasticineTest <pisa config>")
+      sys.exit(-1)
+    }
 
-    val config = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
+    val pisaFile = appArgs(0)
+    val config = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+
+//    val config = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
 
     val testMode = args.contains("--test")
 
-    if (testMode) {
-      chiselMainTest(chiselArgs, () => Module(new PlasticineSim(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, config)).asInstanceOf[AbstractPlasticine]) {
+      chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, config)).asInstanceOf[AbstractPlasticine]) {
         c => new PlasticineTests(c)
       }
-    } else {
-      chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, config)).asInstanceOf[AbstractPlasticine]) {
-        c => new PlasticineTests(c)
-      }
-    }
-
 
   }
 }
