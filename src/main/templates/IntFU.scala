@@ -32,6 +32,9 @@ object Opcodes {
     ("f>" , (a,b,c) => UInt(0)),
     ("f*" , (a,b,c) => UInt(0)),
     ("f+" , (a,b,c) => UInt(0)),
+    ("mux" , (a,b,c) => Mux(c(0), a, b)),
+    ("min" , (a,b,c) => Mux(a<b, a, b)),
+    ("max" , (a,b,c) => Mux(a>b, a, b)),
     ("passA" , (a,b,c) => a),
     ("passB" , (a,b,c) => b)
   )
@@ -103,6 +106,9 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
     ("f>" , (a,b,c) => fpGt),
     ("f*" , (a,b,c) => fmaOut),
     ("f+" , (a,b,c) => fmaOut),
+    ("mux" , (a,b,c) => Mux(c(0), a, b)),
+    ("min" , (a,b,c) => Mux(a<b, a, b)),
+    ("max" , (a,b,c) => Mux(a>b, a, b)),
     ("passA" , (a,b,c) => a),
     ("passB" , (a,b,c) => b)
   )
