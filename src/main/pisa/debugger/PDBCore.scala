@@ -30,7 +30,7 @@ trait PDBGlobals {
 
 trait PDBBase
 
-class PlasticinePDBTester(c: Plasticine, config: PlasticineConfig) extends PlasticineTester(c) {
+class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends PlasticineTester(module) {
 
   def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
 
@@ -141,6 +141,42 @@ class PlasticinePDBTester(c: Plasticine, config: PlasticineConfig) extends Plast
         // Top unit
         setConfig(m.top, c.top)
     }
+    step(1)
+  }
+
+  var cycleCount = 0
+  def writeReg(reg: Int, data: Int) = {
+    poke(module.io.addr, reg)
+    poke(module.io.wdata, data)
+    poke(module.io.wen, 1)
+    step(1)
+    poke(module.io.wen, 0)
+  }
+
+  def readReg(reg: Int) = {
+    poke(module.io.addr, reg)
+    peek(module.io.rdata).toInt
+  }
+
+  // Run design by poking the start signal
+  def start {
+    cycleCount = 0
+    val commandReg = module.top.commandRegIdx
+    writeReg(commandReg, 1)
+  }
+
+  def observeFor(numCycles: Int) {
+    cycleCount += 1
+    step(1)
+  }
+
+  def runToFinish {
+    var status = readReg(module.top.statusRegIdx)
+    while (status != 1) {
+      status = readReg(module.top.statusRegIdx)
+      observeFor(1)
+    }
+    finish
   }
 }
 
