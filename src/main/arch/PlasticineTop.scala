@@ -97,6 +97,7 @@ class PlasticineTop(
 }
 
 class PlasticineTopTests(c: AbstractPlasticineTop) extends PlasticineTester(c) {
+  println("IN TEST!!!")
 
 }
 
