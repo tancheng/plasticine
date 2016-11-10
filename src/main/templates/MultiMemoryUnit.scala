@@ -92,7 +92,7 @@ class MultiMemoryUnitTester (
     sims(id).io.tagIn := mus(id).io.dram.tagOut
     sims(id).io.vldIn := mus(id).io.dram.vldOut
     sims(id).io.isWr := mus(id).io.dram.isWr
-
+//TODO: test with rdy signal... or is it really needed? 
     mus(id).io.dram.rdata := sims(id).io.rdata
     mus(id).io.dram.vldIn := sims(id).io.vldOut
     mus(id).io.dram.tagIn := sims(id).io.tagOut
