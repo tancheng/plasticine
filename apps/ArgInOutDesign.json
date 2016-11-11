@@ -11,7 +11,7 @@
         "cu": [
           {
             "scalarInXbar" :{
-              "outSelect" : ["x","6"]
+              "outSelect" : ["x","x","x","6"]
             },
             "scratchpads": [
               "x",
@@ -271,12 +271,12 @@
           "x"
         ],
         "dataSwitch": [
-          "outSelect" : ["x","x","x","x","4","x","x","x"],
-          "outSelect" : ["x","x","x","x","x","x","x","x"],
-          "outSelect" : ["x","x","x","x","x","x","x","x"],
-          "outSelect" : ["x","x","x","x","x","x","x","x"],
-          "outSelect" : ["x","x","x","x","x","x","x","x"],
-          "outSelect" : ["x","x","x","x","x","5"],
+          "outSelect" : ["x","x","x","s_0","x","x","x"],
+          "outSelect" : ["x","x","x","x","x","x","x"],
+          "outSelect" : ["x","x","x","x","x","x","x"],
+          "outSelect" : ["x","x","x","x","x","x","x"],
+          "outSelect" : ["x","x","x","x","x","x","x"],
+          "outSelect" : ["x","x","x","x","x","sw_0"],
           "outSelect" : ["x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x"],
@@ -298,7 +298,7 @@
           "outSelect" : ["x","x","x","x","x","x"]
         ],
         "controlSwitch": [
-          "outSelect" : ["x","x","x","x","x","x","x","12","x","x","x","x","x","7","x","x"],
+          "outSelect" : ["x","x","x","x","x","x","x","s_0","x","x","x","x","x","ne_1","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
           "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"],
