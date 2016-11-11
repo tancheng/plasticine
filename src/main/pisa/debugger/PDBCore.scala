@@ -22,15 +22,15 @@ trait PDBGlobals {
   def hw = _hw
   def hw_=(h: Plasticine) { _hw = h }
 
-  private var _tester: PlasticineTester[Plasticine] = _
+  private var _tester: PlasticinePDBTester = _
   def tester = _tester
-  def tester_=(h: PlasticineTester[Plasticine]) { _tester = h }
+  def tester_=(h: PlasticinePDBTester) { _tester = h }
 
 }
 
 trait PDBBase
 
-class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends PlasticineTester(module) {
+class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends PlasticineTester(module, isTrace = false, dumpFile=Some("pdbDump.txt")) {
 
   def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
 
@@ -178,6 +178,13 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     }
     finish
   }
+
+  def printScalarRegs {
+   val numRegs = module.v + 2
+   for (i <- 0 until numRegs) {
+     println(s"ScalarReg$i = ${readReg(i)}")
+   }
+  }
 }
 
 trait PDBCore extends PDBBase with PDBGlobals {
@@ -215,5 +222,10 @@ trait PDBCore extends PDBBase with PDBGlobals {
 }
 
 object PDB extends PDBCore {
-
+  def writeReg(reg: Int, data: Int) = tester.writeReg(reg, data)
+  def readReg(reg: Int) = tester.readReg(reg)
+  def start = tester.start
+  def observeFor(numCycles: Int) = tester.observeFor(numCycles)
+  def runToFinish = tester.runToFinish
+  def printScalarRegs = tester.printScalarRegs
 }

@@ -1,8 +1,8 @@
 import sys.process._
 import plasticine.templates._
-import plasticine.pisa.debugger.PDB._
 
 import Chisel._
+import plasticine.pisa.debugger.PDB._
 
 def clear = "clear".!
 def cmd(cmd: String) = cmd.!
