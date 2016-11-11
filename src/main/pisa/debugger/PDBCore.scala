@@ -6,6 +6,7 @@ import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import plasticine.templates._
 import plasticine.ArchConfig
+import scala.collection.mutable.Set
 
 class PDBTester(c: Module) extends Tester(c)
 
@@ -145,6 +146,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
   }
 
   var cycleCount = 0
+  val signalsToWatch = Set[UInt]()
   def writeReg(reg: Int, data: Int) = {
     poke(module.io.addr, reg)
     poke(module.io.wdata, data)
@@ -158,6 +160,26 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     peek(module.io.rdata).toInt
   }
 
+  def breakOnHigh(signals: List[UInt]) {
+    var sigs = signals.map { s => peek(s).toInt }
+    var anyHigh = sigs.reduce { (a,b) => a | b }
+    while (anyHigh < 1) {
+      observeFor(1)
+      sigs = signals.map { s => peek(s).toInt }
+      anyHigh = sigs.reduce { (a,b) => a | b }
+    }
+    signals.zip(sigs).foreach { case (signal, v) =>
+      println(s"[breakOnHigh] $signal = $v, at cycle $cycleCount")
+    }
+  }
+
+  def breakOnHigh(signal: UInt) {
+    breakOnHigh(List(signal))
+  }
+
+  def break(signals: Seq[UInt]) { signals.foreach { s => signalsToWatch += s } }
+  def break(signal: UInt) { break(List(signal)) }
+
   // Run design by poking the start signal
   def start {
     cycleCount = 0
@@ -166,8 +188,25 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
   }
 
   def observeFor(numCycles: Int) {
-    cycleCount += 1
-    step(1)
+    var localCycles = 0
+
+    var anyHigh = 0
+    while ((localCycles < numCycles) &(anyHigh < 1)) {
+      val signals = signalsToWatch.toList
+      val watchVals = signals.map { s => peek(s).toInt }
+      anyHigh = watchVals.reduce { (a,b) => a | b }
+
+      // Peek every signal in signalsToWatch
+      if (anyHigh > 1) {
+          signals.zip(watchVals).foreach { case (signal, v) =>
+          println(s"[watch] $signal = $v, at cycle $cycleCount")
+        }
+      } else {
+        step(1)
+        localCycles += 1
+        cycleCount += 1
+      }
+    }
   }
 
   def runToFinish {
@@ -184,6 +223,80 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
    for (i <- 0 until numRegs) {
      println(s"ScalarReg$i = ${readReg(i)}")
    }
+  }
+
+  def watchCU(x: Int, y: Int) {
+    val cuModule = module.computeUnits(x)(y)
+    val tokenIns = cuModule.io.tokenIns
+    val tokenOuts = cuModule.io.tokenOuts
+    break(tokenIns ++ tokenOuts)
+  }
+
+  def showSwitch(x: Int, y: Int) {
+    val switch = module.controlSwitch(x)(y)
+    println(s"--------------------------------")
+    println(s"Control Switch $x, $y:")
+    val invals = switch.io.ins map { in => peek(in(0)).toInt }
+    println(invals.mkString(" "))
+    for (i <- 0 until switch.numOutputs) {
+      val outSelect = peek(switch.config.outSelect(i)).toInt
+      val configStr = List.tabulate(switch.numInputs) { i => if (i == outSelect) "x" else "" }.mkString(" ")
+      val output = peek(switch.io.outs(i)(0)).toInt
+      println(configStr + " | " + output)
+    }
+    println(s"--------------------------------")
+  }
+
+  def showTop {
+    val top = module.top
+    println(s"--------------------------------")
+    println(s"Top")
+    val tokenIns = top.io.ctrlIns.map { i => peek(i).toInt }
+    val tokenOut = peek(top.io.startTokenOut).toInt
+    println(s"  TokenOut: $tokenOut")
+    println(s"  TokenIns: $tokenIns")
+    println(s"--------------------------------")
+  }
+  def showCU(x: Int, y: Int) {
+    val cuModule = module.computeUnits(x)(y)
+    // Print counters, ALU operands, results
+    // Format:
+    // Compute Unit x, y:
+    //   Counters: 0(*) 1(*) 2 3 4 5 6 7, * for enabled
+    //   Datapath:
+    //       Stage0 (ocpode):
+    //              [opA] ......
+    //              [opB] ......
+    //              [opC] ......
+    //              [res] ......
+
+    println(s"--------------------------------")
+    println(s"COMPUTE UNIT $x, $y:")
+    println(s"-- Counters")
+    val counterChain = cuModule.counterChain
+    for (i <- 0 until counterChain.numCounters) {
+      val ctrEn = peek(counterChain.io.control(i).enable)
+      val ctrVal = peek(counterChain.io.data(i).out)
+      val enStr = if (ctrEn == 1) "(*)" else ""
+      val chainLink = if (i == 0) 0 else counterChain.config.chain(i-1)
+      val chainLinkStr = if (chainLink == 1) "-" else " "
+      print(s"  $ctrVal $enStr $chainLinkStr")
+    }
+    println("")
+    println("-- Datapath")
+    for (i <- 0 until cuModule.d) {
+      println(s"---- Stage $i (${Opcodes.opcodes(peek(cuModule.config.pipeStage(i).opcode).toInt)._1})")
+      val stageFUs = cuModule.pipeStages(i)
+      val opAs = stageFUs.map { fu => peek(fu.io.a) }
+      val opBs = stageFUs.map { fu => peek(fu.io.b) }
+      val opCs = stageFUs.map { fu => peek(fu.io.c) }
+      val res = stageFUs.map { fu => peek(fu.io.out) }
+      println(s"---- opA: $opAs")
+      println(s"---- opB: $opBs")
+      println(s"---- opC: $opCs")
+      println(s"---- res: $res")
+    }
+    println(s"--------------------------------")
   }
 }
 
@@ -211,13 +324,20 @@ trait PDBCore extends PDBBase with PDBGlobals {
     pisaFile = file
 
     // 1. Load and parse the JSON
+    println("[PDB INIT] Parsing JSON")
     pisaConfig = Parser(pisaFile).asInstanceOf[PlasticineConfig]
 
     // 4. Static Chisel args
     val chiselArgs = Array("--targetDir", "/dev/null", "--backend", "null", "--test", "--testCommand", "generated/PlasticineTest/Simulator")
+    println("[PDB INIT] Creating a hardware instance")
     val module = Driver(chiselArgs, () => getHardwareInstance(pisaConfig), true)
     // 3. Create a tester instance with the hardware module
+    hw = module
+
+    println("[PDB INIT] Creating a tester instance")
     tester = new PlasticinePDBTester(module, pisaConfig)
+
+    println("[PDB INIT] Done")
   }
 }
 
@@ -228,4 +348,13 @@ object PDB extends PDBCore {
   def observeFor(numCycles: Int) = tester.observeFor(numCycles)
   def runToFinish = tester.runToFinish
   def printScalarRegs = tester.printScalarRegs
+  def breakOnHigh(signal: UInt) = tester.breakOnHigh(signal)
+  def poke(signal: Bits, data: Int) = tester.poke(signal, data)
+  def peek(signal: UInt) = tester.peek(signal)
+  def break(signal: UInt) = tester.break(signal)
+  def break(signals: Seq[UInt]) = tester.break(signals)
+  def showCU(x: Int, y: Int) = tester.showCU(x, y)
+  def showSwitch(x: Int, y: Int) = tester.showSwitch(x, y)
+  def showTop = tester.showTop
+  def watchCU(x: Int, y: Int) = tester.watchCU(x, y)
 }
