@@ -9,13 +9,13 @@
   "rwStages" : 3,
   "numTokens" : 8,
   "numCounters" : 8,
-  "m" : 2048,
+  "m" : 512,
   "numScratchpads" : 4,
   "numStagesAfterReduction" : 2,
-  "numRows" :         4,
-  "numCols" :         4,
-  "numMemoryUnits" :  4,
-  "numTopInputs" :    8,
+  "numRows" :         8,
+  "numCols" :         8,
+  "numMemoryUnits" :  8,
+  "numTopInputs" :    16,
   "burstSizeBytes" : 64,
   "numOutstandingBursts" : 16
 }
