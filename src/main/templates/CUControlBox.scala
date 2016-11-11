@@ -42,7 +42,7 @@ case class CUControlBoxOpcode(val numTokens: Int, val numTokenDownLUTs: Int, con
  */
 class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends ConfigurableModule[CUControlBoxOpcode] {
   val udctrWidth = 4
-  val numTokenDownLUTs = 1
+  val numTokenDownLUTs = 4
 
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
@@ -67,18 +67,18 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   }
 
   // Done crossbar - connects done signals from counter chains to LUTs
-  val doneXbar = Module(new Crossbar(1, numTokens, 2*(numTokens - numTokenDownLUTs), inst.doneXbar))
+  val doneXbar = Module(new Crossbar(1, numTokens, 2*numTokens, inst.doneXbar))
   doneXbar.io.config_enable := io.config_enable
   doneXbar.io.config_data := io.config_data
   doneXbar.io.ins.zip(io.done.reverse).foreach { case (in, done) => in := done } // MSB must be in position 0
 
   // Token out LUTs
-  val tokenOutLUTs = List.tabulate(numTokens-1) { i =>
+  val tokenOutLUTs = List.tabulate(numTokens) { i =>
     val lut = Module(new LUT(1, 1 << 2, inst.tokenOutLUT(i)))
     lut.io.config_enable := io.config_enable
     lut.io.config_data := io.config_data
     lut.io.ins := doneXbar.io.outs.drop(i*2).take(2)
-    io.tokenOuts(i+1) := lut.io.out
+//    io.tokenOuts(i+1) := lut.io.out
     lut
   }
 
