@@ -8,7 +8,7 @@ fi
 FILE=$1
 EXE=`grep -o "public mod_t" *.h -r | cut -f1 -d'.'`
 EMU_FILE=${EXE}-emulator.cpp
-NUM=20000
+NUM=5000
 
 function labelStartLine() {
   label=$1
@@ -162,6 +162,9 @@ function processDumpInitFile() {
 
 function processInitSimDataFile () {
   echo "Processing init_sim_data function"
+  PREV_NUM=$NUM
+  NUM=20000
+
 #  chopCommon "init_sim_data" "${EXE}_t*" "mod"
   funcName=init_sim_data
   argType=${EXE}_t*
@@ -189,7 +192,7 @@ function processInitSimDataFile () {
   done
 
   sed -i "/\/\/${funcName}Splitter/r ${METHODS}" ${FILE}
-
+  NUM=$PREV_NUM
 }
 
 function processClockLoFile() {
