@@ -206,11 +206,11 @@ trait PDBCore extends PDBBase with PDBGlobals {
     // 1. Load and parse the JSON
     pisaConfig = Parser(pisaFile).asInstanceOf[PlasticineConfig]
 
-    // 2. Create a hardware module
-    hw = getHardwareInstance(pisaConfig)
-
+    // 4. Static Chisel args
+    val chiselArgs = Array("--targetDir", "/dev/null", "--backend", "null", "--test", "--testCommand", "generated/PlasticineTest/Simulator")
+    val module = Driver(chiselArgs, () => getHardwareInstance(pisaConfig), true)
     // 3. Create a tester instance with the hardware module
-    tester = new PlasticinePDBTester(hw, pisaConfig)
+    tester = new PlasticinePDBTester(module, pisaConfig)
   }
 }
 
