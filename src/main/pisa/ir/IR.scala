@@ -206,31 +206,31 @@ case class CUControlBoxConfig(
 object CUControlBoxConfig {
   def getRandom(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
     new CUControlBoxConfig(
-        List.fill(numTokenOut-1) { LUTConfig.getRandom(2) }, // tokenOutLUT
+        List.fill(numTokenOut) { LUTConfig.getRandom(2) }, // tokenOutLUT
         List.fill(numCounters) { LUTConfig.getRandom(numCounters)}, // enableLUT
-        List.fill(2) { LUTConfig.getRandom(numCounters+1) }, // tokenDownLUT,
+        List.fill(8) { LUTConfig.getRandom(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
         CrossbarConfig.getRandom(numCounters), // decXbar,
         CrossbarConfig.getRandom(2*numCounters), // incXbar,
         CrossbarConfig.getRandom(numCounters), // tokenInXbar,
         CrossbarConfig.getRandom(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
-        List.fill(2) { math.abs(Random.nextInt) % 2 }, // syncTokenMux
+        List.fill(8) { math.abs(Random.nextInt) % 2 }, // syncTokenMux
         CrossbarConfig.getRandom(numCounters) // tokenOutXbar,
       )
   }
   def zeroes(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
     new CUControlBoxConfig(
-        List.fill(numTokenOut-1) { LUTConfig.zeroes(2) }, // tokenOutLUT
+        List.fill(numTokenOut) { LUTConfig.zeroes(2) }, // tokenOutLUT
         List.fill(numCounters) { LUTConfig.zeroes(numCounters)}, // enableLUT
-        List.fill(2) { LUTConfig.zeroes(numCounters+1) }, // tokenDownLUT,
+        List.fill(8) { LUTConfig.zeroes(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
         CrossbarConfig.zeroes(numCounters), // decXbar,
         CrossbarConfig.zeroes(2*numCounters), // incXbar,
         CrossbarConfig.zeroes(numCounters), // tokenInXbar,
         CrossbarConfig.zeroes(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
-        List.fill(2) { 0 }, // syncTokenMux
+        List.fill(8) { 0 }, // syncTokenMux
         CrossbarConfig.zeroes(numCounters) // tokenOutXbar,
       )
   }
@@ -282,21 +282,21 @@ object ConnBoxConfig {
  */
 case class TopUnitConfig(
   doneConnBox: ConnBoxConfig,
-  dataVldConnBox: ConnBoxConfig,
+//  dataVldConnBox: ConnBoxConfig,
   argOutConnBox: ConnBoxConfig
 ) extends AbstractConfig
 object TopUnitConfig {
   def getRandom(numInputs: Int) = {
     new TopUnitConfig(
       ConnBoxConfig.getRandom(numInputs),
-      ConnBoxConfig.getRandom(numInputs),
+//      ConnBoxConfig.getRandom(numInputs),
       ConnBoxConfig.getRandom(numInputs)
       )
   }
   def zeroes(numInputs: Int) = {
     new TopUnitConfig(
       ConnBoxConfig.zeroes(numInputs),
-      ConnBoxConfig.zeroes(numInputs),
+//      ConnBoxConfig.zeroes(numInputs),
       ConnBoxConfig.zeroes(numInputs)
       )
   }

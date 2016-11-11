@@ -112,7 +112,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
       case m: TopUnit =>
         val c = cfg.asInstanceOf[TopUnitConfig]
         setConfig(m.doneConnBox, c.doneConnBox)
-        setConfig(m.dataVldConnBox, c.dataVldConnBox)
+//        setConfig(m.dataVldConnBox, c.dataVldConnBox)
         setConfig(m.argOutConnBox, c.argOutConnBox)
       case m: Plasticine =>
         val c = cfg.asInstanceOf[PlasticineConfig]

@@ -225,7 +225,7 @@ object Parser {
     val syncTokenMux: List[Int] = Parser.getFieldListOfMaps(m, "tokenDownLUT")
       .map { tokenDownMap => isDontCare(tokenDownMap) match {
           case true => parseValue("x")
-          case false => parseValue(Parser.getFieldString(tokenDownMap, "mux"))
+          case false => parseValue(Parser.getFieldString(tokenDownMap, "syncTokenMux"))
         }
       }
     val tokenOutXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenOutXbar"), true)
@@ -304,10 +304,10 @@ object Parser {
     case true =>
       TopUnitConfig.zeroes(10) // Some random number
     case false =>
-      val doneConnBox = ConnBoxConfig(Parser.getFieldInt(m, "doneConnBox"))
-      val dataVldConnBox = ConnBoxConfig(Parser.getFieldInt(m, "dataVldConnBox"))
-      val argOutConnBox = ConnBoxConfig(Parser.getFieldInt(m, "argOutConnBox"))
-      TopUnitConfig(doneConnBox, dataVldConnBox, argOutConnBox)
+      val doneConnBox = ConnBoxConfig(Parser.getFieldInt(m, "done"))
+//      val dataVldConnBox = ConnBoxConfig(Parser.getFieldInt(m, "dataVldConnBox"))
+      val argOutConnBox = ConnBoxConfig(Parser.getFieldInt(m, "argOut"))
+      TopUnitConfig(doneConnBox, argOutConnBox)
   }
 
   def parseMemoryUnit(m: Map[Any, Any]): MemoryUnitConfig = isDontCare(m) match {
