@@ -114,7 +114,6 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
   )
 
   if (useFMA) {
-    println(s"Instantiating FMA")
     val fmulCode = UInt(Opcodes.getCode("f*"))
     val faddCode = UInt(Opcodes.getCode("f+"))
     val fma = Module(new MulAddRecFN(8, 24))
@@ -123,7 +122,6 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
     fma.io.c := recFNFromFN(8, 24, Mux(faddCode === io.opcode, io.b, Flo(1.0f)))
     fmaOut := fNFromRecFN(8, 24, fma.io.out)
   } else {
-    println(s"No FMA")
     fmaOut := UInt(0, width=w)
   }
 
