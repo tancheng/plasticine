@@ -11,7 +11,7 @@
         "cu": [
           {
             "scalarInXbar" :{
-              "outSelect" : ["x","12"]
+              "outSelect" : ["x","6"]
             },
             "scratchpads": [
               "x",
