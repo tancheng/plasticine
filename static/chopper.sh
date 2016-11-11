@@ -36,6 +36,7 @@ function extractLabelTxt() {
 GLOBALS=globals.h
 GLOBALDEFS=globalDefs.h
 function processGlobals() {
+  echo "Splitting global .h files"
   ## Split the header file
   rm -f $GLOBALS $GLOBALDEFS
   echo "#ifndef __GLOBALS_H__" >> $GLOBALS
@@ -93,16 +94,18 @@ function extractFunctionTxt() {
   funcStart=`grep -n "void ${EXE}_${3}t::${funcName} " ${FILE} | cut -f1 -d':'`
   funcEnd=`grep -n "^}$" ${FILE} | cut -f1 -d':' | sort -n | awk -v threshold="$funcStart" '$1 > threshold' | head -n1`
 
-  ## Extract body into separate file
-#  sed -n $(expr $funcStart + $offset + 1),$(expr $funcEnd - 1)p ${FILE} > ${funcName}.txt
-  extractRange $(expr $funcStart + $offset + 1) $(expr $funcEnd - 1) $FILE ${funcName}.txt
+  if [ $(expr $funcStart + $offset + 1) -lt $(expr $funcEnd) ]; then
+    ## Extract body into separate file
+  #  sed -n $(expr $funcStart + $offset + 1),$(expr $funcEnd - 1)p ${FILE} > ${funcName}.txt
+    extractRange $(expr $funcStart + $offset + 1) $(expr $funcEnd - 1) $FILE ${funcName}.txt
 
-  ## Add a placeholder into the file
-  placeHolderLine=$(expr $funcStart + $offset + 1)
-  sed -i "${placeHolderLine}i\//${funcName}Splitter" ${FILE}
+    ## Add a placeholder into the file
+    placeHolderLine=$(expr $funcStart + $offset + 1)
+    sed -i "${placeHolderLine}i\//${funcName}Splitter" ${FILE}
 
-  ## Delete chopped up lines from file
-  sed -i -e "$(expr $funcStart + $offset + 2), $(expr $funcEnd)d" ${FILE}
+    ## Delete chopped up lines from file
+    sed -i -e "$(expr $funcStart + $offset + 2), $(expr $funcEnd)d" ${FILE}
+  fi
 }
 
 
@@ -117,42 +120,48 @@ function chopCommon() {
   argType=$2
   argName=$3
 
-  ## Chop up file into several pieces
-  split -l ${NUM} --additional-suffix="${funcName}.cpp" --numeric-suffixes ${funcName}.txt
+  if [ -e ${funcName}.txt ]; then
+    ## Chop up file into several pieces
+    split -l ${NUM} --additional-suffix="${funcName}.cpp" --numeric-suffixes ${funcName}.txt
 
-  ## Append common header files, method call names for each file
-  ## Insert method calls in place (don't forget semicolons)
-  METHODS=methods.txt
-  HEADER=${funcName}.h
-  rm -f $METHODS $HEADER
-  for file in `ls x[0-9]*${funcName}.cpp`; do
-    f=`echo $file | cut -f1 -d'.'`
-    sed -i "1i #include \"${EXE}.h\"" $file
-    sed -i "2i #include \"${GLOBALS}\"" $file
-    sed -i "3i void $f($argType $argName) {" $file
-    echo "}" >> $file
-    echo "$f($argName);" >> $METHODS
-    echo "void $f($argType $argName);" >> $HEADER
-  done
+    ## Append common header files, method call names for each file
+    ## Insert method calls in place (don't forget semicolons)
+    METHODS=methods.txt
+    HEADER=${funcName}.h
+    rm -f $METHODS $HEADER
+    for file in `ls x[0-9]*${funcName}.cpp`; do
+      f=`echo $file | cut -f1 -d'.'`
+      sed -i "1i #include \"${EXE}.h\"" $file
+      sed -i "2i #include \"${GLOBALS}\"" $file
+      sed -i "3i void $f($argType $argName) {" $file
+      echo "}" >> $file
+      echo "$f($argName);" >> $METHODS
+      echo "void $f($argType $argName);" >> $HEADER
+    done
 
-  sed -i "$(getHeaderIdx)i #include\"$HEADER\"" ${FILE}
-  sed -i "/\/\/${funcName}Splitter/r ${METHODS}" ${FILE}
+    sed -i "$(getHeaderIdx)i #include\"$HEADER\"" ${FILE}
+    sed -i "/\/\/${funcName}Splitter/r ${METHODS}" ${FILE}
+  fi
 }
 
 function processInitFile() {
+  echo "Processing init function"
   chopCommon "init"
 }
 
 function processClockHiFile() {
+  echo "Processing clock_hi function"
   chopCommon "clock_hi"
 }
 
 
 function processDumpInitFile() {
+  echo "Processing dump_init function"
   chopCommon "dump_init" "FILE*" "f"
 }
 
 function processInitSimDataFile () {
+  echo "Processing init_sim_data function"
 #  chopCommon "init_sim_data" "${EXE}_t*" "mod"
   funcName=init_sim_data
   argType=${EXE}_t*
@@ -184,6 +193,7 @@ function processInitSimDataFile () {
 }
 
 function processClockLoFile() {
+  echo "Processing clock_lo function"
   ## Move "val_t T<num>;" declarations into a global header file
   CLOCKLO_GLOBALS=clock_loGlobals.h
   CLOCKLO_GLOBALDEFS=clock_loGlobalDefs.h
