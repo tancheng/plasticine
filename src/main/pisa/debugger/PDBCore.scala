@@ -237,10 +237,12 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     println(s"--------------------------------")
     println(s"Control Switch $x, $y:")
     val invals = switch.io.ins map { in => peek(in(0)).toInt }
+    val cfg = List.tabulate(switch.numOutputs) { i => peek(switch.config.outSelect(i)).toInt }
+    println(s"Config: $cfg, Inst: ${switch.inst.outSelect}")
     println(invals.mkString(" "))
     for (i <- 0 until switch.numOutputs) {
       val outSelect = peek(switch.config.outSelect(i)).toInt
-      val configStr = List.tabulate(switch.numInputs) { i => if (i == outSelect) "x" else "" }.mkString(" ")
+      val configStr = List.tabulate(switch.numInputs) { i => if (i == outSelect) "x" else " " }.mkString(" ")
       val output = peek(switch.io.outs(i)(0)).toInt
       println(configStr + " | " + output)
     }
@@ -342,6 +344,10 @@ trait PDBCore extends PDBBase with PDBGlobals {
 }
 
 object PDB extends PDBCore {
+  def reconfig(file: String) = {
+    pisaConfig = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+    tester.setConfig(hw, pisaConfig)
+  }
   def writeReg(reg: Int, data: Int) = tester.writeReg(reg, data)
   def readReg(reg: Int) = tester.readReg(reg)
   def start = tester.start
