@@ -21,6 +21,21 @@ object Parser {
     }
   }
 
+  def parseRaw(path: String) = {
+    val file = new File(path)
+    assert(file.isFile, path+ " does not exist")
+    val contents = scala.io.Source.fromFile(file).mkString
+    import JSON._
+
+    phrase(root)(new lexical.Scanner(contents)) match {
+      case Success(result,_) => resolveType(result) match {
+        case m: Map[Any, Any] => m
+        case _ => throw new RuntimeException(s"Couldn't parse PISA file: $path")
+      }
+      case f@NoSuccess(_,_) => throw new RuntimeException("Couldn't parse PISA file:\n" + f.toString)
+    }
+  }
+
   def buildFromParsedJSON(json: Any) = {
     json match {
       case m: Map[Any, Any] =>

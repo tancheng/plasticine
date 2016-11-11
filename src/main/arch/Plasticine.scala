@@ -769,37 +769,40 @@ class PlasticineTests(c: AbstractPlasticine) extends PlasticineTester(c) {
 
 object PlasticineTest {
 
-  val bitwidth = ArchConfig.w
-  val startDelayWidth = ArchConfig.startDelayWidth
-  val endDelayWidth = ArchConfig.endDelayWidth
-  val d = ArchConfig.d
-  val v = ArchConfig.v
-  val l = ArchConfig.l
-  val r = ArchConfig.r
-  val rwStages = ArchConfig.rwStages
-  val numTokens = ArchConfig.numTokens
-  val m = ArchConfig.m
-  val numScratchpads = ArchConfig.numScratchpads
-  val numStagesAfterReduction = ArchConfig.numStagesAfterReduction
-  val numRows = ArchConfig.numRows
-  val numCols = ArchConfig.numCols
-  val numMemoryUnits = ArchConfig.numMemoryUnits
-
   def main(args: Array[String]): Unit = {
 
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-    if (appArgs.size != 1) {
-      println("Usage: bin/sadl PlasticineTest <pisa config>")
+    if (appArgs.size != 2) {
+      println("Usage: bin/sadl PlasticineTest <spade config> <pisa config>")
       sys.exit(-1)
     }
 
-    val pisaFile = appArgs(0)
-    val config = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+    val spadeFile = appArgs(0)
+    val pisaFile = appArgs(1)
 
+    val config = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+    ArchConfig.setConfig(spadeFile)
 //    val config = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
 
-    val testMode = args.contains("--test")
+    val bitwidth = ArchConfig.w
+    val startDelayWidth = ArchConfig.startDelayWidth
+    val endDelayWidth = ArchConfig.endDelayWidth
+    val d = ArchConfig.d
+    val v = ArchConfig.v
+    val l = ArchConfig.l
+    val r = ArchConfig.r
+    val rwStages = ArchConfig.rwStages
+    val numTokens = ArchConfig.numTokens
+    val m = ArchConfig.m
+    val numScratchpads = ArchConfig.numScratchpads
+    val numStagesAfterReduction = ArchConfig.numStagesAfterReduction
+    val numRows = ArchConfig.numRows
+    val numCols = ArchConfig.numCols
+    val numMemoryUnits = ArchConfig.numMemoryUnits
+
+
+
 
       chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, config)).asInstanceOf[AbstractPlasticine]) {
         c => new PlasticineTests(c)
