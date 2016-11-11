@@ -1,6 +1,8 @@
 package plasticine.templates
 
 import Chisel._
+
+import plasticine.ArchConfig
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 
@@ -767,21 +769,21 @@ class PlasticineTests(c: AbstractPlasticine) extends PlasticineTester(c) {
 
 object PlasticineTest {
 
-  val bitwidth = 32
-  val startDelayWidth = 4
-  val endDelayWidth = 4
-  val d = 10
-  val v = 16
-  val l = 0
-  val r = 16
-  val rwStages = 3
-  val numTokens = 8
-  val m = 64
-  val numScratchpads = 4
-  val numStagesAfterReduction = 2
-  val numRows = 2
-  val numCols = 2
-  val numMemoryUnits = 2
+  val bitwidth = ArchConfig.w
+  val startDelayWidth = ArchConfig.startDelayWidth
+  val endDelayWidth = ArchConfig.endDelayWidth
+  val d = ArchConfig.d
+  val v = ArchConfig.v
+  val l = ArchConfig.l
+  val r = ArchConfig.r
+  val rwStages = ArchConfig.rwStages
+  val numTokens = ArchConfig.numTokens
+  val m = ArchConfig.m
+  val numScratchpads = ArchConfig.numScratchpads
+  val numStagesAfterReduction = ArchConfig.numStagesAfterReduction
+  val numRows = ArchConfig.numRows
+  val numCols = ArchConfig.numCols
+  val numMemoryUnits = ArchConfig.numMemoryUnits
 
   def main(args: Array[String]): Unit = {
 

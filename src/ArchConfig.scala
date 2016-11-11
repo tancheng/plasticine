@@ -11,7 +11,7 @@ object ArchConfig {
   val rwStages = 3
   val numTokens = 8
   val numCounters = 8
-  val m = 64
+  val m = 2048
   val numScratchpads = 4
   val numStagesAfterReduction = 2
   val numRows = 2
