@@ -70,8 +70,12 @@ def stage(app, params, opts):
         err("SADL compilation failed")
 
     if opts.sim == True:
-        print("Performing Split C++ compilation...")
+        print("Performing static copying...")
         os.system("cp %s/* %s" %(static_dir, build_dir))
+
+        print("Making a copy of generated simulator code as gold..")
+        os.system("mkdir %s/gold && cp %s/* %s/gold" %(build_dir, build_dir, build_dir))
+
         #ecode = os.system("pushd %s && time ./splitMethods.sh && time make -j16 && popd" %(build_dir))
 #        ecode = os.system("pushd %s && time make -j16 && popd" %(build_dir))
         #if (ecode != 0):
