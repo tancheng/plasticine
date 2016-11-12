@@ -674,8 +674,9 @@ with DirectionOps {
 
   val numOutstandingBursts = 16
   def genMemoryUnits = {
+    val numMUCounters = 6
     List.tabulate(numMemoryUnits) { i =>
-      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, burstSizeBytes, inst.mu(i)))
+      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numMUCounters, inst.mu(i)))
       mu.io.config_enable := io.config_enable
       mu.io.config_data := io.config_data
 

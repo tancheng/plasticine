@@ -3,6 +3,7 @@ package plasticine.pisa.ir
 import java.io.File
 import _root_.scala.util.parsing.json.JSON
 import scala.collection.immutable.Map
+import plasticine.ArchConfig
 import plasticine.pisa.parser._
 import plasticine.templates.Opcodes
 import scala.collection.mutable.HashMap
@@ -151,14 +152,15 @@ case class FIFOConfig (
 
 case class MemoryUnitConfig (
   scatterGather: Int = 0,
-  isWr: Int = 0
+  isWr: Int = 0,
+  counterChain: CounterChainConfig
 ) extends AbstractConfig
 object MemoryUnitConfig {
   def getRandom = {
-    MemoryUnitConfig(0, 0)
+    MemoryUnitConfig(0, 0, CounterChainConfig.getRandom(ArchConfig.numCounters))
   }
   def zeroes = {
-    new MemoryUnitConfig()
+    new MemoryUnitConfig(0, 0, CounterChainConfig.zeroes(ArchConfig.numCounters))
   }
 }
 case class ComputeUnitConfig(

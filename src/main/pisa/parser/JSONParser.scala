@@ -331,7 +331,8 @@ object Parser {
     case false =>
       val scatterGather = parseValue(Parser.getFieldString(m, "scatteGather"))
       val isWr = parseValue(Parser.getFieldString(m, "isWr"))
-      MemoryUnitConfig(scatterGather, isWr)
+      val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
+      MemoryUnitConfig(scatterGather, isWr, counterChain)
   }
 
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {

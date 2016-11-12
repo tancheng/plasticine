@@ -58,6 +58,9 @@ abstract class AbstractMemoryUnit(
   val v: Int,
   val numOutstandingBursts: Int,
   val burstSizeBytes: Int,
+  val startDelayWidth: Int,
+  val endDelayWidth: Int,
+  val numCounters: Int,
   val inst: MemoryUnitConfig) extends ConfigurableModule[MemoryUnitOpcode] {
 
   val wordSizeBytes = w/8
@@ -87,7 +90,10 @@ class MemoryUnitSim(
   override val v: Int,
   override val numOutstandingBursts: Int,
   override val burstSizeBytes: Int,
-  override val inst: MemoryUnitConfig) extends AbstractMemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst) {
+  override val startDelayWidth: Int,
+  override val endDelayWidth: Int,
+  override val numCounters: Int,
+  override val inst: MemoryUnitConfig) extends AbstractMemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numCounters, inst) {
 
   // Empty module
   this.name = "MemoryUnit"
@@ -99,7 +105,10 @@ class MemoryUnit(
   override val v: Int,
   override val numOutstandingBursts: Int,
   override val burstSizeBytes: Int,
-  override val inst: MemoryUnitConfig) extends AbstractMemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst) {
+  override val startDelayWidth: Int,
+  override val endDelayWidth: Int,
+  override val numCounters: Int,
+  override val inst: MemoryUnitConfig) extends AbstractMemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numCounters, inst) {
 
   // The data bus width to DRAM is 1-burst wide
   // While it should be possible in the future to add a write combining buffer
@@ -241,6 +250,27 @@ class MemoryUnit(
   }
   completed := completionMask.map { _.io.data.out }.reduce { _ & _ }
 
+  // FIFO for sizes to be received
+  val receivedFifo = Module(new FIFOCore(w, d, v))
+  receivedFifo.io.chainWrite := UInt(1)
+  receivedFifo.io.chainRead := UInt(1)
+  receivedFifo.io.enq := Vec.fill(v) { sizeInBursts }
+  receivedFifo.io.enqVld := burstVld & burstCounter.io.data.out === UInt(0)
+
+  val maxReceivedSizeBursts = receivedFifo.io.deq(0)
+
+  // Burst received counter
+  val receivedCounter = Module(new Counter(w))
+  receivedCounter.io.data.max := maxReceivedSizeBursts
+  receivedCounter.io.data.stride := UInt(1)
+  receivedCounter.io.control.reset := UInt(0)
+  receivedCounter.io.control.enable := Mux(config.scatterGather, UInt(0), io.dram.vldIn)
+  receivedCounter.io.control.saturate := UInt(0)
+  receivedFifo.io.deqVld := receivedCounter.io.control.done
+
+  // Counter chain, where innermost counter is chained to receivedCounter
+  val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain))
+
   io.dram.addr := Cat((burstAddrs(0) + burstCounter.io.data.out), UInt(0, width=log2Up(burstSizeBytes)))
   io.dram.tagOut := Mux(config.scatterGather, burstAddrs(0), burstTagCounter.io.data.out)
   io.dram.wdata := dataFifo.io.deq
@@ -258,6 +288,9 @@ class MemoryTester (
   val v: Int,
   val numOutstandingBursts: Int,
   val burstSizeBytes: Int,
+  val startDelayWidth: Int,
+  val endDelayWidth: Int,
+  val numCounters: Int,
   val inst: MemoryUnitConfig) extends Module {
 
   val io = new ConfigInterface {
@@ -266,7 +299,7 @@ class MemoryTester (
     val dram = new DRAMCmdInterface(w, v) // Should not have to pass vector width; must be DRAM burst width
   }
 
-  val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst))
+  val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numCounters, inst))
   mu.io.config_enable := io.config_enable
   mu.io.config_data := io.config_data
   mu.io.interconnect.rdyIn := io.interconnect.rdyIn
@@ -624,17 +657,21 @@ object MemoryUnitTest {
   val d = 512
   val numOutstandingBursts = 16
   val burstSizeBytes = 64
+  val startDelayWidth = 4
+  val endDelayWidth = 4
+  val numCounters = 8
+
   val scatterGather = 1
   val isWr = 0
-  val config = MemoryUnitConfig(scatterGather, isWr)
+  val config = MemoryUnitConfig(scatterGather, isWr, CounterChainConfig.zeroes(numCounters))
   def main(args: Array[String]): Unit = {
     val testMode = args.contains("--test")
     if (testMode) {
-      chiselMainTest(args, () => Module(new MemoryUnitSim(w, d, v, numOutstandingBursts, burstSizeBytes, config)).asInstanceOf[AbstractMemoryUnit]) {
+      chiselMainTest(args, () => Module(new MemoryUnitSim(w, d, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numCounters, config)).asInstanceOf[AbstractMemoryUnit]) {
             c => { new MemoryUnitTests(c) }
       }
     } else {
-      chiselMainTest(args, () => Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, config)).asInstanceOf[AbstractMemoryUnit]) {
+      chiselMainTest(args, () => Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numCounters, config)).asInstanceOf[AbstractMemoryUnit]) {
             c => { new MemoryUnitTests(c) }
       }
     }
