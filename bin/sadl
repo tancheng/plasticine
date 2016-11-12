@@ -76,10 +76,15 @@ def stage(app, params, opts):
         print("Making a copy of generated simulator code as gold..")
         os.system("mkdir %s/gold && cp %s/* %s/gold" %(build_dir, build_dir, build_dir))
 
-        #ecode = os.system("pushd %s && time ./splitMethods.sh && time make -j16 && popd" %(build_dir))
+
+        print("Performing chopping...")
+        ecode = os.system("pushd %s && time ./chopper.sh Plasticine.cpp && popd" %(build_dir))
+
+        print("Performing parallel make..")
+        ecode = os.system("pushd %s && make -j80 && popd" %(build_dir))
 #        ecode = os.system("pushd %s && time make -j16 && popd" %(build_dir))
-        #if (ecode != 0):
-        #    err("SADL compilation failed")
+        if (ecode != 0):
+            err("C compilation failed")
 
     if opts.verilog == True:
         # Move generated verilog files into a separate "src" folder
