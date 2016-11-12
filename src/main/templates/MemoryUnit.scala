@@ -33,20 +33,27 @@ abstract class AbstractMemoryCmdInterface(w: Int, v: Int, dir: IODirection) exte
     case NODIR => NODIR
   }
 
-  val addr: Data // Can be 1 (for output) or Vec(v) (for input)
-  val wdata = Vec.fill(v) { UInt(dir, width=w) } // v
-  val rdata = Vec.fill(v) { UInt(reverseDir, width=w) } // v
 }
 
-class PlasticineMemoryCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPUT) {
-  val addr = Vec.fill(v) { UInt(INPUT, width=w) }
-  val size = UInt(INPUT, width=w)
-  val dataRdyOut = Bool(OUTPUT)
-  val dataVldIn = Bool(INPUT)
+class PlasticineMemoryCmdInterface(w: Int, v: Int) extends Bundle {
+
+  val numDataIn = 4
+  val numCtrlIn = 8
+  val numCtrlOut = 9
+
+  /* data inputs */
+  val dataIns = Vec.fill(numDataIn) { Vec.fill(v) { UInt(INPUT, w) } }
+  val dataOut = Vec.fill(v) { UInt(OUTPUT, w) }
+
+  /* control inputs */
+  val ctrlIns = Vec.fill(numCtrlIn) { Bool(INPUT) }
+  val ctrlOuts = Vec.fill(numCtrlOut) { Bool(OUTPUT) }
 }
 
 class DRAMCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, OUTPUT) {
   val addr = UInt(OUTPUT, width=w)
+  val wdata = Vec.fill(v) { UInt(OUTPUT, width=w) } // v
+  val rdata = Vec.fill(v) { UInt(INPUT, width=w) } // v
   val isWr = Bool(OUTPUT) // 1
   val tagIn = UInt(INPUT, width=w)
   val tagOut = UInt(OUTPUT, width=w)
@@ -81,6 +88,22 @@ abstract class AbstractMemoryUnit(
   } .otherwise {
     configIn := config
   }
+
+
+  /* Data IO aliases to input buses */
+  def addr = io.interconnect.dataIns(0)             // First data bus contains addr / size
+  def size = addr(1)                                // Second word in address bus
+  def wdata = io.interconnect.dataIns(1)   // Second bus corresponds to wdata
+  def rdata = io.interconnect.dataOut
+
+  /* Control IO aliases */
+  def vldIn = io.interconnect.ctrlIns(0)    // Addr/Size valid in
+  val dataVldIn = io.interconnect.ctrlIns(1)         // Wdata valid in
+  def tokenIns = io.interconnect.ctrlIns.drop(2)     // Rest of ctrlIns are called tokenIns
+  def vldOut = io.interconnect.ctrlOuts(0)  // Data valid for read data
+  def rdyOut = io.interconnect.ctrlOuts(1)  // Addr/size FIFO-not-full
+  def dataRdyOut = io.interconnect.ctrlOuts(2)       // Data FIFO-not-full
+  def tokenOuts = io.interconnect.ctrlOuts.drop(3)   // TokenOuts from counters
 
 }
 
@@ -138,8 +161,8 @@ class MemoryUnit(
   val addrFifo = Module(new FIFOCore(w, d, v))
   addrFifo.io.chainRead := UInt(1)
   addrFifo.io.chainWrite := ~config.scatterGather
-  addrFifo.io.enq := io.interconnect.addr
-  addrFifo.io.enqVld := io.interconnect.vldIn
+  addrFifo.io.enq := addr
+  addrFifo.io.enqVld := vldIn
 
   val burstAddrs = addrFifo.io.deq map { extractBurstAddr(_) }
   val wordOffsets = addrFifo.io.deq map { extractWordOffset(_) }
@@ -148,8 +171,8 @@ class MemoryUnit(
   val sizeFifo = Module(new FIFOCore(w, d, v))
   sizeFifo.io.chainWrite := UInt(1)
   sizeFifo.io.chainRead := UInt(1)
-  sizeFifo.io.enq := Vec.fill(v) { io.interconnect.size }
-  sizeFifo.io.enqVld := io.interconnect.vldIn & ~config.scatterGather
+  sizeFifo.io.enq := Vec.fill(v) { size }
+  sizeFifo.io.enqVld := vldIn & ~config.scatterGather
   val burstVld = ~sizeFifo.io.empty
 
   val sizeTop = sizeFifo.io.deq(0)
@@ -163,8 +186,8 @@ class MemoryUnit(
   val dataFifo = Module(new FIFOCore(w, d, v))
   dataFifo.io.chainWrite := UInt(0)
   dataFifo.io.chainRead := config.scatterGather
-  dataFifo.io.enq := io.interconnect.wdata
-  dataFifo.io.enqVld := io.interconnect.dataVldIn
+  dataFifo.io.enq := wdata
+  dataFifo.io.enqVld := dataVldIn
 
   // Burst offset counter
   val burstCounter = Module(new Counter(w))
@@ -277,9 +300,10 @@ class MemoryUnit(
   io.dram.vldOut := Mux(config.scatterGather, ccache.io.miss, burstVld)
   io.dram.isWr := config.isWr
 
-  io.interconnect.rdata := Mux(config.scatterGather, gatherData, io.dram.rdata)
-  io.interconnect.vldOut := Mux(config.scatterGather, completed, io.dram.vldIn)
-  io.interconnect.rdyOut := ~addrFifo.io.full & ~dataFifo.io.full
+  rdata := Mux(config.scatterGather, gatherData, io.dram.rdata)
+  vldOut := Mux(config.scatterGather, completed, io.dram.vldIn)
+  rdyOut := ~addrFifo.io.full
+  dataRdyOut := ~dataFifo.io.full
 }
 
 class MemoryTester (
@@ -299,18 +323,35 @@ class MemoryTester (
     val dram = new DRAMCmdInterface(w, v) // Should not have to pass vector width; must be DRAM burst width
   }
 
+  /* Data IO aliases to input buses */
+  def addr = io.interconnect.dataIns(0)             // First data bus contains addr / size
+  def size = addr(1)                                // Second word in address bus
+  def wdata = io.interconnect.dataIns(1)   // Second bus corresponds to wdata
+  def rdata = io.interconnect.dataOut
+
+  /* Control IO aliases */
+  def vldIn = io.interconnect.ctrlIns(0)    // Addr/Size valid in
+  val dataVldIn = io.interconnect.ctrlIns(1)         // Wdata valid in
+  def tokenIns = io.interconnect.ctrlIns.drop(2)     // Rest of ctrlIns are called tokenIns
+  def vldOut = io.interconnect.ctrlOuts(0)  // Data valid for read data
+  def rdyOut = io.interconnect.ctrlOuts(1)  // Addr/size FIFO-not-full
+  def dataRdyOut = io.interconnect.ctrlOuts(2)       // Data FIFO-not-full
+  def tokenOuts = io.interconnect.ctrlOuts.drop(3)   // TokenOuts from counters
+
+
+
   val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numCounters, inst))
   mu.io.config_enable := io.config_enable
   mu.io.config_data := io.config_data
-  mu.io.interconnect.rdyIn := io.interconnect.rdyIn
-  mu.io.interconnect.vldIn := io.interconnect.vldIn
-  io.interconnect.rdyOut := mu.io.interconnect.rdyOut
-  io.interconnect.vldOut := mu.io.interconnect.vldOut
-  mu.io.interconnect.addr := io.interconnect.addr
-  mu.io.interconnect.wdata := io.interconnect.wdata
-  mu.io.interconnect.dataVldIn := io.interconnect.dataVldIn
-  mu.io.interconnect.size := io.interconnect.size
-  io.interconnect.rdata := mu.io.interconnect.rdata
+//  mu.rdyIn := rdyIn
+  mu.vldIn := vldIn
+  rdyOut := mu.rdyOut
+  vldOut := mu.vldOut
+  mu.addr := addr
+  mu.wdata := wdata
+  mu.dataVldIn := dataVldIn
+  mu.size := size
+  rdata := mu.rdata
 
   io.dram.addr := mu.io.dram.addr
   io.dram.wdata := mu.io.dram.wdata
@@ -443,41 +484,41 @@ class MemoryUnitTests(c: AbstractMemoryUnit) extends Tester(c) {
   }
 
   def enqueueCmd(addr: Int, size: Int, data: List[Int] = List[Int]()) {
-    poke(c.io.interconnect.vldIn, 1)
-    poke(c.io.interconnect.addr(0), addr)
-    poke(c.io.interconnect.size, size)
+    poke(c.vldIn, 1)
+    poke(c.addr(0), addr)
+    poke(c.size, size)
     val isWr = writeMode
     // If it is a write, enqueue first burst
     val dataInBursts = getDataInBursts(data)
     if (isWr > 0) {
-      poke(c.io.interconnect.wdata, dataInBursts.dequeue)
-      poke(c.io.interconnect.dataVldIn, 1)
+      poke(c.wdata, dataInBursts.dequeue)
+      poke(c.dataVldIn, 1)
     }
     observeFor(1)
-    poke(c.io.interconnect.vldIn, 0)
+    poke(c.vldIn, 0)
     if (isWr > 0) {
       while (!dataInBursts.isEmpty) {
-        poke(c.io.interconnect.wdata, dataInBursts.dequeue)
+        poke(c.wdata, dataInBursts.dequeue)
         observeFor(1)
       }
     }
-    poke(c.io.interconnect.dataVldIn, 0)
+    poke(c.dataVldIn, 0)
     updateExpected(addr, size, data)
   }
 
   def enqueueCmd(addr: List[Int], data: List[Int]) {
     val isWr = writeMode
-    poke(c.io.interconnect.vldIn, 1)
-    c.io.interconnect.addr.zip(addr) foreach { case (in, i) => poke(in, i) }
+    poke(c.vldIn, 1)
+    c.addr.zip(addr) foreach { case (in, i) => poke(in, i) }
 
     // If it is a write, enqueue first burst
     if (isWr > 0) {
-      poke(c.io.interconnect.wdata, data)
-      poke(c.io.interconnect.dataVldIn, 1)
+      poke(c.wdata, data)
+      poke(c.dataVldIn, 1)
     }
     observeFor(1)
-    poke(c.io.interconnect.vldIn, 0)
-    poke(c.io.interconnect.dataVldIn, 0)
+    poke(c.vldIn, 0)
+    poke(c.dataVldIn, 0)
     updateExpected(addr, data)
   }
 
@@ -581,7 +622,7 @@ class MemoryUnitTests(c: AbstractMemoryUnit) extends Tester(c) {
   def testBurstMode {
     // Test burst mode
     // 1. If queue is empty, there must be a 'ready' signal sent to the interconnect
-    expect(c.io.interconnect.rdyOut, 1)
+    expect(c.rdyOut, 1)
 
     testBurstRead
     testBurstWrite

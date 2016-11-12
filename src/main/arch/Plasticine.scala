@@ -329,14 +329,14 @@ trait InterconnectHelper extends DirectionOps {
       val westOutputs = getIdxs(switchx, switchy, W(), OUTPUT).map { switches(switchx)(switchy).io.outs(_) }
       val westInputs = getIdxs(switchx, switchy, W(), INPUT).map { switches(switchx)(switchy).io.ins(_) }
       val addr = westOutputs(0)
-      val size = westOutputs(1)
-      val wdata = westOutputs(2)
+      val size = addr(1) // Size is the second word in addr bus
+      val wdata = westOutputs(1)
       val rdata = westInputs(0)
 
-      rdata := mus(i).io.interconnect.rdata
-      mus(i).io.interconnect.wdata := wdata
-      mus(i).io.interconnect.addr :=  addr
-      mus(i).io.interconnect.size :=  size(0)  // Size is a scalar
+      rdata := mus(i).rdata
+      mus(i).wdata := wdata
+      mus(i).addr :=  addr
+      mus(i).size :=  size
 
       dot.println(s"m${i} -> s${0}${i}")
       dot.println(s"s${0}${i} -> m${i}")
@@ -497,16 +497,16 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
       val dataRdyOut = westInputs(1)
       val vldOut = westInputs(2)
 
-      mus(i).io.interconnect.rdyIn := rdyIn
-      mus(i).io.interconnect.vldIn := vldIn
-      mus(i).io.interconnect.dataVldIn := dataVldIn
+//      mus(i).rdyIn := rdyIn
+      mus(i).vldIn := vldIn
+      mus(i).dataVldIn := dataVldIn
       dot.println(s"s${switchx}${switchy} -> m${i}")
       dot.println(s"s${switchx}${switchy} -> m${i}")
       dot.println(s"s${switchx}${switchy} -> m${i}")
 
-      rdyOut := mus(i).io.interconnect.rdyOut
-      dataRdyOut := mus(i).io.interconnect.dataRdyOut
-      vldOut := mus(i).io.interconnect.vldOut
+      rdyOut := mus(i).rdyOut
+      dataRdyOut := mus(i).dataRdyOut
+      vldOut := mus(i).vldOut
       dot.println(s"m${i} -> s${switchx}${switchy}")
       dot.println(s"m${i} -> s${switchx}${switchy}")
       dot.println(s"m${i} -> s${switchx}${switchy}")
