@@ -432,12 +432,12 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
   }
 
   override def getNumLinks(x: Int, y: Int, d: Direction, iodir: IODirection) = {
-    val interSwitchLinks = 3
+    val interSwitchLinks = 4
     d match {
         case N() => interSwitchLinks
         case S() => interSwitchLinks
-        case W() => interSwitchLinks
-        case E() => interSwitchLinks
+        case W() => if (isMUSwitch(x, y)) 3 else interSwitchLinks
+        case E() => if (isMUSwitch(x, y)) 3 else interSwitchLinks
         case _ => defaultNumLinks
     }
   }
@@ -719,6 +719,7 @@ with DirectionOps {
 
   val computeUnits = genDataArray(inst.cu)
 
+  println("-- Generating Data Interconnect --")
   val dataInterconnect = new InterconnectHelper {
     val rows = numRows
     val cols = numCols
@@ -733,6 +734,7 @@ with DirectionOps {
   dataInterconnect.connectAll
   val dataSwitch = dataInterconnect.switches
 
+  println("-- Generating Control Interconnect --")
   val ctrlInterconnect = new CtrlInterconnectHelper {
     val rows = numRows
     val cols = numCols

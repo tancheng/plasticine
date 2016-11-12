@@ -42,7 +42,7 @@ case class CUControlBoxOpcode(val numTokens: Int, val numTokenDownLUTs: Int, con
  */
 class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends ConfigurableModule[CUControlBoxOpcode] {
   val udctrWidth = 4
-  val numTokenDownLUTs = 4
+  val numTokenDownLUTs = 8
 
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)

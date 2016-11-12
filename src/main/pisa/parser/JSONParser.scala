@@ -341,7 +341,7 @@ object Parser {
                                           .map { parseCrossbar(_) }
 
     val controlSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "controlSwitch")
-                                          .map { parseCrossbar(_) }
+      .map { cm => if (isDontCare(cm)) CrossbarConfig.zeroes(100) else parseCrossbar(cm) }
 
     val mu: List[MemoryUnitConfig] = Parser.getFieldListOfMaps(m, "mu")
                                     .map { parseMemoryUnit(_) }
