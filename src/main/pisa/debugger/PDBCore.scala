@@ -19,6 +19,10 @@ trait PDBGlobals {
   def pisaConfig = _pisaConfig
   def pisaConfig_=(c: PlasticineConfig) { _pisaConfig = c }
 
+  private var _simulator: Option[String] = None
+  def simulator = if (_simulator.isDefined) _simulator.get else ""
+  def simulator_=(h: String) { _simulator = Some(h) }
+
   private var _hw: Plasticine = _
   def hw = _hw
   def hw_=(h: Plasticine) { _hw = h }
@@ -194,7 +198,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     while ((localCycles < numCycles) &(anyHigh < 1)) {
       val signals = signalsToWatch.toList
       val watchVals = signals.map { s => peek(s).toInt }
-      anyHigh = watchVals.reduce { (a,b) => a | b }
+      anyHigh = if (watchVals.size == 0) 0 else watchVals.reduce { (a,b) => a | b }
 
       // Peek every signal in signalsToWatch
       if (anyHigh > 1) {
@@ -322,24 +326,37 @@ trait PDBCore extends PDBBase with PDBGlobals {
     case _ => throw new Exception(s"Unsupported config type $config")
   }
 
+  def setSim(rows: Int, cols: Int) = {
+    simulator = s"Plasticine${rows}${cols}"
+    println(s"Simulator set to $simulator.")
+    println(s"Path for simulator binary: ${simulator}/generated/PlasticineTest/Simulator")
+  }
+
   def init(file: String) = {
-    pisaFile = file
+    if (simulator == "") {
+      println("Simulator not set. Use the 'setSim(rows, cols)' method to set it before calling init")
+    } else {
+      ArchConfig.setConfig(s"configs/${simulator}.json")
 
-    // 1. Load and parse the JSON
-    println("[PDB INIT] Parsing JSON")
-    pisaConfig = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+      pisaFile = file
 
-    // 4. Static Chisel args
-    val chiselArgs = Array("--targetDir", "/dev/null", "--backend", "null", "--test", "--testCommand", "generated/PlasticineTest/Simulator")
-    println("[PDB INIT] Creating a hardware instance")
-    val module = Driver(chiselArgs, () => getHardwareInstance(pisaConfig), true)
-    // 3. Create a tester instance with the hardware module
-    hw = module
+      // 1. Load and parse the JSON
+      println("[PDB INIT] Parsing JSON")
+      pisaConfig = Parser(pisaFile).asInstanceOf[PlasticineConfig]
 
-    println("[PDB INIT] Creating a tester instance")
-    tester = new PlasticinePDBTester(module, pisaConfig)
+      // 4. Static Chisel args
+      val chiselArgs = Array("--targetDir", "/dev/null", "--backend", "null", "--test", "--testCommand", s"$simulator/generated/PlasticineTest/Simulator")
+      println("[PDB INIT] Creating a hardware instance")
+      val module = Driver(chiselArgs, () => getHardwareInstance(pisaConfig), true)
+      // 3. Create a tester instance with the hardware module
+      hw = module
 
-    println("[PDB INIT] Done")
+      println("[PDB INIT] Creating a tester instance")
+      tester = new PlasticinePDBTester(module, pisaConfig)
+
+      println("[PDB INIT] Done")
+      }
+      val plasticineConfig="Plasticine22"
   }
 }
 
