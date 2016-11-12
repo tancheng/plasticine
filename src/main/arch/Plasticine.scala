@@ -166,11 +166,11 @@ trait InterconnectHelper extends DirectionOps {
     d match {
         case W() => iodir match {
           case INPUT => if (isMUSwitch(x, y) & (x == 0)) 1 else defaultNumLinks
-          case OUTPUT => if (isMUSwitch(x, y) & (x == 0)) 3 else defaultNumLinks
+          case OUTPUT => if (isMUSwitch(x, y) & (x == 0)) 4 else defaultNumLinks
         }
         case E() => iodir match {
           case INPUT => if (isMUSwitch(x, y) & (x == cols)) 1 else defaultNumLinks
-          case OUTPUT => if (isMUSwitch(x, y) & (x == cols)) 3 else defaultNumLinks
+          case OUTPUT => if (isMUSwitch(x, y) & (x == cols)) 4 else defaultNumLinks
         }
         case _ => defaultNumLinks
     }
@@ -337,8 +337,11 @@ trait InterconnectHelper extends DirectionOps {
       mus(i).wdata := wdata
       mus(i).addr :=  addr
       mus(i).size :=  size
+      mus(i).io.interconnect.dataIns(2) := westOutputs(2)
+      mus(i).io.interconnect.dataIns(3) := westOutputs(3)
 
       dot.println(s"m${i} -> s${0}${i}")
+      dot.println(s"s${0}${i} -> m${i}")
       dot.println(s"s${0}${i} -> m${i}")
       dot.println(s"s${0}${i} -> m${i}")
       dot.println(s"s${0}${i} -> m${i}")
@@ -436,8 +439,18 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
     d match {
         case N() => interSwitchLinks
         case S() => interSwitchLinks
-        case W() => if (isMUSwitch(x, y)) 3 else interSwitchLinks
-        case E() => if (isMUSwitch(x, y)) 3 else interSwitchLinks
+        case W() => if (isMUSwitch(x, y)) { iodir match {
+            case OUTPUT => 8
+            case INPUT => 9
+            case _ => throw new Exception(s"Unknown direction $iodir")
+          }
+        } else interSwitchLinks
+        case E() => if (isMUSwitch(x, y)) { iodir match {
+            case OUTPUT => 8
+            case INPUT => 9
+            case _ => throw new Exception(s"Unknown direction $iodir")
+          }
+        } else interSwitchLinks
         case _ => defaultNumLinks
     }
   }
@@ -490,26 +503,32 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
       val switchy = i
       val westOutputs = getIdxs(switchx, switchy, W(), OUTPUT).map { switches(switchx)(switchy).io.outs(_)(0) }
       val westInputs = getIdxs(switchx, switchy, W(), INPUT).map { switches(switchx)(switchy).io.ins(_)(0) }
-      val rdyIn = westOutputs(0)
-      val vldIn = westOutputs(1)
-      val dataVldIn = westOutputs(2)
+//      val rdyIn = westOutputs(0)
+      val vldIn = westOutputs(0)
+      val dataVldIn = westOutputs(1)
+      val tokenIns = westOutputs.drop(2)
+
       val rdyOut = westInputs(0)
       val dataRdyOut = westInputs(1)
       val vldOut = westInputs(2)
+      val tokenOuts = westInputs.drop(3)
 
 //      mus(i).rdyIn := rdyIn
       mus(i).vldIn := vldIn
       mus(i).dataVldIn := dataVldIn
+      mus(i).tokenIns.zip(tokenIns) foreach { case (in, i) => in := i }
       dot.println(s"s${switchx}${switchy} -> m${i}")
       dot.println(s"s${switchx}${switchy} -> m${i}")
-      dot.println(s"s${switchx}${switchy} -> m${i}")
+      for (link <- 0 until mus(i).tokenIns.size) { dot.println(s"s${switchx}${switchy} -> m${i}") }
 
       rdyOut := mus(i).rdyOut
       dataRdyOut := mus(i).dataRdyOut
       vldOut := mus(i).vldOut
+      tokenOuts.zip(mus(i).tokenOuts)foreach { case (out, o) => out := o }
       dot.println(s"m${i} -> s${switchx}${switchy}")
       dot.println(s"m${i} -> s${switchx}${switchy}")
       dot.println(s"m${i} -> s${switchx}${switchy}")
+      for (link <- 0 until mus(i).tokenOuts.size) { dot.println(s"m${i} -> s${switchx}${switchy}") }
     }
   }
 
@@ -787,8 +806,17 @@ object PlasticineTest {
     val spadeFile = appArgs(0)
     val pisaFile = appArgs(1)
 
-    val config = Parser(pisaFile).asInstanceOf[PlasticineConfig]
     ArchConfig.setConfig(spadeFile)
+    val config =  PlasticineConfig.zeroes(
+        ArchConfig.d,
+        ArchConfig.numRows,
+        ArchConfig.numCols,
+        ArchConfig.numTokens,
+        ArchConfig.numTokens,
+        ArchConfig.numTokens,
+        ArchConfig.numScratchpads,
+        ArchConfig.numMemoryUnits
+      ) // Parser(pisaFile).asInstanceOf[PlasticineConfig]
 //    val config = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
 
     val bitwidth = ArchConfig.w

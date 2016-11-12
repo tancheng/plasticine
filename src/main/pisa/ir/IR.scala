@@ -352,8 +352,8 @@ object PlasticineConfig {
   ) = {
     new PlasticineConfig(
       List.tabulate(rows*cols) { i => ComputeUnitConfig.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(8) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(8) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(100) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(100) },
       List.tabulate(numMemoryUnits) { i => MemoryUnitConfig.zeroes },
       TopUnitConfig.zeroes(8))
       }
