@@ -8,9 +8,9 @@ ifndef TOP_MODULE
 $(error TOP_MODULE is not set)
 endif
 
-all: pnr
+all: synth pnr
 
-pnr: synth
+pnr:
 	@echo "Running IC Compiler"
 	icc_shell -f scripts/icc.tcl | tee icc.log
 
