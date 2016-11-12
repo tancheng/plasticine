@@ -432,9 +432,12 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
   }
 
   override def getNumLinks(x: Int, y: Int, d: Direction, iodir: IODirection) = {
+    val interSwitchLinks = 3
     d match {
-        case W() => if (isMUSwitch(x, y) & (x == 0)) 3 else defaultNumLinks
-        case E() => if (isMUSwitch(x, y) & (x == cols)) 3 else defaultNumLinks
+        case N() => interSwitchLinks
+        case S() => interSwitchLinks
+        case W() => interSwitchLinks
+        case E() => interSwitchLinks
         case _ => defaultNumLinks
     }
   }
