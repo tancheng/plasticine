@@ -18,6 +18,11 @@ synth: $(PARAM_FILE)
 	@echo "Running Design Compiler"
 	dc_shell-t -f scripts/dc.tcl | tee dc.log
 
+synth-fast: $(PARAM_FILE)
+	@echo "Running Design Compiler (noautoungroup)"
+	dc_shell-t -f scripts/dc_noungroup.tcl | tee dc_noungroup.log
+
+
 $(PARAM_FILE):
 	bash scripts/genParam.sh $(PWD) $(TOP_MODULE)
 
