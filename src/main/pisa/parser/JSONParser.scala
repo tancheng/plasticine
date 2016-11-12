@@ -332,7 +332,8 @@ object Parser {
       val scatterGather = parseValue(Parser.getFieldString(m, "scatteGather"))
       val isWr = parseValue(Parser.getFieldString(m, "isWr"))
       val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
-      MemoryUnitConfig(scatterGather, isWr, counterChain)
+      val control = parseControlBox(Parser.getFieldMap(m, "control"))
+      MemoryUnitConfig(scatterGather, isWr, counterChain, control)
   }
 
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {

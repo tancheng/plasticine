@@ -4,6 +4,7 @@ import scala.collection.mutable.Queue
 import scala.collection.mutable.HashMap
 import Chisel._
 
+import plasticine.ArchConfig
 import plasticine.pisa.ir._
 
 /**
@@ -293,6 +294,25 @@ class MemoryUnit(
 
   // Counter chain, where innermost counter is chained to receivedCounter
   val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain))
+  counterChain.io.config_enable := io.config_enable
+  counterChain.io.config_data := io.config_data
+  val counterEnable = counterChain.io.control.map { _.enable }
+  val counterDone = counterChain.io.control.map { _.done }
+
+  // Control block for memory unit
+  val controlBox = Module(new CUControlBox(tokenIns.size, inst.control))
+  controlBox.io.config_enable := io.config_enable
+  controlBox.io.config_data := io.config_data
+  controlBox.io.tokenIns := tokenIns
+  counterEnable.zipWithIndex foreach { case (en, i) =>
+    if (i == 0) { // Chain counter 0 to receivedCounter
+      counterEnable(i) := receivedCounter.io.control.done
+    } else {
+      counterEnable(i) := controlBox.io.enable(i)
+    }
+  }
+  controlBox.io.done.zip(counterDone) foreach { case (done, d) => done := d }
+  tokenOuts.zip(controlBox.io.tokenOuts) foreach { case (out, o) => out := o }
 
   io.dram.addr := Cat((burstAddrs(0) + burstCounter.io.data.out), UInt(0, width=log2Up(burstSizeBytes)))
   io.dram.tagOut := Mux(config.scatterGather, burstAddrs(0), burstTagCounter.io.data.out)
@@ -700,11 +720,13 @@ object MemoryUnitTest {
   val burstSizeBytes = 64
   val startDelayWidth = 4
   val endDelayWidth = 4
-  val numCounters = 8
+  val numCounters = 6
 
   val scatterGather = 1
   val isWr = 0
-  val config = MemoryUnitConfig(scatterGather, isWr, CounterChainConfig.zeroes(numCounters))
+  val config = MemoryUnitConfig(scatterGather, isWr, CounterChainConfig.zeroes(numCounters),
+    CUControlBoxConfig.zeroes(numCounters, numCounters, numCounters)
+    )
   def main(args: Array[String]): Unit = {
     val testMode = args.contains("--test")
     if (testMode) {

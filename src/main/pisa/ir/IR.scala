@@ -153,14 +153,19 @@ case class FIFOConfig (
 case class MemoryUnitConfig (
   scatterGather: Int = 0,
   isWr: Int = 0,
-  counterChain: CounterChainConfig
+  counterChain: CounterChainConfig,
+  control: CUControlBoxConfig
 ) extends AbstractConfig
 object MemoryUnitConfig {
   def getRandom = {
-    MemoryUnitConfig(0, 0, CounterChainConfig.getRandom(ArchConfig.numCounters))
+    MemoryUnitConfig(0, 0, CounterChainConfig.getRandom(ArchConfig.numCounters),
+      CUControlBoxConfig.getRandom(ArchConfig.numTokens, ArchConfig.numTokens, ArchConfig.numCounters)
+      )
   }
   def zeroes = {
-    new MemoryUnitConfig(0, 0, CounterChainConfig.zeroes(ArchConfig.numCounters))
+    new MemoryUnitConfig(0, 0, CounterChainConfig.zeroes(ArchConfig.numCounters),
+      CUControlBoxConfig.zeroes(ArchConfig.numTokens, ArchConfig.numTokens, ArchConfig.numCounters)
+      )
   }
 }
 case class ComputeUnitConfig(
