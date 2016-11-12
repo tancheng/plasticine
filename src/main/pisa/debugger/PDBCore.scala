@@ -109,7 +109,18 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         m.config.table.zip(c.table) foreach { case (c, i) => poke(c, i) }
       case m: Crossbar =>
         val c = cfg.asInstanceOf[CrossbarConfig]
+      case m: CrossbarReg  =>
+        val c = cfg.asInstanceOf[CrossbarConfig]
         m.config.outSelect.zip(c.outSelect) foreach { case (c, i) => poke(c, i) }
+
+        m.config.outSelect.zip(c.outSelect) foreach { case (c, i) => poke(c, i) }
+      case m: CrossbarVec =>
+        val c = cfg.asInstanceOf[CrossbarConfig]
+        m.config.outSelect.zip(c.outSelect) foreach { case (c, i) => poke(c, i) }
+      case m: CrossbarVecReg  =>
+        val c = cfg.asInstanceOf[CrossbarConfig]
+        m.config.outSelect.zip(c.outSelect) foreach { case (c, i) => poke(c, i) }
+
       case m: ConnBox =>
         val c = cfg.asInstanceOf[ConnBoxConfig]
         poke(m.config.sel, c.sel)
@@ -363,6 +374,7 @@ trait PDBCore extends PDBBase with PDBGlobals {
 object PDB extends PDBCore {
   def reconfig(file: String) = {
     pisaConfig = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+    tester.reset(10)
     tester.setConfig(hw, pisaConfig)
   }
   def writeReg(reg: Int, data: Int) = tester.writeReg(reg, data)
