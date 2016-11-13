@@ -206,7 +206,8 @@ private:
     	  MultiMemoryUnitTester_DRAMSimulator__io_rdata_15 = rdataVec.at(15);
       }
 	  }
-	  else if (id == 1)
+
+		if (id == 1)
 	  {
       MultiMemoryUnitTester_DRAMSimulator_1__io_vldOut.values[0] = 1;
      	printf("[Callback] read complete: channel = %d, address = 0x%lx, cycle = %lu\n", id, address, clock_cycle);
@@ -255,7 +256,8 @@ private:
     	  MultiMemoryUnitTester_DRAMSimulator_1__io_rdata_15 = rdataVec.at(15);
       }
 	  }
-	  else if (id == 2)
+
+	  if (id == 2)
 	  {
       MultiMemoryUnitTester_DRAMSimulator_2__io_vldOut.values[0] = 1;
      	printf("[Callback] read complete: channel = %d, address = 0x%lx, cycle = %lu\n", id, address, clock_cycle);
@@ -304,7 +306,8 @@ private:
     	  MultiMemoryUnitTester_DRAMSimulator_2__io_rdata_15 = rdataVec.at(15);
       }
 	  }
-	  else if (id == 3)
+
+	  if (id == 3)
 	  {
       MultiMemoryUnitTester_DRAMSimulator_3__io_vldOut.values[0] = 1;
      	printf("[Callback] read complete: channel = %d, address = 0x%lx, cycle = %lu\n", id, address, clock_cycle);
@@ -353,11 +356,6 @@ private:
     	  MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_15 = rdataVec.at(15);
       }
 	  }
-	  else
-	  {
-	  	printf("Error: wrong channel number = %d\n", id);
-	  }
-
   }
 
   void write_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
@@ -366,92 +364,47 @@ private:
 		if (id == 0)
 		{
 			MultiMemoryUnitTester_DRAMSimulator__io_vldOut.values[0] = 1;
-    	printf("[Callback] write complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
 			MultiMemoryUnitTester_DRAMSimulator__io_tagOut = tagMap[address];
+    	printf("[Callback] write complete: %d 0x%lx cycle=%lu tag=%lu\n", id, address, clock_cycle, MultiMemoryUnitTester_DRAMSimulator__io_tagOut.values[0]);
 		}
-		else if (id == 1)
+
+		if (id == 1)
 		{
 			MultiMemoryUnitTester_DRAMSimulator_1__io_vldOut.values[0] = 1;
-    	printf("[Callback] write complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
 			MultiMemoryUnitTester_DRAMSimulator_1__io_tagOut = tagMap[address];
+    	printf("[Callback] write complete: %d 0x%lx cycle=%lu tag=%lu\n", id, address, clock_cycle, MultiMemoryUnitTester_DRAMSimulator_1__io_tagOut.values[0]);
 		}
-		else if (id == 2)
+
+		if (id == 2)
 		{
 			MultiMemoryUnitTester_DRAMSimulator_2__io_vldOut.values[0] = 1;
-    	printf("[Callback] write complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
 			MultiMemoryUnitTester_DRAMSimulator_2__io_tagOut = tagMap[address];
+    	printf("[Callback] write complete: %d 0x%lx cycle=%lu tag=%lu\n", id, address, clock_cycle, MultiMemoryUnitTester_DRAMSimulator_2__io_tagOut.values[0]);
 		}
-		else if (id == 3)
+
+		if (id == 3)
 		{
 			MultiMemoryUnitTester_DRAMSimulator_3__io_vldOut.values[0] = 1;
-    	printf("[Callback] write complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
 			MultiMemoryUnitTester_DRAMSimulator_3__io_tagOut = tagMap[address];
-		}
-		else
-		{
-			printf("Error: wrong channel number = %d\n", id);
+    	printf("[Callback] write complete: %d 0x%lx cycle=%lu tag=%lu\n", id, address, clock_cycle, MultiMemoryUnitTester_DRAMSimulator_3__io_tagOut.values[0]);
 		}
   }
 
   virtual inline void step() {
     mcMem->update();
   	MultiMemoryUnitTester_t *pctrl = (MultiMemoryUnitTester_t *)module;
-		cout << ">>>>>>>>>> start step <<<<<<<<<<" << endl;
+//		cout << ">>>>>>>>>> start step <<<<<<<<<<" << endl;
 
-  	// NOTES: in the generated simulation code, all the output of the DRAMSimulator module would be reset to 
-  	// 0 at posedge of every clock. The callback of write / read complete is triggerred before step() function 
-  	// is called.
-//  	cout << "before clock, DRAMSimulator_vldOut = " << pctrl->MultiMemoryUnitTester_DRAMSimulator__io_vldOut.values[0] << endl;
-//  	// tmp values
-//  	dat_t<1> tmpVldOut = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_vldOut;
-//		dat_t<32> tmpTagIn = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_tagOut;
-//		dat_t<32> tmpRd0 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_0;
-//		dat_t<32> tmpRd1 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_1;
-//  	dat_t<32> tmpRd2 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_2;
-//  	dat_t<32> tmpRd3 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_3;
-//  	dat_t<32> tmpRd4 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_4;
-//  	dat_t<32> tmpRd5 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_5;
-//  	dat_t<32> tmpRd6 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_6;
-//  	dat_t<32> tmpRd7 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_7;
-//  	dat_t<32> tmpRd8 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_8;
-//  	dat_t<32> tmpRd9 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_9;
-//  	dat_t<32> tmpRd10 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_10;
-//  	dat_t<32> tmpRd11 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_11;
-//  	dat_t<32> tmpRd12 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_12;
-//  	dat_t<32> tmpRd13 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_13;
-//  	dat_t<32> tmpRd14 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_14;
-//  	dat_t<32> tmpRd15 = pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_15;
-
-		cout << ">>>>>>>>>> start clock_lo  <<<<<<<<<<" << endl;
+//		cout << ">>>>>>>>>> start clock_lo  <<<<<<<<<<" << endl;
     module->clock(LIT<1>(0));
     // FIXME: should call twice to get the output for now
     module->clock_lo(LIT<1>(0), false);
-		cout << ">>>>>>>>>> end clock_lo  <<<<<<<<<<" << endl;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_vldOut = tmpVldOut;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_tagOut = tmpTagIn;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_0 = tmpRd0;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_1 = tmpRd1;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_2 = tmpRd2;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_3 = tmpRd3;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_4 = tmpRd4;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_5 = tmpRd5;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_6 = tmpRd6;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_7 = tmpRd7;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_8 = tmpRd8;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_9 = tmpRd9;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_10 = tmpRd10;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_11 = tmpRd11;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_12 = tmpRd12;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_13 = tmpRd13;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_14 = tmpRd14;
-//  	pctrl->MultiMemoryUnitTester_DRAMSimulator_3__io_rdata_15 = tmpRd15;
-//  	cout << "after clock, DRAMSimulator_vldOut = " << pctrl->MultiMemoryUnitTester_DRAMSimulator__io_vldOut.values[0] << endl;
-
-		cout << ">>>>>>>>>> start injection  <<<<<<<<<<" << endl;
+//		cout << ">>>>>>>>>> end clock_lo  <<<<<<<<<<" << endl;
+//		cout << ">>>>>>>>>> start injection  <<<<<<<<<<" << endl;
 		// channel 0
   	if (MultiMemoryUnitTester_DRAMSimulator__io_vldIn.values[0] > 0)
   	{
-			cout << ">>>>>>>>>> addTransaction to channel 0 <<<<<<<<<<" << endl;
+//			cout << ">>>>>>>>>> addTransaction to channel 0 <<<<<<<<<<" << endl;
   	  dat_t<32> transTag = MultiMemoryUnitTester_DRAMSimulator__io_tagIn;
   	  bool isWR = MultiMemoryUnitTester_DRAMSimulator__io_isWr.values[0];
   	  uint64_t addr = MultiMemoryUnitTester_DRAMSimulator__io_addr.values[0];
@@ -463,8 +416,8 @@ private:
 			if (!transSuccess) cout << ">>>>>>>>>> warning: cannot enqueue a transaction to DRAMSim! <<<<<<<<<<" << endl;
   	  if (isWR)
   	  {
-  	  	cout << "channel 0: isWr: writing to addr = " << addr << endl;
-  	    cout << ">>>>>>>>>> isWR, channel 0 <<<<<<<<<<" << endl;
+//  	  	cout << "channel 0: isWr: writing to addr = " << addr << endl;
+//  	    cout << ">>>>>>>>>> isWR, channel 0 <<<<<<<<<<" << endl;
   	  	vector<dat_t<32> > wdataVec;
   	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_0);
   	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_1);
@@ -485,17 +438,17 @@ private:
     	 	dataMap[addr] = wdataVec;
         //
     		// check keys....
-    		cout << "checking keys stored in dataMap" << endl;
-    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
-    		{
-    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
-    		}
+//    		cout << "checking keys stored in dataMap" << endl;
+//    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
+//    		{
+//    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
+//    		}
   	  }
   	}
 		// channel 1
-		else if (MultiMemoryUnitTester_DRAMSimulator_1__io_vldIn.values[0] > 0)
+		if (MultiMemoryUnitTester_DRAMSimulator_1__io_vldIn.values[0] > 0)
   	{
-			cout << ">>>>>>>>>> addTransaction to channel 1 <<<<<<<<<<" << endl;
+//			cout << ">>>>>>>>>> addTransaction to channel 1 <<<<<<<<<<" << endl;
   	  dat_t<32> transTag = MultiMemoryUnitTester_DRAMSimulator_1__io_tagIn;
   	  bool isWR = MultiMemoryUnitTester_DRAMSimulator_1__io_isWr.values[0];
   	  uint64_t addr = MultiMemoryUnitTester_DRAMSimulator_1__io_addr.values[0];
@@ -508,8 +461,8 @@ private:
 
   	  if (isWR)
   	  {
-  	    cout << ">>>>>>>>>> isWR, channel 1 <<<<<<<<<<" << endl;
-  	  	cout << "channel 1: isWr: writing to addr = " << addr << endl;
+//  	    cout << ">>>>>>>>>> isWR, channel 1 <<<<<<<<<<" << endl;
+//  	  	cout << "channel 1: isWr: writing to addr = " << addr << endl;
   	  	vector<dat_t<32> > wdataVec;
   	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_0);
   	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_1);
@@ -530,17 +483,17 @@ private:
     	 	dataMap[addr] = wdataVec;
         //
     		// check keys....
-    		cout << "checking keys stored in dataMap" << endl;
-    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
-    		{
-    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
-    		}
+//    		cout << "checking keys stored in dataMap" << endl;
+//    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
+//    		{
+//    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
+//    		}
   	  }
   	}
 	  // channel 2
-		else if (MultiMemoryUnitTester_DRAMSimulator_2__io_vldIn.values[0] > 0)
+		if (MultiMemoryUnitTester_DRAMSimulator_2__io_vldIn.values[0] > 0)
   	{
-			cout << ">>>>>>>>>> addTransaction to channel 2 <<<<<<<<<<" << endl;
+//			cout << ">>>>>>>>>> addTransaction to channel 2 <<<<<<<<<<" << endl;
   	  dat_t<32> transTag = MultiMemoryUnitTester_DRAMSimulator_2__io_tagIn;
   	  bool isWR = MultiMemoryUnitTester_DRAMSimulator_2__io_isWr.values[0];
   	  uint64_t addr = MultiMemoryUnitTester_DRAMSimulator_2__io_addr.values[0];
@@ -553,8 +506,8 @@ private:
 
   	  if (isWR)
   	  {
-  	    cout << ">>>>>>>>>> isWR, channel 2 <<<<<<<<<<" << endl;
-  	  	cout << "channel 2: isWr: writing to addr = " << addr << endl;
+//  	    cout << ">>>>>>>>>> isWR, channel 2 <<<<<<<<<<" << endl;
+//  	  	cout << "channel 2: isWr: writing to addr = " << addr << endl;
   	  	vector<dat_t<32> > wdataVec;
   	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_0);
   	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_1);
@@ -575,15 +528,15 @@ private:
     	 	dataMap[addr] = wdataVec;
         //
     		// check keys....
-    		cout << "checking keys stored in dataMap" << endl;
-    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
-    		{
-    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
-    		}
+//    		cout << "checking keys stored in dataMap" << endl;
+//    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
+//    		{
+//    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
+//    		}
   	  }
   	}
 	  // channel 3
-		else if (MultiMemoryUnitTester_DRAMSimulator_3__io_vldIn.values[0] > 0)
+		if (MultiMemoryUnitTester_DRAMSimulator_3__io_vldIn.values[0] > 0)
   	{
 			cout << ">>>>>>>>>> addTransaction to channel 3 <<<<<<<<<<" << endl;
   	  dat_t<32> transTag = MultiMemoryUnitTester_DRAMSimulator_3__io_tagIn;
@@ -599,8 +552,8 @@ private:
 
   	  if (isWR)
   	  {
-  	    cout << ">>>>>>>>>> isWR, channel 3 <<<<<<<<<<" << endl;
-  	  	cout << "channel 3: isWr: writing to addr = " << addr << endl;
+//  	    cout << ">>>>>>>>>> isWR, channel 3 <<<<<<<<<<" << endl;
+//  	  	cout << "channel 3: isWr: writing to addr = " << addr << endl;
   	  	vector<dat_t<32> > wdataVec;
   	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_0);
   	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_1);
@@ -621,15 +574,15 @@ private:
     	 	dataMap[addr] = wdataVec;
         //
     		// check keys....
-    		cout << "checking keys stored in dataMap" << endl;
-    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
-    		{
-    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
-    		}
+//    		cout << "checking keys stored in dataMap" << endl;
+//    		for (map<uint64_t, vector<dat_t<32> > >::iterator it = dataMap.begin(); it != dataMap.end(); ++it)
+//    		{
+//    			cout << "key = " << it->first << " size of data  = " << it->second.size() << endl;
+//    		}
   	  }
   	}
 
-		cout << ">>>>>>>>>> end injection  <<<<<<<<<<" << endl;
+//		cout << ">>>>>>>>>> end injection  <<<<<<<<<<" << endl;
     // reset all the control signals at falling edge... that way control signals
     // will only be high for one clock cycle
     // TODO: need to set rdyOut as well...
@@ -637,7 +590,7 @@ private:
     MultiMemoryUnitTester_DRAMSimulator_1__io_vldOut.values[0] = 0;
     MultiMemoryUnitTester_DRAMSimulator_2__io_vldOut.values[0] = 0;
     MultiMemoryUnitTester_DRAMSimulator_3__io_vldOut.values[0] = 0;
-		cout << ">>>>>>>>>> end reseting control signals <<<<<<<<<<" << endl;
+//		cout << ">>>>>>>>>> end reseting control signals <<<<<<<<<<" << endl;
   }
 
   virtual inline void update() {

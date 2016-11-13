@@ -229,7 +229,7 @@ private:
   }
 
   void peek() {
-		std::cout << "start peeking" << std::endl;
+//		std::cout << "start peeking" << std::endl;
     size_t id;
     while(!recv_cmd(id));
     T obj = sim_data.signals[id];
@@ -248,7 +248,7 @@ private:
 //    MultiMemoryUnitTester_DRAMSimulator_2__io_vldOut.values[0] = 0;
 //    MultiMemoryUnitTester_DRAMSimulator_3__io_vldOut.values[0] = 0;
 //		cout << ">>>>>>>>>> end reseting control signals <<<<<<<<<<" << endl;
-		std::cout << "end peeking" << std::endl;
+//		std::cout << "end peeking" << std::endl;
   }
 
   void getid() {

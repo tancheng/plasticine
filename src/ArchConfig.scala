@@ -19,7 +19,7 @@ object ArchConfig {
   var numStagesAfterReduction = 2
   var numRows = 2
   var numCols = 2
-  var numMemoryUnits = 2
+  var numMemoryUnits = 4
   var burstSizeBytes = 64
   var numOutstandingBursts = 16
   var numTopInputs = 2 * numCols
