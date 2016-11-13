@@ -162,7 +162,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   // (numTokenDownLUTs+1)..(numTokenDownLUTs+1+numTokens-1): tokenOutLUTs(i-numTokenDownLUTs-1)
   val tokenOutXbarIns = Vec(
         List(UInt(0, width=1)) ++
-        List.tabulate(ArchConfig.numScratchpads) { io.fifoNotFull(_) } ++
+        io.fifoNotFull ++
         tokenDownPulser ++
         tokenOutLUTs.map {_.io.out} ++
         enableLUTs.map {_.io.out}
@@ -170,7 +170,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   val tokenOutXbar = Module(new Crossbar(1, tokenOutXbarIns.size, numTokens, inst.tokenOutXbar))
   tokenOutXbar.io.config_enable := io.config_enable
   tokenOutXbar.io.config_data := io.config_data
-  tokenOutXbar.io.ins := tokenOutXbarIns
+  tokenOutXbar.io.ins.zip(tokenOutXbarIns).foreach { case (in, i) => in := i }
 
   io.enable.zip(enableMux) foreach { case (en, mux) => en := mux }
   io.tokenOuts.zip(tokenOutXbar.io.outs) foreach { case (tout, out) => tout := out }
