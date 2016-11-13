@@ -31,14 +31,31 @@ trait DirectionOps {
     case _ => 0
   }
 
-  case class W() extends West
-  case class NW() extends North with West
-  case class N() extends North
-  case class NE() extends North with East
-  case class E() extends East
-  case class SE() extends South with East
-  case class S() extends South
-  case class SW() extends South with West
+  case class W() extends West {
+    override def toString = "W"
+  }
+
+  case class NW() extends North with West {
+    override def toString = "NW"
+  }
+  case class N() extends North {
+    override def toString = "N"
+  }
+  case class NE() extends North with East {
+    override def toString = "NE"
+  }
+  case class E() extends East {
+    override def toString = "E"
+  }
+  case class SE() extends South with East {
+    override def toString = "SE"
+  }
+  case class S() extends South {
+    override def toString = "S"
+  }
+  case class SW() extends South with West {
+    override def toString = "SW"
+  }
 
   def reverseDir(d: Direction) = d match {
     case N() => S()

@@ -149,7 +149,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
     m.io.config_data := io.config_data
     m
   }
-  enableLUTs.foreach { _.io.ins := gtzs.reverse } // MSB must be in position 0
+  enableLUTs.foreach { _.io.ins := gtzs } // MSB must be in position 0
   val enableMux = List.tabulate(numTokens) { i => Mux(config.enableMux(i), tokenInXbar.io.outs(i), enableLUTs(i).io.out) }
   io.enable.zip(enableMux) foreach { case (en, mux) => en := mux }
 

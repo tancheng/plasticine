@@ -109,11 +109,11 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         m.config.table.zip(c.table) foreach { case (c, i) => poke(c, i) }
       case m: Crossbar =>
         val c = cfg.asInstanceOf[CrossbarConfig]
+        m.config.outSelect.zip(c.outSelect) foreach { case (c, i) => poke(c, i) }
       case m: CrossbarReg  =>
         val c = cfg.asInstanceOf[CrossbarConfig]
         m.config.outSelect.zip(c.outSelect) foreach { case (c, i) => poke(c, i) }
 
-        m.config.outSelect.zip(c.outSelect) foreach { case (c, i) => poke(c, i) }
       case m: CrossbarVec =>
         val c = cfg.asInstanceOf[CrossbarConfig]
         m.config.outSelect.zip(c.outSelect) foreach { case (c, i) => poke(c, i) }
@@ -247,19 +247,100 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     break(tokenIns ++ tokenOuts)
   }
 
+  val ctrlNetwork = new CtrlInterconnectHelper {
+    val rows = ArchConfig.numRows
+    val cols = ArchConfig.numCols
+    val mus = List.fill(ArchConfig.numMemoryUnits) { null }
+    val cus = null
+    val topUnit = null
+    val config_enable = null
+    val config_data = null
+    val dot = null
+    val switches = null
+  }
+
+  def printLUT(mod: LUT, name: String = "") {
+    println(s"--------------------------------")
+    println(s"LUT: $name")
+
+        println(s"   |       Input Bits         |             Output       ")
+        println(s"___|__________________________|__________________________")
+    val table = List.tabulate(mod.size) { i =>
+      val idxStr = if (peek(mod.sel).toInt == i) "-->" else "   "
+        println(s"$idxStr | " + String.format(s"%${log2Up(mod.size)}s", Integer.toBinaryString(i)).replace(' ', '0') + " | " + peek(mod.config.table(i)))
+    }
+
+        println(s"_________________________________________________________")
+
+  }
+  def printXbar(mod: Crossbar, name: String = "") {
+    println(s"--------------------------------")
+    println(s"Xbar: $name")
+
+    val invals = mod.io.ins map { in =>
+      val v = peek(in(0))
+      if (v < 0) "-" else s"$v"
+    }
+    println(invals.mkString("   "))
+    for (i <- 0 until mod.numOutputs) {
+      val outSelect = peek(mod.config.outSelect(i)).toInt
+      val configStr = List.tabulate(mod.numInputs) { i => if (i == outSelect) "x" else " " }.mkString("   ")
+      val output = peek(mod.io.outs(i)(0)).toInt
+      println(configStr + " | " + output)
+    }
+    println(s"--------------------------------")
+
+  }
+
   def showSwitch(x: Int, y: Int) {
+    def getNeighbor(d: ctrlNetwork.Direction, io: IODirection) = {
+      val valid = ctrlNetwork.getValidIO(x, y, io)
+      if (valid.contains(d)) {
+        d match {
+        case ctrlNetwork.W() =>
+            if ((x == 0) & ctrlNetwork.isMUSwitch(x,y)) s"MU${x}${y}"
+            else s"S${ctrlNetwork.xOffset(d)}${ctrlNetwork.yOffset(d)}"
+        case ctrlNetwork.E() =>
+            if ((x == ctrlNetwork.cols) & ctrlNetwork.isMUSwitch(x,y)) s"MU${x}${y}"
+            else s"S${ctrlNetwork.xOffset(d)}${ctrlNetwork.yOffset(d)}"
+        case ctrlNetwork.NW() =>
+          s"CU${x-1}${y}"
+        case ctrlNetwork.N() =>
+          if (y == ctrlNetwork.rows) "Top" else s"S${x}${y+1}"
+        case ctrlNetwork.NE() =>
+          s"CU${x}${y}"
+        case ctrlNetwork.SE() =>
+          s"CU${x}${y-1}"
+        case ctrlNetwork.S() =>
+          if (x == 0) "Top" else s"S${x}${y-1}"
+        case ctrlNetwork.SW() =>
+          s"CU${x-1}${y-1}"
+        }
+      } else "Unconnected"
+    }
     val switch = module.controlSwitch(x)(y)
     println(s"--------------------------------")
     println(s"Control Switch $x, $y:")
-    val invals = switch.io.ins map { in => peek(in(0)).toInt }
+    val indirs = ctrlNetwork.getValidIO(x, y, INPUT).map { d =>
+      ctrlNetwork.getIdxs(x, y, d, INPUT).map{ (_, d) }
+    }.toList.flatten.sortBy(_._1).map { _._2 }
+    val outdirs = ctrlNetwork.getValidIO(x, y, OUTPUT).map { d =>
+      ctrlNetwork.getIdxs(x, y, d, OUTPUT).map{ (_, d) }
+    }.toList.flatten.sortBy(_._1).map { _._2 }
+
+    val invals = switch.io.ins map { in =>
+      val v = peek(in(0))
+      if (v < 0) "-" else s"$v"
+    }
     val cfg = List.tabulate(switch.numOutputs) { i => peek(switch.config.outSelect(i)).toInt }
     println(s"Config: $cfg, Inst: ${switch.inst.outSelect}")
-    println(invals.mkString(" "))
+    println(indirs.mkString("   "))
+    println(invals.mkString("   "))
     for (i <- 0 until switch.numOutputs) {
       val outSelect = peek(switch.config.outSelect(i)).toInt
-      val configStr = List.tabulate(switch.numInputs) { i => if (i == outSelect) "x" else " " }.mkString(" ")
+      val configStr = List.tabulate(switch.numInputs) { i => if (i == outSelect) "x" else " " }.mkString("   ")
       val output = peek(switch.io.outs(i)(0)).toInt
-      println(configStr + " | " + output)
+      println(configStr + " | " + output + " " + outdirs(i) + " " + getNeighbor(outdirs(i), OUTPUT))
     }
     println(s"--------------------------------")
   }
@@ -300,19 +381,28 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
       print(s"  $ctrVal $enStr $chainLinkStr")
     }
     println("")
-    println("-- Datapath")
-    for (i <- 0 until cuModule.d) {
-      println(s"---- Stage $i (${Opcodes.opcodes(peek(cuModule.config.pipeStage(i).opcode).toInt)._1})")
-      val stageFUs = cuModule.pipeStages(i)
-      val opAs = stageFUs.map { fu => peek(fu.io.a) }
-      val opBs = stageFUs.map { fu => peek(fu.io.b) }
-      val opCs = stageFUs.map { fu => peek(fu.io.c) }
-      val res = stageFUs.map { fu => peek(fu.io.out) }
-      println(s"---- opA: $opAs")
-      println(s"---- opB: $opBs")
-      println(s"---- opC: $opCs")
-      println(s"---- res: $res")
+    println("-- Control")
+    print("tokenIns: "); cuModule.io.tokenIns foreach { t => print(peek(t) + " ") }; println("")
+    print("tokenOuts: "); cuModule.io.tokenOuts foreach { t => print(peek(t) + " ") }; println("")
+    printXbar(cuModule.controlBlock.incXbar, "incXbar")
+    println("----UpDownCtrs")
+    cuModule.controlBlock.udCounters.zipWithIndex.foreach { case (udc, i) =>
+      println(s"----[$i] init: ${peek(udc.io.init)}, inc: ${peek(udc.io.inc)}, dec: ${peek(udc.io.dec)}, gtz: ${peek(udc.io.gtz)}")
     }
+    printLUT(cuModule.controlBlock.enableLUTs(0))
+//    println("-- Datapath")
+//    for (i <- 0 until cuModule.d) {
+//      println(s"---- Stage $i (${Opcodes.opcodes(peek(cuModule.config.pipeStage(i).opcode).toInt)._1})")
+//      val stageFUs = cuModule.pipeStages(i)
+//      val opAs = stageFUs.map { fu => peek(fu.io.a) }
+//      val opBs = stageFUs.map { fu => peek(fu.io.b) }
+//      val opCs = stageFUs.map { fu => peek(fu.io.c) }
+//      val res = stageFUs.map { fu => peek(fu.io.out) }
+//      println(s"---- opA: $opAs")
+//      println(s"---- opB: $opBs")
+//      println(s"---- opC: $opCs")
+//      println(s"---- res: $res")
+//    }
     println(s"--------------------------------")
   }
 }
@@ -380,16 +470,19 @@ object PDB extends PDBCore {
   def writeReg(reg: Int, data: Int) = tester.writeReg(reg, data)
   def readReg(reg: Int) = tester.readReg(reg)
   def start = tester.start
-  def observeFor(numCycles: Int) = tester.observeFor(numCycles)
+  def n = s(1)
+  def s(numCycles: Int = 1) = tester.observeFor(numCycles)
   def runToFinish = tester.runToFinish
-  def printScalarRegs = tester.printScalarRegs
+  def scalars = tester.printScalarRegs
   def breakOnHigh(signal: UInt) = tester.breakOnHigh(signal)
   def poke(signal: Bits, data: Int) = tester.poke(signal, data)
   def peek(signal: UInt) = tester.peek(signal)
   def break(signal: UInt) = tester.break(signal)
   def break(signals: Seq[UInt]) = tester.break(signals)
-  def showCU(x: Int, y: Int) = tester.showCU(x, y)
-  def showSwitch(x: Int, y: Int) = tester.showSwitch(x, y)
+  def cu(x: Int, y: Int) = tester.showCU(x, y)
+  def cs(x: Int, y: Int) = tester.showSwitch(x, y)
   def showTop = tester.showTop
   def watchCU(x: Int, y: Int) = tester.watchCU(x, y)
+  def xbar(mod: Crossbar) = tester.printXbar(mod)
+  def lut(mod: LUT) = tester.printLUT(mod)
 }
