@@ -435,7 +435,7 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
   }
 
   override def getNumLinks(x: Int, y: Int, d: Direction, iodir: IODirection) = {
-    val interSwitchLinks = 4
+    val interSwitchLinks = 8
     d match {
         case N() => interSwitchLinks
         case S() => interSwitchLinks
@@ -807,16 +807,17 @@ object PlasticineTest {
     val pisaFile = appArgs(1)
 
     ArchConfig.setConfig(spadeFile)
-    val config =  PlasticineConfig.zeroes(
-        ArchConfig.d,
-        ArchConfig.numRows,
-        ArchConfig.numCols,
-        ArchConfig.numTokens,
-        ArchConfig.numTokens,
-        ArchConfig.numTokens,
-        ArchConfig.numScratchpads,
-        ArchConfig.numMemoryUnits
-      ) // Parser(pisaFile).asInstanceOf[PlasticineConfig]
+//    val config =  PlasticineConfig.zeroes(
+//        ArchConfig.d,
+//        ArchConfig.numRows,
+//        ArchConfig.numCols,
+//        ArchConfig.numTokens,
+//        ArchConfig.numTokens,
+//        ArchConfig.numTokens,
+//        ArchConfig.numScratchpads,
+//        ArchConfig.numMemoryUnits
+//      )
+    val config = Parser(pisaFile).asInstanceOf[PlasticineConfig]
 //    val config = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
 
     val bitwidth = ArchConfig.w

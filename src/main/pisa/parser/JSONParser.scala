@@ -4,8 +4,10 @@ import java.io.File
 import _root_.scala.util.parsing.json.JSON
 import scala.collection.mutable.HashMap
 import scala.util.Random
+import plasticine.ArchConfig
 import plasticine.pisa.ir._
 import plasticine.templates.Opcodes
+import plasticine.templates.{DirectionOps, InterconnectHelper, CtrlInterconnectHelper}
 import Chisel._
 
 object Parser {
@@ -339,11 +341,82 @@ object Parser {
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
     val cu: List[ComputeUnitConfig] = Parser.getFieldListOfMaps(m, "cu")
                                           .map { parseCU(_) }
-    val dataSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "dataSwitch")
-                                          .map { parseCrossbar(_) }
+    val dataNetwork = new InterconnectHelper {
+      val rows = ArchConfig.numRows
+      val cols = ArchConfig.numCols
+      val mus = List.fill(ArchConfig.numMemoryUnits) { null }
+      val cus = null
+      val topUnit = null
+      val config_enable = null
+      val config_data = null
+      val dot = null
+      val switches = null
+    }
+    val ctrlNetwork = new CtrlInterconnectHelper {
+      val rows = ArchConfig.numRows
+      val cols = ArchConfig.numCols
+      val mus = List.fill(ArchConfig.numMemoryUnits) { null }
+      val cus = null
+      val topUnit = null
+      val config_enable = null
+      val config_data = null
+      val dot = null
+      val switches = null
+    }
 
-    val controlSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "controlSwitch")
-      .map { cm => if (isDontCare(cm)) CrossbarConfig.zeroes(100) else parseCrossbar(cm) }
+    def parseSwitches(ml: List[Map[Any, Any]], helper: InterconnectHelper) = {
+      List.tabulate(helper.rows+1) { y =>
+        List.tabulate (helper.cols+1) { x =>
+          val map = ml(y*helper.cols + x)
+          val outSelectRaw = Parser.getFieldList(map, "outSelect")
+                                        .asInstanceOf[List[String]]
+          val outSelect = outSelectRaw.map { str =>
+          println(s"[parseSwitches $x $y] $str")
+            val split = if (str == "x") Array("x","0") else str.split("_")
+            val (dir, offset) = (split(0), split(1))
+            val directionOp = dir match {
+              case "w" => helper.W()
+              case "nw" => helper.NW()
+              case "n" =>  helper.N()
+              case "ne" => helper.NE()
+              case "e" =>  helper.E()
+              case "se" => helper.SE()
+              case "s" =>  helper.S()
+              case "sw" => helper.SW()
+              case "x" =>  helper.N() // don't care direction is N (as every switch has N)
+              case _ => throw new Exception(s"[parseSwitch $x $y] Unknown direction $dir")
+            }
+            val baseIdx = helper.getIdxBase(x, y, directionOp, helper.getValidIO(x, y, INPUT), INPUT)
+            val validIdxs = helper.getIdxs(x, y, directionOp, INPUT)
+//            val validIdxsW = helper.getIdxs(x, y, helper.W(), INPUT)
+//            val validIdxsNW = helper.getIdxs(x, y, helper.NW(), INPUT)
+//            val validIdxsN = helper.getIdxs(x, y, helper.N(), INPUT)
+//            val validIdxsNE = helper.getIdxs(x, y, helper.NE(), INPUT)
+//              validIdxsW: $validIdxsW
+//              validIdxsN: $validIdxsN
+//              validIdxsNE: $validIdxsNE
+
+            val idx = baseIdx + Integer.parseInt(offset)
+            if (!validIdxs.contains(idx)) {
+              throw new Exception(s"""
+[parseSwitch $x $y] Invalid config $str: translates to invalid index $idx (valid indices: $validIdxs)")
+""")
+            }
+            idx
+          }
+          CrossbarConfig(outSelect)
+        }
+      }.flatten
+    }
+
+    println(s"[parsePlasticine] Parsing controlSwitch")
+    val controlSwitch: List[CrossbarConfig] = parseSwitches(Parser.getFieldListOfMaps(m, "controlSwitch"),
+                                                  ctrlNetwork)
+
+    println(s"[parsePlasticine] Parsing dataSwitch")
+    val dataSwitch: List[CrossbarConfig] = parseSwitches(Parser.getFieldListOfMaps(m, "dataSwitch"),
+                                                  dataNetwork)
+
 
     val mu: List[MemoryUnitConfig] = Parser.getFieldListOfMaps(m, "mu")
                                     .map { parseMemoryUnit(_) }
