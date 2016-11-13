@@ -7,7 +7,7 @@
         "comment-argIns" : "ArgIn5 -> 0",
         "comment-argOuts" : "ArgOut4 -> 0",
         "top" :{
-          "done" : "0",
+          "done" : "7",
           "argOut" : "1"
         },
         "cu": [
@@ -229,7 +229,7 @@
                 }
               ],
               "tokenOutXbar" :{
-                "outSelect" : ["x","x","x","x","x","x","x","8"]
+                "outSelect" : ["x","x","x","x","x","x","x","12"]
               },
               "doneXbar" :{
                 "outSelect" : ["1","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
