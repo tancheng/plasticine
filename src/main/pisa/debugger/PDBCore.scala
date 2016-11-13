@@ -355,7 +355,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     println(s"  TokenIns: $tokenIns")
     println(s"--------------------------------")
   }
-  def showCU(x: Int, y: Int) {
+  def showCU(x: Int, y: Int, options: String*) {
     val cuModule = module.computeUnits(x)(y)
     // Print counters, ALU operands, results
     // Format:
@@ -374,36 +374,55 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     val counterChain = cuModule.counterChain
     for (i <- 0 until counterChain.numCounters) {
       val ctrEn = peek(counterChain.io.control(i).enable)
+      val ctrDone = peek(counterChain.io.control(i).done)
       val ctrVal = peek(counterChain.io.data(i).out)
-      val enStr = if (ctrEn == 1) "(*)" else ""
-      val chainLink = if (i == 0) 0 else counterChain.config.chain(i-1)
+      val enStr = if (ctrEn == 1) "*" else ""
+      val doneStr = if (ctrDone == 1) "*" else ""
+      val chainLink = if (i == 0) 0 else peek(counterChain.config.chain(i-1)).toInt
       val chainLinkStr = if (chainLink == 1) "-" else " "
-      print(s"  $ctrVal $enStr $chainLinkStr")
+      print(s"  $chainLinkStr $ctrVal [$enStr $doneStr]")
     }
     println("")
     println("-- Control")
     print("tokenIns: "); cuModule.io.tokenIns foreach { t => print(peek(t) + " ") }; println("")
     print("tokenOuts: "); cuModule.io.tokenOuts foreach { t => print(peek(t) + " ") }; println("")
     printXbar(cuModule.controlBlock.incXbar, "incXbar")
-    println("----UpDownCtrs")
-    cuModule.controlBlock.udCounters.zipWithIndex.foreach { case (udc, i) =>
-      println(s"----[$i] init: ${peek(udc.io.init)}, inc: ${peek(udc.io.inc)}, dec: ${peek(udc.io.dec)}, gtz: ${peek(udc.io.gtz)}")
+
+    if (options.contains("udc")) {
+      println("----UpDownCtrs")
+      cuModule.controlBlock.udCounters.zipWithIndex.foreach { case (udc, i) =>
+        println(s"----[$i] init: ${peek(udc.io.init)}, inc: ${peek(udc.io.inc)}, dec: ${peek(udc.io.dec)}, gtz: ${peek(udc.io.gtz)}")
+      }
     }
-    printLUT(cuModule.controlBlock.enableLUTs(0))
-//    println("-- Datapath")
-//    for (i <- 0 until cuModule.d) {
-//      println(s"---- Stage $i (${Opcodes.opcodes(peek(cuModule.config.pipeStage(i).opcode).toInt)._1})")
-//      val stageFUs = cuModule.pipeStages(i)
-//      val opAs = stageFUs.map { fu => peek(fu.io.a) }
-//      val opBs = stageFUs.map { fu => peek(fu.io.b) }
-//      val opCs = stageFUs.map { fu => peek(fu.io.c) }
-//      val res = stageFUs.map { fu => peek(fu.io.out) }
-//      println(s"---- opA: $opAs")
-//      println(s"---- opB: $opBs")
-//      println(s"---- opC: $opCs")
-//      println(s"---- res: $res")
-//    }
-    println(s"--------------------------------")
+
+    if (options.contains("elut0")) {
+      printLUT(cuModule.controlBlock.enableLUTs(0))
+    }
+
+    if (options.contains("incXbar")) {
+      printXbar(cuModule.controlBlock.incXbar)
+    }
+
+    if (options.contains("doneXbar")) {
+      printXbar(cuModule.controlBlock.doneXbar)
+    }
+
+    if (options.contains("datapath")) {
+      println("-- Datapath")
+      for (i <- 0 until cuModule.d) {
+        println(s"---- Stage $i (${Opcodes.opcodes(peek(cuModule.config.pipeStage(i).opcode).toInt)._1})")
+        val stageFUs = cuModule.pipeStages(i)
+        val opAs = stageFUs.map { fu => peek(fu.io.a) }
+        val opBs = stageFUs.map { fu => peek(fu.io.b) }
+        val opCs = stageFUs.map { fu => peek(fu.io.c) }
+        val res = stageFUs.map { fu => peek(fu.io.out) }
+        println(s"---- opA: $opAs")
+        println(s"---- opB: $opBs")
+        println(s"---- opC: $opCs")
+        println(s"---- res: $res")
+      }
+      println(s"--------------------------------")
+    }
   }
 }
 
@@ -479,7 +498,7 @@ object PDB extends PDBCore {
   def peek(signal: UInt) = tester.peek(signal)
   def break(signal: UInt) = tester.break(signal)
   def break(signals: Seq[UInt]) = tester.break(signals)
-  def cu(x: Int, y: Int) = tester.showCU(x, y)
+  def cu(x: Int, y: Int, options: String*) = tester.showCU(x, y, options:_*)
   def cs(x: Int, y: Int) = tester.showSwitch(x, y)
   def showTop = tester.showTop
   def watchCU(x: Int, y: Int) = tester.watchCU(x, y)
