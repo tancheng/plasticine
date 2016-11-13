@@ -1,63 +1,135 @@
 [0m[[0minfo[0m] [0mLoading project definition from /local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/project[0m
 [0m[[0minfo[0m] [0mSet current project to plasticine (in build file:/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/)[0m
-[0m[[0minfo[0m] [0mCompiling 1 Scala source to /local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/target/scala-2.11/classes...[0m
-[0m[[33mwarn[0m] [0mthere were 46 feature warnings; re-run with -feature for details[0m
-[0m[[33mwarn[0m] [0mone warning found[0m
-[0m[[0minfo[0m] [0mRunning plasticine.templates.MultiMemoryUnitTest end --targetDir /home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/generated/MultiMemoryUnitTest/ --debug --backend c --genHarness[0m
-CPP elaborate
-[[35minfo[0m] [4.867] // COMPILING < (class plasticine.templates.MultiMemoryUnitTester)>(8)
-[[35minfo[0m] [6.223] giving names
-[[35minfo[0m] [8.766] executing custom transforms
-[[35minfo[0m] [8.768] convert masked writes of inline mems
-[[35minfo[0m] [9.243] adding clocks and resets
-[[35minfo[0m] [9.970] inferring widths
-[[35minfo[0m] [11.186] checking widths
-[[35minfo[0m] [11.519] lowering complex nodes to primitives
-[[35minfo[0m] [11.520] removing type nodes
-[[35minfo[0m] [12.209] compiling 115077 nodes
-[[35minfo[0m] [12.209] computing memory ports
-[[35minfo[0m] [12.653] resolving nodes to the components
-[[35minfo[0m] [15.286] creating clock domains
-[[35minfo[0m] [15.805] pruning unconnected IOs
-[[35minfo[0m] [15.913] checking for combinational loops
-[[35minfo[0m] [16.926] NO COMBINATIONAL LOOP FOUND
-[[35minfo[0m] [17.654] populating clock domains
-CppBackend::elaborate: need 120, redundant 4508 shadow registers
-[[35minfo[0m] [19.315] generating cpp files
-CppBackend: createCppFile MultiMemoryUnitTester.cpp
-[[33mwarn[0m] MultiMemoryUnit.scala:286: 'end' is an unknown argument. in class plasticine.templates.MultiMemoryUnitTest$
-[0m[[32msuccess[0m] [0mTotal time: 32 s, completed Nov 12, 2016 4:08:06 PM[0m
-change init rand
-finished changing init rand
-start adding init declarations for DRAMSimulator outputs
-init-ed
-start modifying line connections going out of DRAMSimulator module
-line connections rerouted
-Extracting function init
-[extractRange] output = init.txt
-Extracting function clock_lo
-[extractRange] output = clock_lo.txt
-Extracting function clock_hi
-[extractRange] output = clock_hi.txt
-Extracting function init_sim_data
-[extractRange] output = init_sim_data.txt
-g++ -g -c -o MultiMemoryUnitTester.o  -I../ -I/csrc/ MultiMemoryUnitTester.cpp
-g++ -g -c -o MultiMemoryUnitTester-emulator.o  -I../ -I/csrc/ MultiMemoryUnitTester-emulator.cpp
-g++ -g -c -o x00clock_hi.o  -I../ -I/csrc/ x00clock_hi.cpp
-g++ -g -c -o x00clock_lo.o  -I../ -I/csrc/ x00clock_lo.cpp
-g++ -g -c -o x00init.o  -I../ -I/csrc/ x00init.cpp
-g++ -g -c -o x00init_sim_data.o  -I../ -I/csrc/ x00init_sim_data.cpp
-g++ -g -c -o x01clock_lo.o  -I../ -I/csrc/ x01clock_lo.cpp
-g++ -g -c -o x01init_sim_data.o  -I../ -I/csrc/ x01init_sim_data.cpp
-g++ -g -c -o x02clock_lo.o  -I../ -I/csrc/ x02clock_lo.cpp
-g++ -g -c -o x02init_sim_data.o  -I../ -I/csrc/ x02init_sim_data.cpp
-g++ -g -c -o x03clock_lo.o  -I../ -I/csrc/ x03clock_lo.cpp
-g++ -g -c -o x03init_sim_data.o  -I../ -I/csrc/ x03init_sim_data.cpp
-g++ -g -c -o x04clock_lo.o  -I../ -I/csrc/ x04clock_lo.cpp
-g++ -g -c -o x05clock_lo.o  -I../ -I/csrc/ x05clock_lo.cpp
-g++ -g -c -o x06clock_lo.o  -I../ -I/csrc/ x06clock_lo.cpp
-g++ -g -c -o x07clock_lo.o  -I../ -I/csrc/ x07clock_lo.cpp
-g++ -g -o MultiMemoryUnitTester MultiMemoryUnitTester.o MultiMemoryUnitTester-emulator.o x00clock_hi.o x00clock_lo.o x00init.o x00init_sim_data.o x01clock_lo.o x01init_sim_data.o x02clock_lo.o x02init_sim_data.o x03clock_lo.o x03init_sim_data.o x04clock_lo.o x05clock_lo.o x06clock_lo.o x07clock_lo.o -I../ -L../ -ldramsim -Wl,-rpath=../
+[0m[[0minfo[0m] [0mCompiling 15 Scala sources to /local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/target/scala-2.11/classes...[0m
+[0m[[33mwarn[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/pisa/parser/JSONParser.scala:32: non-variable type argument Any in type pattern scala.collection.immutable.Map[Any,Any] (the underlying of Map[Any,Any]) is unchecked since it is eliminated by erasure[0m
+[0m[[33mwarn[0m] [0m        case m: Map[Any, Any] => m[0m
+[0m[[33mwarn[0m] [0m                ^[0m
+[0m[[33mwarn[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/pisa/parser/JSONParser.scala:41: non-variable type argument Any in type pattern scala.collection.immutable.Map[Any,Any] (the underlying of Map[Any,Any]) is unchecked since it is eliminated by erasure[0m
+[0m[[33mwarn[0m] [0m      case m: Map[Any, Any] =>[0m
+[0m[[33mwarn[0m] [0m              ^[0m
+[0m[[33mwarn[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/pisa/parser/JSONParser.scala:270: non-variable type argument Any in type pattern scala.collection.immutable.Map[Any,Any] (the underlying of Map[Any,Any]) is unchecked since it is eliminated by erasure[0m
+[0m[[33mwarn[0m] [0m    case m: Map[Any,Any] => m.get("dontCare") match {[0m
+[0m[[33mwarn[0m] [0m            ^[0m
+[0m[[33mwarn[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/pisa/parser/JSONParser.scala:419: non-variable type argument Any in type pattern scala.collection.immutable.Map[Any,Any] (the underlying of Map[Any,Any]) is unchecked since it is eliminated by erasure[0m
+[0m[[33mwarn[0m] [0m        case map: Map[Any,Any] => map[0m
+[0m[[33mwarn[0m] [0m                  ^[0m
+[0m[[33mwarn[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/pisa/parser/JSONParser.scala:420: non-variable type argument Any in type pattern scala.collection.mutable.HashMap[Any,Any] is unchecked since it is eliminated by erasure[0m
+[0m[[33mwarn[0m] [0m        case hmap: HashMap[Any, Any] => hmap.toMap[0m
+[0m[[33mwarn[0m] [0m                   ^[0m
+[0m[[33mwarn[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/pisa/parser/JSONParser.scala:430: non-variable type argument Any in type pattern scala.collection.immutable.Map[Any,Any] (the underlying of Map[Any,Any]) is unchecked since it is eliminated by erasure[0m
+[0m[[33mwarn[0m] [0m        case map: Map[Any,Any] => map[0m
+[0m[[33mwarn[0m] [0m                  ^[0m
+[0m[[33mwarn[0m] [0mthere were 982 feature warnings; re-run with -feature for details[0m
+[0m[[33mwarn[0m] [0m7 warnings found[0m
+[0m[[0minfo[0m] [0mCompiling 18 Scala sources to /local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/target/scala-2.11/classes...[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/arch/PlasticineTop.scala:84: not enough arguments for constructor Plasticine: (w: Int, startDelayWidth: Int, endDelayWidth: Int, d: Int, v: Int, rwStages: Int, numTokens: Int, l: Int, r: Int, m: Int, numScratchpads: Int, numStagesAfterReduction: Int, numMemoryUnits: Int, numRows: Int, numCols: Int, inst: plasticine.pisa.ir.PlasticineConfig)plasticine.templates.Plasticine.[0m
+[0m[[31merror[0m] [0mUnspecified value parameters numCols, inst.[0m
+[0m[[31merror[0m] [0m	val pl = Module(new Plasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst))[0m
+[0m[[31merror[0m] [0m	                ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/arch/PlasticineTop.scala:119: value getReadNoScatterGatherConfig is not a member of object plasticine.pisa.ir.PlasticineConfig[0m
+[0m[[31merror[0m] [0m  val configObj = PlasticineConfig.getReadNoScatterGatherConfig(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)[0m
+[0m[[31merror[0m] [0m                                   ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:26: not enough arguments for constructor MemoryUnit: (w: Int, d: Int, v: Int, numOutstandingBursts: Int, burstSizeBytes: Int, startDelayWidth: Int, endDelayWidth: Int, numCounters: Int, inst: plasticine.pisa.ir.MemoryUnitConfig)plasticine.templates.MemoryUnit.[0m
+[0m[[31merror[0m] [0mUnspecified value parameters endDelayWidth, numCounters, inst.[0m
+[0m[[31merror[0m] [0m      val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, inst))[0m
+[0m[[31merror[0m] [0m                      ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:31: value rdyOut is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m      io.interconnects(i).rdyOut := mu.io.interconnect.rdyOut[0m
+[0m[[31merror[0m] [0m                          ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:32: value vldOut is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m      io.interconnects(i).vldOut := mu.io.interconnect.vldOut[0m
+[0m[[31merror[0m] [0m                          ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:37: value rdata is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m      io.interconnects(i).rdata := mu.io.interconnect.rdata[0m
+[0m[[31merror[0m] [0m                          ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:56: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    sims(id).io.addr := Cat(chnRanksIdBits(id), mus(id).io.dram.addr)[0m
+[0m[[31merror[0m] [0m                                                        ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:57: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    sims(id).io.wdata := mus(id).io.dram.wdata[0m
+[0m[[31merror[0m] [0m                                 ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:58: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    sims(id).io.tagIn := mus(id).io.dram.tagOut[0m
+[0m[[31merror[0m] [0m                                 ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:59: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    sims(id).io.vldIn := mus(id).io.dram.vldOut[0m
+[0m[[31merror[0m] [0m                                 ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:60: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    sims(id).io.isWr := mus(id).io.dram.isWr[0m
+[0m[[31merror[0m] [0m                                ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:62: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    mus(id).io.dram.rdata := sims(id).io.rdata[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:63: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    mus(id).io.dram.vldIn := sims(id).io.vldOut[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:64: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    mus(id).io.dram.tagIn := sims(id).io.tagOut[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:211: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    val dramTagIn = peek(c.mus(chan).io.dram.tagIn).toInt[0m
+[0m[[31merror[0m] [0m                                     ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:212: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    val dramTagOut = peek(c.mus(chan).io.dram.tagOut).toInt[0m
+[0m[[31merror[0m] [0m                                      ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:213: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    val dramVldOut = peek(c.mus(chan).io.dram.vldOut).toInt[0m
+[0m[[31merror[0m] [0m                                      ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:214: value io is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    val dramVldIn = peek(c.mus(chan).io.dram.vldIn).toInt[0m
+[0m[[31merror[0m] [0m                                     ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:215: value vldIn is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m    val interconnectsVldIn = peek(c.io.interconnects(chan0).vldIn).toInt[0m
+[0m[[31merror[0m] [0m                                                            ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:224: value config is not a member of Nothing[0m
+[0m[[31merror[0m] [0m  val writeMode = peek(c.mus(chan0).config.isWr).toInt[0m
+[0m[[31merror[0m] [0m                                    ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:231: value vldIn is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m        poke(c.io.interconnects(chan0).vldIn, 1)[0m
+[0m[[31merror[0m] [0m                                       ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:232: value addr is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m        poke(c.io.interconnects(chan0).addr(0), waddr)[0m
+[0m[[31merror[0m] [0m                                       ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:233: value size is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m        poke(c.io.interconnects(chan0).size, wsize)[0m
+[0m[[31merror[0m] [0m                                       ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:234: value wdata is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m        poke(c.io.interconnects(chan0).wdata, wdata)[0m
+[0m[[31merror[0m] [0m                                       ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:240: value vldIn is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m    poke(c.io.interconnects(chan0).vldIn, 0)[0m
+[0m[[31merror[0m] [0m                                   ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:241: value addr is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m    poke(c.io.interconnects(chan0).addr(0), 0x0000)[0m
+[0m[[31merror[0m] [0m                                   ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:242: value size is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m    poke(c.io.interconnects(chan0).size, 0)[0m
+[0m[[31merror[0m] [0m                                   ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:256: value vldIn is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m        poke(c.io.interconnects(chan0).vldIn, 1)[0m
+[0m[[31merror[0m] [0m                                       ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:257: value addr is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m        poke(c.io.interconnects(chan0).addr(0), raddr)[0m
+[0m[[31merror[0m] [0m                                       ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:258: value size is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m        poke(c.io.interconnects(chan0).size, rsize)[0m
+[0m[[31merror[0m] [0m                                       ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:264: value vldIn is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m    poke(c.io.interconnects(chan0).vldIn, 0)[0m
+[0m[[31merror[0m] [0m                                   ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:265: value addr is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m    poke(c.io.interconnects(chan0).addr(0), 0x0000)[0m
+[0m[[31merror[0m] [0m                                   ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:266: value size is not a member of plasticine.templates.PlasticineMemoryCmdInterface[0m
+[0m[[31merror[0m] [0m    poke(c.io.interconnects(chan0).size, 0)[0m
+[0m[[31merror[0m] [0m                                   ^[0m
+[0m[[31merror[0m] [0m/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/src/main/templates/MultiMemoryUnit.scala:284: not enough arguments for method apply: (scatterGather: Int, isWr: Int, counterChain: plasticine.pisa.ir.CounterChainConfig, control: plasticine.pisa.ir.CUControlBoxConfig)plasticine.pisa.ir.MemoryUnitConfig in object MemoryUnitConfig.[0m
+[0m[[31merror[0m] [0mUnspecified value parameters counterChain, control.[0m
+[0m[[31merror[0m] [0m  val config = MemoryUnitConfig(scatterGather, isWr)[0m
+[0m[[31merror[0m] [0m                               ^[0m
+[0m[[31merror[0m] [0m34 errors found[0m
+[0m[[31merror[0m] [0m(compile:[31mcompileIncremental[0m) Compilation failed[0m
+[0m[[31merror[0m] [0mTotal time: 32 s, completed Nov 12, 2016 6:17:21 PM[0m
 CLASSPATH=../target/scala-2.11/classes:$CLASSPATH sbt "; run-main plasticine.templates.MultiMemoryUnitTest  end  --targetDir /home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/generated/MultiMemoryUnitTest/ --debug --backend c --genHarness"
 Invoking Chisel...
 Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder

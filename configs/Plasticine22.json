@@ -1,0 +1,22 @@
+{
+  "w" : 32,
+  "startDelayWidth" : 4,
+  "endDelayWidth" : 4,
+  "d" : 10,
+  "v" : 16,
+  "l" : 0,
+  "r" : 16,
+  "rwStages" : 3,
+  "numTokens" : 8,
+  "numCounters" : 8,
+  "m" : 512,
+  "numScratchpads" : 4,
+  "numStagesAfterReduction" : 2,
+  "numRows" : 2,
+  "numCols" : 2,
+  "numMemoryUnits" : 2,
+  "burstSizeBytes" : 64,
+  "numOutstandingBursts" : 16,
+  "numTopInputs" : 4
+
+}

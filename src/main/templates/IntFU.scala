@@ -15,28 +15,31 @@ import plasticine.templates.hardfloat._
 object Opcodes {
   // HACK: Duplicated with IntFU. Need to refactor this into
   // a separate Decode table
-  private var _opcodes = List[(String, (UInt, UInt) => UInt)](
-    ("+" , (a,b)    => a+b),
-    ("-" , (a,b)    => a-b),
-    ("*" , (a,b)    => a*b),
-    ("/" , (a,b)    => a*b),  // No divider temporarily
-    ("&" , (a,b)    => a&b),
-    ("|" , (a,b)    => a|b),
-    ("==" , (a,b)   => a===b),
-    (">" , (a,b)   => a>b),
-    ("<" , (a,b)   => a<b),
-    ("<<" , (a,b)   => a<<b),
-    (">>" , (a,b)   => a>>b),
-    ("f<" , (a,b)   => UInt(0)),
-    ("f==" , (a,b)  => UInt(0)),
-    ("f>" , (a,b) => UInt(0)),
-    ("f*" , (a,b) => UInt(0)),
-    ("f+" , (a,b) => UInt(0)),
-    ("passA" , (a,b) => a),
-    ("passB" , (a,b) => b)
+  private var _opcodes = List[(String, (UInt, UInt, UInt) => UInt)](
+    ("+" , (a,b,c)    => a+b),
+    ("-" , (a,b,c)    => a-b),
+    ("*" , (a,b,c)    => a*b),
+    ("/" , (a,b,c)    => a*b),  // No divider temporarily
+    ("&" , (a,b,c)    => a&b),
+    ("|" , (a,b,c)    => a|b),
+    ("==" , (a,b,c)   => a===b),
+    (">" , (a,b,c)   => a>b),
+    ("<" , (a,b,c)   => a<b),
+    ("<<" , (a,b,c)   => a<<b),
+    (">>" , (a,b,c)   => a>>b),
+    ("f<" , (a,b,c)   => UInt(0)),
+    ("f==" , (a,b,c)  => UInt(0)),
+    ("f>" , (a,b,c) => UInt(0)),
+    ("f*" , (a,b,c) => UInt(0)),
+    ("f+" , (a,b,c) => UInt(0)),
+    ("mux" , (a,b,c) => Mux(c(0), a, b)),
+    ("min" , (a,b,c) => Mux(a<b, a, b)),
+    ("max" , (a,b,c) => Mux(a>b, a, b)),
+    ("passA" , (a,b,c) => a),
+    ("passB" , (a,b,c) => b)
   )
   def opcodes = _opcodes
-  def opcodes_=(x: List[(String, (UInt, UInt) => UInt)]) { _opcodes = x }
+  def opcodes_=(x: List[(String, (UInt, UInt, UInt) => UInt)]) { _opcodes = x }
 
   def size = opcodes.size
 
@@ -44,8 +47,8 @@ object Opcodes {
     opcodes.indexWhere (_._1 == op)
   }
 
-  def getOp(i: Int, a: UInt, b: UInt): UInt = {
-    opcodes(i)._2(a, b)
+  def getOp(i: Int, a: UInt, b: UInt, c: UInt = UInt(0)): UInt = {
+    opcodes(i)._2(a, b, c)
   }
 
   def getOpLambda(op: String) = {
@@ -58,6 +61,7 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
   val io = new Bundle {
     val a      = UInt(INPUT,  w)
     val b      = UInt(INPUT,  w)
+    val c      = UInt(INPUT,  w)
     val opcode = UInt(INPUT,  log2Up(Opcodes.opcodes.size))
     val out = UInt(OUTPUT, w)
   }
@@ -85,29 +89,31 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
   val fmaOut = UInt(width=w)
 
   // Populate opcode table
-  Opcodes.opcodes = List[(String, (UInt, UInt) => UInt)](
-    ("+" , (a,b)    => a+b),
-    ("-" , (a,b)    => a-b),
-    ("*" , (a,b)    => a*b),
-    ("/" , (a,b)    => a*b),  // No divider temporarily
-    ("&" , (a,b)    => a&b),
-    ("|" , (a,b)    => a|b),
-    ("==" , (a,b)   => a===b),
-    (">" , (a,b)   => a>b),
-    ("<" , (a,b)   => a<b),
-    ("<<" , (a,b)   => a<<b),
-    (">>" , (a,b)   => a>>b),
-    ("f<" , (a,b)   => fpLt),
-    ("f==" , (a,b)  => fpEq),
-    ("f>" , (a,b) => fpGt),
-    ("f*" , (a,b) => fmaOut),
-    ("f+" , (a,b) => fmaOut),
-    ("passA" , (a,b) => a),
-    ("passB" , (a,b) => b)
+  Opcodes.opcodes = List[(String, (UInt, UInt, UInt) => UInt)](
+    ("+" , (a,b,c)    => a+b),
+    ("-" , (a,b,c)    => a-b),
+    ("*" , (a,b,c)    => a*b),
+    ("/" , (a,b,c)    => a*b),  // No divider temporarily
+    ("&" , (a,b,c)    => a&b),
+    ("|" , (a,b,c)    => a|b),
+    ("==" , (a,b,c)   => a===b),
+    (">" , (a,b,c)   => a>b),
+    ("<" , (a,b,c)   => a<b),
+    ("<<" , (a,b,c)   => a<<b),
+    (">>" , (a,b,c)   => a>>b),
+    ("f<" , (a,b,c)   => fpLt),
+    ("f==" , (a,b,c)  => fpEq),
+    ("f>" , (a,b,c) => fpGt),
+    ("f*" , (a,b,c) => fmaOut),
+    ("f+" , (a,b,c) => fmaOut),
+    ("mux" , (a,b,c) => Mux(c(0), a, b)),
+    ("min" , (a,b,c) => Mux(a<b, a, b)),
+    ("max" , (a,b,c) => Mux(a>b, a, b)),
+    ("passA" , (a,b,c) => a),
+    ("passB" , (a,b,c) => b)
   )
 
   if (useFMA) {
-    println(s"Instantiating FMA")
     val fmulCode = UInt(Opcodes.getCode("f*"))
     val faddCode = UInt(Opcodes.getCode("f+"))
     val fma = Module(new MulAddRecFN(8, 24))
@@ -116,13 +122,12 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
     fma.io.c := recFNFromFN(8, 24, Mux(faddCode === io.opcode, io.b, Flo(1.0f)))
     fmaOut := fNFromRecFN(8, 24, fma.io.out)
   } else {
-    println(s"No FMA")
     fmaOut := UInt(0, width=w)
   }
 
   // Instantiate result mux
   val ins = Vec.tabulate(Opcodes.opcodes.size) { i =>
-    Opcodes.getOp(i, io.a, io.b)
+    Opcodes.getOp(i, io.a, io.b, io.c)
   }
   val m = if (Globals.noModule) new MuxNL(Opcodes.opcodes.size, w) else Module(new MuxN(Opcodes.opcodes.size, w))
   m.io.ins.zip(ins).foreach { case (in, i) =>
@@ -198,6 +203,7 @@ class IntFUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
   val io = new Bundle {
     val a      = UInt(INPUT,  w)
     val b      = UInt(INPUT,  w)
+    val c      = UInt(INPUT,  w)
     val opcode = UInt(INPUT,  log2Up(Opcodes.opcodes.size))
     val out = UInt(OUTPUT, w)
   }
@@ -213,6 +219,11 @@ class IntFUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
   bReg.io.data.in := io.b
   val b = bReg.io.data.out
 
+  val cReg = Module(new FF(w))
+  cReg.io.control.enable := Bool(true)
+  cReg.io.data.in := io.c
+  val c = bReg.io.data.out
+
   val opcodeReg = Module(new FF(log2Up(Opcodes.opcodes.size)))
   opcodeReg.io.control.enable := Bool(true)
   opcodeReg.io.data.in := io.opcode
@@ -222,6 +233,7 @@ class IntFUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
   val fu = Module(new IntFU(w, useFMA, useFPComp))
   fu.io.a := a
   fu.io.b := b
+  fu.io.b := c
   fu.io.opcode := op
 
   // Register the output

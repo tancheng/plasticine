@@ -17,12 +17,16 @@ class RegisterBlock(val w: Int, val l: Int, val r: Int) extends Module {
     val writeSel        = UInt(INPUT, l+r)  // One-hot encoded, else a decoder is needed
     val readLocalASel   = UInt(INPUT, log2Up(l+r))  // Binary encoded
     val readLocalBSel   = UInt(INPUT, log2Up(l+r))  // Binary encoded
+    val readLocalCSel   = UInt(INPUT, log2Up(l+r))  // Binary encoded
     val readRemoteASel  = UInt(INPUT, log2Up(r)) // Binary encoded
     val readRemoteBSel  = UInt(INPUT, log2Up(r)) // Binary encoded
+    val readRemoteCSel  = UInt(INPUT, log2Up(r)) // Binary encoded
     val readLocalA      = UInt(OUTPUT, w)
     val readLocalB      = UInt(OUTPUT, w)
+    val readLocalC      = UInt(OUTPUT, w)
     val readRemoteA     = UInt(OUTPUT, w)
     val readRemoteB     = UInt(OUTPUT, w)
+    val readRemoteC     = UInt(OUTPUT, w)
     val passDataOut     = Vec.fill(r) { UInt(OUTPUT, w) }
   }
 
@@ -56,6 +60,10 @@ class RegisterBlock(val w: Int, val l: Int, val r: Int) extends Module {
   readLocalBMux.io.ins := Vec.tabulate(l+r) { i => regs(i).io.data.out }
   readLocalBMux.io.sel := io.readLocalBSel
   io.readLocalB := readLocalBMux.io.out
+  val readLocalCMux = if (Globals.noModule) new MuxNL(l+r, w) else Module(new MuxN(l+r, w))
+  readLocalBMux.io.ins := Vec.tabulate(l+r) { i => regs(i).io.data.out }
+  readLocalBMux.io.sel := io.readLocalCSel
+  io.readLocalC := readLocalCMux.io.out
 
   // Output assignments: to remote FU
 //  val readRemoteAMux = Module(new MuxN(r, w))
@@ -68,6 +76,10 @@ class RegisterBlock(val w: Int, val l: Int, val r: Int) extends Module {
   readRemoteBMux.io.ins := Vec.tabulate(r) { i => remoteRegs(i).io.data.out }
   readRemoteBMux.io.sel := io.readRemoteBSel
   io.readRemoteB := readRemoteBMux.io.out
+  val readRemoteCMux = if (Globals.noModule) new MuxNL(r, w) else Module(new MuxN(r, w))
+  readRemoteCMux.io.ins := Vec.tabulate(r) { i => remoteRegs(i).io.data.out }
+  readRemoteCMux.io.sel := io.readRemoteCSel
+  io.readRemoteC := readRemoteCMux.io.out
 
   // Output assignments: passthrough
   (0 until r) foreach { i =>

@@ -8,15 +8,20 @@ ifndef TOP_MODULE
 $(error TOP_MODULE is not set)
 endif
 
-all: pnr
+all: synth pnr
 
-pnr: synth
+pnr:
 	@echo "Running IC Compiler"
 	icc_shell -f scripts/icc.tcl | tee icc.log
 
 synth: $(PARAM_FILE)
 	@echo "Running Design Compiler"
 	dc_shell-t -f scripts/dc.tcl | tee dc.log
+
+synth-fast: $(PARAM_FILE)
+	@echo "Running Design Compiler (noautoungroup)"
+	dc_shell-t -f scripts/dc_noungroup.tcl | tee dc_noungroup.log
+
 
 $(PARAM_FILE):
 	bash scripts/genParam.sh $(PWD) $(TOP_MODULE)

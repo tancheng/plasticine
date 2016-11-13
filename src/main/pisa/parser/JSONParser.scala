@@ -21,6 +21,21 @@ object Parser {
     }
   }
 
+  def parseRaw(path: String) = {
+    val file = new File(path)
+    assert(file.isFile, path+ " does not exist")
+    val contents = scala.io.Source.fromFile(file).mkString
+    import JSON._
+
+    phrase(root)(new lexical.Scanner(contents)) match {
+      case Success(result,_) => resolveType(result) match {
+        case m: Map[Any, Any] => m
+        case _ => throw new RuntimeException(s"Couldn't parse PISA file: $path")
+      }
+      case f@NoSuccess(_,_) => throw new RuntimeException("Couldn't parse PISA file:\n" + f.toString)
+    }
+  }
+
   def buildFromParsedJSON(json: Any) = {
     json match {
       case m: Map[Any, Any] =>
@@ -107,13 +122,19 @@ object Parser {
   def parseLUT(m: Map[Any, Any]): LUTConfig = isDontCare(m) match {
     case true => LUTConfig.zeroes(10) // Some random hardcoded number
     case false =>
-      val table: List[Int] = Parser.getFieldList(m, "table")
-                                          .asInstanceOf[List[String]]
-                                          .map { s => if (isDontCare(s)) 0 else parseValue(s) }
-      LUTConfig(table)
+      val values = Parser.getFieldList(m, "table")
+      isDontCare(values) match {
+        case true => LUTConfig.zeroes(10) // Some random hardcoded number
+        case false =>
+          val table: List[Int] = values.asInstanceOf[List[String]]
+                                       .map { s => if (isDontCare(s)) 0 else parseValue(s) }
+          LUTConfig(table)
+
+      }
   }
 
   def parseOperandConfig(s: String): OperandConfig = {
+
     // (0..rwStages-1)
     // x l r c i m e
     // (rwStages)
@@ -122,7 +143,6 @@ object Parser {
     // x l r c
     // (reduction stages)
     // x l r c t
-
     def getDataSrc = s(0) match {
       case 'x' => 0 // Don't care (must eventually be turned off)
       case 'l' => 0 // Local register
@@ -142,6 +162,7 @@ object Parser {
   def parsePipeStage(m: Map[Any, Any]): PipeStageConfig = {
     val opA = parseOperandConfig(Parser.getFieldString(m, "opA"))
     val opB = parseOperandConfig(Parser.getFieldString(m, "opB"))
+    val opC = parseOperandConfig(Parser.getFieldString(m, "opC"))
     val opcode = {
       val o = Parser.getFieldString(m, "opcode")
       if (o == "x") 0 else Opcodes.getCode(o)
@@ -168,7 +189,7 @@ object Parser {
       }
       t.toMap
     }
-    PipeStageConfig(opA, opB, opcode, result, fwd)
+    PipeStageConfig(opA, opB, opC, opcode, result, fwd)
   }
 
   def parseCU(m: Map[Any, Any]): ComputeUnitConfig = isDontCare(m) match {
@@ -219,7 +240,7 @@ object Parser {
     val syncTokenMux: List[Int] = Parser.getFieldListOfMaps(m, "tokenDownLUT")
       .map { tokenDownMap => isDontCare(tokenDownMap) match {
           case true => parseValue("x")
-          case false => parseValue(Parser.getFieldString(tokenDownMap, "mux"))
+          case false => parseValue(Parser.getFieldString(tokenDownMap, "syncTokenMux"))
         }
       }
     val tokenOutXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenOutXbar"), true)
@@ -298,10 +319,10 @@ object Parser {
     case true =>
       TopUnitConfig.zeroes(10) // Some random number
     case false =>
-      val doneConnBox = ConnBoxConfig(Parser.getFieldInt(m, "doneConnBox"))
-      val dataVldConnBox = ConnBoxConfig(Parser.getFieldInt(m, "dataVldConnBox"))
-      val argOutConnBox = ConnBoxConfig(Parser.getFieldInt(m, "argOutConnBox"))
-      TopUnitConfig(doneConnBox, dataVldConnBox, argOutConnBox)
+      val doneConnBox = ConnBoxConfig(Parser.getFieldInt(m, "done"))
+//      val dataVldConnBox = ConnBoxConfig(Parser.getFieldInt(m, "dataVldConnBox"))
+      val argOutConnBox = ConnBoxConfig(Parser.getFieldInt(m, "argOut"))
+      TopUnitConfig(doneConnBox, argOutConnBox)
   }
 
   def parseMemoryUnit(m: Map[Any, Any]): MemoryUnitConfig = isDontCare(m) match {
@@ -310,7 +331,9 @@ object Parser {
     case false =>
       val scatterGather = parseValue(Parser.getFieldString(m, "scatteGather"))
       val isWr = parseValue(Parser.getFieldString(m, "isWr"))
-      MemoryUnitConfig(scatterGather, isWr)
+      val counterChain = parseCounterChain(Parser.getFieldMap(m, "counterChain"))
+      val control = parseControlBox(Parser.getFieldMap(m, "control"))
+      MemoryUnitConfig(scatterGather, isWr, counterChain, control)
   }
 
   def parsePlasticine(m: Map[Any, Any]): PlasticineConfig = {
@@ -320,7 +343,7 @@ object Parser {
                                           .map { parseCrossbar(_) }
 
     val controlSwitch: List[CrossbarConfig] = Parser.getFieldListOfMaps(m, "controlSwitch")
-                                          .map { parseCrossbar(_) }
+      .map { cm => if (isDontCare(cm)) CrossbarConfig.zeroes(100) else parseCrossbar(cm) }
 
     val mu: List[MemoryUnitConfig] = Parser.getFieldListOfMaps(m, "mu")
                                     .map { parseMemoryUnit(_) }

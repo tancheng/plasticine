@@ -61,9 +61,9 @@ class TopUnit(val w: Int, val v: Int, val numInputs: Int, val inst: TopUnitConfi
   doneConnBox.io.ins := io.ctrlIns
   val doneTokenIn = doneConnBox.io.out(0) // Conn box assumes vector input/output ports
 
-  val dataVldConnBox = Module(new ConnBox(numInputs, 1, 1, inst.dataVldConnBox))
-  dataVldConnBox.io.ins := io.ctrlIns
-  val dataVld = dataVldConnBox.io.out(0) // Conn box assumes vector input/output ports
+//  val dataVldConnBox = Module(new ConnBox(numInputs, 1, 1, inst.dataVldConnBox))
+//  dataVldConnBox.io.ins := io.ctrlIns
+  val dataVld = doneTokenIn // Conn box assumes vector input/output ports
 
   val depulser = Module(new Depulser())
   depulser.io.in := Bool(doneTokenIn)
@@ -175,7 +175,7 @@ class TopUnitTests(c: TopUnit) extends Tester(c) {
   // Write from data bus
   val newWriteVals = List.tabulate(c.v) { i => 0xF00D + i }
   c.io.ins(0).zip(newWriteVals).foreach { case (in, i) => poke(in, i) }
-  pulseSignal(c.io.ctrlIns(c.inst.dataVldConnBox.sel))
+  pulseSignal(c.io.ctrlIns(c.inst.doneConnBox.sel))
   // Test output data bus
   for (i <- 0 until c.v) {
     val observed = peek(c.io.out(i)).toInt

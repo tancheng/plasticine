@@ -8,6 +8,8 @@ import plasticine.pisa.ir._
 
 class DRAMCmdIn(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPUT) {
   val addr = UInt(INPUT, width=w)
+  val wdata = Vec.fill(v) { UInt(OUTPUT, width=w) } // v
+  val rdata = Vec.fill(v) { UInt(INPUT, width=w) } // v
   val tagIn = UInt(INPUT, width=w)
   val isWr = Bool(INPUT)
   val tagOut = UInt(OUTPUT, width=w)

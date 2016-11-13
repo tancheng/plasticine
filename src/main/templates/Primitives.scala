@@ -2,20 +2,22 @@ package plasticine.templates
 
 import Chisel._
 
-class IntPrimitiveModule(val w: Int, op: (UInt, UInt) => UInt) extends Module {
+class IntPrimitiveModule(val w: Int, op: (UInt, UInt, UInt) => UInt) extends Module {
   val io = new Bundle {
     val a = UInt(INPUT, w)
     val b = UInt(INPUT, w)
+    val c = UInt(INPUT, w)
     val out = UInt(OUTPUT, w)
   }
 
-  io.out := op(io.a, io.b)
+  io.out := op(io.a, io.b, io.c)
 }
 
-class IntPrimitiveReg(val w: Int, op: (UInt, UInt) => UInt) extends Module {
+class IntPrimitiveReg(val w: Int, op: (UInt, UInt, UInt) => UInt) extends Module {
   val io = new Bundle {
     val a = UInt(INPUT, w)
     val b = UInt(INPUT, w)
+    val c = UInt(INPUT, w)
     val out = UInt(OUTPUT, w)
   }
 
@@ -30,9 +32,16 @@ class IntPrimitiveReg(val w: Int, op: (UInt, UInt) => UInt) extends Module {
   bReg.io.data.in := io.b
   val b = bReg.io.data.out
 
+  val cReg = Module(new FF(w))
+  cReg.io.control.enable := Bool(true)
+  cReg.io.data.in := io.b
+  val c = cReg.io.data.out
+
+
   val fu = Module(new IntPrimitiveModule(w, op))
   fu.io.a := a
   fu.io.b := b
+  fu.io.c := c
 
   // Register the output
   val outReg = Module(new FF(w))

@@ -3,6 +3,7 @@ package plasticine.pisa.ir
 import java.io.File
 import _root_.scala.util.parsing.json.JSON
 import scala.collection.immutable.Map
+import plasticine.ArchConfig
 import plasticine.pisa.parser._
 import plasticine.templates.Opcodes
 import scala.collection.mutable.HashMap
@@ -91,6 +92,7 @@ object OperandConfig {
 case class PipeStageConfig(
   opA: OperandConfig = OperandConfig(),
   opB: OperandConfig = OperandConfig(),
+  opC: OperandConfig = OperandConfig(),
   opcode: Int = 0,
   result: Int = 0,
   fwd: Map[Int, Int] = Map[Int, Int]()
@@ -98,6 +100,7 @@ case class PipeStageConfig(
 object PipeStageConfig {
   def getRandom = {
     new PipeStageConfig(
+        OperandConfig.getRandom,
         OperandConfig.getRandom,
         OperandConfig.getRandom,
         math.abs(Random.nextInt) % Opcodes.size,
@@ -149,14 +152,20 @@ case class FIFOConfig (
 
 case class MemoryUnitConfig (
   scatterGather: Int = 0,
-  isWr: Int = 0
+  isWr: Int = 0,
+  counterChain: CounterChainConfig,
+  control: CUControlBoxConfig
 ) extends AbstractConfig
 object MemoryUnitConfig {
   def getRandom = {
-    MemoryUnitConfig(0, 0)
+    MemoryUnitConfig(0, 0, CounterChainConfig.getRandom(ArchConfig.numCounters),
+      CUControlBoxConfig.getRandom(ArchConfig.numTokens, ArchConfig.numTokens, ArchConfig.numCounters)
+      )
   }
   def zeroes = {
-    new MemoryUnitConfig()
+    new MemoryUnitConfig(0, 0, CounterChainConfig.zeroes(ArchConfig.numCounters),
+      CUControlBoxConfig.zeroes(ArchConfig.numTokens, ArchConfig.numTokens, ArchConfig.numCounters)
+      )
   }
 }
 case class ComputeUnitConfig(
@@ -204,31 +213,31 @@ case class CUControlBoxConfig(
 object CUControlBoxConfig {
   def getRandom(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
     new CUControlBoxConfig(
-        List.fill(numTokenOut-1) { LUTConfig.getRandom(2) }, // tokenOutLUT
+        List.fill(numTokenOut) { LUTConfig.getRandom(2) }, // tokenOutLUT
         List.fill(numCounters) { LUTConfig.getRandom(numCounters)}, // enableLUT
-        List.fill(2) { LUTConfig.getRandom(numCounters+1) }, // tokenDownLUT,
+        List.fill(8) { LUTConfig.getRandom(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
         CrossbarConfig.getRandom(numCounters), // decXbar,
         CrossbarConfig.getRandom(2*numCounters), // incXbar,
         CrossbarConfig.getRandom(numCounters), // tokenInXbar,
         CrossbarConfig.getRandom(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
-        List.fill(2) { math.abs(Random.nextInt) % 2 }, // syncTokenMux
+        List.fill(8) { math.abs(Random.nextInt) % 2 }, // syncTokenMux
         CrossbarConfig.getRandom(numCounters) // tokenOutXbar,
       )
   }
   def zeroes(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
     new CUControlBoxConfig(
-        List.fill(numTokenOut-1) { LUTConfig.zeroes(2) }, // tokenOutLUT
+        List.fill(numTokenOut) { LUTConfig.zeroes(2) }, // tokenOutLUT
         List.fill(numCounters) { LUTConfig.zeroes(numCounters)}, // enableLUT
-        List.fill(2) { LUTConfig.zeroes(numCounters+1) }, // tokenDownLUT,
+        List.fill(8) { LUTConfig.zeroes(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
         CrossbarConfig.zeroes(numCounters), // decXbar,
         CrossbarConfig.zeroes(2*numCounters), // incXbar,
         CrossbarConfig.zeroes(numCounters), // tokenInXbar,
         CrossbarConfig.zeroes(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
-        List.fill(2) { 0 }, // syncTokenMux
+        List.fill(8) { 0 }, // syncTokenMux
         CrossbarConfig.zeroes(numCounters) // tokenOutXbar,
       )
   }
@@ -280,21 +289,21 @@ object ConnBoxConfig {
  */
 case class TopUnitConfig(
   doneConnBox: ConnBoxConfig,
-  dataVldConnBox: ConnBoxConfig,
+//  dataVldConnBox: ConnBoxConfig,
   argOutConnBox: ConnBoxConfig
 ) extends AbstractConfig
 object TopUnitConfig {
   def getRandom(numInputs: Int) = {
     new TopUnitConfig(
       ConnBoxConfig.getRandom(numInputs),
-      ConnBoxConfig.getRandom(numInputs),
+//      ConnBoxConfig.getRandom(numInputs),
       ConnBoxConfig.getRandom(numInputs)
       )
   }
   def zeroes(numInputs: Int) = {
     new TopUnitConfig(
       ConnBoxConfig.zeroes(numInputs),
-      ConnBoxConfig.zeroes(numInputs),
+//      ConnBoxConfig.zeroes(numInputs),
       ConnBoxConfig.zeroes(numInputs)
       )
   }
@@ -331,42 +340,6 @@ object PlasticineConfig {
       TopUnitConfig.getRandom(8))
       }
 
-  def getReadNoScatterGatherConfig(
-    d: Int,
-    rows: Int,
-    cols: Int,
-    numTokenIn: Int,
-    numTokenOut: Int,
-    numCounters: Int,
-    numScratchpads: Int,
-    numMemoryUnits: Int
-  ) = {
-    new PlasticineConfig(
-      List.tabulate(rows*cols) { i => ComputeUnitConfig.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
-      List.tabulate(numMemoryUnits) { i => MemoryUnitConfig(0,0) },
-      TopUnitConfig.getRandom(8))
-      }
-
-  def getWriteNoScatterGatherConfig(
-    d: Int,
-    rows: Int,
-    cols: Int,
-    numTokenIn: Int,
-    numTokenOut: Int,
-    numCounters: Int,
-    numScratchpads: Int,
-    numMemoryUnits: Int
-  ) = {
-    new PlasticineConfig(
-      List.tabulate(rows*cols) { i => ComputeUnitConfig.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
-      List.tabulate(numMemoryUnits) { i => MemoryUnitConfig(0,1) },
-      TopUnitConfig.getRandom(8))
-      }
-
   def zeroes(
     d: Int,
     rows: Int,
@@ -379,8 +352,8 @@ object PlasticineConfig {
   ) = {
     new PlasticineConfig(
       List.tabulate(rows*cols) { i => ComputeUnitConfig.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(8) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(8) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(100) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(100) },
       List.tabulate(numMemoryUnits) { i => MemoryUnitConfig.zeroes },
       TopUnitConfig.zeroes(8))
       }

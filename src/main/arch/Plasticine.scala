@@ -1,6 +1,8 @@
 package plasticine.templates
 
 import Chisel._
+
+import plasticine.ArchConfig
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 
@@ -164,11 +166,11 @@ trait InterconnectHelper extends DirectionOps {
     d match {
         case W() => iodir match {
           case INPUT => if (isMUSwitch(x, y) & (x == 0)) 1 else defaultNumLinks
-          case OUTPUT => if (isMUSwitch(x, y) & (x == 0)) 3 else defaultNumLinks
+          case OUTPUT => if (isMUSwitch(x, y) & (x == 0)) 4 else defaultNumLinks
         }
         case E() => iodir match {
           case INPUT => if (isMUSwitch(x, y) & (x == cols)) 1 else defaultNumLinks
-          case OUTPUT => if (isMUSwitch(x, y) & (x == cols)) 3 else defaultNumLinks
+          case OUTPUT => if (isMUSwitch(x, y) & (x == cols)) 4 else defaultNumLinks
         }
         case _ => defaultNumLinks
     }
@@ -327,16 +329,19 @@ trait InterconnectHelper extends DirectionOps {
       val westOutputs = getIdxs(switchx, switchy, W(), OUTPUT).map { switches(switchx)(switchy).io.outs(_) }
       val westInputs = getIdxs(switchx, switchy, W(), INPUT).map { switches(switchx)(switchy).io.ins(_) }
       val addr = westOutputs(0)
-      val size = westOutputs(1)
-      val wdata = westOutputs(2)
+      val size = addr(1) // Size is the second word in addr bus
+      val wdata = westOutputs(1)
       val rdata = westInputs(0)
 
-      rdata := mus(i).io.interconnect.rdata
-      mus(i).io.interconnect.wdata := wdata
-      mus(i).io.interconnect.addr :=  addr
-      mus(i).io.interconnect.size :=  size(0)  // Size is a scalar
+      rdata := mus(i).rdata
+      mus(i).wdata := wdata
+      mus(i).addr :=  addr
+      mus(i).size :=  size
+      mus(i).io.interconnect.dataIns(2) := westOutputs(2)
+      mus(i).io.interconnect.dataIns(3) := westOutputs(3)
 
       dot.println(s"m${i} -> s${0}${i}")
+      dot.println(s"s${0}${i} -> m${i}")
       dot.println(s"s${0}${i} -> m${i}")
       dot.println(s"s${0}${i} -> m${i}")
       dot.println(s"s${0}${i} -> m${i}")
@@ -430,9 +435,22 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
   }
 
   override def getNumLinks(x: Int, y: Int, d: Direction, iodir: IODirection) = {
+    val interSwitchLinks = 4
     d match {
-        case W() => if (isMUSwitch(x, y) & (x == 0)) 3 else defaultNumLinks
-        case E() => if (isMUSwitch(x, y) & (x == cols)) 3 else defaultNumLinks
+        case N() => interSwitchLinks
+        case S() => interSwitchLinks
+        case W() => if (isMUSwitch(x, y)) { iodir match {
+            case OUTPUT => 8
+            case INPUT => 9
+            case _ => throw new Exception(s"Unknown direction $iodir")
+          }
+        } else interSwitchLinks
+        case E() => if (isMUSwitch(x, y)) { iodir match {
+            case OUTPUT => 8
+            case INPUT => 9
+            case _ => throw new Exception(s"Unknown direction $iodir")
+          }
+        } else interSwitchLinks
         case _ => defaultNumLinks
     }
   }
@@ -485,26 +503,32 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
       val switchy = i
       val westOutputs = getIdxs(switchx, switchy, W(), OUTPUT).map { switches(switchx)(switchy).io.outs(_)(0) }
       val westInputs = getIdxs(switchx, switchy, W(), INPUT).map { switches(switchx)(switchy).io.ins(_)(0) }
-      val rdyIn = westOutputs(0)
-      val vldIn = westOutputs(1)
-      val dataVldIn = westOutputs(2)
+//      val rdyIn = westOutputs(0)
+      val vldIn = westOutputs(0)
+      val dataVldIn = westOutputs(1)
+      val tokenIns = westOutputs.drop(2)
+
       val rdyOut = westInputs(0)
       val dataRdyOut = westInputs(1)
       val vldOut = westInputs(2)
+      val tokenOuts = westInputs.drop(3)
 
-      mus(i).io.interconnect.rdyIn := rdyIn
-      mus(i).io.interconnect.vldIn := vldIn
-      mus(i).io.interconnect.dataVldIn := dataVldIn
+//      mus(i).rdyIn := rdyIn
+      mus(i).vldIn := vldIn
+      mus(i).dataVldIn := dataVldIn
+      mus(i).tokenIns.zip(tokenIns) foreach { case (in, i) => in := i }
       dot.println(s"s${switchx}${switchy} -> m${i}")
       dot.println(s"s${switchx}${switchy} -> m${i}")
-      dot.println(s"s${switchx}${switchy} -> m${i}")
+      for (link <- 0 until mus(i).tokenIns.size) { dot.println(s"s${switchx}${switchy} -> m${i}") }
 
-      rdyOut := mus(i).io.interconnect.rdyOut
-      dataRdyOut := mus(i).io.interconnect.dataRdyOut
-      vldOut := mus(i).io.interconnect.vldOut
+      rdyOut := mus(i).rdyOut
+      dataRdyOut := mus(i).dataRdyOut
+      vldOut := mus(i).vldOut
+      tokenOuts.zip(mus(i).tokenOuts)foreach { case (out, o) => out := o }
       dot.println(s"m${i} -> s${switchx}${switchy}")
       dot.println(s"m${i} -> s${switchx}${switchy}")
       dot.println(s"m${i} -> s${switchx}${switchy}")
+      for (link <- 0 until mus(i).tokenOuts.size) { dot.println(s"m${i} -> s${switchx}${switchy}") }
     }
   }
 
@@ -578,20 +602,8 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
   }
 }
 
-/**
- * Plasticine Top
- * @param w: Word width
- * @param startDelayWidth: Start delay width
- * @param endDelayWidth: End delay width
- * @param d: Pipeline depth
- * @param v: Vector length
- * @param rwStages: Read-write stages (at the beginning)
- * @param numTokens: Number of input (and output) tokens
- * @param l: Number of local pipeline registers
- * @param r: Number of remote pipeline registers
- * @param m: Scratchpad size in words
- */
-class Plasticine(val w: Int,
+
+class AbstractPlasticine(val w: Int,
   val startDelayWidth: Int,
   val endDelayWidth: Int,
   val d: Int,
@@ -603,11 +615,8 @@ class Plasticine(val w: Int,
   val numScratchpads: Int,
   val numStagesAfterReduction: Int,
   val numMemoryUnits: Int,
-  inst: PlasticineConfig) extends Module with DirectionOps {
-
-  val numRows = 4
-  val numCols = 4
-  val burstSizeBytes = 64
+  inst: PlasticineConfig)
+extends Module {
 
   val io = new ConfigInterface {
     /* Configuration interface */
@@ -624,10 +633,69 @@ class Plasticine(val w: Int,
     val dramChannel = Vec.fill(numMemoryUnits) { new DRAMCmdInterface(w, v) }
   }
 
+
+
+}
+
+
+class PlasticineSim(override val w: Int,
+  override val startDelayWidth: Int,
+  override val endDelayWidth: Int,
+  override val d: Int,
+  override val v: Int, rwStages: Int,
+  override val numTokens: Int,
+  override val l: Int,
+  override val r: Int,
+  override val m: Int,
+  override val numScratchpads: Int,
+  override val numStagesAfterReduction: Int,
+  override val numMemoryUnits: Int,
+  inst: PlasticineConfig)
+extends AbstractPlasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst) {
+
+  // Empty module
+  this.name = "Plasticine"
+}
+
+/**
+ * Plasticine Top
+ * @param w: Word width
+ * @param startDelayWidth: Start delay width
+ * @param endDelayWidth: End delay width
+ * @param d: Pipeline depth
+ * @param v: Vector length
+ * @param rwStages: Read-write stages (at the beginning)
+ * @param numTokens: Number of input (and output) tokens
+ * @param l: Number of local pipeline registers
+ * @param r: Number of remote pipeline registers
+ * @param m: Scratchpad size in words
+ */
+class Plasticine(override val w: Int,
+  override val startDelayWidth: Int,
+  override val endDelayWidth: Int,
+  override val d: Int,
+  override val v: Int, rwStages: Int,
+  override val numTokens: Int,
+  override val l: Int,
+  override val r: Int,
+  override val m: Int,
+  override val numScratchpads: Int,
+  override val numStagesAfterReduction: Int,
+  override val numMemoryUnits: Int,
+  val numRows: Int,
+  val numCols: Int,
+  inst: PlasticineConfig) extends AbstractPlasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst)
+with DirectionOps {
+
+//  val numRows = 2
+//  val numCols = 2
+  val burstSizeBytes = 64
+
   val numOutstandingBursts = 16
   def genMemoryUnits = {
+    val numMUCounters = 6
     List.tabulate(numMemoryUnits) { i =>
-      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, burstSizeBytes, inst.mu(i)))
+      val mu = Module(new MemoryUnit(w, m, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numMUCounters, inst.mu(i)))
       mu.io.config_enable := io.config_enable
       mu.io.config_data := io.config_data
 
@@ -671,6 +739,7 @@ class Plasticine(val w: Int,
 
   val computeUnits = genDataArray(inst.cu)
 
+  println("-- Generating Data Interconnect --")
   val dataInterconnect = new InterconnectHelper {
     val rows = numRows
     val cols = numCols
@@ -683,7 +752,9 @@ class Plasticine(val w: Int,
     val switches = genSwitchArray(w, v, inst.dataSwitch)
   }
   dataInterconnect.connectAll
+  val dataSwitch = dataInterconnect.switches
 
+  println("-- Generating Control Interconnect --")
   val ctrlInterconnect = new CtrlInterconnectHelper {
     val rows = numRows
     val cols = numCols
@@ -696,12 +767,13 @@ class Plasticine(val w: Int,
     val switches = genSwitchArray(1, 1, inst.controlSwitch)
   }
   ctrlInterconnect.connectAll
+  val controlSwitch = ctrlInterconnect.switches
 }
 
 /**
  * ComputeUnit test harness
  */
-class PlasticineTests(c: Plasticine) extends PlasticineTester(c) {
+class PlasticineTests(c: AbstractPlasticine) extends PlasticineTester(c) {
   var numCycles = 0
 
   val a = Array.tabulate(c.m) { i => i }
@@ -721,36 +793,54 @@ class PlasticineTests(c: Plasticine) extends PlasticineTester(c) {
 
 
 object PlasticineTest {
+
   def main(args: Array[String]): Unit = {
 
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-//    if (appArgs.size != 1) {
-//      println("Usage: bin/sadl PlasticineTest <pisa config>")
-//      sys.exit(-1)
-//    }
-//
-//    val pisaFile = appArgs(0)
-//    val configObj = Parser(pisaFile).asInstanceOf[PlasticineConfig]
-
-    val bitwidth = 32
-    val startDelayWidth = 4
-    val endDelayWidth = 4
-    val d = 10
-    val v = 16
-    val l = 0
-    val r = 16
-    val rwStages = 3
-    val numTokens = 8
-    val m = 64
-    val numScratchpads = 4
-    val numStagesAfterReduction = 2
-    val rows = 4
-    val cols = 4
-    val numMemoryUnits = 4
-    val configObj = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
-    chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, configObj))) {
-      c => new PlasticineTests(c)
+    if (appArgs.size != 2) {
+      println("Usage: bin/sadl PlasticineTest <spade config> <pisa config>")
+      sys.exit(-1)
     }
+
+    val spadeFile = appArgs(0)
+    val pisaFile = appArgs(1)
+
+    ArchConfig.setConfig(spadeFile)
+    val config =  PlasticineConfig.zeroes(
+        ArchConfig.d,
+        ArchConfig.numRows,
+        ArchConfig.numCols,
+        ArchConfig.numTokens,
+        ArchConfig.numTokens,
+        ArchConfig.numTokens,
+        ArchConfig.numScratchpads,
+        ArchConfig.numMemoryUnits
+      ) // Parser(pisaFile).asInstanceOf[PlasticineConfig]
+//    val config = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
+
+    val bitwidth = ArchConfig.w
+    val startDelayWidth = ArchConfig.startDelayWidth
+    val endDelayWidth = ArchConfig.endDelayWidth
+    val d = ArchConfig.d
+    val v = ArchConfig.v
+    val l = ArchConfig.l
+    val r = ArchConfig.r
+    val rwStages = ArchConfig.rwStages
+    val numTokens = ArchConfig.numTokens
+    val m = ArchConfig.m
+    val numScratchpads = ArchConfig.numScratchpads
+    val numStagesAfterReduction = ArchConfig.numStagesAfterReduction
+    val numRows = ArchConfig.numRows
+    val numCols = ArchConfig.numCols
+    val numMemoryUnits = ArchConfig.numMemoryUnits
+
+
+
+
+      chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, config)).asInstanceOf[AbstractPlasticine]) {
+        c => new PlasticineTests(c)
+      }
+
   }
 }

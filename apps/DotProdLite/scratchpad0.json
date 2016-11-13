@@ -1,0 +1,19 @@
+{
+  "PISA" :{
+    "version" : 0.1,
+    "topconfig" :{
+      "type" : "scratchpad",
+      "config" :
+              {
+                "ra" : "i0",
+                "wa" : "i0",
+                "wd" : "local",
+                "wen" : "i0",
+                "banking" : "b1",
+                "numBufs" : 1,
+                "rswap" : "x",
+                "wswap" : "x"
+              }
+      }
+    }
+}
