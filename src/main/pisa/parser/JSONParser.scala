@@ -367,11 +367,11 @@ object Parser {
     def parseSwitches(ml: List[Map[Any, Any]], helper: InterconnectHelper) = {
       List.tabulate(helper.rows+1) { y =>
         List.tabulate (helper.cols+1) { x =>
-          val map = ml(y*helper.cols + x)
+          val map = ml(y*(helper.cols+1) + x)
           val outSelectRaw = Parser.getFieldList(map, "outSelect")
                                         .asInstanceOf[List[String]]
           val outSelect = outSelectRaw.map { str =>
-          println(s"[parseSwitches $x $y] $str")
+//          println(s"[parseSwitches $x $y] $str")
             val split = if (str == "x") Array("x","0") else str.split("_")
             val (dir, offset) = (split(0), split(1))
             val directionOp = dir match {
@@ -404,18 +404,21 @@ object Parser {
             }
             idx
           }
+          println(s"[parseSwitch $x $y] outSelectRaw = $outSelectRaw, outSelect = $outSelect")
           CrossbarConfig(outSelect)
         }
       }.flatten
     }
 
-    println(s"[parsePlasticine] Parsing controlSwitch")
-    val controlSwitch: List[CrossbarConfig] = parseSwitches(Parser.getFieldListOfMaps(m, "controlSwitch"),
-                                                  ctrlNetwork)
-
     println(s"[parsePlasticine] Parsing dataSwitch")
     val dataSwitch: List[CrossbarConfig] = parseSwitches(Parser.getFieldListOfMaps(m, "dataSwitch"),
                                                   dataNetwork)
+    sys.exit(0)
+
+
+    println(s"[parsePlasticine] Parsing controlSwitch")
+    val controlSwitch: List[CrossbarConfig] = parseSwitches(Parser.getFieldListOfMaps(m, "controlSwitch"),
+                                                  ctrlNetwork)
 
 
     val mu: List[MemoryUnitConfig] = Parser.getFieldListOfMaps(m, "mu")
