@@ -353,6 +353,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     val tokenOut = peek(top.io.startTokenOut).toInt
     println(s"  TokenOut: $tokenOut")
     println(s"  TokenIns: $tokenIns")
+    println(s"  Done token in: ${peek(top.doneConnBox.config.sel).toInt}")
     println(s"--------------------------------")
   }
   def showCU(x: Int, y: Int, options: String*) {

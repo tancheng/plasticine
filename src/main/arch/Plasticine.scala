@@ -746,7 +746,7 @@ with DirectionOps {
 
   val memoryUnits = genMemoryUnits
 
-  val top = Module(new TopUnit(w, v, (numCols+1) * 2, inst.top))
+  val top = Module(new TopUnit(w, v, (numCols+1) * 8, inst.top))
   top.io.config_enable := io.config_enable
   top.io.config_data := io.config_data
   top.io.addr := io.addr
