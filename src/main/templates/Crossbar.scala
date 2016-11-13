@@ -11,6 +11,8 @@ import plasticine.Globals
  */
 case class CrossbarOpcode(val w: Int, val numInputs: Int, val numOutputs: Int, config: Option[CrossbarConfig] = None) extends OpcodeT {
   var outSelect = if (config.isDefined) {
+    println(s"[CrossbarOpcode $numInputs x $numOutputs], config.size = ${config.get.outSelect.size}, config = ${config.get}")
+    if (config.get.outSelect.contains(32)) Predef.assert(false)
     Vec.tabulate(numOutputs) { i => UInt(config.get.outSelect(i), width=log2Up(numInputs)) }
   } else {
     Vec.fill(numOutputs) { UInt(width=log2Up(numInputs)) }

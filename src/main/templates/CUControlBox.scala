@@ -70,7 +70,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   val doneXbar = Module(new Crossbar(1, numTokens, 2*numTokens, inst.doneXbar))
   doneXbar.io.config_enable := io.config_enable
   doneXbar.io.config_data := io.config_data
-  doneXbar.io.ins.zip(io.done.reverse).foreach { case (in, done) => in := done } // MSB must be in position 0
+  doneXbar.io.ins.zip(io.done).foreach { case (in, done) => in := done } // MSB must be in position 0
 
   // Token out LUTs
   val tokenOutLUTs = List.tabulate(numTokens) { i =>
@@ -149,7 +149,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
     m.io.config_data := io.config_data
     m
   }
-  enableLUTs.foreach { _.io.ins := gtzs.reverse } // MSB must be in position 0
+  enableLUTs.foreach { _.io.ins := gtzs } // MSB must be in position 0
   val enableMux = List.tabulate(numTokens) { i => Mux(config.enableMux(i), tokenInXbar.io.outs(i), enableLUTs(i).io.out) }
   io.enable.zip(enableMux) foreach { case (en, mux) => en := mux }
 
