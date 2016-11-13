@@ -257,6 +257,7 @@ class ComputeUnit(
   controlBlock.io.config_enable := io.config_enable
   controlBlock.io.config_data := io.config_data
   controlBlock.io.tokenIns := io.tokenIns
+  controlBlock.io.fifoNotFull := Vec(scratchpads.map { ~_.io.full })
   controlBlock.io.done := counterChain.io.control map { _.done}
   counterEnables := controlBlock.io.enable
   io.tokenOuts := controlBlock.io.tokenOuts

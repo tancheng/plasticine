@@ -3,6 +3,7 @@ import plasticine.pisa.parser.Parser
 import plasticine.misc.Utils
 import Chisel._
 
+import plasticine.ArchConfig
 import plasticine.pisa.ir._
 
 /**
@@ -48,6 +49,8 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
     val config_enable = Bool(INPUT)
     /* Input tokens */
    val tokenIns = Vec.fill(numTokens) { Bool(INPUT)}
+
+   val fifoNotFull = Vec.fill(ArchConfig.numScratchpads) { Bool(INPUT) }
     /* Input local 'done' signals */
    val done = Vec.fill(numTokens) { Bool(INPUT)}
     /* Output tokens */
@@ -159,6 +162,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   // (numTokenDownLUTs+1)..(numTokenDownLUTs+1+numTokens-1): tokenOutLUTs(i-numTokenDownLUTs-1)
   val tokenOutXbarIns = Vec(
         List(UInt(0, width=1)) ++
+        List.tabulate(ArchConfig.numScratchpads) { io.fifoNotFull(_) } ++
         tokenDownPulser ++
         tokenOutLUTs.map {_.io.out} ++
         enableLUTs.map {_.io.out}
