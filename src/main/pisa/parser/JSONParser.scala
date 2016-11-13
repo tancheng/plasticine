@@ -208,7 +208,9 @@ object Parser {
 
       val control = parseControlBox(Parser.getFieldMap(m, "control"))
 
-      ComputeUnitConfig(counterChain, scalarXbar, scratchpads, pipeStage, control)
+      val scalarOutMux = parseValue(Parser.getFieldString(m, "scalarOutMux"))
+
+      ComputeUnitConfig(counterChain, scalarXbar, scratchpads, pipeStage, control, scalarOutMux)
   }
 
   def parseCrossbar(m: Map[Any, Any], incByOne: Boolean = false): CrossbarConfig = {

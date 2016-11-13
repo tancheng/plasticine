@@ -684,6 +684,7 @@ class Plasticine(override val w: Int,
   override val numMemoryUnits: Int,
   val numRows: Int,
   val numCols: Int,
+  val numScalarIO: Int,
   inst: PlasticineConfig) extends AbstractPlasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, inst)
 with DirectionOps {
 
@@ -719,7 +720,7 @@ with DirectionOps {
   def genDataArray(inst: List[ComputeUnitConfig]) = {
     ListBuffer.tabulate(numCols) { i =>
       ListBuffer.tabulate(numRows) { j =>
-        val cu = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, inst(i*numCols+j)))
+        val cu = Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numScalarIO, inst(i*numCols+j)))
         cu.io.config_enable := io.config_enable
         cu.io.config_data := io.config_data
         cu
@@ -834,11 +835,9 @@ object PlasticineTest {
     val numRows = ArchConfig.numRows
     val numCols = ArchConfig.numCols
     val numMemoryUnits = ArchConfig.numMemoryUnits
+    val numScalarIO = ArchConfig.numScalarIO
 
-
-
-
-      chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, config)).asInstanceOf[AbstractPlasticine]) {
+      chiselMainTest(chiselArgs, () => Module(new Plasticine(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, numScalarIO, config)).asInstanceOf[AbstractPlasticine]) {
         c => new PlasticineTests(c)
       }
 

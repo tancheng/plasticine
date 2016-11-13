@@ -4,7 +4,7 @@ import Chisel._
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import plasticine.Globals
-
+import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
@@ -98,6 +98,7 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, val l: Int, 
     }
   }
 
+  val scalarOutMux = if (config.isDefined) Bool(config.get.scalarOutMux > 0) else Bool()
   override def cloneType(): this.type = {
     new ComputeUnitOpcode(w, d, rwStages, l, r, m, v, numCounters, numScratchpads, config).asInstanceOf[this.type]
   }
@@ -128,6 +129,7 @@ class ComputeUnit(
   val m: Int,
   val numScratchpads: Int,
   val numStagesAfterReduction: Int,
+  val numScalarIO: Int,
   inst: ComputeUnitConfig
 ) extends ConfigurableModule[ComputeUnitOpcode] {
 
@@ -262,9 +264,9 @@ class ComputeUnit(
   io.tokenOuts := controlBlock.io.tokenOuts
 
   // Scalar crossbar: (numInputs * 2) x 2
-  val numInputWordsPerBus = 2
-  val scalarXbar = Module(new Crossbar(w, numScratchpads * numInputWordsPerBus, 2, inst.scalarXbar))
-  scalarXbar.io.ins := Vec(io.dataIn.map { _.take(numInputWordsPerBus) }.flatten)
+//  val numInputWordsPerBus = 2
+  val scalarXbar = Module(new Crossbar(w, numScratchpads * numScalarIO, numScalarIO, inst.scalarXbar))
+  scalarXbar.io.ins := Vec(rdata.map { _.take(numScalarIO) }.flatten)
   val scalarIns = scalarXbar.io.outs
 
   // Empty pipe stage generation for each lane
@@ -485,7 +487,12 @@ class ComputeUnit(
     }
   }
 
-  io.dataOut := vecOut
+  val out = Vec.tabulate(v) { i =>
+    if (i < numScalarIO) {
+      Mux(config.scalarOutMux, pipeRegs.last(0).io.passDataOut(i), vecOut(i))
+    } else vecOut(i)
+  }
+  io.dataOut := out
 }
 
 /**
@@ -533,10 +540,11 @@ object ComputeUnitTest {
     val m = 2048  // words per scratchpad
     val numScratchpads = 4
     val numStagesAfterReduction = 2
+    val numScalarIO = ArchConfig.numScalarIO
 
     val configObj = ComputeUnitConfig.getRandom(d, numTokens, numTokens, numTokens, numScratchpads)
 
-    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, configObj))) {
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numScalarIO, configObj))) {
       c => new ComputeUnitTests(c)
     }
   }

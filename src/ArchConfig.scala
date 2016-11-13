@@ -23,7 +23,7 @@ object ArchConfig {
   var burstSizeBytes = 64
   var numOutstandingBursts = 16
   var numTopInputs = 2 * numCols
-
+  var numScalarIO = 8
   def printConfig {
      println("Plasticine Configuration:")
      println(s"w =  $w")
@@ -45,29 +45,31 @@ object ArchConfig {
      println(s"burstSizeBytes = $burstSizeBytes")
      println(s"numOutstandingBursts =  $numOutstandingBursts")
      println(s"numTopInputs = $numTopInputs")
+     println(s"numScalarIO = $numScalarIO")
   }
 
   def setConfig(file: String) {
     val map = Parser.parseRaw(file)
-     w =                     Parser.getFieldInt(map, "w")
-     startDelayWidth =        Parser.getFieldInt(map, "startDelayWidth")
-     endDelayWidth =          Parser.getFieldInt(map, "endDelayWidth")
-     d =                     Parser.getFieldInt(map, "d")
-     v =                     Parser.getFieldInt(map, "v")
-     l =                      Parser.getFieldInt(map, "l")
-     r =                     Parser.getFieldInt(map, "r")
-     rwStages =               Parser.getFieldInt(map, "rwStages")
-     numTokens =              Parser.getFieldInt(map, "numTokens")
-     numCounters =            Parser.getFieldInt(map, "numCounters")
-     m =                   Parser.getFieldInt(map, "m")
-     numScratchpads =         Parser.getFieldInt(map, "numScratchpads")
-     numStagesAfterReduction = Parser.getFieldInt(map, "numStagesAfterReduction")
-     numRows =                Parser.getFieldInt(map, "numRows")
-     numCols =                Parser.getFieldInt(map, "numCols")
-     numMemoryUnits =         Parser.getFieldInt(map, "numMemoryUnits")
-     burstSizeBytes =        Parser.getFieldInt(map, "burstSizeBytes")
-     numOutstandingBursts =  Parser.getFieldInt(map, "numOutstandingBursts")
-     numTopInputs =          Parser.getFieldInt(map, "numTopInputs")
+    w =                     Parser.getFieldInt(map, "w")
+    startDelayWidth =        Parser.getFieldInt(map, "startDelayWidth")
+    endDelayWidth =          Parser.getFieldInt(map, "endDelayWidth")
+    d =                     Parser.getFieldInt(map, "d")
+    v =                     Parser.getFieldInt(map, "v")
+    l =                      Parser.getFieldInt(map, "l")
+    r =                     Parser.getFieldInt(map, "r")
+    rwStages =               Parser.getFieldInt(map, "rwStages")
+    numTokens =              Parser.getFieldInt(map, "numTokens")
+    numCounters =            Parser.getFieldInt(map, "numCounters")
+    m =                   Parser.getFieldInt(map, "m")
+    numScratchpads =         Parser.getFieldInt(map, "numScratchpads")
+    numStagesAfterReduction = Parser.getFieldInt(map, "numStagesAfterReduction")
+    numRows =                Parser.getFieldInt(map, "numRows")
+    numCols =                Parser.getFieldInt(map, "numCols")
+    numMemoryUnits =         Parser.getFieldInt(map, "numMemoryUnits")
+    burstSizeBytes =        Parser.getFieldInt(map, "burstSizeBytes")
+    numOutstandingBursts =  Parser.getFieldInt(map, "numOutstandingBursts")
+    numTopInputs =          Parser.getFieldInt(map, "numTopInputs")
+    numScalarIO =          Parser.getFieldInt(map, "numScalarIO")
 
     printConfig
   }
