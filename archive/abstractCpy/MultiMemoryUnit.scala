@@ -5,7 +5,7 @@ import Chisel._
 
 import plasticine.pisa.ir._
 
-class MultiMemoryUnitTester (
+abstract class AbstractMultiMemoryUnitTester (
   val w: Int,
   val d: Int,
   val v: Int,
@@ -19,7 +19,27 @@ class MultiMemoryUnitTester (
   val io = new ConfigInterface {
     val config_enable = Bool(INPUT)
     val interconnects = Vec.fill(numMemoryUnits) { new PlasticineMemoryCmdInterface(w, v) }
+    val dramChannel = Vec.fill(numMemoryUnits) { new DRAMCmdInterface(w, v) }
   }
+}
+
+class MultiMemoryUnitTesterSim (
+  override val w: Int,
+  override val d: Int,
+  override val v: Int,
+  override val numOutstandingBursts: Int,
+  override val burstSizeBytes: Int,
+  override val inst: MemoryUnitConfig) extends AbstractMultiMemoryUnitTester (w, d, v, numOutstandingBursts, burstSizeBytes, inst) {
+    this.name = "MultiMemoryUnitTester"
+}
+
+class MultiMemoryUnitTester (
+  override val w: Int,
+  override val d: Int,
+  override val v: Int,
+  override val numOutstandingBursts: Int,
+  override val burstSizeBytes: Int,
+  override val inst: MemoryUnitConfig) extends AbstractMultiMemoryUnitTester (w, d, v, numOutstandingBursts, burstSizeBytes, inst) {
 
   def genMemoryUnits = {
     List.tabulate(numMemoryUnits) { i =>
@@ -32,9 +52,23 @@ class MultiMemoryUnitTester (
       io.interconnects(i).vldOut := mu.io.interconnect.vldOut
       mu.io.interconnect.addr := io.interconnects(i).addr
       mu.io.interconnect.wdata := io.interconnects(i).wdata
+//      mu.io.interconnect.isWr := io.interconnects(i).isWr
       mu.io.interconnect.dataVldIn := io.interconnects(i).dataVldIn
       mu.io.interconnect.size := io.interconnects(i).size
       io.interconnects(i).rdata := mu.io.interconnect.rdata
+
+      io.dramChannel(i).addr := mu.io.dram.addr
+      io.dramChannel(i).wdata := mu.io.dram.wdata
+      io.dramChannel(i).tagOut := mu.io.dram.tagOut
+
+      io.dramChannel(i).vldOut := mu.io.dram.vldOut
+      io.dramChannel(i).rdyOut := mu.io.dram.rdyOut
+      io.dramChannel(i).isWr  := mu.io.dram.isWr
+
+      mu.io.dram.rdata := io.dramChannel(i).rdata
+      mu.io.dram.vldIn := io.dramChannel(i).vldIn
+      mu.io.dram.rdyIn := io.dramChannel(i).rdyIn
+      mu.io.dram.tagIn := io.dramChannel(i).tagIn
 
       mu
     }
@@ -58,14 +92,14 @@ class MultiMemoryUnitTester (
     sims(id).io.tagIn := mus(id).io.dram.tagOut
     sims(id).io.vldIn := mus(id).io.dram.vldOut
     sims(id).io.isWr := mus(id).io.dram.isWr
-
+//TODO: test with rdy signal... or is it really needed? 
     mus(id).io.dram.rdata := sims(id).io.rdata
     mus(id).io.dram.vldIn := sims(id).io.vldOut
     mus(id).io.dram.tagIn := sims(id).io.tagOut
   }
 }
 
-class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
+class MultiMemoryUnitTests(c: AbstractMultiMemoryUnitTester) extends Tester(c) {
   val size = 64
   val burstSizeBytes = 64
   val wordsPerBurst = burstSizeBytes / (c.w / 8)
@@ -80,7 +114,7 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
 	val chan2 = 2
 	val chan3 = 3
   val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
-  val numCmds = c.numOutstandingBursts
+  val numCmds = 500
   val numChans = 4
   // Test var
   var numTransCompleted = 0
@@ -115,12 +149,26 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
   val expectedOrder = Queue[Cmd]()
   val observedOrder = Queue[Cmd]()
 
+  def observeFor(chan:Int, x: Int) {
+    for (i <- 0 until x) {
+      if (peek(c.io.dramChannel(chan).vldOut) > 0) {
+        val issuedAddr = peek(c.io.dramChannel(chan).addr).toInt
+        val data = peek(c.io.dramChannel(chan).wdata)
+        val wr = peek(c.io.dramChannel(chan).isWr).toInt
+        val tag = peek(c.io.dramChannel(chan).tagOut).toInt
+        observedOrder += Cmd(chan, issuedAddr, data, wr, tag)
+      }
+      step(1)
+    }
+  }
+
   def observeAllForOneCycle() {
     for (chan <- 0 until numChans) {
-      if (peek(c.sims(chan).io.vldOut) > 0) {
+      if (peek(c.io.dramChannel(chan).vldIn) > 0) {
         numTransCompleted = numTransCompleted + 1
-        print("========== transaction at channel " + chan + " finished ==========")
       }
+
+//      step(1)
     }
 
     step(1)
@@ -172,119 +220,83 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
     case _ => printFail(s)
   }
 
-//  def enqueueCmd(chan: Int, addr: Int, size: Int, isWr: Int, data: List[Int] = List[Int]()) {
-//    poke(c.io.interconnects(chan).vldIn, 1)
-//    poke(c.io.interconnects(chan).addr(0), addr)
-//    poke(c.io.interconnects(chan).size, size)
-//
-//    // If it is a write, enqueue first burst
-//    val dataInBursts = getDataInBursts(data)
-//    if (isWr > 0) {
-//      poke(c.io.interconnects(chan).wdata, dataInBursts.dequeue)
-//      poke(c.io.interconnects(chan).dataVldIn, 1)
-//    }
-//
-//    observeChannel(chan)
-//
-//    poke(c.io.interconnects(chan).vldIn, 0)
-//    if (isWr > 0) {
-//      println("writing......")
-//      while (!dataInBursts.isEmpty) {
-//        poke(c.io.interconnects(chan).wdata, dataInBursts.dequeue)
-//        observeChannel(chan)
-//      }
-//    }
-//
-//    poke(c.io.interconnects(chan).dataVldIn, 0)
-//    updateExpected(chan, addr, size, isWr, data)
-//  }
+  def enqueueCmd(chan: Int, addr: Int, size: Int, isWr: Int, data: List[Int] = List[Int]()) {
+    poke(c.io.interconnects(chan).vldIn, 1)
+    poke(c.io.interconnects(chan).addr(0), addr)
+    poke(c.io.interconnects(chan).size, size)
+//    poke(c.io.interconnects(chan).isWr, isWr)
 
-//  def enqueueBurstRead(chan: Int, addr: Int, size: Int) {
-//    enqueueCmd(chan, addr, size, 0)
-//  }
-//
-//  def enqueueBurstWrite(chan: Int, addr: Int, size: Int, data: List[Int]) {
-//    enqueueCmd(chan, addr, size, 1, data)
-//  }
-
-  def peekOnChan(chan: Int) {
-    val dramTagIn = peek(c.mus(chan).io.dram.tagIn).toInt
-    val dramTagOut = peek(c.mus(chan).io.dram.tagOut).toInt
-    val dramVldOut = peek(c.mus(chan).io.dram.vldOut).toInt
-    val dramVldIn = peek(c.mus(chan).io.dram.vldIn).toInt
-    val interconnectsVldIn = peek(c.io.interconnects(chan0).vldIn).toInt
-
-    if (dramVldIn > 0) {
-      numTransCompleted = numTransCompleted + 1
+    // If it is a write, enqueue first burst
+    val dataInBursts = getDataInBursts(data)
+    if (isWr > 0) {
+      poke(c.io.interconnects(chan).wdata, dataInBursts.dequeue)
+      poke(c.io.interconnects(chan).dataVldIn, 1)
     }
-  }
-
-//  val numCommands = numCmds
-  val numCommands = 500
-  val writeMode = peek(c.mus(chan0).config.isWr).toInt
-  if (writeMode > 0) {
-    println("start testing writes")
-    val waddrs = List.tabulate(numCommands) { i => addr1 + i * 0x40 }
-    val wsizes = List.tabulate(numCommands) { i => burstSizeBytes }
-    waddrs.zip(wsizes) foreach {
-      case (waddr, wsize) => {
-        poke(c.io.interconnects(chan0).vldIn, 1)
-        poke(c.io.interconnects(chan0).addr(0), waddr)
-        poke(c.io.interconnects(chan0).size, wsize)
-        poke(c.io.interconnects(chan0).wdata, wdata)
-        step(1)
-        peekOnChan(chan0)
+//    observeFor(chan, 1)
+    observeAllForOneCycle()
+    poke(c.io.interconnects(chan).vldIn, 0)
+    if (isWr > 0) {
+      while (!dataInBursts.isEmpty) {
+        poke(c.io.interconnects(chan).wdata, dataInBursts.dequeue)
+//        observeFor(chan, 1)
+          observeAllForOneCycle()
       }
     }
 
-    poke(c.io.interconnects(chan0).vldIn, 0)
-    poke(c.io.interconnects(chan0).addr(0), 0x0000)
-    poke(c.io.interconnects(chan0).size, 0)
-
-    while (numTransCompleted != numCommands) {
-      println("numTransCompleted = " + numTransCompleted)
-      step(1)
-      peekOnChan(chan0)
-    }
-
-  } else {
-    println("start testing writes")
-    val raddrs = List.tabulate(numCommands) { i => addr1 + i * 0x40 }
-    val rsizes = List.tabulate(numCommands) { i => burstSizeBytes }
-    raddrs.zip(rsizes) foreach {
-      case (raddr, rsize) => {
-        poke(c.io.interconnects(chan0).vldIn, 1)
-        poke(c.io.interconnects(chan0).addr(0), raddr)
-        poke(c.io.interconnects(chan0).size, rsize)
-        step(1)
-        peekOnChan(chan0)
-      }
-    }
-
-    poke(c.io.interconnects(chan0).vldIn, 0)
-    poke(c.io.interconnects(chan0).addr(0), 0x0000)
-    poke(c.io.interconnects(chan0).size, 0)
-
-    while (numTransCompleted != numCommands) {
-      println("numTransCompleted = " + numTransCompleted)
-      step(1)
-      peekOnChan(chan0)
-    }
+    poke(c.io.interconnects(chan).dataVldIn, 0)
+    updateExpected(chan, addr, size, isWr, data)
   }
+
+  def enqueueBurstRead(chan: Int, addr: Int, size: Int) {
+    enqueueCmd(chan, addr, size, 0)
+  }
+
+  def enqueueBurstWrite(chan: Int, addr: Int, size: Int, data: List[Int]) {
+    enqueueCmd(chan, addr, size, 1, data)
+  }
+
+  println("start testing")
+  for (x <- 0 to numCmds) {
+    print("numCmds = "); print(numCmds); print("; numTranscompleted = "); println(numTransCompleted)
+    enqueueBurstWrite(chan0, waddr1 + x, burstSizeBytes, wdata)
+    print("enqueue a burst write at ")
+    println(waddr1 + x)
+  }
+
+
+  print("numCmds = "); print(numCmds); print("; numTranscompleted = "); println(numTransCompleted)
+  while (numTransCompleted != numCmds) {
+    print("num of transaction completed = ");
+    print(numTransCompleted);
+    print(", num of transaction issued = ");
+    println(numCmds)
+    step(1)
+  }
+
+  println("stay for another 100 steps to make sure that no remaining transactions are here......")
+  step(100)
 }
 
 object MultiMemoryUnitTest {
   val w = 32
   val v = 16
   val d = 512
-  val numOutstandingBursts = 1024
+  val numOutstandingBursts = 16
   val burstSizeBytes = 64
   val scatterGather = 0
-  val isWr = 0
+  val isWr = 1
   val config = MemoryUnitConfig(scatterGather, isWr)
   def main(args: Array[String]): Unit = {
-      chiselMainTest(args, () => Module(new MultiMemoryUnitTester(w, d, v, numOutstandingBursts, burstSizeBytes, config))) {
+    val testMode = args.contains("--test")
+    if (testMode) {
+      println("In test mode")
+      chiselMainTest(args, () => Module(new MultiMemoryUnitTesterSim(w, d, v, numOutstandingBursts, burstSizeBytes, config)).asInstanceOf[AbstractMultiMemoryUnitTester]) {
         c => { new MultiMemoryUnitTests(c) }
+      }
+    } else {
+      chiselMainTest(args, () => Module(new MultiMemoryUnitTester(w, d, v, numOutstandingBursts, burstSizeBytes, config)).asInstanceOf[AbstractMultiMemoryUnitTester]) {
+        c => { new MultiMemoryUnitTests(c) }
+      }
     }
   }
 }
