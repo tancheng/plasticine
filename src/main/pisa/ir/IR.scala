@@ -127,8 +127,12 @@ case class ScratchpadConfig(
   ra: SrcValueTuple = SrcValueTuple(),
   wd: Int = 0,
   wen: Int = 0,
+  wswap: Int = 0,
+  rswap: Int = 0,
   banking: BankingConfig = BankingConfig(),
-  numBufs: Int = 0
+  numBufs: Int = 0,
+  isReadFifo: Int = 0,
+  isWriteFifo: Int = 0
 ) extends AbstractConfig
 object ScratchpadConfig {
   def getRandom = {
@@ -137,8 +141,12 @@ object ScratchpadConfig {
       SrcValueTuple(0, 0), // ra
       0,
       0,
+      0,
+      0,
       BankingConfig(0, 1),
-      1
+      1,
+      0,
+      0
     )
   }
   def zeroes = {

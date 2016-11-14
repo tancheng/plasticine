@@ -24,6 +24,8 @@ case class ScratchpadOpcode(val d: Int, val v: Int, config: Option[ScratchpadCon
     } else UInt(math.max(1, d / (v*config.get.numBufs)), width=log2Up(d/v)+1)
   } else UInt(width = log2Up(d/v))
 
+  val isReadFifo = if (config.isDefined) Bool(config.get.isReadFifo > 0) else Bool()
+  val isWriteFifo = if (config.isDefined) Bool(config.get.isWriteFifo > 0) else Bool()
   override def cloneType(): this.type = {
     new ScratchpadOpcode(d, v, config).asInstanceOf[this.type]
   }
@@ -167,7 +169,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
   val mems = List.fill(v) { Module(new SRAM(w, bankSize)) }
 
   // Create size register
-  val isFifo = config.bufSize === UInt(1)
+//  val isFifo = config.bufSize === UInt(1)
   val sizeUDC = Module(new UpDownCtr(log2Up(d+1)))
   val size = sizeUDC.io.out
   val empty = size === UInt(0)
@@ -243,14 +245,14 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
     raddrDecoder.io.addr := laneRaddr
     raddrDecoder.io.strideLog2 := config.strideLog2
     val localRaddr = raddrDecoder.io.localAddr
-    m.io.raddr := Mux(isFifo, Mux(readEn, nextHeadLocalAddr, headLocalAddr), localRaddr + headLocalAddr)
+    m.io.raddr := Mux(config.isReadFifo, Mux(readEn, nextHeadLocalAddr, headLocalAddr), localRaddr + headLocalAddr)
 
     // Write address
     val waddrDecoder = Module(new AddrDecoder(d, v))
     waddrDecoder.io.addr := laneWaddr
     waddrDecoder.io.strideLog2 := config.strideLog2
     val localWaddr = waddrDecoder.io.localAddr
-    m.io.waddr := Mux(isFifo, tailLocalAddr, localWaddr + tailLocalAddr)
+    m.io.waddr := Mux(config.isWriteFifo, tailLocalAddr, localWaddr + tailLocalAddr)
 
     // Write data
     m.io.wdata := io.wdata(i)

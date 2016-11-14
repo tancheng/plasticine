@@ -67,6 +67,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         poke(m.config.strideLog2, c.banking.strideLog2)
         val bufSize = if (c.numBufs == 0) 1 else math.max(1, m.d / (m.v*c.numBufs))
         poke(m.config.bufSize, bufSize)
+        poke(m.config.isReadFifo, c.isReadFifo)
+        poke(m.config.isWriteFifo, c.isWriteFifo)
       case m: ComputeUnit =>
         val c = cfg.asInstanceOf[ComputeUnitConfig]
         setConfig(m.counterChain, c.counterChain)
@@ -78,6 +80,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
           poke(c.waValue, i.wa.value)
           poke(c.wdSrc, i.wd)
           poke(c.wen, i.wen)
+          poke(c.wswap, i.wswap)
+          poke(c.rswap, i.rswap)
         }
         m.scratchpads.zip(c.scratchpads) foreach { case (c, i) =>
           setConfig(c, i)

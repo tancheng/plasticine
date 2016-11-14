@@ -316,9 +316,21 @@ object Parser {
           case n@_ => n.drop(1).toInt + 1
         }
 
+        val wswap = Parser.getFieldString(m, "wswap") match {
+          case "x" => 0
+          case n@_ => n.drop(1).toInt + 1
+        }
+
+        val rswap = Parser.getFieldString(m, "rswap") match {
+          case "x" => 0
+          case n@_ => n.drop(1).toInt + 1
+        }
+
         val banking = parseBankingConfig(Parser.getFieldString(m, "banking"))
         val numBufs = Parser.getFieldInt(m, "numBufs")
-        ScratchpadConfig(wa, ra, wd, wen, banking, numBufs)
+        val isReadFifo = parseValue(Parser.getFieldString(m, "isReadFifo"))
+        val isWriteFifo = parseValue(Parser.getFieldString(m, "isWriteFifo"))
+        ScratchpadConfig(wa, ra, wd, wen, wswap, rswap, banking, numBufs, isReadFifo, isWriteFifo)
     }
   }
 

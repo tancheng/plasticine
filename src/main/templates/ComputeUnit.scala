@@ -23,6 +23,8 @@ class ScratchpadBundle(w: Int, m: Int, v: Int, numCounters: Int, d: Int, config:
   var waValue = if (config.isDefined) UInt(config.get.wa.value, width=log2Up(math.max(numCounters, d))) else UInt(width=log2Up(math.max(numCounters, d)))
   var wdSrc = if (config.isDefined) UInt(config.get.wd, width=1) else UInt(width=1)
   var wen = if (config.isDefined) UInt(config.get.wen, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
+  val wswap = if (config.isDefined) UInt(config.get.wswap, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
+  val rswap = if (config.isDefined) UInt(config.get.rswap, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
 
   override def cloneType(): this.type = {
     new ScratchpadBundle(w, m, v, numCounters, d, config).asInstanceOf[this.type]
@@ -240,11 +242,23 @@ class ComputeUnit(
     mux.io.sel := config.scratchpads(i).wen
     mux
   }
+  val wswapMux = List.tabulate(numScratchpads) { i =>
+    val mux = if (Globals.noModule) new MuxNL(numCounters+1, 1) else Module(new MuxN(numCounters+1, 1))
+    mux.io.sel := config.scratchpads(i).wswap
+    mux
+  }
+  val rswapMux = List.tabulate(numScratchpads) { i =>
+    val mux = if (Globals.noModule) new MuxNL(numCounters+1, 1) else Module(new MuxN(numCounters+1, 1))
+    mux.io.sel := config.scratchpads(i).rswap
+    mux
+  }
   scratchpads.zipWithIndex.foreach { case (s, i) =>
     s.io.waddr := waSrcMux(i).io.out
     s.io.wdata := wdMux(i).io.out
     s.io.raddr := raSrcMux(i).io.out
     s.io.wen   := wenMux(i).io.out
+    s.io.wdone   := wswapMux(i).io.out
+    s.io.rdone   := rswapMux(i).io.out
   }
   val rdata = scratchpads.map { _.io.rdata }
 
@@ -264,7 +278,8 @@ class ComputeUnit(
   controlBlock.io.config_data := io.config_data
   controlBlock.io.tokenIns := io.tokenIns
   controlBlock.io.fifoNotFull := Vec(scratchpads.map { ~_.io.full })
-  controlBlock.io.done := counterChain.io.control map { _.done}
+  val counterDones = counterChain.io.control map { _.done}
+  controlBlock.io.done := counterDones
   counterEnables := controlBlock.io.enable
   io.tokenOuts := controlBlock.io.tokenOuts
 
@@ -492,6 +507,14 @@ class ComputeUnit(
     wenMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
       if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
       else in := counterEnables(ii-1)
+    }
+    wswapMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
+      if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
+      else in := counterDones(ii-1)
+    }
+    rswapMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
+      if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
+      else in := counterDones(ii-1)
     }
   }
 
