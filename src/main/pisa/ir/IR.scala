@@ -194,7 +194,7 @@ object ComputeUnitConfig {
   def getRandom(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
     new ComputeUnitConfig (
       CounterChainConfig.getRandom(numCounters),
-      CrossbarConfig.getRandom(ArchConfig.numScalarIO),
+      CrossbarConfig.getRandom(ArchConfig.numScalarRegisters),
       List.tabulate(numScratchpads) { i => ScratchpadConfig.getRandom },
       List.tabulate(d) { i => PipeStageConfig.getRandom },
       CUControlBoxConfig.getRandom(numTokenIn, numTokenOut, numCounters),
@@ -205,7 +205,7 @@ object ComputeUnitConfig {
   def zeroes(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
     new ComputeUnitConfig (
       CounterChainConfig.zeroes(numCounters),
-      CrossbarConfig.zeroes(ArchConfig.numScalarIO),
+      CrossbarConfig.zeroes(ArchConfig.numScalarRegisters),
       List.tabulate(numScratchpads) { i => ScratchpadConfig.zeroes },
       List.tabulate(d) { i => PipeStageConfig.zeroes },
       CUControlBoxConfig.zeroes(numTokenIn, numTokenOut, numCounters),
