@@ -82,6 +82,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
           poke(c.wen, i.wen)
           poke(c.wswap, i.wswap)
           poke(c.rswap, i.rswap)
+          poke(c.enqEn, i.enqEn)
+          poke(c.deqEn, i.deqEn)
         }
         m.scratchpads.zip(c.scratchpads) foreach { case (c, i) =>
           setConfig(c, i)

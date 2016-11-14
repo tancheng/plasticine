@@ -129,6 +129,8 @@ case class ScratchpadConfig(
   wen: Int = 0,
   wswap: Int = 0,
   rswap: Int = 0,
+  enqEn: Int = 0,
+  deqEn: Int = 0,
   banking: BankingConfig = BankingConfig(),
   numBufs: Int = 0,
   isReadFifo: Int = 0,
@@ -139,6 +141,8 @@ object ScratchpadConfig {
     new ScratchpadConfig(
       SrcValueTuple(0, 0), // wa
       SrcValueTuple(0, 0), // ra
+      0,
+      0,
       0,
       0,
       0,

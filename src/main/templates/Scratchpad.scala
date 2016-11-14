@@ -145,6 +145,8 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
     val rdata = Vec.fill(v) { Bits(OUTPUT, width = w) }
     val rdone = Bool(INPUT)
     val wdone = Bool(INPUT)
+    val enqEn = Bool(INPUT)
+    val deqEn  = Bool(INPUT)
     val empty = Bool(OUTPUT)
     val full = Bool(OUTPUT)
   }
@@ -170,6 +172,11 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
 
   // Create size register
 //  val isFifo = config.bufSize === UInt(1)
+
+  // NOTE: Size output only makes sense of both sides (read and write)
+  // are FIFOs. Size UDC is controlled by the enqEn and deqEn signals,
+  // which are active only when configured as FIFOs. Size is not correct
+  // when one side is a FIFO
   val sizeUDC = Module(new UpDownCtr(log2Up(d+1)))
   val size = sizeUDC.io.out
   val empty = size === UInt(0)
@@ -181,10 +188,9 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
   sizeUDC.io.strideInc := UInt(v)
 //  sizeUDC.io.strideDec := Mux(config.chainRead, UInt(1), UInt(v))
   sizeUDC.io.strideDec := UInt(v)
-  sizeUDC.io.init := UInt(0)
 
-  val writeEn = io.wdone & ~full
-  val readEn = io.rdone & ~empty
+  val writeEn = io.enqEn & ~full
+  val readEn = io.deqEn & ~empty
   sizeUDC.io.inc := writeEn
   sizeUDC.io.dec := readEn
 
@@ -231,6 +237,25 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
   val headBankAddr = rptr.io.data(0).out
   val nextHeadBankAddr = rptr.io.data(0).next
 
+  // Read address generator
+  val raddrGen = Module(new Counter(log2Up(d+1)))
+  raddrGen.io.data.max := UInt(bankSize - (bankSize % inst.numBufs))  // Mux if non-parallel FIFO
+  raddrGen.io.data.stride := UInt(1)
+  raddrGen.io.control.enable := readEn
+  raddrGen.io.control.reset := io.rdone
+  raddrGen.io.control.saturate := Bool(false)
+  val generatedRaddr = raddrGen.io.data.out
+  val generatedRaddrNext = raddrGen.io.data.next
+
+  // Write address generator
+  val waddrGen = Module(new Counter(log2Up(d+1)))
+  waddrGen.io.data.max := UInt(bankSize - (bankSize % inst.numBufs))  // Mux if non-parallel FIFO
+  waddrGen.io.data.stride := UInt(1)
+  waddrGen.io.control.enable := readEn
+  waddrGen.io.control.reset := io.rdone
+  waddrGen.io.control.saturate := Bool(false)
+  val generatedWaddr = waddrGen.io.data.out
+
   io.empty := empty
   io.full := full
 
@@ -245,14 +270,14 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
     raddrDecoder.io.addr := laneRaddr
     raddrDecoder.io.strideLog2 := config.strideLog2
     val localRaddr = raddrDecoder.io.localAddr
-    m.io.raddr := Mux(config.isReadFifo, Mux(readEn, nextHeadLocalAddr, headLocalAddr), localRaddr + headLocalAddr)
+    m.io.raddr := Mux(config.isReadFifo, Mux(readEn, generatedRaddrNext, generatedRaddr) + headLocalAddr, localRaddr + headLocalAddr)
 
     // Write address
     val waddrDecoder = Module(new AddrDecoder(d, v))
     waddrDecoder.io.addr := laneWaddr
     waddrDecoder.io.strideLog2 := config.strideLog2
     val localWaddr = waddrDecoder.io.localAddr
-    m.io.waddr := Mux(config.isWriteFifo, tailLocalAddr, localWaddr + tailLocalAddr)
+    m.io.waddr := Mux(config.isWriteFifo, generatedWaddr + tailLocalAddr, localWaddr + tailLocalAddr)
 
     // Write data
     m.io.wdata := io.wdata(i)

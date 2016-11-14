@@ -25,6 +25,9 @@ class ScratchpadBundle(w: Int, m: Int, v: Int, numCounters: Int, d: Int, config:
   var wen = if (config.isDefined) UInt(config.get.wen, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
   val wswap = if (config.isDefined) UInt(config.get.wswap, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
   val rswap = if (config.isDefined) UInt(config.get.rswap, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
+  val enqEn = if (config.isDefined) UInt(config.get.enqEn, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
+  val deqEn = if (config.isDefined) UInt(config.get.deqEn, width=log2Up(numCounters+1)) else UInt(width=log2Up(numCounters+1))
+
 
   override def cloneType(): this.type = {
     new ScratchpadBundle(w, m, v, numCounters, d, config).asInstanceOf[this.type]
@@ -252,6 +255,18 @@ class ComputeUnit(
     mux.io.sel := config.scratchpads(i).rswap
     mux
   }
+
+  val enqEnMux = List.tabulate(numScratchpads) { i =>
+    val mux = if (Globals.noModule) new MuxNL(numCounters+1, 1) else Module(new MuxN(numCounters+1, 1))
+    mux.io.sel := config.scratchpads(i).enqEn
+    mux
+  }
+  val deqEnMux = List.tabulate(numScratchpads) { i =>
+    val mux = if (Globals.noModule) new MuxNL(numCounters+1, 1) else Module(new MuxN(numCounters+1, 1))
+    mux.io.sel := config.scratchpads(i).deqEn
+    mux
+  }
+
   scratchpads.zipWithIndex.foreach { case (s, i) =>
     s.io.waddr := waSrcMux(i).io.out
     s.io.wdata := wdMux(i).io.out
@@ -259,6 +274,9 @@ class ComputeUnit(
     s.io.wen   := wenMux(i).io.out
     s.io.wdone   := wswapMux(i).io.out
     s.io.rdone   := rswapMux(i).io.out
+    s.io.enqEn := enqEnMux(i).io.out
+    s.io.deqEn := deqEnMux(i).io.out
+
   }
   val rdata = scratchpads.map { _.io.rdata }
 
@@ -515,6 +533,14 @@ class ComputeUnit(
     rswapMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
       if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
       else in := counterDones(ii-1)
+    }
+    enqEnMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
+      if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
+      else in := counterEnables(ii-1)
+    }
+    deqEnMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
+      if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
+      else in := counterEnables(ii-1)
     }
   }
 
