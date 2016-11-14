@@ -7,8 +7,8 @@
         "comment-argIns" : "ArgIn5 -> 0",
         "comment-argOuts" : "ArgOut4 -> 0",
         "top" :{
-          "done" : "0",
-          "argOut" : "0"
+          "done" : "7",
+          "argOut" : "1"
         },
         "cu": [
           {
@@ -279,77 +279,59 @@
           "x"
         ],
         "dataSwitch": [
-          
           {
             "outSelect" : ["x","x","x","x","x","s_0","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x"]
           },
-          
           {
-            "outSelect" : ["x","x","x","x","sw_0"]
+            "outSelect" : ["x","x","x","x","nw_0"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x"]
           }
         ],
         "controlSwitch": [
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","s_0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","ne_0"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
-          
           {
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           }
