@@ -12,8 +12,8 @@
         },
         "cu": [
           {
-            "comment-CUName" : "cu30[(0,0)] <- UnitCompUnit31_x106_0",
-            "comment-scalarIn" : "reg40[6] -> ib829[3] 3",
+            "comment-CUName" : "cu50[(0,0)] <- UnitCompUnit31_x106_0",
+            "comment-scalarIn" : "reg60[12] -> ib849[3] 3",
             "scalarInXbar" :{
               "outSelect" : ["x","x","x","3","x","x","x","x"]
             },
@@ -59,7 +59,7 @@
               },
               {
                 "en" : "i0",
-                "comment-stage" : "wast173 <- LStage56(operands=[s41_regsi59_0,Const(4i)], op=FixAdd, results=[s56_regso67_1])",
+                "comment-stage" : "wast193 <- LStage56(operands=[s41_regsi59_0,Const(4i)], op=FixAdd, results=[s56_regso67_1])",
                 "opA" : "e8",
                 "opB" : "c4i",
                 "opC" : "x",
@@ -68,7 +68,7 @@
                 "fwd" : {"r0" : "alu"}
               },
               {
-                "comment-stage" : "wast227 <- no map",
+                "comment-stage" : "wast247 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -79,7 +79,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "comment-stage" : "wast281 <- no map",
+                "comment-stage" : "wast301 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -90,7 +90,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "comment-stage" : "wast335 <- no map",
+                "comment-stage" : "wast355 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -101,7 +101,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "comment-stage" : "rdst389 <- no map",
+                "comment-stage" : "rdst409 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -112,7 +112,7 @@
                 "fwd" : {"r0" : "t0"}
               },
               {
-                "comment-stage" : "rdst443 <- no map",
+                "comment-stage" : "rdst463 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -123,7 +123,7 @@
                 "fwd" : {"r0" : "t0"}
               },
               {
-                "comment-stage" : "rdst497 <- no map",
+                "comment-stage" : "rdst517 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -134,7 +134,7 @@
                 "fwd" : {"r0" : "t0"}
               },
               {
-                "comment-stage" : "rdst551 <- no map",
+                "comment-stage" : "rdst571 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -145,7 +145,7 @@
                 "fwd" : {"r0" : "t0"}
               },
               {
-                "comment-stage" : "st605 <- no map",
+                "comment-stage" : "st625 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -156,7 +156,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "comment-stage" : "st659 <- no map",
+                "comment-stage" : "st679 <- no map",
                 "en" : "i0",
                 "opA" : "x",
                 "opB" : "x",
@@ -235,7 +235,7 @@
               "doneXbar" :{
                 "outSelect" : ["1","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
               },
-              "comment-udc" : "TokBuf99 -> udlut746[0]",
+              "comment-udc" : "TokBuf99 -> udlut766[0]",
               "comment-inc" : "TokBuf99.inc -> x",
               "comment-dec" : "TokBuf99.inc -> 1",
               "incXbar" :{
@@ -277,7 +277,7 @@
                 "outSelect" : ["x","x","x","x","x","x","x","x"]
               },
               "comment-tokenIn" :{
-                "TokBuf99.init(ib724[5])" : "from Top1_Top.command(ob28[0])"
+                "TokBuf99.init(ib744[5])" : "from Top1_Top.command(ob48[0])"
               }
             }
           },
@@ -287,77 +287,77 @@
         ],
         "dataSwitch": [
           {
-            "comment-sb" : "sb4048[0,0]",
+            "comment-sb" : "sb4308[0,0]",
             "outSelect" : ["x","x","x","x","x","s_0","x","x"]
           },
           {
-            "comment-sb" : "sb4304[0,1]",
+            "comment-sb" : "sb4564[0,1]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb4560[0,2]",
+            "comment-sb" : "sb4820[0,2]",
             "outSelect" : ["x","x","x","x"]
           },
           {
-            "comment-sb" : "sb4816[1,0]",
+            "comment-sb" : "sb5076[1,0]",
             "outSelect" : ["x","x","x","x","nw_0"]
           },
           {
-            "comment-sb" : "sb5021[1,1]",
+            "comment-sb" : "sb5281[1,1]",
             "outSelect" : ["x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb5226[1,2]",
+            "comment-sb" : "sb5486[1,2]",
             "outSelect" : ["x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb5431[2,0]",
+            "comment-sb" : "sb5691[2,0]",
             "outSelect" : ["x","x","x"]
           },
           {
-            "comment-sb" : "sb5636[2,1]",
+            "comment-sb" : "sb5896[2,1]",
             "outSelect" : ["x","x","x"]
           },
           {
-            "comment-sb" : "sb5841[2,2]",
+            "comment-sb" : "sb6101[2,2]",
             "outSelect" : ["x","x","x"]
           }
         ],
         "controlSwitch": [
           {
-            "comment-sb" : "sb6046[0,0]",
+            "comment-sb" : "sb6306[0,0]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb6241[0,1]",
+            "comment-sb" : "sb6501[0,1]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb6436[0,2]",
+            "comment-sb" : "sb6696[0,2]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb6631[1,0]",
+            "comment-sb" : "sb6891[1,0]",
             "outSelect" : ["x","x","x","x","x","x","x","x","s_0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","nw_0"]
           },
           {
-            "comment-sb" : "sb6888[1,1]",
+            "comment-sb" : "sb7148[1,1]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb7145[1,2]",
+            "comment-sb" : "sb7405[1,2]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb7402[2,0]",
+            "comment-sb" : "sb7662[2,0]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb7659[2,1]",
+            "comment-sb" : "sb7919[2,1]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
-            "comment-sb" : "sb7916[2,2]",
+            "comment-sb" : "sb8176[2,2]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           }
         ],
