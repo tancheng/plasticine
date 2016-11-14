@@ -18,5 +18,6 @@
   "burstSizeBytes" : 64,
   "numOutstandingBursts" : 16,
   "numTopInputs" : 4,
-  "numScalarIO" : 8
+  "numScalarIO" : 4,
+  "numScalarRegisters" : 8
 }

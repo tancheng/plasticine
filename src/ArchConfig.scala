@@ -23,7 +23,8 @@ object ArchConfig {
   var burstSizeBytes = 64
   var numOutstandingBursts = 16
   var numTopInputs = 2 * numCols
-  var numScalarIO = 8
+  var numScalarIO = 4
+  var numScalarRegisters = 8
   def printConfig {
      println("Plasticine Configuration:")
      println(s"w =  $w")
@@ -46,6 +47,7 @@ object ArchConfig {
      println(s"numOutstandingBursts =  $numOutstandingBursts")
      println(s"numTopInputs = $numTopInputs")
      println(s"numScalarIO = $numScalarIO")
+     println(s"numScalarRegisters = $numScalarRegisters")
   }
 
   def setConfig(file: String) {
@@ -70,6 +72,7 @@ object ArchConfig {
     numOutstandingBursts =  Parser.getFieldInt(map, "numOutstandingBursts")
     numTopInputs =          Parser.getFieldInt(map, "numTopInputs")
     numScalarIO =          Parser.getFieldInt(map, "numScalarIO")
+    numScalarRegisters =          Parser.getFieldInt(map, "numScalarRegisters")
 
     printConfig
   }

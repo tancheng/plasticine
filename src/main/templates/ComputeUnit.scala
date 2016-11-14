@@ -138,7 +138,8 @@ class ComputeUnit(
   val m: Int,
   val numScratchpads: Int,
   val numStagesAfterReduction: Int,
-  val numScalarIO: Int,
+  val numScalarIO: Int, // Number of words per bus that can contain scalar
+  val numScalarRegisters: Int, // Number of scalar registers
   inst: ComputeUnitConfig
 ) extends ConfigurableModule[ComputeUnitOpcode] {
 
@@ -308,7 +309,7 @@ class ComputeUnit(
   }.flatten
   // Scalar crossbar: (numInputs * 2) x 2
 //  val numInputWordsPerBus = 2
-  val scalarXbar = Module(new Crossbar(w, numScratchpads * numScalarIO, numScalarIO, inst.scalarXbar))
+  val scalarXbar = Module(new Crossbar(w, numScratchpads * numScalarIO, numScalarRegisters, inst.scalarXbar))
   scalarXbar.io.ins.zip(scalarInMux) foreach { case (in, i) => in := i }
   val scalarIns = scalarXbar.io.outs
 
@@ -600,10 +601,11 @@ object ComputeUnitTest {
     val numScratchpads = 4
     val numStagesAfterReduction = 2
     val numScalarIO = ArchConfig.numScalarIO
+    val numScalarRegisters = ArchConfig.numScalarRegisters
 
     val configObj = ComputeUnitConfig.getRandom(d, numTokens, numTokens, numTokens, numScratchpads)
 
-    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numScalarIO, configObj))) {
+    chiselMainTest(chiselArgs, () => Module(new ComputeUnit(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numScalarIO, numScalarRegisters, configObj))) {
       c => new ComputeUnitTests(c)
     }
   }
