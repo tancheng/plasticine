@@ -130,6 +130,7 @@ class CrossbarVecReg(val w: Int, val v: Int, val numInputs: Int, val numOutputs:
       val ff = Module(new FF(w))
       ff.io.control.enable := UInt(1)
       ff.io.data.in := outMux.io.out(i)
+      ff.io.data.init := UInt(0)
       ff
     }
 

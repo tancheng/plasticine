@@ -501,13 +501,16 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
     for (y <- List(0, rows)) {
       val d = if (y == 0) S() else N()
       for (x <- 0 to cols) {
-        val switchOut = getIdxs(x, y, d, OUTPUT)(0)
+        val switchOuts = getIdxs(x, y, d, OUTPUT)
         val switchIn = getIdxs(x, y, d, INPUT)(0)
         switches(x)(y).io.ins(switchIn)(0) := topUnit.io.startTokenOut
-        val topInIdx = if (y > 0) cols + x else x  // Row 0 gets 0..cols-1, last row gets cols..
-        topUnit.io.ctrlIns(topInIdx) := switches(x)(y).io.outs(switchOut)(0)
+        val topInIdx = if (y > 0) (cols+1 + x) * 8 else x*8  // Row 0 gets 0..cols-1, last row gets cols..
+
+        switchOuts.zipWithIndex.foreach { case (outIdx, i) =>
+          topUnit.io.ctrlIns(topInIdx+i) := switches(x)(y).io.outs(outIdx)(0)
+          dot.println(s"s${x}${y} -> top")
+        }
         dot.println(s"top -> s${x}${y}")
-        dot.println(s"s${x}${y} -> top")
       }
     }
   }
@@ -746,7 +749,7 @@ with DirectionOps {
 
   val memoryUnits = genMemoryUnits
 
-  val top = Module(new TopUnit(w, v, (numCols+1) * 8, inst.top))
+  val top = Module(new TopUnit(w, v, (numCols+1) * 2 * 8, inst.top))
   top.io.config_enable := io.config_enable
   top.io.config_data := io.config_data
   top.io.addr := io.addr

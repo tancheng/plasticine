@@ -365,9 +365,9 @@ object Parser {
     }
 
     def parseSwitches(ml: List[Map[Any, Any]], helper: InterconnectHelper) = {
-      List.tabulate(helper.rows+1) { y =>
-        List.tabulate (helper.cols+1) { x =>
-          val map = ml(y*(helper.cols+1) + x)
+      List.tabulate (helper.cols+1) { x =>
+        List.tabulate(helper.rows+1) { y =>
+          val map = ml(x*(helper.rows+1) + y)
           val outSelectRaw = Parser.getFieldList(map, "outSelect")
                                         .asInstanceOf[List[String]]
           val outSelect = outSelectRaw.map { str =>
@@ -413,7 +413,6 @@ object Parser {
     println(s"[parsePlasticine] Parsing dataSwitch")
     val dataSwitch: List[CrossbarConfig] = parseSwitches(Parser.getFieldListOfMaps(m, "dataSwitch"),
                                                   dataNetwork)
-    sys.exit(0)
 
 
     println(s"[parsePlasticine] Parsing controlSwitch")

@@ -30,12 +30,15 @@ trait PDBGlobals {
   private var _tester: PlasticinePDBTester = _
   def tester = _tester
   def tester_=(h: PlasticinePDBTester) { _tester = h }
-
 }
 
 trait PDBBase
 
-class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends PlasticineTester(module, isTrace = false, dumpFile=Some("pdbDump.txt")) {
+case class SimulationConfig(
+  alertInterval: Int
+  )
+
+class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends PlasticineTester(module, isTrace = false, dumpFile=Some("pdbDump.txt")) with PDBGlobals {
 
   def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
 
@@ -192,8 +195,13 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     breakOnHigh(List(signal))
   }
 
-  def break(signals: Seq[UInt]) { signals.foreach { s => signalsToWatch += s } }
+  def break(signals: Seq[UInt]) { signals.foreach { s =>
+    println(s"[break] Set on signal ${s.name}")
+  signalsToWatch += s } }
   def break(signal: UInt) { break(List(signal)) }
+
+  def clear(signals: Seq[UInt]) { signals.foreach { signalsToWatch -= _ }}
+  def clear(signal: UInt = null) { if (signal == null) signalsToWatch.clear else clear(Seq(signal)) }
 
   // Run design by poking the start signal
   def start {
@@ -202,35 +210,42 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     writeReg(commandReg, 1)
   }
 
-  def observeFor(numCycles: Int) {
+  def observeFor(numCycles: Int) = {
     var localCycles = 0
 
     var anyHigh = 0
     while ((localCycles < numCycles) &(anyHigh < 1)) {
+      // Advance time
+      step(1)
+      localCycles += 1
+      cycleCount += 1
+      if ((cycleCount % alertInterval) == 0) println(s"[cycleCount $cycleCount]")
+
       val signals = signalsToWatch.toList
-      val watchVals = signals.map { s => peek(s).toInt }
+      val watchVals = signals.map { s =>
+        val v = peek(s).toInt
+        if (v < 0) 0 else v
+      }
       anyHigh = if (watchVals.size == 0) 0 else watchVals.reduce { (a,b) => a | b }
 
       // Peek every signal in signalsToWatch
-      if (anyHigh > 1) {
+      if (anyHigh != 0) {
           signals.zip(watchVals).foreach { case (signal, v) =>
-          println(s"[watch] $signal = $v, at cycle $cycleCount")
+          if (v != 0) println(s"[watch] ${signal.name} = $v, at cycle $cycleCount")
         }
-      } else {
-        step(1)
-        localCycles += 1
-        cycleCount += 1
       }
     }
+    anyHigh
   }
 
-  def runToFinish {
+  def c {
     var status = readReg(module.top.statusRegIdx)
-    while (status != 1) {
+    var breakpoint = 0
+    while ((status != 1) & (breakpoint != 1)) {
       status = readReg(module.top.statusRegIdx)
-      observeFor(1)
+      breakpoint = observeFor(1)
     }
-    finish
+    if (status == 1) println(s"Done, design ran for $cycleCount cycles")
   }
 
   def printScalarRegs {
@@ -240,12 +255,22 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
    }
   }
 
-  def watchCU(x: Int, y: Int) {
+  def watchcu(x: Int, y: Int) {
     val cuModule = module.computeUnits(x)(y)
     val tokenIns = cuModule.io.tokenIns
     val tokenOuts = cuModule.io.tokenOuts
     break(tokenIns ++ tokenOuts)
   }
+
+  def watchcs(x: Int, y: Int) {
+    val ctrlSwitch = module.controlSwitch(x)(y)
+    val tokenIns = ctrlSwitch.io.ins map { _(0) }
+    val tokenOuts = ctrlSwitch.io.outs map { _(0) }
+    break(tokenIns ++ tokenOuts)
+  }
+
+  var alertInterval = 10000
+  def setAlertInterval(i: Int) { alertInterval = i }
 
   val ctrlNetwork = new CtrlInterconnectHelper {
     val rows = ArchConfig.numRows
@@ -492,17 +517,22 @@ object PDB extends PDBCore {
   def start = tester.start
   def n = s(1)
   def s(numCycles: Int = 1) = tester.observeFor(numCycles)
-  def runToFinish = tester.runToFinish
   def scalars = tester.printScalarRegs
   def breakOnHigh(signal: UInt) = tester.breakOnHigh(signal)
   def poke(signal: Bits, data: Int) = tester.poke(signal, data)
   def peek(signal: UInt) = tester.peek(signal)
   def break(signal: UInt) = tester.break(signal)
   def break(signals: Seq[UInt]) = tester.break(signals)
+  def clear(signal: UInt = null) = tester.clear(signal)
+  def clear(signals: Seq[UInt]) = tester.clear(signals)
   def cu(x: Int, y: Int, options: String*) = tester.showCU(x, y, options:_*)
   def cs(x: Int, y: Int) = tester.showSwitch(x, y)
   def showTop = tester.showTop
-  def watchCU(x: Int, y: Int) = tester.watchCU(x, y)
+  def watchcu(x: Int, y: Int) = tester.watchcu(x, y)
+  def watchcs(x: Int, y: Int) = tester.watchcs(x, y)
   def xbar(mod: Crossbar) = tester.printXbar(mod)
   def lut(mod: LUT) = tester.printLUT(mod)
+  def cycles = tester.cycleCount
+  def c = tester.c
+  def alert(x: Int) { tester.setAlertInterval(x) }
 }
