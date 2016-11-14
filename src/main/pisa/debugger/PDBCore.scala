@@ -495,6 +495,13 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     v foreach { i => print(peek(i) + " ")}
     println(" ")
   }
+
+  def dout(mod: Module) = mod match {
+    case t: TopUnit => dv(t.io.out)
+    case cu: ComputeUnit => dv(cu.io.dataOut)
+    case _ => println(s"No rule added to dump output for ${mod.name}")
+  }
+
 }
 
 trait PDBCore extends PDBBase with PDBGlobals {
@@ -550,7 +557,6 @@ trait PDBCore extends PDBBase with PDBGlobals {
       val plasticineConfig="Plasticine22"
   }
 
-
 }
 
 object PDB extends PDBCore {
@@ -588,4 +594,6 @@ object PDB extends PDBCore {
   def regs(c: ComputeUnit, d: Int, v: Int) = tester.dumpRegs(c, d, v)
   def stage(c: ComputeUnit, d: Int, verbose: Boolean = false) = tester.dumpStage(c, d, verbose)
   def callback(f: () => Unit) = tester.regCallback(f)
+  def dv(v: Vec[UInt]) = tester.dv(v)
+  def dout (mod: Module) = tester.dout(mod)
 }
