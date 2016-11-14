@@ -303,14 +303,14 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     println(s"Xbar: $name")
 
     val invals = mod.io.ins map { in =>
-      val v = peek(in(0))
+      val v = if (mod.w == 1) peek(in(0)) else peek(in)
       if (v < 0) "-" else s"$v"
     }
     println(invals.mkString("   "))
     for (i <- 0 until mod.numOutputs) {
       val outSelect = peek(mod.config.outSelect(i)).toInt
       val configStr = List.tabulate(mod.numInputs) { i => if (i == outSelect) "x" else " " }.mkString("   ")
-      val output = peek(mod.io.outs(i)(0)).toInt
+      val output = if (mod.w == 1) peek(mod.io.outs(i)(0)).toInt else peek(mod.io.outs(i)).toInt
       println(configStr + " | " + output)
     }
     println(s"--------------------------------")
