@@ -829,17 +829,19 @@ object PlasticineTest {
     val pisaFile = appArgs(1)
 
     ArchConfig.setConfig(spadeFile)
-//    val config =  PlasticineConfig.zeroes(
-//        ArchConfig.d,
-//        ArchConfig.numRows,
-//        ArchConfig.numCols,
-//        ArchConfig.numTokens,
-//        ArchConfig.numTokens,
-//        ArchConfig.numTokens,
-//        ArchConfig.numScratchpads,
-//        ArchConfig.numMemoryUnits
-//      )
-    val config = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+    val config =  PlasticineConfig.zeroes(
+        ArchConfig.d,
+        ArchConfig.numRows,
+        ArchConfig.numCols,
+        ArchConfig.numTokens,
+        ArchConfig.numTokens,
+        ArchConfig.numTokens,
+        ArchConfig.numScratchpads,
+        ArchConfig.numMemoryUnits
+//        ArchConfig.numScalarIO
+//        ArchConfig.numScalarRegisters
+      )
+//    val config = Parser(pisaFile).asInstanceOf[PlasticineConfig]
 //    val config = PlasticineConfig.getRandom(d, rows, cols, numTokens, numTokens, numTokens, numScratchpads, numMemoryUnits)
 
     val bitwidth = ArchConfig.w

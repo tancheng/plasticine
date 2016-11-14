@@ -81,7 +81,7 @@ def stage(app, params, opts):
         ecode = os.system("pushd %s && time ./chopper.sh Plasticine.cpp && popd" %(build_dir))
 
         print("Performing parallel make..")
-        ecode = os.system("pushd %s && make -j80 && popd" %(build_dir))
+        ecode = os.system("pushd %s && make -j12 && popd" %(build_dir))
 #        ecode = os.system("pushd %s && time make -j16 && popd" %(build_dir))
         if (ecode != 0):
             err("C compilation failed")
