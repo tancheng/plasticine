@@ -239,7 +239,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
 
   // Read address generator
   val raddrGen = Module(new Counter(log2Up(d+1)))
-  raddrGen.io.data.max := UInt(bankSize - (bankSize % inst.numBufs))  // Mux if non-parallel FIFO
+  raddrGen.io.data.max := UInt(if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs))  // Mux if non-parallel FIFO
   raddrGen.io.data.stride := UInt(1)
   raddrGen.io.control.enable := readEn
   raddrGen.io.control.reset := io.rdone
@@ -249,7 +249,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
 
   // Write address generator
   val waddrGen = Module(new Counter(log2Up(d+1)))
-  waddrGen.io.data.max := UInt(bankSize - (bankSize % inst.numBufs))  // Mux if non-parallel FIFO
+  waddrGen.io.data.max := UInt(if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)) // Mux if non-parallel FIFO
   waddrGen.io.data.stride := UInt(1)
   waddrGen.io.control.enable := readEn
   waddrGen.io.control.reset := io.rdone
