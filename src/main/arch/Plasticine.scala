@@ -275,7 +275,7 @@ trait InterconnectHelper extends DirectionOps {
         val switchOut = getIdxs(x, y, d, OUTPUT)(0)
         val switchIn = getIdxs(x, y, d, INPUT)(0)
         switches(x)(y).io.ins(switchIn) := topUnit.io.out
-        val topInIdx = if (y > 0) cols + x else x
+        val topInIdx = if (y > 0) cols + 1 + x else x
         topUnit.io.ins(topInIdx) := switches(x)(y).io.outs(switchOut)
         dot.println(s"top -> s${x}${y}")
         dot.println(s"s${x}${y} -> top")
