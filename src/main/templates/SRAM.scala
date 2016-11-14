@@ -27,7 +27,7 @@ class SRAM(val w: Int, val d: Int) extends Module {
  * @param mask: Vec of Bool mask in little-to-big-byte order
  * I.e., mask(0) corresponds to byte enable of least significant byte
  */
-class SRAMByteEnable(val w: Int, val d: Int) extends BlackBox {
+class SRAMByteEnable(val w: Int, val d: Int) extends Module {
   val addrWidth = log2Up(d)
   val numBytes = w/8
   Predef.assert(w%8 == 0, s"Invalid word width $w in SRAMByteEnable: Must be a multiple of 8")

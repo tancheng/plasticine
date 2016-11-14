@@ -249,12 +249,12 @@ object CUControlBoxConfig {
         List.fill(numTokenOut) { LUTConfig.zeroes(2) }, // tokenOutLUT
         List.fill(numCounters) { LUTConfig.zeroes(numCounters)}, // enableLUT
         List.fill(8) { LUTConfig.zeroes(numCounters+1) }, // tokenDownLUT,
-        List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
+        List.fill(numCounters) { 0 }, // udcInit,
         CrossbarConfig.zeroes(numCounters), // decXbar,
         CrossbarConfig.zeroes(2*numCounters), // incXbar,
         CrossbarConfig.zeroes(numCounters), // tokenInXbar,
         CrossbarConfig.zeroes(2*numCounters), // doneXbar,
-        List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
+        List.fill(numCounters) { false }, // enableMux,
         List.fill(8) { 0 }, // syncTokenMux
         CrossbarConfig.zeroes(numCounters) // tokenOutXbar,
       )
