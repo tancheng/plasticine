@@ -34,6 +34,7 @@ class CounterChainCore(val w: Int, val startDelayWidth: Int, val endDelayWidth: 
     }
     val control = Vec.fill(numCounters) { new Bundle {
         val enable = Bool(INPUT)
+        val enableWithDelay = Bool(OUTPUT)
         val done   = Bool(OUTPUT)
       }
     }
@@ -73,6 +74,7 @@ class CounterChainCore(val w: Int, val startDelayWidth: Int, val endDelayWidth: 
                                       Bool(false))
     }
     io.control(i).done := counters(i).io.control.done
+    io.control(i).enableWithDelay := counters(i).io.control.enableWithDelay
   }
 }
 
@@ -96,6 +98,7 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
     }
     val control = Vec.fill(numCounters) { new Bundle {
         val enable = Bool(INPUT)
+        val enableWithDelay = Bool(OUTPUT)
         val done   = Bool(OUTPUT)
       }
     }
@@ -146,6 +149,7 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
                                       Bool(false))
     }
     io.control(i).done := counters(i).io.control.done
+    io.control(i).enableWithDelay := counters(i).io.control.enableWithDelay
   }
 }
 

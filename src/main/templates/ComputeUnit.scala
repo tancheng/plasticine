@@ -296,10 +296,12 @@ class ComputeUnit(
   controlBlock.io.config_data := io.config_data
   controlBlock.io.tokenIns := io.tokenIns
   controlBlock.io.fifoNotFull := Vec(scratchpads.map { ~_.io.full })
+  val counterEnablesWithDelay = counterChain.io.control map { _.enableWithDelay }
   val counterDones = counterChain.io.control map { _.done}
   controlBlock.io.done := counterDones
   counterEnables := controlBlock.io.enable
   io.tokenOuts := controlBlock.io.tokenOuts
+
 
   val scalarInMux = List.tabulate(numScratchpads) { i =>
     Mux(config.scalarInMux(i), Vec(rdata(i).take(numScalarIO)), Vec(io.dataIn(i).take(numScalarIO)))
@@ -524,7 +526,7 @@ class ComputeUnit(
     wdMux(i).io.ins(1) := remoteWriteData(i) // remote write data - one-to-one correspondence between input bus and scratchpad
     wenMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
       if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
-      else in := counterEnables(ii-1)
+      else in := counterEnablesWithDelay(ii-1)
     }
     wswapMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
       if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
@@ -536,11 +538,11 @@ class ComputeUnit(
     }
     enqEnMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
       if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
-      else in := counterEnables(ii-1)
+      else in := counterEnablesWithDelay(ii-1)
     }
     deqEnMux(i).io.ins.zipWithIndex.foreach { case(in, ii) =>
       if (ii == 0) in := UInt(0, width=1) // To enable turning off writes statically
-      else in := counterEnables(ii-1)
+      else in := counterEnablesWithDelay(ii-1)
     }
   }
 

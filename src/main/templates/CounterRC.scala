@@ -46,6 +46,7 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
     }
     val control = new Bundle {
       val enable    = Bool(INPUT)
+      val enableWithDelay = Bool(OUTPUT)
       val waitIn    = Bool(INPUT)
       val waitOut    = Bool(OUTPUT)
       val done   = Bool(OUTPUT)
@@ -84,9 +85,12 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
     val localEnable = io.control.enable & ~io.control.waitIn
     startDelayCounter.io.control.enable := localEnable
     startDelayCounter.io.control.reset := counter.io.control.done
-    counter.io.control.enable := startDelayCounter.io.control.done & ~depulser.io.out
+    val enableWithDelay = startDelayCounter.io.control.done & ~depulser.io.out
+    counter.io.control.enable := enableWithDelay
+    io.control.enableWithDelay := enableWithDelay
   } else {
     counter.io.control.enable := io.control.enable
+    io.control.enableWithDelay := io.control.enable
   }
 
   if (endDelayWidth > 0) {
