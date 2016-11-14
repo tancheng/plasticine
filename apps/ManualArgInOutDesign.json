@@ -59,7 +59,7 @@
               {
                 "en" : "i0",
                 "comment-stage" : "wast173 <- LStage56(operands=[s41_regsi59_0,Const(4i)], op=FixAdd, results=[s56_regso67_1])",
-                "opA" : "e12",
+                "opA" : "e11",
                 "opB" : "c4i",
                 "opC" : "x",
                 "opcode" : "+",

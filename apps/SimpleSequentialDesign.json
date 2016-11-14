@@ -8,7 +8,7 @@
         "comment-argOuts" : "ArgOut7 -> 0",
         "top" :{
           "done" : "39",
-          "argOut" : "4"
+          "argOut" : "3"
         },
         "cu": [
           {
@@ -33,7 +33,7 @@
                 {
                   "max" : "c96i",
                   "min" : "c0i",
-                  "stride" : "c1i",
+                  "stride" : "c16i",
                   "startDelay" : "0",
                   "endDelay" : "10"
                 },
@@ -53,7 +53,7 @@
               {
                 "en" : "i0",
                 "comment-stage" : "wast173 <- LStage58(operands=[s43_regsi61_0,s43_regct65_1], op=FixMul, results=[s58_regvo71_2])",
-                "opA" : "e12",
+                "opA" : "e11",
                 "opB" : "e0",
                 "opC" : "x",
                 "opcode" : "*",
@@ -272,13 +272,15 @@
           {
             "comment-CUName" : "cu903[(0,1)] <- UnitCompUnit79_x390",
             "scalarInXbar" :{
-              "outSelect" : ["x","x","x","3"]
+              "outSelect" : ["x","x","x","4"]
             },
             "scalarOutMux" : "1",
             "scalarInMux" :{
               "outSelect" : [0,0,0,0]
             },
             "scratchpads": [
+              "x",
+              "x",
               {
                 "ra" : "s0",
                 "deqEn" : "x",
@@ -289,14 +291,12 @@
                 "end" : "x",
                 "enqEn" : "x",
                 "isWriteFifo" : "0",
-                "wd" : "bus2",
+                "wd" : "remote",
                 "banking" : "b1",
                 "numBufs" : 1,
                 "rswap" : "x",
                 "wswap" : "x"
               },
-              "x",
-              "x",
               "x"
             ],
             "counterChain" :{
@@ -306,8 +306,8 @@
                 {
                   "max" : "c96i",
                   "min" : "c0i",
-                  "stride" : "c1i",
-                  "startDelay" : "0",
+                  "stride" : "c16i",
+                  "startDelay" : "10",
                   "endDelay" : "0"
                 },
                 {
@@ -338,7 +338,7 @@
               {
                 "en" : "i1",
                 "comment-stage" : "wast1046 <- LStage119(operands=[s89_regsi123_0], op=Bypass, results=[SRAM112.ra])",
-                "opA" : "e12",
+                "opA" : "e11",
                 "opB" : "x",
                 "opC" : "x",
                 "opcode" : "passA",
@@ -348,7 +348,7 @@
               {
                 "en" : "i1",
                 "comment-stage" : "wast1100 <- LStage120(operands=[SRAM112.rp], op=Bypass, results=[s120_regso132_1])",
-                "opA" : "m0",
+                "opA" : "m2",
                 "opB" : "x",
                 "opC" : "x",
                 "opcode" : "passA",
