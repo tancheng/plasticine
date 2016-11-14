@@ -17,6 +17,6 @@
   "numMemoryUnits" : 2,
   "burstSizeBytes" : 64,
   "numOutstandingBursts" : 16,
-  "numTopInputs" : 4
-
+  "numTopInputs" : 4,
+  "numScalarIO" : 8
 }

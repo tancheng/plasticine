@@ -468,7 +468,7 @@ trait PDBCore extends PDBBase with PDBGlobals {
 //    case c: ComputeUnitConfig => Module(new ComputeUnit(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, c))
 //    case c: CUControlBoxConfig => Module(new CUControlBox(numTokens, c))
 //    case c: TopUnitConfig => Module(new TopUnit(w, v, numTopInputs, c))
-    case c: PlasticineConfig => Module(new Plasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, c))
+    case c: PlasticineConfig => Module(new Plasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, numScalarIO, c))
     case _ => throw new Exception(s"Unsupported config type $config")
   }
 
