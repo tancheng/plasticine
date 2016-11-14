@@ -261,6 +261,8 @@
                   "table" : "x"
                 }
               ],
+              "fifoAndTree" : [0,0,0,0],
+              "tokInAndTree" : ["x","x","x","x","x","x","x","x"],
               "enableMux" : ["0","x","x","x","x","x","x","x"],
               "tokenInXbar" :{
                 "outSelect" : ["x","x","x","x","x","x","x","x"]
@@ -469,7 +471,7 @@
               ],
               "tokenOutLUT": [
                 {
-                  "comment-TokOutLUT222" : "TransferFunction: !Ctr175.done && Ctr138.done, Map(Ctr175.done -> 1, Ctr138.done -> 0)",
+                  "comment-TokOutLUT222" : "TransferFunction: !Ctr175.done && Ctr138.done, Map(Ctr138.done -> 0, Ctr175.done -> 1)",
                   "table" : ["0","0","1","0"]
                 },
                 {
@@ -538,6 +540,8 @@
                   "table" : "x"
                 }
               ],
+              "fifoAndTree" : [0,0,0,0],
+              "tokInAndTree" : ["x","x","x","x","x","x","x","x"],
               "enableMux" : ["0","x","x","x","x","x","x","x"],
               "tokenInXbar" :{
                 "outSelect" : ["x","x","x","x","x","x","x","x"]

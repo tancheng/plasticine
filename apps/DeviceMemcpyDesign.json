@@ -275,6 +275,8 @@
                   "table" : "x"
                 }
               ],
+              "fifoAndTree" : [0,0,0,0],
+              "tokInAndTree" : ["x","x","x","x","x","x","x","x"],
               "enableMux" : ["0","x","x","x","x","x","x","x"],
               "tokenInXbar" :{
                 "outSelect" : ["x","x","x","x","x","x","x","x"]
