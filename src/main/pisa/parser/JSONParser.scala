@@ -210,9 +210,12 @@ object Parser {
 
       val control = parseControlBox(Parser.getFieldMap(m, "control"))
 
+      val scalarInMux = Parser.getFieldList(Parser.getFieldMap(m, "scalarInMux"), "outSelect")
+                        .asInstanceOf[List[Double]]
+                        .map { _.toInt }
       val scalarOutMux = parseValue(Parser.getFieldString(m, "scalarOutMux"))
 
-      ComputeUnitConfig(counterChain, scalarXbar, scratchpads, pipeStage, control, scalarOutMux)
+      ComputeUnitConfig(counterChain, scalarXbar, scratchpads, pipeStage, control, scalarInMux, scalarOutMux)
   }
 
   def parseCrossbar(m: Map[Any, Any], incByOne: Boolean = false): CrossbarConfig = {
@@ -235,7 +238,7 @@ object Parser {
                                 .map { parseValue(_) }
     val decXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "decXbar"), true)
     val incXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "incXbar"), true)
-    val tokenInXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenInXbar"))
+    val tokenInXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenInXbar"), true)
     val doneXbar: CrossbarConfig  = parseCrossbar(Parser.getFieldMap(m, "doneXbar"))
     val enableMux: List[Boolean] = Parser.getFieldList(m, "enableMux")
                                 .asInstanceOf[List[String]]

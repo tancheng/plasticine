@@ -59,6 +59,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         m.counters.zip(c.counters) foreach { case (c, i) => setConfig(c, i) }
       case m: AbstractMemoryUnit =>
         val c = cfg.asInstanceOf[MemoryUnitConfig]
+        poke(m.config.scatterGather, c.scatterGather > 0)
+        poke(m.config.isWr, c.isWr > 0)
       case m: Scratchpad =>
         val c = cfg.asInstanceOf[ScratchpadConfig]
         poke(m.config.mode, c.banking.mode)
@@ -94,6 +96,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
           }
         }
         setConfig(m.controlBlock, c.control)
+        m.config.scalarInMux.zip(c.scalarInMux) foreach { case (c, i) => poke(c, i) }
+        poke(m.config.scalarOutMux, c.scalarOutMux)
       case m: CUControlBox =>
         val c = cfg.asInstanceOf[CUControlBoxConfig]
         m.config.udcInit.zip(c.udcInit) foreach { case (c, i) => poke(c, i) }
@@ -210,6 +214,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     writeReg(commandReg, 1)
   }
 
+  var callback: () => Unit = () => ()
+  def regCallback (f: () => Unit) { callback = f }
   def observeFor(numCycles: Int) = {
     var localCycles = 0
 
@@ -235,6 +241,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         }
       }
     }
+    callback()
     anyHigh
   }
 
@@ -450,6 +457,38 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
       println(s"--------------------------------")
     }
   }
+
+  def dumpRegs(mod: ComputeUnit, d: Int, v: Int) {
+    val pipeRegs = mod.pipeRegs(d)(v)
+    pipeRegs.io.passDataOut.foreach { r => println(peek(r)) }
+  }
+
+  def dumpStage(mod: ComputeUnit, d: Int, verbose: Boolean = false) {
+    println(s"---- Stage $d (${Opcodes.opcodes(peek(mod.config.pipeStage(d).opcode).toInt)._1})")
+    val stageFUs = mod.pipeStages(d)
+    val opAs = stageFUs.map { fu => peek(fu.io.a) }
+    val opBs = stageFUs.map { fu => peek(fu.io.b) }
+    val opCs = stageFUs.map { fu => peek(fu.io.c) }
+    val res = stageFUs.map { fu => peek(fu.io.out) }
+    if (verbose) {
+      println("---- First lane previous regfile")
+      dumpRegs(mod, d, 0)
+    }
+    println(s"---- opA: $opAs")
+    println(s"---- opB: $opBs")
+    println(s"---- opC: $opCs")
+    println(s"---- res: $res")
+    if (verbose) {
+      println("---- First lane regfile")
+      dumpRegs(mod, d+1, 0)
+    }
+
+  }
+
+  def dv(v: Vec[UInt]) = {
+    v foreach { i => print(peek(i) + " ")}
+    println(" ")
+  }
 }
 
 trait PDBCore extends PDBBase with PDBGlobals {
@@ -504,11 +543,13 @@ trait PDBCore extends PDBBase with PDBGlobals {
       }
       val plasticineConfig="Plasticine22"
   }
+
+
 }
 
 object PDB extends PDBCore {
   def reconfig(file: String) = {
-    pisaConfig = Parser(pisaFile).asInstanceOf[PlasticineConfig]
+    pisaConfig = Parser(file).asInstanceOf[PlasticineConfig]
     tester.reset(10)
     tester.setConfig(hw, pisaConfig)
   }
@@ -523,10 +564,13 @@ object PDB extends PDBCore {
   def peek(signal: UInt) = tester.peek(signal)
   def break(signal: UInt) = tester.break(signal)
   def break(signals: Seq[UInt]) = tester.break(signals)
-  def clear(signal: UInt = null) = tester.clear(signal)
-  def clear(signals: Seq[UInt]) = tester.clear(signals)
+  def bclear(signal: UInt = null) = tester.clear(signal)
+  def bclear(signals: Seq[UInt]) = tester.clear(signals)
   def cu(x: Int, y: Int, options: String*) = tester.showCU(x, y, options:_*)
   def cs(x: Int, y: Int) = tester.showSwitch(x, y)
+  def getcu(x: Int, y: Int) = hw.computeUnits(x)(y)
+  def getds(x: Int, y: Int) = hw.dataSwitch(x)(y)
+  def getcs(x: Int, y: Int) = hw.controlSwitch(x)(y)
   def showTop = tester.showTop
   def watchcu(x: Int, y: Int) = tester.watchcu(x, y)
   def watchcs(x: Int, y: Int) = tester.watchcs(x, y)
@@ -535,4 +579,7 @@ object PDB extends PDBCore {
   def cycles = tester.cycleCount
   def c = tester.c
   def alert(x: Int) { tester.setAlertInterval(x) }
+  def regs(c: ComputeUnit, d: Int, v: Int) = tester.dumpRegs(c, d, v)
+  def stage(c: ComputeUnit, d: Int, verbose: Boolean = false) = tester.dumpStage(c, d, verbose)
+  def callback(f: () => Unit) = tester.regCallback(f)
 }

@@ -98,6 +98,10 @@ case class ComputeUnitOpcode(val w: Int, val d: Int, rwStages: Int, val l: Int, 
     }
   }
 
+  val scalarInMux = Vec.tabulate(numScratchpads) { i =>
+    if (config.isDefined) Bool(config.get.scalarInMux(i) > 0) else Bool()
+  }
+
   val scalarOutMux = if (config.isDefined) Bool(config.get.scalarOutMux > 0) else Bool()
   override def cloneType(): this.type = {
     new ComputeUnitOpcode(w, d, rwStages, l, r, m, v, numCounters, numScratchpads, config).asInstanceOf[this.type]
@@ -264,10 +268,13 @@ class ComputeUnit(
   counterEnables := controlBlock.io.enable
   io.tokenOuts := controlBlock.io.tokenOuts
 
+  val scalarInMux = List.tabulate(numScratchpads) { i =>
+    Mux(config.scalarInMux(i), Vec(rdata(i).take(numScalarIO)), Vec(io.dataIn(i).take(numScalarIO)))
+  }.flatten
   // Scalar crossbar: (numInputs * 2) x 2
 //  val numInputWordsPerBus = 2
   val scalarXbar = Module(new Crossbar(w, numScratchpads * numScalarIO, numScalarIO, inst.scalarXbar))
-  scalarXbar.io.ins := Vec(rdata.map { _.take(numScalarIO) }.flatten)
+  scalarXbar.io.ins.zip(scalarInMux) foreach { case (in, i) => in := i }
   val scalarIns = scalarXbar.io.outs
 
   // Empty pipe stage generation for each lane

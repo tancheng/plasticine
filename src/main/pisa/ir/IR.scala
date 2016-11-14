@@ -174,6 +174,7 @@ case class ComputeUnitConfig(
   scratchpads: List[ScratchpadConfig],
   pipeStage: List[PipeStageConfig],
   control: CUControlBoxConfig,
+  scalarInMux: List[Int],
   scalarOutMux: Int
 //  dataInXbar: CrossbarConfig
 ) extends AbstractConfig
@@ -185,6 +186,7 @@ object ComputeUnitConfig {
       List.tabulate(numScratchpads) { i => ScratchpadConfig.getRandom },
       List.tabulate(d) { i => PipeStageConfig.getRandom },
       CUControlBoxConfig.getRandom(numTokenIn, numTokenOut, numCounters),
+      List.fill(numScratchpads) { 0 },
       0
       )
   }
@@ -195,6 +197,7 @@ object ComputeUnitConfig {
       List.tabulate(numScratchpads) { i => ScratchpadConfig.zeroes },
       List.tabulate(d) { i => PipeStageConfig.zeroes },
       CUControlBoxConfig.zeroes(numTokenIn, numTokenOut, numCounters),
+      List.fill(numScratchpads) { 0 },
       0
       )
   }
