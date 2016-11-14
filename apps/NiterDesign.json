@@ -4,21 +4,22 @@
     "topconfig" :{
       "type" : "plasticine",
       "config" :{
-        "comment-argIns" : "ArgIn4 -> 0",
-        "comment-argOuts" : "ArgOut5 -> 0",
+        "comment-argIns-busIdx" : "ArgIn4 -> 0",
+        "comment-argOuts-busIdx" : "ArgOut5 -> 0",
         "top" :{
-          "done" : "0",
-          "argOut" : "0"
+          "done" : "15",
+          "argOut" : "1"
         },
         "cu": [
           {
             "comment-CUName" : "cu30[(0,0)] <- PipeCU85_x465",
+            "comment-scalarIn" : "reg40[6] -> ib829[3] 3",
             "scalarInXbar" :{
-              "outSelect" : ["x","x","x","6"]
+              "outSelect" : ["x","x","x","3","x","x","x","x"]
             },
             "scalarOutMux" : "0",
             "scalarInMux" :{
-              "outSelect" : [0,0,0,0]
+              "outSelect" : [0,0,0,0,0,0,0,0]
             },
             "scratchpads": [
               "x",
@@ -38,7 +39,7 @@
                   "endDelay" : "10"
                 },
                 {
-                  "max" : "e12",
+                  "max" : "e8",
                   "min" : "c0i",
                   "stride" : "c96i",
                   "startDelay" : "0",
@@ -236,13 +237,16 @@
                 }
               ],
               "tokenOutXbar" :{
-                "outSelect" : ["x","x","x","x","x","x","x","8"]
+                "outSelect" : ["x","x","x","x","x","12","x","x"]
               },
               "doneXbar" :{
                 "outSelect" : ["3","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
               },
+              "comment-udc" : "TokBuf267 -> udlut746[0]",
+              "comment-inc" : "TokBuf267.inc -> x",
+              "comment-dec" : "TokBuf267.inc -> 3",
               "incXbar" :{
-                "outSelect" : ["x","x","x","x","x","x","x","x","7","x","x","x","x","x","x","x"]
+                "outSelect" : ["x","x","x","x","x","x","x","x","5","x","x","x","x","x","x","x"]
               },
               "decXbar" :{
                 "outSelect" : ["3","x","x","x","x","x","x","x"]
@@ -250,7 +254,7 @@
               "udcInit" : ["1","x","x","x","x","x","x","x"],
               "enableLUT": [
                 {
-                  "comment-EnLUT272" : "TransferFunction: TokBuf267.o, Map(TokBuf267.o -> 0)",
+                  "comment-EnLUT272" : "TransferFunction: TokBuf267.o, Map(TokBuf267.o -> 0) idx:0",
                   "table" : ["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1"]
                 },
                 {
@@ -278,6 +282,9 @@
               "enableMux" : ["0","x","x","x","x","x","x","x"],
               "tokenInXbar" :{
                 "outSelect" : ["x","x","x","x","x","x","x","x"]
+              },
+              "comment-tokenIn" :{
+                "TokBuf267.init(ib724[5])" : "from Top1_Top.command(ob28[0])"
               }
             }
           },
@@ -287,59 +294,77 @@
         ],
         "dataSwitch": [
           {
+            "comment-sb" : "sb4048[0,0]",
             "outSelect" : ["x","x","x","x","x","s_0","x","x"]
           },
           {
+            "comment-sb" : "sb4304[0,1]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb4560[0,2]",
             "outSelect" : ["x","x","x","x"]
           },
           {
-            "outSelect" : ["x","x","x","x","sw_0"]
+            "comment-sb" : "sb4816[1,0]",
+            "outSelect" : ["x","x","x","x","nw_0"]
           },
           {
+            "comment-sb" : "sb5021[1,1]",
             "outSelect" : ["x","x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb5226[1,2]",
             "outSelect" : ["x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb5431[2,0]",
             "outSelect" : ["x","x","x"]
           },
           {
+            "comment-sb" : "sb5636[2,1]",
             "outSelect" : ["x","x","x"]
           },
           {
+            "comment-sb" : "sb5841[2,2]",
             "outSelect" : ["x","x","x"]
           }
         ],
         "controlSwitch": [
           {
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","s_0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","ne_0"]
+            "comment-sb" : "sb6046[0,0]",
+            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb6241[0,1]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb6436[0,2]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+            "comment-sb" : "sb6631[1,0]",
+            "outSelect" : ["x","x","x","x","x","x","x","x","s_0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","nw_0"]
           },
           {
+            "comment-sb" : "sb6888[1,1]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb7145[1,2]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb7402[2,0]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb7659[2,1]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb7916[2,2]",
             "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           }
         ],
