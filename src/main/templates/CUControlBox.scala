@@ -31,6 +31,22 @@ case class CUControlBoxOpcode(val numTokens: Int, val numTokenDownLUTs: Int, con
     if (config.isDefined) UInt(config.get.syncTokenMux(i), width=log2Up(numTokens))
     else UInt(width=log2Up(numTokens))
   }
+
+  val fifoAndTree = Vec.tabulate(ArchConfig.numScratchpads) { i =>
+    if (config.isDefined) UInt(config.get.fifoAndTree(i), width = log2Up(ArchConfig.numScratchpads))
+    else UInt(width = log2Up(ArchConfig.numScratchpads))
+  }
+
+  val tokenInAndTree = Vec.tabulate(ArchConfig.numTokens) { i =>
+    if (config.isDefined) UInt(config.get.tokenInAndTree(i), width = log2Up(ArchConfig.numTokens))
+    else UInt(width = log2Up(ArchConfig.numTokens))
+  }
+
+  val fifoMux = Vec.tabulate(ArchConfig.numTokens) { i =>
+    if (config.isDefined) UInt(config.get.fifoMux(i), width = log2Up(ArchConfig.numTokens))
+    else UInt(width = log2Up(ArchConfig.numTokens))
+  }
+
   override def cloneType(): this.type = {
     new CUControlBoxOpcode(numTokens, numTokenDownLUTs, config).asInstanceOf[this.type]
   }
@@ -145,6 +161,16 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
     pulser.io.in := lut.io.out
     pulser.io.out
   }
+
+  // FIFO And Tree
+  val fifoAndMux = List.tabulate(ArchConfig.numScratchpads) { i => Mux(config.fifoAndTree(i), io.fifoNotFull(i), UInt(1)) }
+  val tokenInAndMux = List.tabulate(ArchConfig.numTokens) { i => Mux(config.tokenInAndTree(i), io.tokenIns(i), UInt(1)) }
+  val fifoAndTree = fifoAndMux.reduce {_&_}
+  val tokenInAndTree = tokenInAndMux.reduce {_&_}
+
+  val fifoTokenTree = fifoAndTree & tokenInAndTree
+
+  val fifoMux = List.tabulate(gtzs.size) { i => Mux(config.fifoMux(i), fifoTokenTree, )}
   // Enable Mux
   val enableLUTs = List.tabulate(numTokens) { i =>
     val m = Module(new LUT(1, 1 << gtzs.size, inst.enableLUT(i)))
