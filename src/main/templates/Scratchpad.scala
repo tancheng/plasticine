@@ -182,7 +182,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
   val empty = size === UInt(0)
   val full = sizeUDC.io.isMax
   sizeUDC.io.initval := UInt(0)
-  sizeUDC.io.max := (if (inst.numBufs == 0) UInt(0) else UInt(d - v * (bankSize % inst.numBufs)))
+  sizeUDC.io.max := (if (inst.numBufs == 0) UInt(bankSize) else UInt(d - v * (bankSize % inst.numBufs)))
   sizeUDC.io.init := UInt(0)
 //  sizeUDC.io.strideInc := Mux(config.chainWrite, UInt(1), UInt(v))
   sizeUDC.io.strideInc := UInt(v)
@@ -239,7 +239,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
 
   // Read address generator
   val raddrGen = Module(new Counter(log2Up(d+1)))
-  raddrGen.io.data.max := UInt(if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs))  // Mux if non-parallel FIFO
+  raddrGen.io.data.max := UInt(if (inst.numBufs == 0) bankSize else bankSize - (bankSize % inst.numBufs))  // Mux if non-parallel FIFO
   raddrGen.io.data.stride := UInt(1)
   raddrGen.io.control.enable := readEn
   raddrGen.io.control.reset := io.rdone
@@ -249,7 +249,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
 
   // Write address generator
   val waddrGen = Module(new Counter(log2Up(d+1)))
-  waddrGen.io.data.max := UInt(if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)) // Mux if non-parallel FIFO
+  waddrGen.io.data.max := UInt(if (inst.numBufs == 0) bankSize else bankSize - (bankSize % inst.numBufs)) // Mux if non-parallel FIFO
   waddrGen.io.data.stride := UInt(1)
   waddrGen.io.control.enable := readEn
   waddrGen.io.control.reset := io.rdone
