@@ -32,26 +32,26 @@ trait DirectionOps {
   }
 
   case class W() extends West {
-    override def toString = "W"
+    override def toString = "W "
   }
 
   case class NW() extends North with West {
     override def toString = "NW"
   }
   case class N() extends North {
-    override def toString = "N"
+    override def toString = "N "
   }
   case class NE() extends North with East {
     override def toString = "NE"
   }
   case class E() extends East {
-    override def toString = "E"
+    override def toString = "E "
   }
   case class SE() extends South with East {
     override def toString = "SE"
   }
   case class S() extends South {
-    override def toString = "S"
+    override def toString = "S "
   }
   case class SW() extends South with West {
     override def toString = "SW"
@@ -571,10 +571,11 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
           val outIdx = getCUInputIdx(reverseDir(in))
           val r = yOffset(in)
           val c = xOffset(in)
-          println(s"[cu $x $y] $in ($inIdx) = cu [${x+c}${y+r}] ${reverseDir(in)} $outIdx")
+          println(s"[ctrl][connectCUArray][cu $x $y] $in ($inIdx) = cu [${x+c}${y+r}] ${reverseDir(in)} $outIdx")
 
           val pipelineReg = Module(new FF(1))
           pipelineReg.io.control.enable := Bool(true)
+          pipelineReg.io.data.init := UInt(0)
           pipelineReg.io.data.in := cus(x+c)(y+r).io.tokenOuts(outIdx)
           cus(x)(y).io.tokenIns(inIdx) := pipelineReg.io.data.out
             dot.println(s"${(x+c)}${(y+r)} -> ${x}${y}")
