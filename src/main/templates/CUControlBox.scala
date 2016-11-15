@@ -37,12 +37,12 @@ case class CUControlBoxOpcode(val numTokens: Int, val numTokenDownLUTs: Int, con
     else Bool()
   }
 
-  val tokenInAndTree = Vec.tabulate(ArchConfig.numTokens) { i =>
+  val tokenInAndTree = Vec.tabulate(numTokens) { i =>
     if (config.isDefined) Bool(config.get.tokenInAndTree(i) > 0)
     else Bool()
   }
 
-  val fifoMux = Vec.tabulate(ArchConfig.numTokens) { i =>
+  val fifoMux = Vec.tabulate(numTokens) { i =>
     if (config.isDefined) Bool(config.get.fifoMux(i) > 0)
     else Bool()
   }
@@ -164,7 +164,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
 
   // FIFO And Tree
   val fifoAndMux = List.tabulate(ArchConfig.numScratchpads) { i => Mux(config.fifoAndTree(i), io.fifoNotFull(i), UInt(1)) }
-  val tokenInAndMux = List.tabulate(ArchConfig.numTokens) { i => Mux(config.tokenInAndTree(i), io.tokenIns(i), UInt(1)) }
+  val tokenInAndMux = List.tabulate(numTokens) { i => Mux(config.tokenInAndTree(i), io.tokenIns(i), UInt(1)) }
   val fifoAndTree = fifoAndMux.reduce {_&_}
   val tokenInAndTree = tokenInAndMux.reduce {_&_}
 
