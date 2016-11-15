@@ -297,6 +297,7 @@ class ComputeUnit(
   controlBlock.io.config_data := io.config_data
   controlBlock.io.tokenIns := io.tokenIns
   controlBlock.io.fifoNotFull := Vec(scratchpads.map { ~_.io.full })
+  controlBlock.io.fifoNotEmpty := Vec(scratchpads.map { ~_.io.empty })
   val counterEnablesWithDelay = counterChain.io.control map { _.enableWithDelay }
   val counterDones = counterChain.io.control map { _.done}
   controlBlock.io.done := counterDones

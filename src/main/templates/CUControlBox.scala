@@ -67,6 +67,8 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
    val tokenIns = Vec.fill(numTokens) { Bool(INPUT)}
 
    val fifoNotFull = Vec.fill(ArchConfig.numScratchpads) { Bool(INPUT) }
+   val fifoNotEmpty = Vec.fill(ArchConfig.numScratchpads) { Bool(INPUT) }
+
     /* Input local 'done' signals */
    val done = Vec.fill(numTokens) { Bool(INPUT)}
     /* Output tokens */
@@ -163,8 +165,8 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   }
 
   // FIFO And Tree
-  val fifoAndMux = List.tabulate(ArchConfig.numScratchpads) { i => Mux(config.fifoAndTree(i), io.fifoNotFull(i), UInt(1)) }
-  val tokenInAndMux = List.tabulate(numTokens) { i => Mux(config.tokenInAndTree(i), io.tokenIns(i), UInt(1)) }
+  val fifoAndMux = List.tabulate(ArchConfig.numScratchpads) { i => Mux(config.fifoAndTree(i), io.fifoNotEmpty(i), Bool(true)) }
+  val tokenInAndMux = List.tabulate(numTokens) { i => Mux(config.tokenInAndTree(i), io.tokenIns(i), Bool(true)) }
   val fifoAndTree = fifoAndMux.reduce {_&_}
   val tokenInAndTree = tokenInAndMux.reduce {_&_}
 
