@@ -253,10 +253,10 @@ object Parser {
     val tokenOutXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenOutXbar"), true)
 
     val fifoAndTree: List[Int] = Parser.getFieldList(m, "fifoAndTree")
-                                .asInstanceOf[List[String]]
-                                .map { parseValue(_) }
+                                .asInstanceOf[List[Double]]
+                                .map { _.toInt }
 
-    val tokenInAndTree: List[Int] = Parser.getFieldList(m, "tokenInAndTree")
+    val tokenInAndTree: List[Int] = Parser.getFieldList(m, "tokInAndTree")
                                 .asInstanceOf[List[String]]
                                 .map { parseValue(_) }
 
