@@ -340,12 +340,12 @@ object Parser {
 
         val enqEn = Parser.getFieldString(m, "enqEn") match {
           case "x" => 0
-          case n@_ => n.drop(1).toInt + 1
+          case n@_ => n.toInt + 1
         }
 
         val deqEn = Parser.getFieldString(m, "deqEn") match {
           case "x" => 0
-          case n@_ => n.drop(1).toInt + 1
+          case n@_ => n.toInt + 1
         }
 
         val banking = parseBankingConfig(Parser.getFieldString(m, "banking"))
