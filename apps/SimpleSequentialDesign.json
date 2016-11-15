@@ -7,8 +7,8 @@
         "comment-argIns-busIdx" : "ArgIn5_x524 -> 0,ArgIn6_x525 -> 1",
         "comment-argOuts-busIdx" : "ArgOut7_x526 -> 0",
         "top" :{
-          "done" : "23",
-          "argOut" : "2"
+          "done" : "47",
+          "argOut" : "6"
         },
         "cu": [
           {
@@ -224,16 +224,16 @@
                 }
               ],
               "tokenOutXbar" :{
-                "outSelect" : ["x","x","x","20","12","x","x","x"]
+                "outSelect" : ["x","12","x","20","x","x","x","x"]
               },
               "doneXbar" :{
                 "outSelect" : ["0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
               },
               "comment-udc" : "TokBuf169 -> udlut766[0]",
-              "comment-inc" : "TokBuf169.inc -> 4",
+              "comment-inc" : "TokBuf169.inc -> 3",
               "comment-dec" : "TokBuf169.inc -> 0",
               "incXbar" :{
-                "outSelect" : ["4","x","x","x","x","x","x","x","3","x","x","x","x","x","x","x"]
+                "outSelect" : ["3","x","x","x","x","x","x","x","1","x","x","x","x","x","x","x"]
               },
               "decXbar" :{
                 "outSelect" : ["0","x","x","x","x","x","x","x"]
@@ -266,24 +266,25 @@
                   "table" : "x"
                 }
               ],
+              "fifoAndTree" : [0,0,0,0],
+              "tokInAndTree" : ["x","x","x","x","x","x","x","x"],
               "enableMux" : ["0","x","x","x","x","x","x","x"],
               "tokenInXbar" :{
                 "outSelect" : ["x","x","x","x","x","x","x","x"]
               },
               "comment-tokenIn" :{
-                "TokBuf169.inc(ib742[4])" : "from TokOutLUT196.o(ob4402[0])",
-                "TokBuf169.init(ib740[3])" : "from TokDownLUT200.o(ob4404[1])"
+                "TokBuf169.inc(ib740[3])" : "from TokOutLUT196.o(ob3499[5])",
+                "TokBuf169.init(ib736[1])" : "from TokDownLUT200.o(ob3503[7])"
               }
             }
           },
           "x",
           "x",
-          "x",
           {
-            "comment-CUName" : "cu3702[(1,0)] <- UnitCompUnit79_x546_0",
-            "comment-scalarIn" : "reg3712[13] -> ib4501[3] 3",
+            "comment-CUName" : "cu2789[(0,3)] <- UnitCompUnit79_x546_0",
+            "comment-scalarIn" : "reg2801[5] -> ib3554[1] 1",
             "scalarInXbar" :{
-              "outSelect" : ["x","x","x","3","x","x","x","x"]
+              "outSelect" : ["x","x","x","x","x","1","x","x"]
             },
             "scalarOutMux" : "1",
             "scalarInMux" :{
@@ -292,8 +293,9 @@
             "scratchpads": [
               "x",
               "x",
+              "x",
               {
-                "comment-SRAM112" : "sram3825[0]",
+                "comment-SRAM112" : "sram2927[3]",
                 "ra" : "s0",
                 "deqEn" : "x",
                 "isReadFifo" : "0",
@@ -308,8 +310,7 @@
                 "numBufs" : 1,
                 "rswap" : "x",
                 "wswap" : "x"
-              },
-              "x"
+              }
             ],
             "counterChain" :{
               "comment-ctrs" : "[0 -> Ctr105,1 -> Ctr97,2 -> Ctr146,3 -> not mapped,4 -> not mapped,5 -> not mapped,6 -> not mapped,7 -> not mapped]",
@@ -320,9 +321,9 @@
                   "min" : "c0i",
                   "stride" : "c16i",
                   "comment-numLocalStages" : "10",
-                  "comment-numDataHop" : "2",
-                  "comment-numCtrlHop" : "2",
-                  "startDelay" : "10",
+                  "comment-numDataHop" : "6",
+                  "comment-numCtrlHop" : "4",
+                  "startDelay" : "12",
                   "endDelay" : "0"
                 },
                 {
@@ -352,18 +353,18 @@
               },
               {
                 "en" : "i1",
-                "comment-stage" : "wast3845 <- LStage119(operands=[s89_regsi123_0], op=Bypass, results=[SRAM112.ra])",
-                "opA" : "e8",
+                "comment-stage" : "wast2932 <- LStage119(operands=[s89_regsi123_0], op=Bypass, results=[SRAM112.ra])",
+                "opA" : "e10",
                 "opB" : "x",
                 "opC" : "x",
                 "opcode" : "passA",
-                "result" : ["m0"],
+                "result" : ["m3"],
                 "fwd" : {}
               },
               {
                 "en" : "i1",
-                "comment-stage" : "wast3899 <- LStage120(operands=[SRAM112.rp], op=Bypass, results=[s120_regso132_1])",
-                "opA" : "m0",
+                "comment-stage" : "wast2986 <- LStage120(operands=[SRAM112.rp], op=Bypass, results=[s120_regso132_1])",
+                "opA" : "m3",
                 "opB" : "x",
                 "opC" : "x",
                 "opcode" : "passA",
@@ -371,7 +372,7 @@
                 "fwd" : {"r0" : "alu"}
               },
               {
-                "comment-stage" : "wast3953 <- no map",
+                "comment-stage" : "wast3040 <- no map",
                 "en" : "i1",
                 "opA" : "x",
                 "opB" : "x",
@@ -382,7 +383,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "comment-stage" : "wast4007 <- no map",
+                "comment-stage" : "wast3094 <- no map",
                 "en" : "i1",
                 "opA" : "x",
                 "opB" : "x",
@@ -393,7 +394,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "comment-stage" : "rdst4061 <- no map",
+                "comment-stage" : "rdst3148 <- no map",
                 "en" : "i1",
                 "opA" : "x",
                 "opB" : "x",
@@ -404,7 +405,7 @@
                 "fwd" : {"r0" : "t0"}
               },
               {
-                "comment-stage" : "rdst4115 <- no map",
+                "comment-stage" : "rdst3202 <- no map",
                 "en" : "i1",
                 "opA" : "x",
                 "opB" : "x",
@@ -415,7 +416,7 @@
                 "fwd" : {"r0" : "t0"}
               },
               {
-                "comment-stage" : "rdst4169 <- no map",
+                "comment-stage" : "rdst3256 <- no map",
                 "en" : "i1",
                 "opA" : "x",
                 "opB" : "x",
@@ -426,7 +427,7 @@
                 "fwd" : {"r0" : "t0"}
               },
               {
-                "comment-stage" : "rdst4223 <- no map",
+                "comment-stage" : "rdst3310 <- no map",
                 "en" : "i1",
                 "opA" : "x",
                 "opB" : "x",
@@ -437,7 +438,7 @@
                 "fwd" : {"r0" : "t0"}
               },
               {
-                "comment-stage" : "st4277 <- no map",
+                "comment-stage" : "st3364 <- no map",
                 "en" : "i1",
                 "opA" : "x",
                 "opB" : "x",
@@ -448,7 +449,7 @@
                 "fwd" : {"r0" : "r0"}
               },
               {
-                "comment-stage" : "st4331 <- no map",
+                "comment-stage" : "st3418 <- no map",
                 "en" : "i1",
                 "opA" : "x",
                 "opB" : "x",
@@ -463,7 +464,7 @@
               "tokenDownLUT": [
                 {
                   "comment-IO" : "tdlut.ins:List(Top1_Top.command, TokBuf179.o) init:TokDownLUT200.i tos:ListBuffer(TokBuf179.o)",
-                  "syncTokenMux" : "5",
+                  "syncTokenMux" : "3",
                   "comment-TokDownLUT200" : "TransferFunction: Top1_Top.command || TokBuf179.o, Map(TokBuf179.o -> 2, Top1_Top.command -> 0)",
                   "table" : ["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1"]
                 },
@@ -498,7 +499,7 @@
               ],
               "tokenOutLUT": [
                 {
-                  "comment-TokOutLUT196" : "TransferFunction: !Ctr146.done && Ctr97.done, Map(Ctr97.done -> 0, Ctr146.done -> 1)",
+                  "comment-TokOutLUT196" : "TransferFunction: !Ctr146.done && Ctr97.done, Map(Ctr146.done -> 1, Ctr97.done -> 0)",
                   "table" : ["0","0","1","0"]
                 },
                 {
@@ -525,16 +526,16 @@
                 }
               ],
               "tokenOutXbar" :{
-                "outSelect" : ["12","4","x","x","x","13","x","x"]
+                "outSelect" : ["x","13","x","x","x","12","x","4"]
               },
               "doneXbar" :{
                 "outSelect" : ["1","2","2","x","x","x","x","x","x","x","x","x","x","x","x","x"]
               },
-              "comment-udc" : "TokBuf174 -> udlut4418[0],TokBuf179 -> udlut4419[1]",
-              "comment-inc" : "TokBuf174.inc -> 0,TokBuf179.inc -> x",
+              "comment-udc" : "TokBuf174 -> udlut3505[0],TokBuf179 -> udlut3506[1]",
+              "comment-inc" : "TokBuf174.inc -> 7,TokBuf179.inc -> x",
               "comment-dec" : "TokBuf174.inc -> 1,TokBuf179.inc -> 2",
               "incXbar" :{
-                "outSelect" : ["0","x","x","x","x","x","x","x","x","5","x","x","x","x","x","x"]
+                "outSelect" : ["7","x","x","x","x","x","x","x","x","3","x","x","x","x","x","x"]
               },
               "decXbar" :{
                 "outSelect" : ["1","2","x","x","x","x","x","x"]
@@ -567,18 +568,21 @@
                   "table" : "x"
                 }
               ],
+              "fifoAndTree" : [0,0,0,0],
+              "tokInAndTree" : ["x","x","x","x","x","x","x","x"],
               "enableMux" : ["1","0","x","x","x","x","x","x"],
               "tokenInXbar" :{
-                "outSelect" : ["1","x","x","x","x","x","x","x"]
+                "outSelect" : ["5","x","x","x","x","x","x","x"]
               },
               "comment-tokenIn" :{
-                "TokBuf174.inc(ib4386[0])" : "from TokOutLUT193.o(ob758[4])",
-                "Ctr105.en(ib4388[1])" : "from EnLUT184.o(ob756[3])",
-                "TokBuf179.init(ib4396[5])" : "from Top1_Top.command(ob48[0])",
-                "TokDownLUT200.i(ib4396[5])" : "from Top1_Top.command(ob48[0])"
+                "TokBuf174.inc(ib3487[7])" : "from TokOutLUT193.o(ob752[1])",
+                "Ctr105.en(ib3483[5])" : "from EnLUT184.o(ob756[3])",
+                "TokBuf179.init(ib3479[3])" : "from Top1_Top.command(ob48[0])",
+                "TokDownLUT200.i(ib3479[3])" : "from Top1_Top.command(ob48[0])"
               }
             }
           },
+          "x",
           "x",
           "x",
           "x",
@@ -606,35 +610,35 @@
           },
           {
             "comment-sb" : "sb16638[0,3]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x"]
+            "outSelect" : ["x","x","x","x","x","e_0","x","x","x"]
           },
           {
             "comment-sb" : "sb16894[0,4]",
-            "outSelect" : ["x","x","x","x"]
+            "outSelect" : ["x","x","n_0","x"]
           },
           {
             "comment-sb" : "sb17150[1,0]",
-            "outSelect" : ["x","x","s_0","x","x"]
-          },
-          {
-            "comment-sb" : "sb17355[1,1]",
-            "outSelect" : ["x","x","x","x","x","x"]
-          },
-          {
-            "comment-sb" : "sb17560[1,2]",
-            "outSelect" : ["x","x","x","x","x","x"]
-          },
-          {
-            "comment-sb" : "sb17765[1,3]",
-            "outSelect" : ["x","x","x","x","x","x"]
-          },
-          {
-            "comment-sb" : "sb17970[1,4]",
             "outSelect" : ["x","x","x","x","x"]
           },
           {
+            "comment-sb" : "sb17355[1,1]",
+            "outSelect" : ["x","sw_0","x","x","x","x"]
+          },
+          {
+            "comment-sb" : "sb17560[1,2]",
+            "outSelect" : ["x","s_0","x","x","x","x"]
+          },
+          {
+            "comment-sb" : "sb17765[1,3]",
+            "outSelect" : ["s_0","x","x","x","x","x"]
+          },
+          {
+            "comment-sb" : "sb17970[1,4]",
+            "outSelect" : ["x","sw_0","x","x","x"]
+          },
+          {
             "comment-sb" : "sb18175[2,0]",
-            "outSelect" : ["x","x","x","x","nw_0"]
+            "outSelect" : ["x","x","x","x","x"]
           },
           {
             "comment-sb" : "sb18380[2,1]",
@@ -700,19 +704,19 @@
           },
           {
             "comment-sb" : "sb21445[0,1]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","se_0","x","x","x","x","x","x","x","x","x","n_7","x","x","x","x","x","x","x","x"]
           },
           {
             "comment-sb" : "sb21640[0,2]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","s_7","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","n_7"]
           },
           {
             "comment-sb" : "sb21835[0,3]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","s_7","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","ne_0"]
           },
           {
             "comment-sb" : "sb22030[0,4]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+            "outSelect" : ["x","x","x","x","x","x","x","se_0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
             "comment-sb" : "sb22225[1,0]",
@@ -720,23 +724,23 @@
           },
           {
             "comment-sb" : "sb22482[1,1]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","sw_0","x","x","x","x","x","x","x","x","se_0"]
+            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","sw_0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","n_7"]
           },
           {
             "comment-sb" : "sb22739[1,2]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","s_7","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","n_7","x"]
           },
           {
             "comment-sb" : "sb22996[1,3]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+            "outSelect" : ["x","x","x","x","x","x","x","x","s_7","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","nw_0","x"]
           },
           {
             "comment-sb" : "sb23253[1,4]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
+            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","n_0"]
           },
           {
             "comment-sb" : "sb23510[2,0]",
-            "outSelect" : ["x","x","x","x","x","x","x","x","s_0","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","nw_0"]
+            "outSelect" : ["x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x","x"]
           },
           {
             "comment-sb" : "sb23767[2,1]",

@@ -13,9 +13,9 @@
         "cu": [
           {
             "comment-CUName" : "cu50[(0,0)] <- PipeCU85_x465",
-            "comment-scalarIn" : "reg60[12] -> ib849[3] 3",
+            "comment-scalarIn" : "reg66[12] -> ib849[3] 3",
             "scalarInXbar" :{
-              "outSelect" : ["x","x","x","3","x","x","x","x"]
+              "outSelect" : ["x","3","x","x","x","x","x","x"]
             },
             "scalarOutMux" : "0",
             "scalarInMux" :{
@@ -39,7 +39,7 @@
                   "endDelay" : "10"
                 },
                 {
-                  "max" : "e8",
+                  "max" : "e14",
                   "min" : "c0i",
                   "stride" : "c96i",
                   "startDelay" : "0",
@@ -279,6 +279,8 @@
                   "table" : "x"
                 }
               ],
+              "fifoAndTree" : [0,0,0,0],
+              "tokInAndTree" : ["x","x","x","x","x","x","x","x"],
               "enableMux" : ["0","x","x","x","x","x","x","x"],
               "tokenInXbar" :{
                 "outSelect" : ["x","x","x","x","x","x","x","x"]

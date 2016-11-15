@@ -13,9 +13,9 @@
         "cu": [
           {
             "comment-CUName" : "cu50[(0,0)] <- UnitCompUnit31_x106_0",
-            "comment-scalarIn" : "reg60[12] -> ib849[3] 3",
+            "comment-scalarIn" : "reg66[12] -> ib849[3] 3",
             "scalarInXbar" :{
-              "outSelect" : ["x","x","x","3","x","x","x","x"]
+              "outSelect" : ["x","3","x","x","x","x","x","x"]
             },
             "scalarOutMux" : "1",
             "scalarInMux" :{
@@ -60,7 +60,7 @@
               {
                 "en" : "i0",
                 "comment-stage" : "wast193 <- LStage56(operands=[s41_regsi59_0,Const(4i)], op=FixAdd, results=[s56_regso67_1])",
-                "opA" : "e8",
+                "opA" : "e14",
                 "opB" : "c4i",
                 "opC" : "x",
                 "opcode" : "+",
@@ -272,6 +272,8 @@
                   "table" : "x"
                 }
               ],
+              "fifoAndTree" : [0,0,0,0],
+              "tokInAndTree" : ["x","x","x","x","x","x","x","x"],
               "enableMux" : ["0","x","x","x","x","x","x","x"],
               "tokenInXbar" :{
                 "outSelect" : ["x","x","x","x","x","x","x","x"]
