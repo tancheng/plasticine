@@ -278,6 +278,23 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     break(tokenIns ++ tokenOuts)
   }
 
+  def dumpScratchpad(mod: Scratchpad, banks: Int*) {
+    val bankList = if (banks.size == 0) (0 until mod.v) else banks
+    bankList.foreach { b =>
+      println(s"[Bank $b]")
+      val data = getMem(mod.mems(b))
+      val addrsPerLine = 8
+      (0 until data.size by addrsPerLine) map { i =>
+        println(s"[0x${i}] ${ println(data.slice(i, i+addrsPerLine).mkString("  ")) }")
+      }
+      println()
+    }
+  }
+
+  def getsp(x: Int, y: Int, idx: Int) = {
+    hw.computeUnits(x)(y).scratchpads(idx)
+  }
+
   def watchcs(x: Int, y: Int) {
     val ctrlSwitch = module.controlSwitch(x)(y)
     val tokenIns = ctrlSwitch.io.ins map { _(0) }
@@ -505,6 +522,16 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     case _ => println(s"No rule added to dump output for ${mod.name}")
   }
 
+  def din(mod: Module) = mod match {
+    case t: TopUnit =>
+      println("Ins:")
+      t.io.ins.zipWithIndex.foreach { case (in, i) => print(s"[$i] ${dv(in)}") }
+    case cu: ComputeUnit =>
+      println("dataIn:")
+      cu.io.dataIn.zipWithIndex.foreach { case (in, i) => print(s"[$i] ${dv(in)}") }
+    case _ => println(s"No rule added to dump output for ${mod.name}")
+  }
+
 }
 
 trait PDBCore extends PDBBase with PDBGlobals {
@@ -589,7 +616,7 @@ object PDB extends PDBCore {
   def showTop = tester.showTop
   def watchcu(x: Int, y: Int) = tester.watchcu(x, y)
   def watchcs(x: Int, y: Int) = tester.watchcs(x, y)
-  def xbar(mod: Crossbar) = tester.printXbar(mod)
+  def xbar(mod: Crossbar, str: String = "") = tester.printXbar(mod, str)
   def lut(mod: LUT) = tester.printLUT(mod)
   def cycles = tester.cycleCount
   def c = tester.c
@@ -599,4 +626,8 @@ object PDB extends PDBCore {
   def callback(f: () => Unit) = tester.regCallback(f)
   def dv(v: Vec[UInt]) = tester.dv(v)
   def dout (mod: Module) = tester.dout(mod)
+  def din (mod: Module) = tester.din(mod)
+  def ds(mod: Scratchpad, banks: Int*) = tester.dumpScratchpad(mod, banks:_*)
+  def getsp(x: Int, y: Int, idx: Int) = tester.getsp(x, y, idx)
+
 }
