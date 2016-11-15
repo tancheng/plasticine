@@ -226,7 +226,10 @@ case class CUControlBoxConfig(
   doneXbar: CrossbarConfig,
   enableMux: List[Boolean],
   syncTokenMux: List[Int],
-  tokenOutXbar: CrossbarConfig
+  tokenOutXbar: CrossbarConfig,
+  fifoAndTree: List[Int],
+  tokenInAndTree: List[Int],
+  fifoMux: List[Int]
 ) extends AbstractConfig
 object CUControlBoxConfig {
   def getRandom(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
@@ -241,7 +244,10 @@ object CUControlBoxConfig {
         CrossbarConfig.getRandom(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
         List.fill(8) { math.abs(Random.nextInt) % 2 }, // syncTokenMux
-        CrossbarConfig.getRandom(numCounters) // tokenOutXbar,
+        CrossbarConfig.getRandom(numCounters), // tokenOutXbar,
+        List.fill(ArchConfig.numScratchpads) { 0 },  // fifoAndTree
+        List.fill(numTokenIn) { 0 },  // tokenInAndTree
+        List.fill(numCounters) { 0 }  // fifoMux
       )
   }
   def zeroes(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
@@ -256,7 +262,10 @@ object CUControlBoxConfig {
         CrossbarConfig.zeroes(2*numCounters), // doneXbar,
         List.fill(numCounters) { false }, // enableMux,
         List.fill(8) { 0 }, // syncTokenMux
-        CrossbarConfig.zeroes(numCounters) // tokenOutXbar,
+        CrossbarConfig.zeroes(numCounters), // tokenOutXbar,
+        List.fill(ArchConfig.numScratchpads) { 0 }, // fifoAndTree
+        List.fill(numTokenIn) { 0 },  // tokenInAndTree
+        List.fill(numCounters) { 0 }  // fifoMux
       )
   }
 }

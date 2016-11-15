@@ -251,7 +251,19 @@ object Parser {
         }
       }
     val tokenOutXbar: CrossbarConfig = parseCrossbar(Parser.getFieldMap(m, "tokenOutXbar"), true)
-    CUControlBoxConfig(tokenOutLUT, enableLUT, tokenDownLUT, udcInit, decXbar, incXbar, tokenInXbar, doneXbar, enableMux, syncTokenMux, tokenOutXbar)
+
+    val fifoAndTree: List[Int] = Parser.getFieldList(m, "fifoAndTree")
+                                .asInstanceOf[List[String]]
+                                .map { parseValue(_) }
+
+    val tokenInAndTree: List[Int] = Parser.getFieldList(m, "tokenInAndTree")
+                                .asInstanceOf[List[String]]
+                                .map { parseValue(_) }
+
+    val fifoMux: List[Int] = Parser.getFieldList(m, "fifoMux")
+                                .asInstanceOf[List[String]]
+                                .map { parseValue(_) }
+    CUControlBoxConfig(tokenOutLUT, enableLUT, tokenDownLUT, udcInit, decXbar, incXbar, tokenInXbar, doneXbar, enableMux, syncTokenMux, tokenOutXbar, fifoAndTree, tokenInAndTree, fifoMux)
   }
 
   def parseBankingConfig(s: String): BankingConfig = {

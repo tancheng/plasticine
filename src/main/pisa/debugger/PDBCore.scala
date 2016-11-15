@@ -117,6 +117,9 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         setConfig(m.tokenInXbar, c.tokenInXbar)
         setConfig(m.doneXbar, c.doneXbar)
         setConfig(m.tokenOutXbar, c.tokenOutXbar)
+        m.config.fifoAndTree.zip(c.fifoAndTree) foreach { case (c, i) => poke(c, i>0) }
+        m.config.tokenInAndTree.zip(c.tokenInAndTree) foreach { case (c, i) => poke(c, i>0) }
+        m.config.fifoMux.zip(c.fifoMux) foreach { case (c, i) => poke(c, i>0) }
       case m: LUT =>
         val c = cfg.asInstanceOf[LUTConfig]
         m.config.table.zip(c.table) foreach { case (c, i) => poke(c, i) }
