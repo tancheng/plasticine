@@ -7,6 +7,7 @@ import plasticine.pisa.ir._
 import plasticine.templates._
 import plasticine.ArchConfig
 import scala.collection.mutable.Set
+import scala.collection.mutable.HashMap
 
 class PDBTester(c: Module) extends Tester(c)
 
@@ -173,11 +174,12 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         // Top unit
         setConfig(m.top, c.top)
     }
+    cycleCount = 0
     step(1)
   }
 
   var cycleCount = 0
-  val signalsToWatch = Set[UInt]()
+  val signalsToWatch = HashMap[UInt, String]()
   def writeReg(reg: Int, data: Int) = {
     poke(module.io.addr, reg)
     poke(module.io.wdata, data)
@@ -208,9 +210,14 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     breakOnHigh(List(signal))
   }
 
-  def break(signals: Seq[UInt]) { signals.foreach { s =>
-    println(s"[break] Set on signal ${s.name}")
-  signalsToWatch += s } }
+  def break(signals: Seq[UInt], metadata: Seq[String] = Seq()) {
+      val metaStrs = if (metadata.size == 0) signals.map(i => "").toSeq else metadata
+      signals.zip(metadata) foreach { case (s, m) =>
+      println(s"[break] Set on signal ${s.name}, ${m}")
+      signalsToWatch(s) = m
+    }
+  }
+
   def break(signal: UInt) { break(List(signal)) }
 
   def clear(signals: Seq[UInt]) { signals.foreach { signalsToWatch -= _ }}
@@ -224,19 +231,20 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
   }
 
   var callback: () => Unit = () => ()
+  var maxSimCycles: Long = Long.MaxValue
   def regCallback (f: () => Unit) { callback = f }
   def observeFor(numCycles: Int) = {
     var localCycles = 0
 
     var anyHigh = 0
-    while ((localCycles < numCycles) &(anyHigh < 1)) {
+    while ((localCycles < numCycles) & (anyHigh < 1) & (cycleCount <= maxSimCycles)) {
       // Advance time
       step(1)
       localCycles += 1
       cycleCount += 1
       if ((cycleCount % alertInterval) == 0) println(s"[cycleCount $cycleCount]")
 
-      val signals = signalsToWatch.toList
+      val signals = signalsToWatch.keys.toList
       val watchVals = signals.map { s =>
         val v = peek(s).toInt
         if (v < 0) 0 else v
@@ -246,22 +254,31 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
       // Peek every signal in signalsToWatch
       if (anyHigh != 0) {
           signals.zip(watchVals).foreach { case (signal, v) =>
-          if (v != 0) println(s"[watch] ${signal.name} = $v, at cycle $cycleCount")
+          if (v != 0) println(s"[watch] ${signalsToWatch(signal)}::${signal.name} = $v, at cycle $cycleCount")
         }
       }
     }
+
+    if (cycleCount > maxSimCycles) { println(s"[PDB] Max simulation cycle limit of ${maxSimCycles} reached") }
     callback()
     anyHigh
+  }
+
+  def stepRaw(x: Int) {
+    step(x)
+    cycleCount += x
   }
 
   def c {
     var status = readReg(module.top.statusRegIdx)
     var breakpoint = 0
-    while ((status != 1) & (breakpoint != 1)) {
+    while ((status != 1) & (breakpoint != 1) & (cycleCount <= maxSimCycles)) {
       status = readReg(module.top.statusRegIdx)
       breakpoint = observeFor(1)
     }
-    if (status == 1) println(s"Done, design ran for $cycleCount cycles")
+
+    if (cycleCount > maxSimCycles) { println(s"[PDB] Max simulation cycle limit of ${maxSimCycles} reached") }
+    if (status == 1) println(s"[PDB] Done, design ran for $cycleCount cycles")
   }
 
   def printScalarRegs {
@@ -275,7 +292,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     val cuModule = module.computeUnits(x)(y)
     val tokenIns = cuModule.io.tokenIns
     val tokenOuts = cuModule.io.tokenOuts
-    break(tokenIns ++ tokenOuts)
+    val metadata = List.fill(tokenIns.size + tokenOuts.size) { s"CU$x$y"}
+    break(tokenIns ++ tokenOuts, metadata)
   }
 
   def dumpScratchpad(mod: Scratchpad, banks: Int*) {
@@ -299,7 +317,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     val ctrlSwitch = module.controlSwitch(x)(y)
     val tokenIns = ctrlSwitch.io.ins map { _(0) }
     val tokenOuts = ctrlSwitch.io.outs map { _(0) }
-    break(tokenIns ++ tokenOuts)
+    val metadata = List.fill(tokenIns.size + tokenOuts.size) { s"CS$x$y"}
+    break(tokenIns ++ tokenOuts, metadata)
   }
 
   var alertInterval = 10000
@@ -339,10 +358,15 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
       val v = if (mod.w == 1) peek(in(0)) else peek(in)
       if (v < 0) "-" else s"$v"
     }
-    println(invals.mkString("   "))
+
+    val cfg = mod.config.outSelect.map { i => peek(i).toInt }
+    println(invals.mkString("  "))
     for (i <- 0 until mod.numOutputs) {
       val outSelect = peek(mod.config.outSelect(i)).toInt
-      val configStr = List.tabulate(mod.numInputs) { i => if (i == outSelect) "x" else " " }.mkString("   ")
+      val configStr = List.tabulate(mod.numInputs) { idx => if (idx == outSelect) "X" else " " }.mkString("  ")
+
+//      val configStr = List.tabulate(mod.numInputs) { idx => if (idx == outSelect) "X--" else if (cfg.contains(idx) & (idx > outSelect)) "|--" else if (idx > outSelect) "---" else "   " }.mkString("")
+//      val configStr = List.tabulate(mod.numInputs) { i => if (i == outSelect) "x" else " " }.mkString("   ")
       val output = if (mod.w == 1) peek(mod.io.outs(i)(0)).toInt else peek(mod.io.outs(i)).toInt
       println(configStr + " | " + output)
     }
@@ -357,10 +381,10 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         d match {
         case ctrlNetwork.W() =>
             if ((x == 0) & ctrlNetwork.isMUSwitch(x,y)) s"MU${x}${y}"
-            else s"S${ctrlNetwork.xOffset(d)}${ctrlNetwork.yOffset(d)}"
+            else s"S${x+ctrlNetwork.xOffset(d)}${y+ctrlNetwork.yOffset(d)}"
         case ctrlNetwork.E() =>
             if ((x == ctrlNetwork.cols) & ctrlNetwork.isMUSwitch(x,y)) s"MU${x}${y}"
-            else s"S${ctrlNetwork.xOffset(d)}${ctrlNetwork.yOffset(d)}"
+            else s"S${x+ctrlNetwork.xOffset(d)}${y+ctrlNetwork.yOffset(d)}"
         case ctrlNetwork.NW() =>
           s"CU${x-1}${y}"
         case ctrlNetwork.N() =>
@@ -392,11 +416,12 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     }
     val cfg = List.tabulate(switch.numOutputs) { i => peek(switch.config.outSelect(i)).toInt }
     println(s"Config: $cfg, Inst: ${switch.inst.outSelect}")
-    println(indirs.mkString("   "))
-    println(invals.mkString("   "))
+    println(indirs.mkString(" "))
+    println(invals.mkString("  "))
     for (i <- 0 until switch.numOutputs) {
-      val outSelect = peek(switch.config.outSelect(i)).toInt
-      val configStr = List.tabulate(switch.numInputs) { i => if (i == outSelect) "x" else " " }.mkString("   ")
+      val outSelect = cfg(i)
+//      val configStr = List.tabulate(switch.numInputs) { idx => if (idx == outSelect) "X--" else if (cfg.contains(idx) & (idx > outSelect)) "|--" else if (idx > outSelect) "---" else "   " }.mkString("")
+      val configStr = List.tabulate(switch.numInputs) { i => if (i == outSelect) "X" else " " }.mkString("  ")
       val output = peek(switch.io.outs(i)(0)).toInt
       println(configStr + " | " + output + " " + outdirs(i) + " " + getNeighbor(outdirs(i), OUTPUT))
     }
@@ -532,6 +557,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     case _ => println(s"No rule added to dump output for ${mod.name}")
   }
 
+  def setMaxCycles(x: Int) { maxSimCycles = x }
 }
 
 trait PDBCore extends PDBBase with PDBGlobals {
@@ -563,7 +589,8 @@ trait PDBCore extends PDBBase with PDBGlobals {
   def init(file: String) = {
     if (simulator == "") {
       println("Simulator not set. Use the 'setSim(rows, cols)' method to set it before calling init")
-    } else {
+      simulator = "Plasticine22"
+      println(s"Setting default simulator to $simulator")
       ArchConfig.setConfig(s"configs/${simulator}.json")
 
       pisaFile = file
@@ -629,5 +656,6 @@ object PDB extends PDBCore {
   def din (mod: Module) = tester.din(mod)
   def ds(mod: Scratchpad, banks: Int*) = tester.dumpScratchpad(mod, banks:_*)
   def getsp(x: Int, y: Int, idx: Int) = tester.getsp(x, y, idx)
-
+  def setmaxCycles(x: Int) = tester.setMaxCycles(x)
+  def stepRaw(x: Int) = tester.stepRaw(x)
 }
