@@ -50,6 +50,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         val c = cfg.asInstanceOf[CounterRCConfig]
         poke(m.config.startDelay, c.startDelay)
         poke(m.config.endDelay, c.endDelay)
+        poke(m.config.onlyDelay, (c.onlyDelay > 0))
         poke(m.config.max, c.max)
         poke(m.config.stride, c.stride)
         poke(m.config.strideConst, (c.strideConst > 0))
@@ -67,9 +68,11 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         poke(m.config.mode, c.banking.mode)
         poke(m.config.strideLog2, c.banking.strideLog2)
         val bufSize = if (c.numBufs == 0) 1 else math.max(1, m.d / (m.v*c.numBufs))
+        println(s"[scratchpad] bufSize = $bufSize")
         poke(m.config.bufSize, bufSize)
         poke(m.config.isReadFifo, c.isReadFifo)
         poke(m.config.isWriteFifo, c.isWriteFifo)
+        poke(m.config.fifoSize, c.fifoSize)
       case m: ComputeUnit =>
         val c = cfg.asInstanceOf[ComputeUnitConfig]
         setConfig(m.counterChain, c.counterChain)
@@ -571,6 +574,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     val writeStr = if (writeFifo) "FIFO" else "SRAM"
     println(s"-- Read Interface: $readStr")
     val rdata = peekVec(scratchpad.io.rdata)
+    val full = peek(scratchpad.io.full)
+    val empty = peek(scratchpad.io.empty)
     if (readFifo) {
       // deqEn, rdata
       val deqEn = peek(scratchpad.io.deqEn)
@@ -595,6 +600,9 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
       val wen = peek(scratchpad.io.wen)
       println(s"---- [wen $wen, wswap $wswap] waddr: ${waddr.mkString(" ")}" )
       println(s"---- [wen $wen, wswap $wswap] wdata: ${wdata.mkString(" ")}" )
+    }
+    if (readFifo & writeFifo) {
+      println(s"full $full empty $empty")
     }
   }
 
@@ -657,7 +665,7 @@ trait PDBCore extends PDBBase with PDBGlobals {
       pisaConfig = Parser(pisaFile).asInstanceOf[PlasticineConfig]
 
       // 4. Static Chisel args
-      val chiselArgs = Array("--targetDir", "/dev/null", "--backend", "null", "--test", "--testCommand", s"$simulator/generated/PlasticineTest/Simulator")
+      val chiselArgs = Array("--targetDir", "/dev/null", "--backend", "null", "--test", "--testCommand", s"${simulator}_sim/generated/PlasticineTest/Simulator")
       println("[PDB INIT] Creating a hardware instance")
       val module = Driver(chiselArgs, () => getHardwareInstance(pisaConfig), true)
       // 3. Create a tester instance with the hardware module

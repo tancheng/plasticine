@@ -76,19 +76,23 @@ object Parser {
           }
         }
 
-        val (max, maxConst) = parseSrcValue(maxStr)
-        val (stride, strideConst) = parseSrcValue(strideStr)
-
         val startDelay: Int = Parser.getFieldString(m, "startDelay") match {
           case "x" => 0 // Don't care
           case n@_ => 1 + n.toInt
         }
 
+        // Counter is used 'only for delay' if max == x, maxConst == x, but delay > 0
+        val onlyDelay = if ((maxStr == "x") & (startDelay > 0)) 1 else 0
+        println(s"[onlyDelay] maxStr = $maxStr, startDelay = $startDelay, onlyDelay = $onlyDelay")
+
+        val (max, maxConst) = parseSrcValue(maxStr)
+        val (stride, strideConst) = parseSrcValue(strideStr)
+
         val endDelay: Int = Parser.getFieldString(m, "endDelay") match {
           case "x" => 0 // Don't care
           case n@_ => 1 + n.toInt
         }
-        CounterRCConfig(max, stride, maxConst, strideConst, startDelay, endDelay)
+        CounterRCConfig(max, stride, maxConst, strideConst, startDelay, endDelay, onlyDelay)
     }
 
   }
@@ -349,10 +353,11 @@ object Parser {
         }
 
         val banking = parseBankingConfig(Parser.getFieldString(m, "banking"))
-        val numBufs = Parser.getFieldInt(m, "numBufs")
         val isReadFifo = parseValue(Parser.getFieldString(m, "isReadFifo"))
         val isWriteFifo = parseValue(Parser.getFieldString(m, "isWriteFifo"))
-        ScratchpadConfig(wa, ra, wd, wen, wswap, rswap, enqEn, deqEn, banking, numBufs, isReadFifo, isWriteFifo)
+        val numBufs = if ((isReadFifo > 0) & (isWriteFifo > 0)) 0 else Parser.getFieldInt(m, "numBufs")
+        val fifoSize = (if (numBufs == 0) ArchConfig.m else ArchConfig.m - ArchConfig.v * (ArchConfig.m/ArchConfig.v % numBufs))
+        ScratchpadConfig(wa, ra, wd, wen, wswap, rswap, enqEn, deqEn, banking, numBufs, isReadFifo, isWriteFifo, fifoSize)
     }
   }
 

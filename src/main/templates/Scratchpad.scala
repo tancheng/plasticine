@@ -26,6 +26,7 @@ case class ScratchpadOpcode(val d: Int, val v: Int, config: Option[ScratchpadCon
 
   val isReadFifo = if (config.isDefined) Bool(config.get.isReadFifo > 0) else Bool()
   val isWriteFifo = if (config.isDefined) Bool(config.get.isWriteFifo > 0) else Bool()
+  val fifoSize = if (config.isDefined) UInt(config.get.fifoSize, width=log2Up(d)+1) else UInt(width=log2Up(d)+1)
   override def cloneType(): this.type = {
     new ScratchpadOpcode(d, v, config).asInstanceOf[this.type]
   }
@@ -182,7 +183,8 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
   val empty = size === UInt(0)
   val full = sizeUDC.io.isMax
   sizeUDC.io.initval := UInt(0)
-  sizeUDC.io.max := (if (inst.numBufs == 0) UInt(bankSize) else UInt(d - v * (bankSize % inst.numBufs)))
+//  sizeUDC.io.max := (if (inst.numBufs == 0) UInt(d) else UInt(d - v * (bankSize % inst.numBufs)))
+  sizeUDC.io.max := config.fifoSize
   sizeUDC.io.init := UInt(0)
 //  sizeUDC.io.strideInc := Mux(config.chainWrite, UInt(1), UInt(v))
   sizeUDC.io.strideInc := UInt(v)
@@ -239,7 +241,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
 
   // Read address generator
   val raddrGen = Module(new Counter(log2Up(d+1)))
-  raddrGen.io.data.max := UInt(if (inst.numBufs == 0) bankSize else bankSize - (bankSize % inst.numBufs))  // Mux if non-parallel FIFO
+  raddrGen.io.data.max := config.fifoSize(config.fifoSize.getWidth-1, log2Up(v)) // Mux if non-parallel FIFO
   raddrGen.io.data.stride := UInt(1)
   raddrGen.io.control.enable := readEn
   raddrGen.io.control.reset := io.rdone
@@ -249,7 +251,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
 
   // Write address generator
   val waddrGen = Module(new Counter(log2Up(d+1)))
-  waddrGen.io.data.max := UInt(if (inst.numBufs == 0) bankSize else bankSize - (bankSize % inst.numBufs)) // Mux if non-parallel FIFO
+  waddrGen.io.data.max := config.fifoSize(config.fifoSize.getWidth-1, log2Up(v)) // Mux if non-parallel FIFO
   waddrGen.io.data.stride := UInt(1)
   waddrGen.io.control.enable := readEn
   waddrGen.io.control.reset := io.rdone

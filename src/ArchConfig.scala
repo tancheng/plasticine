@@ -14,7 +14,7 @@ object ArchConfig {
   var rwStages = 3
   var numTokens = 8
   var numCounters = 8
-  var m = 64
+  var m = 512
   var numScratchpads = 4
   var numStagesAfterReduction = 2
   var numRows = 2

@@ -24,6 +24,7 @@ case class CounterOpcode(val w: Int, val startDelayWidth: Int, val endDelayWidth
     if (config.isDefined) UInt(config.get.endDelay % (1 << endDelayWidth), width=delayWidth) else UInt(width = delayWidth)
   }
 
+  val onlyDelay = if (config.isDefined) Bool(config.get.onlyDelay > 0) else Bool()
   override def cloneType(): this.type = {
     new CounterOpcode(w, startDelayWidth, endDelayWidth, config).asInstanceOf[this.type]
   }
@@ -84,10 +85,9 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
 
     val localEnable = io.control.enable & ~io.control.waitIn
     startDelayCounter.io.control.enable := localEnable
-    startDelayCounter.io.control.reset := counter.io.control.done
-    val enableWithDelay = startDelayCounter.io.control.done & ~depulser.io.out
-    counter.io.control.enable := enableWithDelay
-    io.control.enableWithDelay := enableWithDelay
+    startDelayCounter.io.control.reset := Mux(config.onlyDelay, ~io.control.enable, counter.io.control.done)
+    counter.io.control.enable := startDelayCounter.io.control.done & ~depulser.io.out
+    io.control.enableWithDelay := startDelayCounter.io.control.done
   } else {
     counter.io.control.enable := io.control.enable
     io.control.enableWithDelay := io.control.enable

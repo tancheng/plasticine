@@ -42,7 +42,9 @@ case class CounterRCConfig(
   maxConst: Int = 0,
   strideConst: Int = 0,
   startDelay: Int = 0,
-  endDelay: Int = 0) extends AbstractConfig
+  endDelay: Int = 0,
+  onlyDelay: Int = 0
+) extends AbstractConfig
 object CounterRCConfig {
   def getRandom = {
     new CounterRCConfig(
@@ -51,7 +53,8 @@ object CounterRCConfig {
         Random.nextInt(2),
         Random.nextInt(2),
         Random.nextInt(16),
-        Random.nextInt(16)
+        Random.nextInt(16),
+        math.abs(Random.nextInt(1))
       )
   }
   def zeroes = {
@@ -134,7 +137,8 @@ case class ScratchpadConfig(
   banking: BankingConfig = BankingConfig(),
   numBufs: Int = 0,
   isReadFifo: Int = 0,
-  isWriteFifo: Int = 0
+  isWriteFifo: Int = 0,
+  fifoSize: Int = 0
 ) extends AbstractConfig
 object ScratchpadConfig {
   def getRandom = {
@@ -149,6 +153,7 @@ object ScratchpadConfig {
       0,
       BankingConfig(0, 1),
       1,
+      0,
       0,
       0
     )
