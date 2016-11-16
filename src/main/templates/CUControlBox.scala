@@ -19,6 +19,14 @@ case class CUControlBoxOpcode(val numTokens: Int, val numTokenDownLUTs: Int, con
     }
   }
 
+  val udcInitAtConfig = Vec.tabulate(numTokens) { i =>
+    if (config.isDefined) {
+      Bool(config.get.udcInitAtConfig(i) > 0) // TODO: Remove hardcoded '4' !
+    } else {
+      Bool()
+    }
+  }
+
   val enableMux = Vec.tabulate(numTokens) { i =>
     if (config.isDefined) {
       Bool(config.get.enableMux(i))
@@ -129,6 +137,7 @@ class CUControlBox(val numTokens: Int, inst: CUControlBoxConfig) extends Configu
   // Up-down counters to handle tokens and credits
   val udCounters = List.tabulate(numTokens) { i =>
     val udc = Module(new UpDownCtr(udctrWidth))
+    udc.io.initAtConfig := config.udcInitAtConfig(i)
     udc.io.initval := config.udcInit(i)
     udc.io.strideInc := UInt(1)
     udc.io.strideDec := UInt(1)

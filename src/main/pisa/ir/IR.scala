@@ -225,6 +225,7 @@ case class CUControlBoxConfig(
   enableLUT: List[LUTConfig],
   tokenDownLUT: List[LUTConfig],
   udcInit: List[Int],
+  udcInitAtConfig: List[Int],
   decXbar: CrossbarConfig,
   incXbar: CrossbarConfig,
   tokenInXbar: CrossbarConfig,
@@ -243,6 +244,7 @@ object CUControlBoxConfig {
         List.fill(numCounters) { LUTConfig.getRandom(numCounters)}, // enableLUT
         List.fill(8) { LUTConfig.getRandom(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
+        List.fill(numCounters) { math.abs(Random.nextInt) % 1 }, // udcInitAtConfig,
         CrossbarConfig.getRandom(numCounters), // decXbar,
         CrossbarConfig.getRandom(2*numCounters), // incXbar,
         CrossbarConfig.getRandom(numCounters), // tokenInXbar,
@@ -261,6 +263,7 @@ object CUControlBoxConfig {
         List.fill(numCounters) { LUTConfig.zeroes(numCounters)}, // enableLUT
         List.fill(8) { LUTConfig.zeroes(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { 0 }, // udcInit,
+        List.fill(numCounters) { 0 }, // udcInitAtConfig,
         CrossbarConfig.zeroes(numCounters), // decXbar,
         CrossbarConfig.zeroes(2*numCounters), // incXbar,
         CrossbarConfig.zeroes(numCounters), // tokenInXbar,

@@ -112,6 +112,15 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
       case m: CUControlBox =>
         val c = cfg.asInstanceOf[CUControlBoxConfig]
         m.config.udcInit.zip(c.udcInit) foreach { case (c, i) => poke(c, i) }
+        m.config.udcInitAtConfig.zip(c.udcInitAtConfig) foreach { case (c, i) =>
+          poke(c, i)
+        }
+        for (i <- 0 until m.udCounters.size) {
+          val ctr = m.udCounters(i)
+          val init = if (c.udcInitAtConfig(i) > 0) c.udcInit(i) else 0
+          poke(ctr.reg.ff, init)
+        }
+
         m.config.enableMux.zip(c.enableMux) foreach { case (c, i) => poke(c, i) }
         m.config.syncTokenMux.zip(c.syncTokenMux) foreach { case (c, i) => poke(c, i) }
         m.tokenOutLUTs.zip(c.tokenOutLUT) foreach { case (c, i) => setConfig(c, i) }

@@ -14,6 +14,7 @@ class UpDownCtr(val w: Int) extends Module {
     val max      = UInt(INPUT, w)
     val strideInc   = UInt(INPUT, w)
     val strideDec   = UInt(INPUT, w)
+    val initAtConfig     = Bool(INPUT)
     val init     = Bool(INPUT)
     val inc      = Bool(INPUT)
     val dec      = Bool(INPUT)
@@ -24,8 +25,8 @@ class UpDownCtr(val w: Int) extends Module {
 
 //  val reg = Module(new FF(w))
   val reg = if (Globals.noModule) new FFL(w) else Module(new FF(w))
-  val init = UInt(0, width = w)
-  reg.io.data.init := init
+  val configInit = Mux(io.initAtConfig, io.initval, UInt(0, width = w))
+  reg.io.data.init := configInit
 
   // If inc and dec go high at the same time, the counter
   // should be unaffected. Catch that with an xor
