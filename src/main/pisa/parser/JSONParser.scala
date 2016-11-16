@@ -71,7 +71,7 @@ object Parser {
           s(0) match {
             case 'x' => (0, 0)   // Don't care
             case 'c' => (checkAndCastToInt(s.drop(1)), 1) // Constant value
-            case 'e' => (checkAndCastToInt(s.drop(1)), 0) // From empty stage
+            case 'e' => (s.drop(1).toInt, 0) // From empty stage, not a const
             case _ => throw new Exception("Unknown source for max/stride " + s(0))
           }
         }

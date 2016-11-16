@@ -341,10 +341,20 @@ class ComputeUnit(
   val pipeRegs = ListBuffer[List[RegisterBlock]]()
   pipeRegs.append(initRegblocks)
 
-  // TODO: Get counter strides from the first lane's empty stage
+  // Get counter max from scalarIn registers
+  // Scalar registers are currently r<numCounters> ... r<numScalarRegisters> - 1
+  val scalarRegRange = List.tabulate(numScalarRegisters) { i => numCounters + i }
+  val scalarRegs = Vec(scalarRegRange.map { initRegblocks(0).io.passDataOut(_) })
+  val maxMuxes = List.tabulate(numCounters) { i =>
+    val maxMux = Module(new MuxN(numScalarRegisters, w))
+    maxMux.io.ins := scalarRegs
+    maxMux.io.sel := counterChain.counters(i).config.max
+    maxMux
+  }
+
   counterChain.io.data.zipWithIndex.foreach { case (c, i) =>
-    c.max    := UInt(pipeRegs.last(0).io.passDataOut(i), w)
-    c.stride := UInt(0,w)
+    c.max    := maxMuxes(i).io.out
+    c.stride := UInt(0,w)  // Stride has to be a constant for now
   }
 
   // Reduction stages
