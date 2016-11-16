@@ -1,0 +1,7 @@
+#bash
+
+if [[ $1 == "-c" ]]; then
+	dot -Kfdp -n -Tpdf -o $2.pdf $2.dot && open $2.pdf
+else
+	dot -Tpdf -o $1.pdf $1.dot && open $1.pdf
+fi
