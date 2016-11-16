@@ -658,4 +658,5 @@ object PDB extends PDBCore {
   def getsp(x: Int, y: Int, idx: Int) = tester.getsp(x, y, idx)
   def setmaxCycles(x: Int) = tester.setMaxCycles(x)
   def stepRaw(x: Int) = tester.stepRaw(x)
+  def reset(x: Int) = tester.reset(x)
 }
