@@ -163,7 +163,7 @@ function processDumpInitFile() {
 function processInitSimDataFile () {
   echo "Processing init_sim_data function"
   PREV_NUM=$NUM
-  NUM=20000
+  NUM=19000
 
 #  chopCommon "init_sim_data" "${EXE}_t*" "mod"
   funcName=init_sim_data

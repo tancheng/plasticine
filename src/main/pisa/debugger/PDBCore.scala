@@ -195,6 +195,22 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     peek(module.io.rdata).toInt
   }
 
+  def zeroCUCounter(x: Int, y: Int) {
+    val cu = module.computeUnits(x)(y)
+    cu.counterChain.counters.foreach { m =>
+      // Reset existing counter value
+      poke(m.counter.reg.d, 0)
+    }
+  }
+  def zeroAllCounters {
+    (0 until module.numCols) foreach { x =>
+      (0 until module.numRows) foreach { y =>
+        zeroCUCounter(x, y)
+      }
+    }
+    step(1)
+  }
+
   def breakOnHigh(signals: List[UInt]) {
     var sigs = signals.map { s => peek(s).toInt }
     var anyHigh = sigs.reduce { (a,b) => a | b }
@@ -612,8 +628,7 @@ trait PDBCore extends PDBBase with PDBGlobals {
       tester = new PlasticinePDBTester(module, pisaConfig)
 
       println("[PDB INIT] Done")
-      }
-      val plasticineConfig="Plasticine22"
+    }
   }
 
 }
@@ -661,4 +676,6 @@ object PDB extends PDBCore {
   def setmaxCycles(x: Int) = tester.setMaxCycles(x)
   def stepRaw(x: Int) = tester.stepRaw(x)
   def reset(x: Int) = tester.reset(x)
+  def zeroAllCounters = tester.zeroAllCounters
+  def zeroCUCounter(x: Int, y: Int) = tester.zeroCUCounter(x, y)
 }

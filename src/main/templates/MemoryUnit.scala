@@ -60,6 +60,41 @@ class DRAMCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, 
   val tagOut = UInt(OUTPUT, width=w)
 }
 
+class DRAMSimCmdIn(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPUT) {
+  // DRAMSim2 uses a 36 bit interface as follows:
+  // scheme1:
+  // 35~34: channel number
+  // 33~32: rank number
+  // 31~0: address
+  //  val chnRanks = Vec(UInt(0), UInt(4), UInt(8), UInt(12)) { UInt(width=4) }
+  val addr = UInt(INPUT, width=w)
+  val tagIn = UInt(INPUT, width=w)
+  val tagOut = UInt(OUTPUT, width=w)
+  val isWr = Bool(INPUT)
+  val wdata = Vec.fill(v) { UInt(INPUT, width=w) }
+  val rdata = Vec.fill(v) { UInt(OUTPUT, width=w) }
+
+  // used for reserving simulation wires
+  val addrSimOut = UInt(OUTPUT, width=w)
+  val tagInSimOut = UInt(OUTPUT, width=w)
+  val isWrSimOut = UInt(OUTPUT, width=1)
+  val wdataSimOut = Vec.fill(v) { UInt(OUTPUT, width=w) }
+  val vldInSimOut = Bool(OUTPUT)
+  val rdyInSimOut = Bool(OUTPUT)
+}
+
+class DRAMSimulator(val w: Int, val burstSizeBytes: Int) extends BlackBox {
+  val wordSize = w/8
+  val io = new DRAMSimCmdIn(w, burstSizeBytes/wordSize)
+
+  io.addrSimOut := io.addr
+  io.tagInSimOut := io.tagIn
+  io.isWrSimOut := io.isWr
+  io.wdataSimOut := io.wdata
+  io.vldInSimOut := io.vldIn
+  io.rdyInSimOut := io.rdyIn
+}
+
 abstract class AbstractMemoryUnit(
   val w: Int,
   val d: Int,
@@ -379,15 +414,25 @@ class MemoryTester (
   io.dram.vldOut := mu.io.dram.vldOut
   io.dram.isWr := mu.io.dram.isWr
 
-  val idealMem = Module(new IdealMemory(w, burstSizeBytes))
-  idealMem.io.addr := mu.io.dram.addr
-  idealMem.io.wdata := mu.io.dram.wdata
-  idealMem.io.tagIn := mu.io.dram.tagOut
-  idealMem.io.vldIn := mu.io.dram.vldOut
-  idealMem.io.isWr := mu.io.dram.isWr
-  mu.io.dram.rdata := idealMem.io.rdata
-  mu.io.dram.vldIn := idealMem.io.vldOut
-  mu.io.dram.tagIn := idealMem.io.tagOut
+//  val idealMem = Module(new IdealMemory(w, burstSizeBytes))
+//  idealMem.io.addr := mu.io.dram.addr
+//  idealMem.io.wdata := mu.io.dram.wdata
+//  idealMem.io.tagIn := mu.io.dram.tagOut
+//  idealMem.io.vldIn := mu.io.dram.vldOut
+//  idealMem.io.isWr := mu.io.dram.isWr
+//  mu.io.dram.rdata := idealMem.io.rdata
+//  mu.io.dram.vldIn := idealMem.io.vldOut
+//  mu.io.dram.tagIn := idealMem.io.tagOut
+
+  val DRAMSimulator = Module(new DRAMSimulator(w, burstSizeBytes))
+  DRAMSimulator.io.addr := mu.io.dram.addr
+  DRAMSimulator.io.wdata := mu.io.dram.wdata
+  DRAMSimulator.io.tagIn := mu.io.dram.tagOut
+  DRAMSimulator.io.vldIn := mu.io.dram.vldOut
+  DRAMSimulator.io.isWr := mu.io.dram.isWr
+  mu.io.dram.rdata := DRAMSimulator.io.rdata
+  mu.io.dram.vldIn := DRAMSimulator.io.vldOut
+  mu.io.dram.tagIn := DRAMSimulator.io.tagOut
 }
 
 

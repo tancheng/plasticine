@@ -1,3 +1,5 @@
+genLog
+runLog
 *.log
 *.vcd
 *.swp
