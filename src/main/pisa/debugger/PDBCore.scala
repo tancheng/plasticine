@@ -328,7 +328,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
   }
 
   def getsp(x: Int, y: Int, idx: Int) = {
-    hw.computeUnits(x)(y).scratchpads(idx)
+    module.computeUnits(x)(y).scratchpads(idx)
   }
 
   def watchcs(x: Int, y: Int) {
@@ -554,9 +554,48 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
 
   }
 
+  def peekVec[T<:Bits](v: Vec[T]) = {
+    v map { i => peek(i).toInt }
+  }
+
   def dv(v: Vec[UInt]) = {
-    v foreach { i => print(peek(i) + " ")}
-    println(" ")
+    peekVec(v).mkString(" ")
+  }
+
+  def sp(x: Int, y: Int, idx: Int) = {
+    val scratchpad = getsp(x, y, idx)
+    println(s"CU$x$y Scratchpad $idx")
+    val readFifo = peek(scratchpad.config.isReadFifo).toInt > 0
+    val writeFifo = peek(scratchpad.config.isWriteFifo).toInt > 0
+    val readStr = if (readFifo) "FIFO" else "SRAM"
+    val writeStr = if (writeFifo) "FIFO" else "SRAM"
+    println(s"-- Read Interface: $readStr")
+    val rdata = peekVec(scratchpad.io.rdata)
+    if (readFifo) {
+      // deqEn, rdata
+      val deqEn = peek(scratchpad.io.deqEn)
+      println(s"---- [deqEn $deqEn] ${rdata.mkString(" ")}")
+    } else {
+      // Addr, rdata
+      val raddr = peekVec(scratchpad.io.raddr)
+      val rswap = peek(scratchpad.io.rdone)
+      println(s"---- [rswap $rswap] raddr: ${raddr.mkString(" ")}" )
+      println(s"---- [rswap $rswap] rdata: ${rdata.mkString(" ")}" )
+    }
+    println(s"-- Write Interface: $writeStr")
+    val wdata = peekVec(scratchpad.io.wdata)
+    if (writeFifo) {
+      // enqEn, wdata
+      val enqEn = peek(scratchpad.io.enqEn)
+      println(s"---- [enqEn $enqEn] ${wdata.mkString(" ")}")
+    } else {
+      // Addr, wdata, wen
+      val waddr = peekVec(scratchpad.io.waddr)
+      val wswap = peek(scratchpad.io.wdone)
+      val wen = peek(scratchpad.io.wen)
+      println(s"---- [wen $wen, wswap $wswap] waddr: ${waddr.mkString(" ")}" )
+      println(s"---- [wen $wen, wswap $wswap] wdata: ${wdata.mkString(" ")}" )
+    }
   }
 
   def dout(mod: Module) = mod match {
@@ -673,9 +712,11 @@ object PDB extends PDBCore {
   def din (mod: Module) = tester.din(mod)
   def ds(mod: Scratchpad, banks: Int*) = tester.dumpScratchpad(mod, banks:_*)
   def getsp(x: Int, y: Int, idx: Int) = tester.getsp(x, y, idx)
+  def sp(x: Int, y: Int, idx: Int) = tester.sp(x, y, idx)
   def setmaxCycles(x: Int) = tester.setMaxCycles(x)
   def stepRaw(x: Int) = tester.stepRaw(x)
   def reset(x: Int) = tester.reset(x)
   def zeroAllCounters = tester.zeroAllCounters
   def zeroCUCounter(x: Int, y: Int) = tester.zeroCUCounter(x, y)
+  def finish = tester.finish
 }
