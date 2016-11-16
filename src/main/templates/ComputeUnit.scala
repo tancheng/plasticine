@@ -348,7 +348,7 @@ class ComputeUnit(
   val maxMuxes = List.tabulate(numCounters) { i =>
     val maxMux = Module(new MuxN(numScalarRegisters, w))
     maxMux.io.ins := scalarRegs
-    maxMux.io.sel := counterChain.counters(i).config.max
+    maxMux.io.sel := counterChain.io.data(i).configuredMax
     maxMux
   }
 

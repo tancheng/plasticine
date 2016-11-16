@@ -28,6 +28,7 @@ class CounterChainCore(val w: Int, val startDelayWidth: Int, val endDelayWidth: 
     val data = Vec.fill(numCounters) { new Bundle {
         val max      = UInt(INPUT,  w)
         val stride   = UInt(INPUT,  w)
+        val configuredMax = UInt(OUTPUT,  w)
         val out      = UInt(OUTPUT, w)
         val next     = UInt(OUTPUT, w)
       }
@@ -48,6 +49,7 @@ class CounterChainCore(val w: Int, val startDelayWidth: Int, val endDelayWidth: 
     c.io.config_enable := io.config_enable
     c.io.config_data := io.config_data
     c.io.data.max := io.data(i).max
+    io.data(i).configuredMax := c.io.data.configuredMax
     c.io.data.stride := io.data(i).stride
     io.data(i).out := c.io.data.out
     io.data(i).next := c.io.data.next
@@ -92,6 +94,7 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
     val data = Vec.fill(numCounters) { new Bundle {
         val max      = UInt(INPUT,  w)
         val stride   = UInt(INPUT,  w)
+        val configuredMax = UInt(OUTPUT,  w)
         val out      = UInt(OUTPUT, w)
         val next     = UInt(OUTPUT, w)
       }
@@ -123,6 +126,7 @@ class CounterChain(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int,
     c.io.config_enable := io.config_enable
     c.io.config_data := io.config_data
     c.io.data.max := io.data(i).max
+    io.data(i).configuredMax := c.io.data.configuredMax
     c.io.data.stride := io.data(i).stride
     io.data(i).out := c.io.data.out
     io.data(i).next := c.io.data.next

@@ -42,6 +42,7 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
     val data = new Bundle {
       val max      = UInt(INPUT,  w)
       val stride   = UInt(INPUT,  w)
+      val configuredMax = UInt(OUTPUT,  w)
       val out      = UInt(OUTPUT, w)
       val next     = UInt(OUTPUT, w)
     }
@@ -71,7 +72,7 @@ class CounterRC(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int, in
   counter.io.data.stride := Mux(config.strideConst, config.stride, io.data.stride)
   io.data.out := counter.io.data.out
   io.data.next := counter.io.data.next
-
+  io.data.configuredMax := config.max
   val depulser = Module(new Depulser())
   depulser.io.in := counter.io.control.done
 
