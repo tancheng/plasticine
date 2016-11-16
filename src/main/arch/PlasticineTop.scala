@@ -21,6 +21,8 @@ class PlasticineTop(
   val numMemoryUnits: Int,
 	val numRows: Int,
 	val numCols: Int,
+  val numScalarIO: Int,
+  val numScalarRegisters: Int,
   val inst: PlasticineConfig) extends Module with DirectionOps {
 
   val burstSizeBytes = 64
@@ -47,7 +49,7 @@ class PlasticineTop(
 
 	val sims = genDRAMSims
   val chnRanksIdBits = Vec(UInt(0), UInt(4), UInt(8), UInt(12)) { UInt(width=4) }
-	val pl = Module(new Plasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, inst))
+	val pl = Module(new Plasticine(w, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, numScalarIO, numScalarRegisters, inst))
 
 	for (id <- 0 to numMemoryUnits - 1) {
     sims(id).io.addr := Cat(chnRanksIdBits(id), pl.io.dramChannel(id).addr)
@@ -133,9 +135,11 @@ object PlasticineTopTest {
     val numRows = ArchConfig.numRows
     val numCols = ArchConfig.numCols
     val numMemoryUnits = ArchConfig.numMemoryUnits
+    val numScalarIO = ArchConfig.numScalarIO
+    val numScalarRegisters = ArchConfig.numScalarRegisters
 
 
-    chiselMainTest(chiselArgs, () => Module(new PlasticineTop(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, config)).asInstanceOf[AbstractPlasticine]) {
+    chiselMainTest(chiselArgs, () => Module(new PlasticineTop(bitwidth, startDelayWidth, endDelayWidth, d, v, rwStages, numTokens, l, r, m, numScratchpads, numStagesAfterReduction, numMemoryUnits, numRows, numCols, numScalarIO, numScalarRegisters, config)).asInstanceOf[AbstractPlasticine]) {
         c => new PlasticineTests(c)
     }
   }

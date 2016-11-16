@@ -54,6 +54,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         poke(m.config.strideConst, c.strideConst)
         poke(m.config.startDelay, c.startDelay)
         poke(m.config.endDelay, c.endDelay)
+
       case m: CounterChain =>
         val c = cfg.asInstanceOf[CounterChainConfig]
         m.config.chain.zip(c.chain) foreach { case (c, i) => poke(c, i) }
@@ -174,6 +175,8 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         // Top unit
         setConfig(m.top, c.top)
     }
+
+    zeroAllCounters 
     cycleCount = 0
     step(1)
   }
@@ -191,6 +194,22 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
   def readReg(reg: Int) = {
     poke(module.io.addr, reg)
     peek(module.io.rdata).toInt
+  }
+
+  def zeroCUCounter(x: Int, y: Int) {
+    val cu = module.computeUnits(x)(y)
+    cu.counterChain.counters.foreach { m =>
+      // Reset existing counter value
+      poke(m.counter.reg.d, 0)
+    }
+  }
+  def zeroAllCounters {
+    (0 until module.numCols) foreach { x =>
+      (0 until module.numRows) foreach { y =>
+        zeroCUCounter(x, y)
+      }
+    }
+    step(1)
   }
 
   def breakOnHigh(signals: List[UInt]) {
@@ -610,8 +629,7 @@ trait PDBCore extends PDBBase with PDBGlobals {
       tester = new PlasticinePDBTester(module, pisaConfig)
 
       println("[PDB INIT] Done")
-      }
-      val plasticineConfig="Plasticine22"
+    }
   }
 
 }
@@ -659,4 +677,6 @@ object PDB extends PDBCore {
   def setmaxCycles(x: Int) = tester.setMaxCycles(x)
   def stepRaw(x: Int) = tester.stepRaw(x)
   def reset(x: Int) = tester.reset(x)
+  def zeroAllCounters = tester.zeroAllCounters
+  def zeroCUCounter(x: Int, y: Int) = tester.zeroCUCounter(x, y)
 }
