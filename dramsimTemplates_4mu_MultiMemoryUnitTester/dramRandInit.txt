@@ -1,0 +1,2 @@
+  val_t rand_init = 0;
+	__rand_seed = rand_init;

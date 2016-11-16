@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+
+from optparse import OptionParser
+import multiprocessing
+import os, sys, datetime
+import math
+from socket import gethostname
+from string import *
+import ConfigParser
+from time import localtime, strftime
+
+def err(s):
+    exit("error: " + s)
+
+def warn(s):
+    print("warn: " + s)
+
+def main():
+    usage = "usage: %prog <application runner> [staging args] [options]"
+    parser = OptionParser(usage)
+    parser.add_option("--sim", dest="sim", action="store_true", default=False, help="Generate C++ simulator")
+    parser.add_option("--dot", dest="dot", action="store_true", default=False, help="Generate dot output")
+    parser.add_option("--hex", dest="hex", action="store_true", default=False, help="Generate hex output")
+    parser.add_option("--vcd", dest="vcd", action="store_true", default=False, help="Generate waveform")
+    parser.add_option("--verilog", dest="verilog", action="store_true", default=False, help="Generate Verilog RTL")
+    parser.add_option("-d", "--dest", action="store", dest="build_dir", default=os.getenv("PWD"), help="output location for generated files")
+    parser.add_option("--dramSim", dest="dramSim", action="store_true", default=False, help="Generate tests with DRAMSim2")
+    parser.add_option("--runDramSim", dest="runDramSim", action="store_true", default=False, help="Run generated tests")
+
+    (opts, args) = parser.parse_args()
+    if len(args) < 1:
+        parser.error("an application file must be passed to delitec as an argument")
+
+    stage(args[0], args[1:len(args)], opts)
+
+def stage(app, params, opts):
+    sbt_opts = ""
+
+    build_dir = opts.build_dir + os.sep + "generated" + os.sep + app + os.sep
+    static_dir = os.getenv("PWD") + os.sep + "static"
+
+#    if not opts.runPrep:
+#        print("Clearing build directory %s..." %(build_dir))
+#        os.system("rm -rf %s" %(build_dir))
+
+    sbt_opts = sbt_opts + " --targetDir " + build_dir
+    if (opts.sim == True | opts.hex == True | opts.verilog == True):
+        sbt_opts = sbt_opts + " --genHarness"
+    if opts.dot == True:
+        sbt_opts = sbt_opts + " --backend dot"
+    if opts.sim == True:
+        sbt_opts = sbt_opts + " --debug --backend c" #--compile --test
+    if opts.verilog == True:
+        sbt_opts = sbt_opts + " --backend v"
+    if opts.hex == True:
+        sbt_opts = sbt_opts + " --backend flo"
+    if opts.vcd == True:
+        sbt_opts = sbt_opts + " --vcd"
+#    if opts.prep == True or opts.prep_4mu == True:
+#        sbt_opts = sbt_opts + " --debug --backend c --genHarness --vcd"
+    if opts.dramSim == True:
+        sbt_opts = sbt_opts + " --debug --backend c --genHarness"
+        os.system("cp -r ./dramsimTemplates_4mu_MultiMemoryUnitTester/ini ../")
+        os.system("cp -r ./dramsimTemplates_4mu_MultiMemoryUnitTester/ini ../")
+        os.system("cp ./dramsimTemplates_4mu_MultiMemoryUnitTester/system.ini ../")
+        os.system("cp ./dramsimTemplates_4mu_MultiMemoryUnitTester/libdramsim.so ../")
+    if opts.runDramSim == True:
+						# sbt_opts = sbt_opts + " --test --backend v"
+        sbt_opts = sbt_opts + " --test --backend null --testCommand %s/MultiMemoryUnitTester" %(build_dir)
+
+    cp = "../target/scala-2.11/classes"
+    app_prefix = "plasticine.templates"
+    app_args_end = "end"
+    sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s %s\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, sbt_opts)
+    print sbt_cmd
+    print("Invoking Chisel...")
+    ecode = os.system(sbt_cmd)
+
+#    if opts.runDramSim == True:
+#        print("Running Test DramSim Test")
+#        sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s \"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
+#        print sbt_cmd
+#        ecode = os.system(sbt_cmd)
+#        if ecode != 0:
+#            err("SADL compilation failed")
+
+    if opts.dramSim == True:
+        print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
+        os.system("cp ./dramsimTemplates_4mu_MultiMemoryUnitTester/libdramsim.so ./dramsimTemplates_4mu_MultiMemoryUnitTester/DRAMSim.h ./dramsimTemplates_4mu_MultiMemoryUnitTester/Callback.h ./generated")
+        os.system("cp ./dramsimTemplates_4mu_MultiMemoryUnitTester/Makefile ./dramsimTemplates_4mu_MultiMemoryUnitTester/chopper.sh ./dramsimTemplates_4mu_MultiMemoryUnitTester/dramInit.txt ./dramsimTemplates_4mu_MultiMemoryUnitTester/dramRandInit.txt ./dramsimTemplates_4mu_MultiMemoryUnitTester/comment.sh ./dramsimTemplates_4mu_MultiMemoryUnitTester/emul_api.h ./dramsimTemplates_4mu_MultiMemoryUnitTester/sim_api.h ./generated/%s" %(app))
+        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh MultiMemoryUnitTester.cpp  && make -j32" %(app))
+#        os.system("cd ./generated/%s && bash comment.sh" %(app))
+        os.system("cd ../../")
+
+        if ecode != 0:
+            err("SADL compilation failed")
+#    if ecode != 0:
+#        err("SADL compilation failed")
+
+    elif opts.sim == True:
+        print("Performing Split C++ compilation...")
+        os.system("cp %s/* %s" %(static_dir, build_dir))
+        ecode = os.system("pushd %s && time ./splitMethods.sh && time make -j16 && popd" %(build_dir))
+        if (ecode != 0):
+            err("SADL compilation failed")
+
+        print("Running test...")
+        sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
+        print sbt_cmd
+        ecode = os.system(sbt_cmd)
+        if ecode != 0:
+            err("SADL compilation failed")
+
+    elif opts.verilog == True:
+        # Move generated verilog files into a separate "src" folder
+        os.system("mkdir %s/src && mv %s/*.v %s/src" %(build_dir, build_dir, build_dir))
+
+        # Copy Makefile and ASIC flow scripts
+        os.system("cp -r %s/verilog/* %s" %(static_dir, build_dir))
+
+if __name__ == "__main__":
+    main()
