@@ -48,12 +48,12 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
     mod match {
       case m: CounterRC =>
         val c = cfg.asInstanceOf[CounterRCConfig]
-        poke(m.config.max, c.max)
-        poke(m.config.stride, c.stride)
-        poke(m.config.maxConst, c.maxConst)
-        poke(m.config.strideConst, c.strideConst)
         poke(m.config.startDelay, c.startDelay)
         poke(m.config.endDelay, c.endDelay)
+        poke(m.config.max, c.max)
+        poke(m.config.stride, c.stride)
+        poke(m.config.strideConst, (c.strideConst > 0))
+        poke(m.config.maxConst, (c.maxConst > 0))
       case m: CounterChain =>
         val c = cfg.asInstanceOf[CounterChainConfig]
         m.config.chain.zip(c.chain) foreach { case (c, i) => poke(c, i) }
@@ -148,34 +148,36 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
 //        setConfig(m.dataVldConnBox, c.dataVldConnBox)
         setConfig(m.argOutConnBox, c.argOutConnBox)
       case m: Plasticine =>
-        val c = cfg.asInstanceOf[PlasticineConfig]
-
-        // Compute units
-        c.cu.zipWithIndex.foreach { case (c, idx) =>
-          val cuModule = m.computeUnits(idx/m.numCols)(idx%m.numCols)
-          setConfig(cuModule, c)
-        }
+        val plc = cfg.asInstanceOf[PlasticineConfig]
 
         // Data switches
-        c.dataSwitch.zipWithIndex.foreach { case (dconfig, idx) =>
+        plc.dataSwitch.zipWithIndex.foreach { case (dconfig, idx) =>
           val switch = m.dataSwitch(idx/(m.numCols+1))(idx%(m.numCols+1))
           setConfig(switch, dconfig)
         }
 
         // Control switches
-        c.controlSwitch.zipWithIndex.foreach { case (cconfig, idx) =>
+        plc.controlSwitch.zipWithIndex.foreach { case (cconfig, idx) =>
           val switch = m.controlSwitch(idx/(m.numCols+1))(idx%(m.numCols+1))
           setConfig(switch, cconfig)
         }
 
         // Memory units
-        m.memoryUnits.zip(c.mu) foreach { case (mu, i) => setConfig(mu, i) }
+        m.memoryUnits.zip(plc.mu) foreach { case (mu, i) => setConfig(mu, i) }
 
         // Top unit
-        setConfig(m.top, c.top)
+        setConfig(m.top, plc.top)
+
+        // Compute units
+        plc.cu.zipWithIndex.foreach { case (c, idx) =>
+          println(s"[reconfig] CU${idx/m.numCols}${idx%m.numCols}")
+          val cuModule = m.computeUnits(idx/m.numCols)(idx%m.numCols)
+          setConfig(cuModule, c)
+        }
+
+        cycleCount = 0
+        step(1)
     }
-    cycleCount = 0
-    step(1)
   }
 
   var cycleCount = 0
