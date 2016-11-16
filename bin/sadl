@@ -96,12 +96,12 @@ def stage(app, params, opts):
         if (ecode != 0):
             err("C compilation failed")
 
-        print("Running test...")
-        sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
-        print sbt_cmd
-        ecode = os.system(sbt_cmd)
-        if ecode != 0:
-            err("SADL compilation failed")
+#        print("Running test...")
+#        sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
+#        print sbt_cmd
+#        ecode = os.system(sbt_cmd)
+#        if ecode != 0:
+#            err("SADL compilation failed")
 
     elif opts.verilog == True:
         # Move generated verilog files into a separate "src" folder
