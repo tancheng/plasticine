@@ -72,6 +72,7 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
         poke(m.config.bufSize, bufSize)
         poke(m.config.isReadFifo, c.isReadFifo)
         poke(m.config.isWriteFifo, c.isWriteFifo)
+        println(s"[scratchpad] fifoSize = ${c.fifoSize}")
         poke(m.config.fifoSize, c.fifoSize)
       case m: ComputeUnit =>
         val c = cfg.asInstanceOf[ComputeUnitConfig]
@@ -602,7 +603,9 @@ class PlasticinePDBTester(module: Plasticine, config: PlasticineConfig) extends 
       println(s"---- [wen $wen, wswap $wswap] wdata: ${wdata.mkString(" ")}" )
     }
     if (readFifo & writeFifo) {
-      println(s"full $full empty $empty")
+      val size = peek(scratchpad.size).toInt
+      val max = peek(scratchpad.sizeUDC.io.max).toInt
+      println(s"full $full empty $empty size [ $size of $max]")
     }
   }
 

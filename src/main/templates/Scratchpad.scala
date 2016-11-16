@@ -178,7 +178,7 @@ class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig)
   // are FIFOs. Size UDC is controlled by the enqEn and deqEn signals,
   // which are active only when configured as FIFOs. Size is not correct
   // when one side is a FIFO
-  val sizeUDC = Module(new UpDownCtr(log2Up(d+1)))
+  val sizeUDC = Module(new UpDownCtr(log2Up(d)+1))
   val size = sizeUDC.io.out
   val empty = size === UInt(0)
   val full = sizeUDC.io.isMax
