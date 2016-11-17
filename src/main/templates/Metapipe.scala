@@ -122,14 +122,23 @@ class MetapipeTests(c: Metapipe) extends PlasticineTester(c) {
   val stageIterCount = List.tabulate(c.numInputs) { i => math.abs(rnd.nextInt) % 10 }
   println(s"stageIterCount: $stageIterCount")
 
-  def executeStage(s: Int) {
-    val numCycles = stageIterCount(s)
-    println(s"[stage $s] Executing for $numCycles")
-    step(numCycles)
-    println(s"[stage $s] Done")
-    poke(c.io.stageDone(s), 1)
-    step(1)
-    poke(c.io.stageDone(s), 0)
+  def executeStages(s: List[Int]) {
+    val numCycles = s.map { stageIterCount(_) }
+    var elapsed = 0
+    var done: Int = 0
+    while (done != s.size) {
+      c.io.stageDone.foreach { poke(_, 0) }
+      step(1)
+      elapsed += 1
+      for (i <- 0 until s.size) {
+        if (numCycles(i) == elapsed) {
+          println(s"[Stage ${s(i)} Finished execution at $elapsed")
+          poke(c.io.stageDone(s(i)), 1)
+          done += 1
+        }
+      }
+    }
+    c.io.stageDone.foreach { poke(_, 1) }
   }
 
   def handleStageEnables = {
