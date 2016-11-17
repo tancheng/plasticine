@@ -110,16 +110,16 @@ trait InterconnectHelper extends DirectionOps {
   val baseIODirs = Set(N(), S())
   def topIO(iodir: IODirection): Set[Direction] = {
     (iodir match {
-      case INPUT => Set(W(), E(), SW())
-      case OUTPUT => Set(W(), E(), SE())
+      case INPUT => Set(W(), E(), SW(), SE())
+      case OUTPUT => Set(W(), E(), SW(), SE())
       case _ => throw new Exception(s"Unknown direction $iodir")
     }) ++ baseIODirs
   }
 
   def botIO(iodir: IODirection): Set[Direction] = {
     (iodir match {
-      case INPUT => Set(W(), E(), NW())
-      case OUTPUT => Set(W(), E(), NE())
+      case INPUT => Set(W(), E(), NW(), NE())
+      case OUTPUT => Set(W(), E(), NW(), NE())
       case _ => throw new Exception(s"Unknown direction $iodir")
     }) ++ baseIODirs
   }
@@ -127,14 +127,14 @@ trait InterconnectHelper extends DirectionOps {
   def rightIO(iodir: IODirection): Set[Direction] = {
     (iodir match {
       case INPUT => Set(NW(), W(), SW())
-      case OUTPUT => Set(W())
+      case OUTPUT => Set(NW(), W(), SW())
       case _ => throw new Exception(s"Unknown direction $iodir")
     }) ++ baseIODirs
   }
 
   def leftIO(iodir: IODirection): Set[Direction] = {
     (iodir match {
-      case INPUT => Set(E())
+      case INPUT => Set(E(), NE(), SE())
       case OUTPUT => Set(E(), NE(), SE())
       case _ => throw new Exception(s"Unknown direction $iodir")
     }) ++ baseIODirs
@@ -218,11 +218,11 @@ trait InterconnectHelper extends DirectionOps {
     }
   }
 
-  // CU Input order: West: 0, NW: 1, S: 2, SW: 3
+  // CU Input order: NW: 0, NE: 1, SE: 2, SW: 3
   def getCUInputIdx(d: Direction) = d match {
-    case W() => 0
-    case NW() => 1
-    case S() => 2
+    case NW() => 0
+    case NE() => 1
+    case SE() => 2
     case SW() => 3
     case _ => throw new Exception(s"Unsupported input direction $d for CU")
   }
@@ -284,35 +284,37 @@ trait InterconnectHelper extends DirectionOps {
   }
 
   def connectCUArray {
-    for (x <- 0 until cols) {
-      for (y <- 0 until rows) {
-        dot.println(s"""${x}${y} [pos="${x*2+1},${y*2+1}!"]""")
-        val validInputs = Set(W(), S())
-
-        // Connect CUs together (inputs 0 (W) and 2(S))
-        if (y == 0) { validInputs -= S() }
-        if (x == 0) { validInputs -= W() }
-        validInputs.foreach { case in =>
-          val inIdx = getCUInputIdx(in) // Indices of input ports
-          val r = yOffset(in)
-          val c = xOffset(in)
-          println(s"[cu $x $y] input dir: $in, inIdx = $inIdx, input CU = cu ${x+c}${y+r}")
-          cus(x)(y).io.dataIn(inIdx) := cus(x+c)(y+r).io.dataOut
-            dot.println(s"${(x+c)}${(y+r)} -> ${x}${y}")
-        }
-      }
-    }
+//    for (x <- 0 until cols) {
+//      for (y <- 0 until rows) {
+//        dot.println(s"""${x}${y} [pos="${x*2+1},${y*2+1}!"]""")
+//        val validInputs = Set(W(), S())
+//
+//        // Connect CUs together (inputs 0 (W) and 2(S))
+//        if (y == 0) { validInputs -= S() }
+//        if (x == 0) { validInputs -= W() }
+//        validInputs.foreach { case in =>
+//          val inIdx = getCUInputIdx(in) // Indices of input ports
+//          val r = yOffset(in)
+//          val c = xOffset(in)
+//          println(s"[cu $x $y] input dir: $in, inIdx = $inIdx, input CU = cu ${x+c}${y+r}")
+//          cus(x)(y).io.dataIn(inIdx) := cus(x+c)(y+r).io.dataOut
+//            dot.println(s"${(x+c)}${(y+r)} -> ${x}${y}")
+//        }
+//      }
+//    }
   }
 
   def connectCUAndSwitch = {
     for (i <- 0 until cols) {
       for (j <- 0 until rows) {
         // Connect NW (1) and SW(3) inputs for CUs
-        val validDirs = List(NW(), SW())
+        val validDirs = List(NW(), SW(), NE(), SE())
         validDirs.foreach { dir =>
           val (switchx, switchy) = dir match {
             case NW() => (i, j+1)
             case SW() => (i, j)
+            case NE() => (i+1, j+1)
+            case SE() => (i+1, j)
             case _ => throw new Exception(s"Unsupported CU input dir $dir to connect switches")
           }
 
@@ -320,19 +322,21 @@ trait InterconnectHelper extends DirectionOps {
           Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), INPUT) == 1, s"Num links in $dir direction must be 1")
           Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), OUTPUT) == 1, s"Num links in $dir direction must be 1")
 
+          val switchInIdx = getIdxs(switchx, switchy, reverseDir(dir), INPUT)(0)
           val switchOutIdx = getIdxs(switchx, switchy, reverseDir(dir), OUTPUT)(0)
           val cuIdx = getCUInputIdx(dir)
           cus(i)(j).io.dataIn(cuIdx) := switches(switchx)(switchy).io.outs(switchOutIdx)
+          switches(switchx)(switchy).io.ins(switchInIdx) := cus(i)(j).io.dataOut
           dot.println(s"s${(switchx)}${(switchy)} -> ${i}${j}")
+          dot.println(s"${i}${j} -> s${(switchx)}${(switchy)}")
         }
-
-        // Connect CU output to SW (i, j+1) and NW (i+1, j+1)
-        val swIdxSwitch = getIdxs(i+1, j+1, SW(), INPUT)(0)
-        val nwIdxSwitch = getIdxs(i+1, j, NW(), INPUT)(0)
-        switches(i+1)(j+1).io.ins(swIdxSwitch) := cus(i)(j).io.dataOut
-        switches(i+1)(j).io.ins(nwIdxSwitch) := cus(i)(j).io.dataOut
-        dot.println(s"${(i)}${(j)} -> s${i+1}${j+1}")
-        dot.println(s"${(i)}${(j)} -> s${i+1}${j}")
+//        // Connect CU output to SW (i, j+1) and NW (i+1, j+1)
+//        val swIdxSwitch = getIdxs(i+1, j+1, SW(), INPUT)(0)
+//        val nwIdxSwitch = getIdxs(i+1, j, NW(), INPUT)(0)
+//        switches(i+1)(j+1).io.ins(swIdxSwitch) := cus(i)(j).io.dataOut
+//        switches(i+1)(j).io.ins(nwIdxSwitch) := cus(i)(j).io.dataOut
+//        dot.println(s"${(i)}${(j)} -> s${i+1}${j+1}")
+//        dot.println(s"${(i)}${(j)} -> s${i+1}${j}")
       }
     }
   }
@@ -451,8 +455,9 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
     validIO
   }
 
+  override val defaultNumLinks = 2
   override def getNumLinks(x: Int, y: Int, d: Direction, iodir: IODirection) = {
-    val interSwitchLinks = 8
+    val interSwitchLinks = 2
     d match {
         case N() => interSwitchLinks
         case S() => interSwitchLinks
@@ -552,36 +557,39 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
     }
   }
 
-  // CU Input order: All 8 directions valid for control
-  override def getCUInputIdx(d: Direction) = dirOrder.indexOf(d)
+  // CU Input order: All NW, NE, SE, SW directions valid for control
+  override def getCUInputIdx(d: Direction) = dirOrder.filterNot { i: Direction =>
+      val validCtrlDirs: Set[Direction] = Set(NW(), NE(), SW(), SE())
+      validCtrlDirs.contains(i)
+  }.indexOf(d)
 
   override def connectCUArray {
-    for (x <- 0 until cols) {
-      for (y <- 0 until rows) {
-        dot.println(s"""${x}${y} [pos="${x*2+1},${y*2+1}!"]""")
-        val validInputs = Set(W(), N(), E(), S())
-
-        // Connect CUs together (inputs 0 (W) and 2(S))
-        if (y == 0) { validInputs -= S() }
-        if (y == rows-1) { validInputs -= N() }
-        if (x == 0) { validInputs -= W() }
-        if (x == cols-1) { validInputs -= E() }
-        validInputs.foreach { case in =>
-          val inIdx = getCUInputIdx(in) // Indices of input ports
-          val outIdx = getCUInputIdx(reverseDir(in))
-          val r = yOffset(in)
-          val c = xOffset(in)
-          println(s"[ctrl][connectCUArray][cu $x $y] $in ($inIdx) = cu [${x+c}${y+r}] ${reverseDir(in)} $outIdx")
-
-          val pipelineReg = Module(new FF(1))
-          pipelineReg.io.control.enable := Bool(true)
-          pipelineReg.io.data.init := UInt(0)
-          pipelineReg.io.data.in := cus(x+c)(y+r).io.tokenOuts(outIdx)
-          cus(x)(y).io.tokenIns(inIdx) := pipelineReg.io.data.out
-            dot.println(s"${(x+c)}${(y+r)} -> ${x}${y}")
-        }
-      }
-    }
+//    for (x <- 0 until cols) {
+//      for (y <- 0 until rows) {
+//        dot.println(s"""${x}${y} [pos="${x*2+1},${y*2+1}!"]""")
+//        val validInputs = Set(W(), N(), E(), S())
+//
+//        // Connect CUs together (inputs 0 (W) and 2(S))
+//        if (y == 0) { validInputs -= S() }
+//        if (y == rows-1) { validInputs -= N() }
+//        if (x == 0) { validInputs -= W() }
+//        if (x == cols-1) { validInputs -= E() }
+//        validInputs.foreach { case in =>
+//          val inIdx = getCUInputIdx(in) // Indices of input ports
+//          val outIdx = getCUInputIdx(reverseDir(in))
+//          val r = yOffset(in)
+//          val c = xOffset(in)
+//          println(s"[ctrl][connectCUArray][cu $x $y] $in ($inIdx) = cu [${x+c}${y+r}] ${reverseDir(in)} $outIdx")
+//
+//          val pipelineReg = Module(new FF(1))
+//          pipelineReg.io.control.enable := Bool(true)
+//          pipelineReg.io.data.init := UInt(0)
+//          pipelineReg.io.data.in := cus(x+c)(y+r).io.tokenOuts(outIdx)
+//          cus(x)(y).io.tokenIns(inIdx) := pipelineReg.io.data.out
+//            dot.println(s"${(x+c)}${(y+r)} -> ${x}${y}")
+//        }
+//      }
+//    }
   }
 
   override def connectCUAndSwitch = {
@@ -599,16 +607,23 @@ trait CtrlInterconnectHelper extends InterconnectHelper {
           }
 
           // Currently we support only a single link in each of these directions
-          Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), INPUT) == 1, s"Num links in $dir direction must be 1")
-          Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), OUTPUT) == 1, s"Num links in $dir direction must be 1")
+          Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), INPUT) == 2, s"Num links in $dir direction must be 1")
+          Predef.assert(getNumLinks(switchx, switchy, reverseDir(dir), OUTPUT) == 2, s"Num links in $dir direction must be 1")
 
-          val switchOutIdx = getIdxs(switchx, switchy, reverseDir(dir), OUTPUT)(0)
-          val switchInIdx = getIdxs(switchx, switchy, reverseDir(dir), INPUT)(0)
+          val switchOutIdx = getIdxs(switchx, switchy, reverseDir(dir), OUTPUT)
+          val switchInIdx = getIdxs(switchx, switchy, reverseDir(dir), INPUT)
+
           val cuIdx = getCUInputIdx(dir)  // Same idx for both input and output
-          cus(i)(j).io.tokenIns(cuIdx) := switches(switchx)(switchy).io.outs(switchOutIdx)(0)
-          switches(switchx)(switchy).io.ins(switchInIdx)(0) := cus(i)(j).io.tokenOuts(cuIdx)
-          dot.println(s"s${(switchx)}${(switchy)} -> ${i}${j}")
-          dot.println(s" ${i}${j} -> s${(switchx)}${(switchy)}")
+          (0 until switchOutIdx.size) foreach { l =>
+            cus(i)(j).io.tokenIns(cuIdx+l) := switches(switchx)(switchy).io.outs(switchOutIdx(l))(0)
+            dot.println(s"s${(switchx)}${(switchy)} -> ${i}${j}")
+          }
+
+//            cus(i)(j).io.tokenIns(cuIdx+l) := switches(switchx)(switchy).io.outs(switchOutIdx(l))(0)
+          (0 until switchInIdx.size) foreach { l =>
+            switches(switchx)(switchy).io.ins(switchInIdx(l))(0) := cus(i)(j).io.tokenOuts(cuIdx+l)
+            dot.println(s" ${i}${j} -> s${(switchx)}${(switchy)}")
+          }
         }
       }
     }
