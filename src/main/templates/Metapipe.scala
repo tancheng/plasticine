@@ -44,17 +44,22 @@ class Metapipe(val numInputs: Int) extends Module {
   ctr.io.data.stride := UInt(1)
   val iter = ctr.io.data.out
 
+  val doneClear = UInt(width=1)
   val doneFF = List.tabulate(numInputs) { i =>
     val ff = Module(new FF(1))
-    ff.io.control.enable := io.enable
+    ff.io.control.enable := io.stageDone(i) | doneClear
     ff.io.data.init := UInt(0)
-    ff.io.data.in := io.stageDone(i)
+    ff.io.data.in := Mux(io.stageDone(i), io.stageDone(i), UInt(0))
     ff
   }
 
   val doneMask = doneFF.map { _.io.data.out }
 
-  def clearDone = doneFF.foreach { _.io.data.in := UInt(0) }
+//  def clearDone = doneFF.foreach { _.io.data.in := UInt(0) }
+
+  // Provide default value for enable
+  io.stageEnable.foreach { _ := UInt(0) }
+  doneClear := UInt(0)
 
   when(io.enable) {
     when(state === UInt(initState)) {   // INIT -> RESET
@@ -64,44 +69,50 @@ class Metapipe(val numInputs: Int) extends Module {
     }.elsewhen (state < UInt(steadyState)) {  // FILL -> STEADY
       for ( i <- fillState until steadyState) {
         val fillStateID = i - fillState
-        io.stageEnable.zip(doneMask).take(fillStateID+1).foreach { case (en, done) => en := ~done }
-        io.stageEnable.drop(fillStateID+1).foreach { en => en := UInt(0) }
+        when((state === UInt(i))) {
+          io.stageEnable.zip(doneMask).take(fillStateID+1).foreach { case (en, done) => en := ~done }
+          io.stageEnable.drop(fillStateID+1).foreach { en => en := UInt(0) }
+          val doneTree = Bool(doneMask.take(fillStateID+1).reduce {_&_})
+          doneClear := doneTree
 
-        val doneTree = io.stageDone.take(fillStateID+1).reduce {_&_}
-        when ((state === UInt(i) & doneTree)) {
-          stateFF.io.data.in := UInt(i+1)
-          clearDone
-        }.otherwise {
-          stateFF.io.data.in := state
+          when (doneTree) {
+            stateFF.io.data.in := UInt(i+1)
+          }.otherwise {
+            stateFF.io.data.in := state
+          }
         }
       }
     }.elsewhen (state === UInt(steadyState)) {  // STEADY
       io.stageEnable.zip(doneMask).foreach { case (en, done) => en := ~done }
 
-      val doneTree = io.stageDone.reduce {_&_}
+      val doneTree = Bool(doneMask.reduce {_&_})
+      doneClear := doneTree
       when(doneTree) {
-        when(ctr.io.control.done) {
+        when(ctr.io.data.out === (max - UInt(1))) {
           stateFF.io.data.in := UInt(drainState)
         }.otherwise {
           stateFF.io.data.in := UInt(state)
         }
-        clearDone
       }.otherwise {
         stateFF.io.data.in := state
       }
     }.elsewhen (state < UInt(doneState)) {   // DRAIN
       for ( i <- drainState until doneState) {
         val drainStateID = i - drainState
-        io.stageEnable.zip(doneMask).takeRight(numInputs - drainStateID - 1).foreach { case (en, done) => en := ~done }
-        io.stageEnable.dropRight(numInputs - drainStateID - 1).foreach { en => en := UInt(0) }
+        when (state === UInt(i)) {
+          io.stageEnable.zip(doneMask).takeRight(numInputs - drainStateID - 1).foreach { case (en, done) => en := ~done }
+          io.stageEnable.dropRight(numInputs - drainStateID - 1).foreach { en => en := UInt(0) }
 
-        val doneTree = io.stageDone.takeRight(numInputs - drainStateID - 1).reduce {_&_}
-        when ((state === UInt(i) & doneTree)) {
-          stateFF.io.data.in := UInt(i+1)
-          clearDone
-        }.otherwise {
-          stateFF.io.data.in := state
+          val doneTree = Bool(doneMask.takeRight(numInputs - drainStateID - 1).reduce {_&_})
+          doneClear := doneTree
+          when (doneTree) {
+            stateFF.io.data.in := UInt(i+1)
+          }.otherwise {
+            stateFF.io.data.in := state
+          }
         }
+
+
       }
     }.elsewhen (state === UInt(doneState)) {  // DONE
       stateFF.io.data.in := UInt(initState)
