@@ -23,7 +23,6 @@ class Metapipe(val numInputs: Int) extends Module {
   val steadyState = fillState + numInputs - 1
   val drainState = steadyState + 1
   val doneState = drainState+numInputs-1
-//  val lastState = doneState - 1
 
   val stateFF = Module(new FF(32))
   stateFF.io.control.enable := Bool(true)
@@ -55,9 +54,7 @@ class Metapipe(val numInputs: Int) extends Module {
 
   val doneMask = doneFF.map { _.io.data.out }
 
-//  def clearDone = doneFF.foreach { _.io.data.in := UInt(0) }
-
-  // Provide default value for enable
+  // Provide default value for enable and doneClear
   io.stageEnable.foreach { _ := UInt(0) }
   doneClear := UInt(0)
 
@@ -111,8 +108,6 @@ class Metapipe(val numInputs: Int) extends Module {
             stateFF.io.data.in := state
           }
         }
-
-
       }
     }.elsewhen (state === UInt(doneState)) {  // DONE
       stateFF.io.data.in := UInt(initState)
