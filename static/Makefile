@@ -10,7 +10,7 @@ SIM="Simulator"
 all: $(SIM)
 
 $(SIM): $(EXE)
-	ln -sf $(EXE) $(SIM)
+#	ln -sf $(EXE) $(SIM)
 
 $(EXE): $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS)
