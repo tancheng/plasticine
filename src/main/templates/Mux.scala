@@ -14,6 +14,20 @@ class MuxN(val numInputs: Int, w: Int) extends Module {
   io.out := io.ins(io.sel)
 }
 
+class MuxNOH(val numInputs: Int, w: Int) extends Module {
+  val numSelectBits = log2Up(numInputs)
+  val io = new Bundle {
+    val ins = Vec.fill(numInputs) { Bits(INPUT,  width = w) }
+    val sel = Vec.fill(numInputs) { Bool(INPUT) }
+    val out = Bits(OUTPUT, width = w)
+  }
+
+  io.out := UInt(0)
+  for (i <- 0 until numInputs) {
+    when(io.sel(i)) { io.out := io.ins(i) }
+  }
+}
+
 class MuxNL(val numInputs1: Int, w1: Int) extends MuxN(numInputs1, w1) {
   override val numSelectBits = log2Up(numInputs1)
   override val io = new Bundle {
@@ -83,6 +97,22 @@ class MuxNTests(c: MuxN) extends Tester(c) {
     }
 }
 
+
+class MuxNOHTests(c: MuxNOH) extends Tester(c) {
+    val ins = List.tabulate(c.numInputs) { i =>
+      math.abs(scala.util.Random.nextInt % (1 << 4))
+    }
+    c.io.ins zip ins foreach { case (cin, in) => poke(cin, in) }
+
+    (0 until c.numInputs) foreach { sel =>
+      // Make a one-hot encoded thing
+      c.io.sel.zipWithIndex.foreach { case (s, i) => if (i == sel) poke(s, 1) else poke(s, 0) }
+      step(1)
+      val out = ins(sel)
+      expect(c.io.out, out)
+    }
+}
+
 class MuxNCharTests(c: MuxNReg) extends Tester(c)
 
 object MuxNTest {
@@ -96,6 +126,21 @@ object MuxNTest {
     val numInputs = appArgs(1).toInt
     chiselMainTest(args, () => Module(new MuxN(numInputs, w))) {
       c => new MuxNTests(c)
+    }
+  }
+}
+
+object MuxNOHTest {
+  def main(args: Array[String]): Unit = {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 2) {
+      println("Usage: MuxNOHTest <wordWidth> <numInputs>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    val numInputs = appArgs(1).toInt
+    chiselMainTest(args, () => Module(new MuxNOH(numInputs, w))) {
+      c => new MuxNOHTests(c)
     }
   }
 }
