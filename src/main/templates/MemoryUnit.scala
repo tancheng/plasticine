@@ -255,9 +255,16 @@ class MemoryUnit(
   ccache.io.wdata := dataFifo.io.deq(0)
   ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
 
-  addrFifo.io.deqVld := burstCounter.io.control.done & ~ccache.io.full
-  dataFifo.io.deqVld := Mux(config.scatterGather, burstCounter.io.control.done & ~ccache.io.full, config.isWr & burstVld)
+  val completed = UInt(width=1) // Scatter-gather vector completed
+  val fifoDeqEnCounter = Module(new Counter(log2Up(numOutstandingBursts+1)))
+  fifoDeqEnCounter.io.data.max := UInt(numOutstandingBursts)
+  fifoDeqEnCounter.io.data.stride := UInt(1)
+  fifoDeqEnCounter.io.control.saturate := Bool(true)
+  fifoDeqEnCounter.io.control.reset := completed
+  fifoDeqEnCounter.io.control.enable := burstVld | ~addrFifo.io.empty
 
+  addrFifo.io.deqVld := Mux(config.scatterGather, ~fifoDeqEnCounter.io.control.done & ~ccache.io.full , burstCounter.io.control.done & ~ccache.io.full)
+  dataFifo.io.deqVld := Mux(config.scatterGather, burstCounter.io.control.done & ~ccache.io.full, config.isWr & burstVld)
 
   // Parse Metadata line
   def parseMetadataLine(m: UInt) = {
@@ -302,7 +309,6 @@ class MemoryUnit(
   val gatherData = Vec.tabulate(burstSizeWords) { gatherBuffer(_).io.data.out }
 
   // Completion mask
-  val completed = UInt()
   val completionMask = List.tabulate(burstSizeWords) { i =>
     val ff = Module(new FF(1))
     ff.io.control.enable := completed | (validMask(i) & registeredVld)

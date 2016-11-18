@@ -23,6 +23,7 @@ class TileLoad (
     val addr = UInt(INPUT, width=w)
     val size = UInt(INPUT, width=w)
     val colsize = UInt(INPUT, width=w)
+    val wdata = Vec.fill(v) { UInt(INPUT, width=w) }
     val data = Vec.fill(v) { UInt(OUTPUT, width=w) }
 
     // To/From  MemoryUnit
@@ -33,6 +34,8 @@ class TileLoad (
       val addrValid = Bool(OUTPUT)
       val data = Vec.fill(v) { UInt(INPUT, width=w) }
       val dataValid = Bool(INPUT)
+      val wdata = Vec.fill(v) { UInt(OUTPUT, width=w) }
+      val wdataValid = Bool(OUTPUT)
     }
   }
 

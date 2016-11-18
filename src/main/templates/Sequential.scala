@@ -20,7 +20,7 @@ class Sequential(val numInputs: Int) extends Module {
   val initState = 0
   val resetState = 1
   val firstState = resetState + 1
-  val doneState = numInputs+2
+  val doneState = firstState + numInputs
   val lastState = doneState - 1
 
   val stateFF = Module(new FF(32))
@@ -143,7 +143,7 @@ object SequentialTest {
   def main(args: Array[String]): Unit = {
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-    val numInputs = 2
+    val numInputs = 5
     chiselMainTest(chiselArgs, () => Module(new Sequential(numInputs))) {
       c => new SequentialTests(c)
     }

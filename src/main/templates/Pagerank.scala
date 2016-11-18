@@ -18,6 +18,22 @@ class Pagerank(val numInputs: Int) extends Module {
   val NP = 7680
   val numEdges = 16
 
+  // Instantiate memory controller
+  val w = 32
+  val v = 16
+  val d = 512
+  val numOutstandingBursts = 16
+  val burstSizeBytes = 64
+  val startDelayWidth = 4
+  val endDelayWidth = 4
+  val numCounters = 6
+  val isWr = 0
+  val scatterGather = 0
+  val config = MemoryUnitConfig(scatterGather, isWr, CounterChainConfig.zeroes(numCounters), CUControlBoxConfig.zeroes(numCounters, numCounters, numCounters))
+
+  val mc = Module(new MultiMemoryUnitTester(w, d, v, numOutstandingBursts,
+      burstSizeBytes, startDelayWidth, endDelayWidth, numCounters, config))
+
   //  Sequential s1 {
   //    Sequential s2 {
   //      TileLoad() tl1 Ctr
@@ -50,16 +66,35 @@ class Pagerank(val numInputs: Int) extends Module {
 
     val s2 = Module(new Sequential(5))
     s2.io.numIter := UInt(NP/tileSize)
-    s2.io.enable := s1.io.enable
+    s2.io.enable := s1.io.stageEnable(0)
     s1.io.stageDone(0) := s2.io.done
 
-      val tl1 = Module(new Counter(32))
-      tl1.io.control.saturate := Bool(false)
-      tl1.io.control.reset := Bool(false)
-      tl1.io.data.max := UInt(tileSize)
-      tl1.io.data.stride := UInt(1)
-      tl1.io.control.enable := s2.io.stageEnable(0)
-      s2.io.stageDone(0) := tl1.io.control.done
+//      val tl1 = Module(new Counter(32))
+//      tl1.io.control.saturate := Bool(false)
+//      tl1.io.control.reset := Bool(false)
+//      tl1.io.data.max := UInt(tileSize)
+//      tl1.io.data.stride := UInt(1)
+//      tl1.io.control.enable := s2.io.stageEnable(0)
+//      s2.io.stageDone(0) := tl1.io.control.done
+
+
+      // Instantiate tile loader, connect it to MC
+      val tl1 = Module(new TileLoad(w, v))
+      mc.io.interconnects(0).addr(0) := tl1.io.mc.addr
+      mc.io.interconnects(0).size := tl1.io.mc.size
+      mc.io.interconnects(0).vldIn := tl1.io.mc.addrValid
+      tl1.io.mc.data := mc.io.interconnects(0).rdata
+      tl1.io.mc.dataValid := mc.io.interconnects(0).receivedCtrWrap
+      tl1.io.mc.ready := mc.io.interconnects(0).rdyOut
+
+      tl1.io.rows := UInt(1)
+      tl1.io.addr := UInt(0x1000)
+      tl1.io.size := UInt(tileSize)
+      tl1.io.colsize := UInt(1)
+
+      tl1.io.enable := s2.io.stageEnable(0)
+      s2.io.stageDone(0) := tl1.io.done
+
 
       val tl2 = Module(new Counter(32))
       tl2.io.control.saturate := Bool(false)
@@ -188,7 +223,37 @@ class Pagerank(val numInputs: Int) extends Module {
       s2.io.stageDone(4) := ts1.io.control.done
 
 }
-class PagerankTests(c: Pagerank) extends Tester(c) {}
+class PagerankTests(c: Pagerank) extends Tester(c) {
+  poke(c.io.enable, 1)
+  var done = peek(c.io.done).toInt
+  var cycles = 0
+
+  def peekSeqential(seq: Sequential, str: String="") {
+    val s1_en = peek(seq.io.enable)
+    val s1_done = peek(seq.io.done)
+    val s1_iter = peek(seq.iter)
+    val max = peek(seq.io.numIter)
+    val stageEnables = seq.io.stageEnable.map { peek(_).toInt }.mkString(" ")
+    val stageDones = seq.io.stageDone.map { peek(_).toInt }.mkString(" ")
+    val state = peek(seq.state).toInt
+    println(s"[$cycles] [Sequential $str] (en = $stageEnables) (done = $stageDones) (state = $state) en = $s1_en, done = $s1_done, iter = $s1_iter (max $max)")
+  }
+
+  def peekVals {
+    peekSeqential(c.s1, "S1")
+    peekSeqential(c.s2, "S2")
+    peekSeqential(c.s3, "S3")
+    peekSeqential(c.s4, "S4")
+  }
+
+  while((cycles < 1000) & (done != 1)) {
+    step(1)
+    cycles += 1
+    done = peek(c.io.done).toInt
+    peekVals
+  }
+}
+
 object PagerankTest {
 
   def main(args: Array[String]): Unit = {
