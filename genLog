@@ -1,15 +1,49 @@
-[0m[[0minfo[0m] [0mLoading project definition from /local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/project[0m
-[0m[[0minfo[0m] [0mSet current project to plasticine (in build file:/local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/)[0m
-[0m[[0minfo[0m] [0mCompiling 1 Scala source to /local/ssd/home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/target/scala-2.11/classes...[0m
-[0m[[33mwarn[0m] [0mthere were 8 feature warnings; re-run with -feature for details[0m
-[0m[[33mwarn[0m] [0mone warning found[0m
-[0m[[0minfo[0m] [0mRunning plasticine.templates.PlasticineTopTest end --targetDir /home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/generated/PlasticineTopTest/ --debug --backend c --genHarness[0m
-Usage: bin/sadl PlasticineTopTest <spade config> <pisa config>
-java.lang.RuntimeException: Nonzero exit code: -1
-	at scala.sys.package$.error(package.scala:27)
-[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast compile:runMain[0m for the full output.[0m
-[0m[[31merror[0m] [0m(compile:[31mrunMain[0m) Nonzero exit code: -1[0m
-[0m[[31merror[0m] [0mTotal time: 10 s, completed Nov 13, 2016 1:09:38 PM[0m
+[0m[[0minfo[0m] [0mLoading project definition from /local/ssd/home/tianzhao/DRAMSimulator/plasticine_tileStore/plasticine/project[0m
+[0m[[0minfo[0m] [0mSet current project to plasticine (in build file:/local/ssd/home/tianzhao/DRAMSimulator/plasticine_tileStore/plasticine/)[0m
+[0m[[0minfo[0m] [0mRunning plasticine.templates.TileStorerTest 10 64 end --targetDir /home/tianzhao/DRAMSimulator/plasticine_tileStore/plasticine/generated/TileStorerTest/ --debug --backend c --genHarness[0m
+[CrossbarOpcode 6 x 12], config.size = 13, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 12], config.size = 13, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 25 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 6 x 12], config.size = 13, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 12], config.size = 13, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 25 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 6 x 12], config.size = 13, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 12], config.size = 13, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 25 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 6 x 12], config.size = 13, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 12], config.size = 13, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 7 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+[CrossbarOpcode 25 x 6], config.size = 7, config = CrossbarConfig(List(0, 0, 0, 0, 0, 0, 0))
+CPP elaborate
+[[35minfo[0m] [4.513] // COMPILING < (class plasticine.templates.TileStorer)>(2)
+[[35minfo[0m] [5.922] giving names
+[[35minfo[0m] [8.161] executing custom transforms
+[[35minfo[0m] [8.162] convert masked writes of inline mems
+[[35minfo[0m] [8.672] adding clocks and resets
+[[35minfo[0m] [9.630] inferring widths
+[[35minfo[0m] [10.715] checking widths
+[[35minfo[0m] [11.100] lowering complex nodes to primitives
+[[35minfo[0m] [11.101] removing type nodes
+[[35minfo[0m] [11.577] compiling 214912 nodes
+[[35minfo[0m] [11.577] computing memory ports
+[[35minfo[0m] [12.173] resolving nodes to the components
+[[35minfo[0m] [14.807] creating clock domains
+[[35minfo[0m] [15.052] pruning unconnected IOs
+[[35minfo[0m] [15.121] checking for combinational loops
+[[35minfo[0m] [15.823] NO COMBINATIONAL LOOP FOUND
+[[35minfo[0m] [16.568] populating clock domains
+CppBackend::elaborate: need 1889, redundant 9254 shadow registers
+[[35minfo[0m] [18.106] generating cpp files
+CppBackend: createCppFile TileStorer.cpp
+[[33mwarn[0m] TileStorerTest.scala:134: 'end' is an unknown argument. in class plasticine.templates.TileStorerTest$
+[0m[[32msuccess[0m] [0mTotal time: 21 s, completed Nov 18, 2016 4:10:23 AM[0m
 change init rand
 finished changing init rand
 start adding init declarations for DRAMSimulator outputs
@@ -17,13 +51,37 @@ init-ed
 start modifying line connections going out of DRAMSimulator module
 line connections rerouted
 Extracting function init
-[extractRange] output = 
+[extractRange] output = init.txt
 Extracting function clock_lo
-[extractRange] output = 
+[extractRange] output = clock_lo.txt
 Extracting function clock_hi
-[extractRange] output = 
+[extractRange] output = clock_hi.txt
 Extracting function init_sim_data
-[extractRange] output = 
-CLASSPATH=../target/scala-2.11/classes:$CLASSPATH sbt "; run-main plasticine.templates.PlasticineTopTest  end  --targetDir /home/tianzhao/DRAMSimulator/plasticine_debug_performance_scatther_gather/plasticine/generated/PlasticineTopTest/ --debug --backend c --genHarness"
+[extractRange] output = init_sim_data.txt
+g++ -g -c -o TileStorer.o  -I../ -I/csrc/ TileStorer.cpp
+g++ -g -c -o TileStorer-emulator.o  -I../ -I/csrc/ TileStorer-emulator.cpp
+g++ -g -c -o x00clock_hi.o  -I../ -I/csrc/ x00clock_hi.cpp
+g++ -g -c -o x00clock_lo.o  -I../ -I/csrc/ x00clock_lo.cpp
+g++ -g -c -o x00init.o  -I../ -I/csrc/ x00init.cpp
+g++ -g -c -o x00init_sim_data.o  -I../ -I/csrc/ x00init_sim_data.cpp
+g++ -g -c -o x01clock_hi.o  -I../ -I/csrc/ x01clock_hi.cpp
+g++ -g -c -o x01clock_lo.o  -I../ -I/csrc/ x01clock_lo.cpp
+g++ -g -c -o x01init_sim_data.o  -I../ -I/csrc/ x01init_sim_data.cpp
+g++ -g -c -o x02clock_lo.o  -I../ -I/csrc/ x02clock_lo.cpp
+g++ -g -c -o x02init_sim_data.o  -I../ -I/csrc/ x02init_sim_data.cpp
+g++ -g -c -o x03clock_lo.o  -I../ -I/csrc/ x03clock_lo.cpp
+g++ -g -c -o x03init_sim_data.o  -I../ -I/csrc/ x03init_sim_data.cpp
+g++ -g -c -o x04clock_lo.o  -I../ -I/csrc/ x04clock_lo.cpp
+g++ -g -c -o x04init_sim_data.o  -I../ -I/csrc/ x04init_sim_data.cpp
+g++ -g -c -o x05clock_lo.o  -I../ -I/csrc/ x05clock_lo.cpp
+g++ -g -c -o x05init_sim_data.o  -I../ -I/csrc/ x05init_sim_data.cpp
+g++ -g -c -o x06clock_lo.o  -I../ -I/csrc/ x06clock_lo.cpp
+g++ -g -c -o x07clock_lo.o  -I../ -I/csrc/ x07clock_lo.cpp
+g++ -g -c -o x08clock_lo.o  -I../ -I/csrc/ x08clock_lo.cpp
+g++ -g -c -o x09clock_lo.o  -I../ -I/csrc/ x09clock_lo.cpp
+g++ -g -c -o x10clock_lo.o  -I../ -I/csrc/ x10clock_lo.cpp
+g++ -g -c -o x11clock_lo.o  -I../ -I/csrc/ x11clock_lo.cpp
+g++ -g -o TileStorer TileStorer.o TileStorer-emulator.o x00clock_hi.o x00clock_lo.o x00init.o x00init_sim_data.o x01clock_hi.o x01clock_lo.o x01init_sim_data.o x02clock_lo.o x02init_sim_data.o x03clock_lo.o x03init_sim_data.o x04clock_lo.o x04init_sim_data.o x05clock_lo.o x05init_sim_data.o x06clock_lo.o x07clock_lo.o x08clock_lo.o x09clock_lo.o x10clock_lo.o x11clock_lo.o -I../ -L../ -ldramsim -Wl,-rpath=../
+CLASSPATH=../target/scala-2.11/classes:$CLASSPATH sbt "; run-main plasticine.templates.TileStorerTest 10 64 end  --targetDir /home/tianzhao/DRAMSimulator/plasticine_tileStore/plasticine/generated/TileStorerTest/ --debug --backend c --genHarness"
 Invoking Chisel...
 Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder

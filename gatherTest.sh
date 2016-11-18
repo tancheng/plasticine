@@ -8,6 +8,7 @@ rm grepLogs/*
 # grep -nr runLog -e "MultiMemoryUnitTester.MemoryUnit_3.io_dram_vldOut <- 0x1" > io_dram_vldOut_ch3.gLog
 # grep -nr runLog -e "MultiMemoryUnitTester.MemoryUnit_3.io_dram_vldIn <- 0x1" > io_dram_vldIn_ch3.gLog
 grep -nr run.log -e "read complete" > rd.gLog
+grep -nr run.log -e "io.dram.vldIn is signaled" > dramVldIn.gLog
 grep -nr run.log -e "write complete" > wr.gLog
 grep -nr run.log -e "addTransaction" > addTrans.gLog
 grep -nr run.log -e "start step" > startStep.gLog
