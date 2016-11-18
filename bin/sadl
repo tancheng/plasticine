@@ -88,8 +88,8 @@ def stage(app, params, opts):
         os.system("mkdir %s/gold && cp %s/* %s/gold" %(build_dir, build_dir, build_dir))
 
 
-#        print("Performing chopping...")
-#        ecode = os.system("pushd %s && time ./chopper.sh Plasticine.cpp && popd" %(build_dir))
+        print("Performing chopping...")
+        ecode = os.system("pushd %s && time ./chopper.sh TileLoader.cpp && popd" %(build_dir))
 
         print("Performing parallel make..")
         ecode = os.system("pushd %s && make -j12 && popd" %(build_dir))
