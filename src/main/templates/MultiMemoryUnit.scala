@@ -13,6 +13,7 @@ class TestCmdInterface(w: Int, v: Int) extends Bundle {
   val vldIn = Bool(INPUT)
   val rdata = Vec.fill(v) { UInt(OUTPUT, width=w) }
   val vldOut = Bool(OUTPUT)
+  val receivedCtrWrap = Bool(OUTPUT)
   val rdyOut = Bool(OUTPUT)
 }
 
@@ -51,6 +52,7 @@ class MultiMemoryUnitTester (
       io.interconnects(i).vldOut := mu.vldOut
       io.interconnects(i).rdyOut := mu.rdyOut
       io.interconnects(i).rdata := mu.rdata
+      io.interconnects(i).receivedCtrWrap := mu.io.interconnect.receivedCtrWrap
       mu
     }
   }

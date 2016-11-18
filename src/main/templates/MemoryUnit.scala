@@ -49,6 +49,8 @@ class PlasticineMemoryCmdInterface(w: Int, v: Int) extends Bundle {
   /* control inputs */
   val ctrlIns = Vec.fill(numCtrlIn) { Bool(INPUT) }
   val ctrlOuts = Vec.fill(numCtrlOut) { Bool(OUTPUT) }
+
+  val receivedCtrWrap = Bool(OUTPUT)
 }
 
 class DRAMCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, OUTPUT) {
@@ -326,6 +328,7 @@ class MemoryUnit(
   receivedCounter.io.control.enable := Mux(config.scatterGather, UInt(0), io.dram.vldIn)
   receivedCounter.io.control.saturate := UInt(0)
   receivedFifo.io.deqVld := receivedCounter.io.control.done
+  io.interconnect.receivedCtrWrap := receivedCounter.io.control.done
 
   // Counter chain, where innermost counter is chained to receivedCounter
   val counterChain = Module(new CounterChain(w, startDelayWidth, endDelayWidth, numCounters, inst.counterChain))
