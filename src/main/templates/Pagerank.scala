@@ -87,10 +87,9 @@ class Pagerank(val numInputs: Int) extends Module {
         p1.io.data.max := UInt(1)
         p1.io.data.stride := UInt(1)
         p1.io.control.enable := s3.io.stageEnable(0)
-        s3.io.stageDone(0) := p1.io.done
+        s3.io.stageDone(0) := p1.io.control.done
 
         val par1 = Module(new Parallel(2))
-        par1.io.numIter := UInt(1)
         par1.io.enable := s3.io.stageEnable(1)
         s3.io.stageDone(1) := par1.io.done
 
@@ -121,7 +120,7 @@ class Pagerank(val numInputs: Int) extends Module {
           p2.io.data.max := UInt(1)
           p2.io.data.stride := UInt(1)
           p2.io.control.enable := s4.io.stageEnable(0)
-          s4.io.stageDone(0) := p2.io.done
+          s4.io.stageDone(0) := p2.io.control.done
 
           val p3 = Module(new Counter(32))
           p3.io.control.saturate := Bool(false)
@@ -129,7 +128,7 @@ class Pagerank(val numInputs: Int) extends Module {
           p3.io.data.max := UInt(1)
           p3.io.data.stride := UInt(1)
           p3.io.control.enable := s4.io.stageEnable(1)
-          s4.io.stageDone(1) := p3.io.done
+          s4.io.stageDone(1) := p3.io.control.done
 
           val p4 = Module(new Counter(32))
           p4.io.control.saturate := Bool(false)
@@ -137,7 +136,7 @@ class Pagerank(val numInputs: Int) extends Module {
           p4.io.data.max := UInt(1)
           p4.io.data.stride := UInt(1)
           p4.io.control.enable := s4.io.stageEnable(2)
-          s4.io.stageDone(2) := p4.io.done
+          s4.io.stageDone(2) := p4.io.control.done
 
           val p5 = Module(new Counter(32))
           p5.io.control.saturate := Bool(false)
@@ -145,7 +144,7 @@ class Pagerank(val numInputs: Int) extends Module {
           p5.io.data.max := UInt(1)
           p5.io.data.stride := UInt(1)
           p5.io.control.enable := s4.io.stageEnable(3)
-          s4.io.stageDone(3) := p5.io.done
+          s4.io.stageDone(3) := p5.io.control.done
 
         val p6 = Module(new Counter(32))
         p6.io.control.saturate := Bool(false)
@@ -153,7 +152,7 @@ class Pagerank(val numInputs: Int) extends Module {
         p6.io.data.max := UInt(64) // data-dependent
         p6.io.data.stride := UInt(1)
         p6.io.control.enable := s3.io.stageEnable(3)
-        s3.io.stageDone(3) := p6.io.done
+        s3.io.stageDone(3) := p6.io.control.done
         
         val g1 = Module(new Counter(32))
         g1.io.control.saturate := Bool(false)
@@ -161,7 +160,7 @@ class Pagerank(val numInputs: Int) extends Module {
         g1.io.data.max := UInt(64) // gather
         g1.io.data.stride := UInt(1)
         g1.io.control.enable := s3.io.stageEnable(4)
-        s3.io.stageDone(4) := g1.io.done
+        s3.io.stageDone(4) := g1.io.control.done
 
         val p7 = Module(new Counter(32))
         p7.io.control.saturate := Bool(false)
@@ -169,7 +168,7 @@ class Pagerank(val numInputs: Int) extends Module {
         p7.io.data.max := UInt(64) // data-dependent
         p7.io.data.stride := UInt(1)
         p7.io.control.enable := s3.io.stageEnable(5)
-        s3.io.stageDone(5) := p7.io.done
+        s3.io.stageDone(5) := p7.io.control.done
 
         val p8 = Module(new Counter(32))
         p8.io.control.saturate := Bool(false)
@@ -177,7 +176,7 @@ class Pagerank(val numInputs: Int) extends Module {
         p8.io.data.max := UInt(1)
         p8.io.data.stride := UInt(1)
         p8.io.control.enable := s3.io.stageEnable(6)
-        s3.io.stageDone(6) := p8.io.done
+        s3.io.stageDone(6) := p8.io.control.done
         
       val ts1 = Module(new Counter(32))
       ts1.io.control.saturate := Bool(false)

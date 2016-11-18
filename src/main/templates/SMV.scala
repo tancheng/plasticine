@@ -70,7 +70,6 @@ class SMV(val numInputs: Int) extends Module {
       m2.io.stageDone(1) := p2.io.control.done
 
       val par1 = Module(new Parallel(2))
-      par1.io.numIter := UInt(1)
       par1.io.enable := m2.io.stageEnable(2)
       m2.io.stageDone(2) := par1.io.done
 
@@ -106,13 +105,13 @@ class SMV(val numInputs: Int) extends Module {
       p3.io.control.enable := m2.io.stageEnable(4)
       m2.io.stageDone(4) := p3.io.control.done
 
-      val p2 = Module(new Counter(32))
-      p2.io.control.saturate := Bool(false)
-      p2.io.control.reset := Bool(false)
-      p2.io.data.max := UInt(1)
-      p2.io.data.stride := UInt(1)
-      p2.io.control.enable := m2.io.stageEnable(5)
-      m2.io.stageDone(5) := p2.io.control.done
+      val p4 = Module(new Counter(32))
+      p4.io.control.saturate := Bool(false)
+      p4.io.control.reset := Bool(false)
+      p4.io.data.max := UInt(1)
+      p4.io.data.stride := UInt(1)
+      p4.io.control.enable := m2.io.stageEnable(5)
+      m2.io.stageDone(5) := p4.io.control.done
 
     val ts1 = Module(new Counter(32))
     ts1.io.control.saturate := Bool(false)

@@ -44,7 +44,6 @@ class BFS(val numInputs: Int) extends Module {
   io.done := top.io.done
 
     val par1 = Module(new Parallel(2))
-    par1.io.numIter := UInt(1)
     par1.io.enable := top.io.stageEnable(0)
     top.io.stageDone(0) := par1.io.done
 
@@ -66,8 +65,8 @@ class BFS(val numInputs: Int) extends Module {
 
     val s1 = Module(new Sequential(5))
     s1.io.numIter := UInt(layers)
-    s1.io.enable := top1.io.stageEnable(1)
-    top1.io.stageDone(1) := s1.io.done
+    s1.io.enable := top.io.stageEnable(1)
+    top.io.stageDone(1) := s1.io.done
 
       val m1 = Module(new Metapipe(6))
       m1.io.numIter := UInt(64) // data-dependent

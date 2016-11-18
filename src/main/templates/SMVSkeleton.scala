@@ -1,4 +1,4 @@
-
+/*
     Accel {
       Pipe(N by tileSize par op){ rowchunk => //m1
         tileSizes := sizes(rowchunk :: rowchunk+tileSize par ip) //tl1
@@ -24,4 +24,4 @@
     }
     getMem(out)
   }
-*/
+  */
