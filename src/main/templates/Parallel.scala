@@ -94,7 +94,7 @@ class ParallelTests(c: Parallel) extends PlasticineTester(c) {
   def handleStageEnables = {
     val stageEnables = c.io.stageEnable.map { peek(_).toInt }
     val activeStage = stageEnables.zipWithIndex.filter { _._1 == 1 }.map { _._2 }
-//    executeStage(activeStage)
+    executeStages(activeStage.toList)
   }
 
   // Start

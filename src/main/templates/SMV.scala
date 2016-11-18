@@ -49,7 +49,7 @@ class SMV(val numInputs: Int) extends Module {
     tl1.io.control.enable := m1.io.stageEnable(0)
     m1.io.stageDone(0) := tl1.io.control.done
 
-    val m2 = Module(new Sequential(6))
+    val m2 = Module(new Metapipe(6))
     m2.io.numIter := UInt(tileSize)
     m2.io.enable := m1.io.stageEnable(1)
     m1.io.stageDone(1) := m2.io.done
@@ -70,25 +70,25 @@ class SMV(val numInputs: Int) extends Module {
       p2.io.control.enable := m2.io.stageEnable(1)
       m2.io.stageDone(1) := p2.io.control.done
 
-      val par1 = Module(new Parallel(2))
-      par1.io.enable := m2.io.stageEnable(2)
-      m2.io.stageDone(2) := par1.io.done
+      // val par1 = Module(new Parallel(2))
+      // par1.io.enable := m2.io.stageEnable(2)
+      // m2.io.stageDone(2) := par1.io.done
 
         val tl2 = Module(new Counter(32))
         tl2.io.control.saturate := Bool(false)
         tl2.io.control.reset := Bool(false)
         tl2.io.data.max := UInt(len) // data-dependent
         tl2.io.data.stride := UInt(1)
-        tl2.io.control.enable := par1.io.stageEnable(0)
-        par1.io.stageDone(0) := tl2.io.control.done
+        tl2.io.control.enable := m2.io.stageEnable(2)
+        m2.io.stageDone(2) := tl2.io.control.done
 
-        val tl3 = Module(new Counter(32))
-        tl3.io.control.saturate := Bool(false)
-        tl3.io.control.reset := Bool(false)
-        tl3.io.data.max := UInt(len) // data-dependent
-        tl3.io.data.stride := UInt(1)
-        tl3.io.control.enable := par1.io.stageEnable(1)
-        par1.io.stageDone(1) := tl3.io.control.done
+        // val tl3 = Module(new Counter(32))
+        // tl3.io.control.saturate := Bool(false)
+        // tl3.io.control.reset := Bool(false)
+        // tl3.io.data.max := UInt(len) // data-dependent
+        // tl3.io.data.stride := UInt(1)
+        // tl3.io.control.enable := par1.io.stageEnable(1)
+        // par1.io.stageDone(1) := tl3.io.control.done
 
       val g1 = Module(new Counter(32))
       g1.io.control.saturate := Bool(false)
@@ -119,8 +119,51 @@ class SMV(val numInputs: Int) extends Module {
     ts1.io.control.reset := Bool(false)
     ts1.io.data.max := UInt(tileSize)
     ts1.io.data.stride := UInt(1)
-    ts1.io.control.enable := m1.io.stageEnable(1)
-    m1.io.stageDone(1) := ts1.io.control.done
+    ts1.io.control.enable := m1.io.stageEnable(2)
+    m1.io.stageDone(2) := ts1.io.control.done
 
 
+}
+
+class SMVTests(c: SMV) extends Tester(c) {
+  poke(c.io.enable, 1)
+  var done = peek(c.io.done).toInt
+  var cycles = 0
+
+
+  def peekMetapipe(meta: Metapipe, str: String="") {
+    val s1_en = peek(meta.io.enable)
+    val s1_done = peek(meta.io.done)
+    val s1_iter = peek(meta.iter)
+    val max = peek(meta.io.numIter)
+    val stageEnables = meta.io.stageEnable.map { peek(_).toInt }.mkString(" ")
+    val stageDones = meta.io.stageDone.map { peek(_).toInt }.mkString(" ")
+    val state = peek(meta.state).toInt
+    println(s"[$cycles] [Metapipe $str] (en = $stageEnables) (done = $stageDones) (state = $state) en = $s1_en, done = $s1_done, iter = $s1_iter (max $max)")
+  }
+
+
+  def peekVals {
+    peekMetapipe(c.m1, "M1")
+    peekMetapipe(c.m2, "                                                   M2")
+  }
+
+  while((cycles < 10000000) & (done != 1)) {
+    step(1)
+    cycles += 1
+    done = peek(c.io.done).toInt
+    peekVals
+  }
+}
+
+object SMVTest {
+
+  def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    val numInputs = 2
+    chiselMainTest(chiselArgs, () => Module(new SMV(numInputs))) {
+      c => new SMVTests(c)
+    }
+  }
 }

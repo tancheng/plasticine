@@ -59,12 +59,12 @@ class Pagerank(val numInputs: Int) extends Module {
   //    }
   //  }
 
-  val s1 = Module(new Sequential(1))
+  val s1 = Module(new Sequential1(1))
   s1.io.numIter := UInt(iters)
   s1.io.enable := io.enable
   io.done := s1.io.done
 
-    val s2 = Module(new Sequential(5))
+    val s2 = Module(new Sequential5(5))
     s2.io.numIter := UInt(NP/tileSize)
     s2.io.enable := s1.io.stageEnable(0)
     s1.io.stageDone(0) := s2.io.done
@@ -112,7 +112,7 @@ class Pagerank(val numInputs: Int) extends Module {
       tl3.io.control.enable := s2.io.stageEnable(2)
       s2.io.stageDone(2) := tl3.io.control.done
 
-      val s3 = Module(new Sequential(7))
+      val s3 = Module(new Sequential7(7))
       s3.io.numIter := UInt(tileSize)
       s3.io.enable := s2.io.stageEnable(3)
       s2.io.stageDone(3) := s3.io.done
@@ -125,27 +125,27 @@ class Pagerank(val numInputs: Int) extends Module {
         p1.io.control.enable := s3.io.stageEnable(0)
         s3.io.stageDone(0) := p1.io.control.done
 
-        val par1 = Module(new Parallel(2))
-        par1.io.enable := s3.io.stageEnable(1)
-        s3.io.stageDone(1) := par1.io.done
+        // val par1 = Module(new Parallel(2))
+        // par1.io.enable := s3.io.stageEnable(1)
+        // s3.io.stageDone(1) := par1.io.done
 
           val tl5 = Module(new Counter(32))
           tl5.io.control.saturate := Bool(false)
           tl5.io.control.reset := Bool(false)
           tl5.io.data.max := UInt(numEdges) // data-dependent
           tl5.io.data.stride := UInt(1)
-          tl5.io.control.enable := par1.io.stageEnable(0)
-          par1.io.stageDone(0) := tl5.io.control.done
+          tl5.io.control.enable := s3.io.stageEnable(1)
+          s3.io.stageDone(1) := tl5.io.control.done
 
-          val tl6 = Module(new Counter(32))
-          tl6.io.control.saturate := Bool(false)
-          tl6.io.control.reset := Bool(false)
-          tl6.io.data.max := UInt(numEdges) // data-dependent
-          tl6.io.data.stride := UInt(1)
-          tl6.io.control.enable := s2.io.stageEnable(1)
-          par1.io.stageDone(1) := tl6.io.control.done
+          // val tl6 = Module(new Counter(32))
+          // tl6.io.control.saturate := Bool(false)
+          // tl6.io.control.reset := Bool(false)
+          // tl6.io.data.max := UInt(numEdges) // data-dependent
+          // tl6.io.data.stride := UInt(1)
+          // tl6.io.control.enable := s2.io.stageEnable(1)
+          // par1.io.stageDone(1) := tl6.io.control.done
 
-        val s4 = Module(new Sequential(4))
+        val s4 = Module(new Sequential4(4))
         s4.io.numIter := UInt(numEdges) // data-dependent
         s4.io.enable := s3.io.stageEnable(2)
         s3.io.stageDone(2) := s4.io.done
@@ -193,7 +193,7 @@ class Pagerank(val numInputs: Int) extends Module {
         val g1 = Module(new Counter(32))
         g1.io.control.saturate := Bool(false)
         g1.io.control.reset := Bool(false)
-        g1.io.data.max := UInt(64) // gather
+        g1.io.data.max := UInt(1) // gather
         g1.io.data.stride := UInt(1)
         g1.io.control.enable := s3.io.stageEnable(4)
         s3.io.stageDone(4) := g1.io.control.done
@@ -228,7 +228,40 @@ class PagerankTests(c: Pagerank) extends Tester(c) {
   var done = peek(c.io.done).toInt
   var cycles = 0
 
-  def peekSeqential(seq: Sequential, str: String="") {
+  def peekPar(p: Parallel, str: String="") {
+    val en = peek(p.io.enable)
+    val done = peek(p.io.done)
+    println(s"[$cycles] [par $str] en = $en, done = $done")
+
+  }
+  def peekTL(tl: Counter, str: String="") {
+    val s1_en = peek(tl.io.control.enable)
+    val s1_done = peek(tl.io.control.done)
+    val s1_cnt = peek(tl.io.data.out)
+    val s1_max = peek(tl.io.data.max)
+    println(s"[$cycles] [TL $str] en = $s1_en, done = $s1_done, cnt = $s1_cnt (max $s1_max)")
+  }
+  def peekSequential1(seq: Sequential1, str: String="") {
+    val s1_iter = peek(seq.iter)
+    val max = peek(seq.io.numIter)
+    println(s"[$cycles] [Sequential $str] iter =                                                            $s1_iter / $max")
+  }
+  def peekSequential5(seq: Sequential5, str: String="") {
+    val s1_iter = peek(seq.iter)
+    val max = peek(seq.io.numIter)
+    println(s"[$cycles] [Sequential $str] iter =                                    $s1_iter / $max")
+  }
+  def peekSequential7(seq: Sequential7, str: String="") {
+    // val s1_en = peek(seq.io.enable)
+    // val s1_done = peek(seq.io.done)
+    val s1_iter = peek(seq.iter)
+    val max = peek(seq.io.numIter)
+    // val stageEnables = seq.io.stageEnable.map { peek(_).toInt }.mkString(" ")
+    // val stageDones = seq.io.stageDone.map { peek(_).toInt }.mkString(" ")
+    // val state = peek(seq.state).toInt
+    println(s"[$cycles] [Sequential $str] iter =             $s1_iter / $max")
+  }
+  def peekSequential4(seq: Sequential4, str: String="") {
     val s1_en = peek(seq.io.enable)
     val s1_done = peek(seq.io.done)
     val s1_iter = peek(seq.iter)
@@ -240,13 +273,16 @@ class PagerankTests(c: Pagerank) extends Tester(c) {
   }
 
   def peekVals {
-    peekSeqential(c.s1, "S1")
-    peekSeqential(c.s2, "S2")
-    peekSeqential(c.s3, "S3")
-    peekSeqential(c.s4, "S4")
+    peekSequential1(c.s1, "S1")
+    peekSequential5(c.s2, "S2")
+    peekSequential7(c.s3, "S3")
+    // peekPar(c.par1,"par1")
+    // peekTL(c.tl5,"tl5")
+    // peekTL(c.tl6,"tl6")
+    // peekSequential4(c.s4, "S4")
   }
 
-  while((cycles < 1000) & (done != 1)) {
+  while((cycles < 20000000) & (done != 1)) {
     step(1)
     cycles += 1
     done = peek(c.io.done).toInt

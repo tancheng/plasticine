@@ -7,7 +7,7 @@ import plasticine.pisa.ir._
 
 import scala.collection.mutable.HashMap
 
-class Sequential(val numInputs: Int) extends Module {
+class Sequential1(val numInputs: Int) extends Module {
   val io = new Bundle {
     val enable = Bool(INPUT)
     val done = Bool(OUTPUT)
@@ -68,12 +68,10 @@ class Sequential(val numInputs: Int) extends Module {
     }.elsewhen (state === UInt(resetState)) {
       stateFF.io.data.in := UInt(firstState)
     }.elsewhen (state < UInt(lastState)) {
-      for (i <- firstState until lastState) {
-        when((state === UInt(i)) & io.stageDone(i-2)) {
-          stateFF.io.data.in := UInt(i+1)
-        }.otherwise {
-          stateFF.io.data.in := state
-        }
+      when((state === UInt(2)) & io.stageDone(0)) {
+        stateFF.io.data.in := UInt(3)
+      }.otherwise {
+        stateFF.io.data.in := state
       }
     }.elsewhen (state === UInt(lastState)) {
       when(io.stageDone(lastState-2)) {
@@ -102,7 +100,7 @@ class Sequential(val numInputs: Int) extends Module {
 }
 
 
-class SequentialTests(c: Sequential) extends PlasticineTester(c) {
+class Sequential1Tests(c: Sequential1) extends PlasticineTester(c) {
   val numIter = 5
   val stageIterCount = List.tabulate(c.numInputs) { i => math.abs(rnd.nextInt) % 10 + 1}
   println(s"stageIterCount: $stageIterCount")
@@ -139,14 +137,14 @@ class SequentialTests(c: Sequential) extends PlasticineTester(c) {
 }
 
 
-object SequentialTest {
+object Sequential1Test {
 
   def main(args: Array[String]): Unit = {
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
     val numInputs = 5
-    chiselMainTest(chiselArgs, () => Module(new Sequential(numInputs))) {
-      c => new SequentialTests(c)
+    chiselMainTest(chiselArgs, () => Module(new Sequential1(numInputs))) {
+      c => new Sequential1Tests(c)
     }
   }
 }

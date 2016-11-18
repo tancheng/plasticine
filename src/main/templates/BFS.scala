@@ -46,27 +46,27 @@ class BFS(val numInputs: Int) extends Module {
   top.io.enable := io.enable
   io.done := top.io.done
 
-    val par1 = Module(new Parallel(2))
-    par1.io.enable := top.io.stageEnable(0)
-    top.io.stageDone(0) := par1.io.done
+    // val par1 = Module(new Parallel(2))
+    // par1.io.enable := top.io.stageEnable(0)
+    // top.io.stageDone(0) := par1.io.done
 
       val tl1 = Module(new Counter(32))
       tl1.io.control.saturate := Bool(false)
       tl1.io.control.reset := Bool(false)
       tl1.io.data.max := UInt(tileSize)
       tl1.io.data.stride := UInt(1)
-      tl1.io.control.enable := par1.io.stageEnable(0)
-      par1.io.stageDone(0) := tl1.io.control.done
+      tl1.io.control.enable := top.io.stageEnable(0)
+      top.io.stageDone(0) := tl1.io.control.done
 
-      val tl2 = Module(new Counter(32))
-      tl2.io.control.saturate := Bool(false)
-      tl2.io.control.reset := Bool(false)
-      tl2.io.data.max := UInt(tileSize)
-      tl2.io.data.stride := UInt(1)
-      tl2.io.control.enable := par1.io.stageEnable(1)
-      par1.io.stageDone(1) := tl2.io.control.done
+      // val tl2 = Module(new Counter(32))
+      // tl2.io.control.saturate := Bool(false)
+      // tl2.io.control.reset := Bool(false)
+      // tl2.io.data.max := UInt(tileSize)
+      // tl2.io.data.stride := UInt(1)
+      // tl2.io.control.enable := par1.io.stageEnable(1)
+      // par1.io.stageDone(1) := tl2.io.control.done
 
-    val s1 = Module(new Sequential(5))
+    val s1 = Module(new Sequential5(5))
     s1.io.numIter := UInt(layers)
     s1.io.enable := top.io.stageEnable(1)
     top.io.stageDone(1) := s1.io.done
@@ -143,7 +143,7 @@ class BFS(val numInputs: Int) extends Module {
       val scat1 = Module(new Counter(32))
       scat1.io.control.saturate := Bool(false)
       scat1.io.control.reset := Bool(false)
-      scat1.io.data.max := UInt(64) // scatter
+      scat1.io.data.max := UInt(1) // scatter
       scat1.io.data.stride := UInt(1)
       scat1.io.control.enable := s1.io.stageEnable(3)
       s1.io.stageDone(3) := scat1.io.control.done
@@ -156,4 +156,40 @@ class BFS(val numInputs: Int) extends Module {
       p10.io.control.enable := s1.io.stageEnable(4)
       s1.io.stageDone(4) := p10.io.control.done
 
+}
+class BFSTests(c: BFS) extends Tester(c) {
+  poke(c.io.enable, 1)
+  var done = peek(c.io.done).toInt
+  var cycles = 0
+
+
+  def peekSequential5(seq: Sequential5, str: String="") {
+    val s1_iter = peek(seq.iter)
+    val max = peek(seq.io.numIter)
+    println(s"[$cycles] [Sequential $str] iter =                                                            $s1_iter / $max")
+  }
+
+
+  def peekVals {
+    peekSequential5(c.s1, "S1")
+  }
+
+  while((cycles < 10000000) & (done != 1)) {
+    step(1)
+    cycles += 1
+    done = peek(c.io.done).toInt
+    peekVals
+  }
+}
+
+object BFSTest {
+
+  def main(args: Array[String]): Unit = {
+    val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
+
+    val numInputs = 2
+    chiselMainTest(chiselArgs, () => Module(new BFS(numInputs))) {
+      c => new BFSTests(c)
+    }
+  }
 }

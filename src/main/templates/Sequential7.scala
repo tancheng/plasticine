@@ -7,7 +7,7 @@ import plasticine.pisa.ir._
 
 import scala.collection.mutable.HashMap
 
-class Sequential(val numInputs: Int) extends Module {
+class Sequential7(val numInputs: Int) extends Module {
   val io = new Bundle {
     val enable = Bool(INPUT)
     val done = Bool(OUTPUT)
@@ -68,12 +68,22 @@ class Sequential(val numInputs: Int) extends Module {
     }.elsewhen (state === UInt(resetState)) {
       stateFF.io.data.in := UInt(firstState)
     }.elsewhen (state < UInt(lastState)) {
-      for (i <- firstState until lastState) {
-        when((state === UInt(i)) & io.stageDone(i-2)) {
-          stateFF.io.data.in := UInt(i+1)
-        }.otherwise {
-          stateFF.io.data.in := state
-        }
+      when((state === UInt(2)) & io.stageDone(0)) {
+        stateFF.io.data.in := UInt(3)
+      }.elsewhen((state === UInt(3)) & io.stageDone(1)) {
+        stateFF.io.data.in := UInt(4)
+      }.elsewhen((state === UInt(4)) & io.stageDone(2)) {
+        stateFF.io.data.in := UInt(5)
+      }.elsewhen((state === UInt(5)) & io.stageDone(3)) {
+        stateFF.io.data.in := UInt(6)
+      }.elsewhen((state === UInt(6)) & io.stageDone(4)) {
+        stateFF.io.data.in := UInt(7)
+      }.elsewhen((state === UInt(7)) & io.stageDone(5)) {
+        stateFF.io.data.in := UInt(8)
+      }.elsewhen((state === UInt(8)) & io.stageDone(6)) {
+        stateFF.io.data.in := UInt(9)
+      }.otherwise {
+        stateFF.io.data.in := state
       }
     }.elsewhen (state === UInt(lastState)) {
       when(io.stageDone(lastState-2)) {
@@ -102,7 +112,7 @@ class Sequential(val numInputs: Int) extends Module {
 }
 
 
-class SequentialTests(c: Sequential) extends PlasticineTester(c) {
+class Sequential7Tests(c: Sequential7) extends PlasticineTester(c) {
   val numIter = 5
   val stageIterCount = List.tabulate(c.numInputs) { i => math.abs(rnd.nextInt) % 10 + 1}
   println(s"stageIterCount: $stageIterCount")
@@ -139,14 +149,14 @@ class SequentialTests(c: Sequential) extends PlasticineTester(c) {
 }
 
 
-object SequentialTest {
+object Sequential7Test {
 
   def main(args: Array[String]): Unit = {
     val (appArgs, chiselArgs) = args.splitAt(args.indexOf("end"))
 
-    val numInputs = 5
-    chiselMainTest(chiselArgs, () => Module(new Sequential(numInputs))) {
-      c => new SequentialTests(c)
+    val numInputs = 7
+    chiselMainTest(chiselArgs, () => Module(new Sequential7(numInputs))) {
+      c => new Sequential7Tests(c)
     }
   }
 }
