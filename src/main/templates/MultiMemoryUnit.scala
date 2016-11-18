@@ -14,6 +14,7 @@ class TestCmdInterface(w: Int, v: Int) extends Bundle {
   val rdata = Vec.fill(v) { UInt(OUTPUT, width=w) }
   val vldOut = Bool(OUTPUT)
   val rdyOut = Bool(OUTPUT)
+  val masksIn = Vec.fill(v) { Bool(INPUT) }
 }
 
 class MultiMemoryUnitTester (
@@ -41,6 +42,7 @@ class MultiMemoryUnitTester (
       val mu = Module(new MemoryUnit(w, d, v, numOutstandingBursts, burstSizeBytes, startDelayWidth, endDelayWidth, numCounters, inst))
       mu.io.config_enable := io.config_enable
       mu.io.config_data := io.config_data
+      mu.io.masksIn := io.interconnects(i).masksIn
 
       mu.vldIn := io.interconnects(i).vldIn
       mu.addr := io.interconnects(i).addr
@@ -58,7 +60,6 @@ class MultiMemoryUnitTester (
   def genDRAMSims = {
     List.tabulate(numMemoryUnits) { j =>
       val DRAMSimulator = Module(new DRAMSimulator(w+4, burstSizeBytes))
-
       DRAMSimulator
     }
   }
@@ -73,6 +74,7 @@ class MultiMemoryUnitTester (
     sims(id).io.tagIn := mus(id).io.dram.tagOut
     sims(id).io.vldIn := mus(id).io.dram.vldOut
     sims(id).io.isWr := mus(id).io.dram.isWr
+    sims(id).io.masksIn := mus(id).io.dram.masksOut
 
     mus(id).io.dram.rdata := sims(id).io.rdata
     mus(id).io.dram.vldIn := sims(id).io.vldOut
@@ -85,139 +87,64 @@ class MultiMemoryUnitTests(c: MultiMemoryUnitTester) extends Tester(c) {
   val burstSizeBytes = 64
   val wordsPerBurst = burstSizeBytes / (c.w / 8)
 
-  // Test constants
-  val addr1 = 0x1000
-  val waddr1 = 0x2000
-	val addr2 = 0x1000
-	val waddr2 = 0x2000
   val numChans = 4
-  var numTransCompleted = 0
-  val numCommands = 50
   val numBurstsPerCmd = 1
   val writeMode = peek(c.mus(0).config.isWr).toInt
-  val wdata = List.tabulate(wordsPerBurst * numBurstsPerCmd) { i => i + 0xcafe }
 
-  def peekOnChan(chan: Int) {
-    val dramTagIn = peek(c.mus(chan).io.dram.tagIn).toInt
-    val dramVldIn = peek(c.mus(chan).io.dram.vldIn).toInt
-    val dramTagOut = peek(c.mus(chan).io.dram.tagOut).toInt
-    val dramVldOut = peek(c.mus(chan).io.dram.vldOut).toInt
-    val dramAddrOut = peek(c.mus(chan).io.dram.addr).toInt
-    if (dramVldOut > 0) {
-      println("transmitting to DRAM at addr = " + dramAddrOut + " tag = " + dramTagOut + " at Channl " + chan)
+  val waddr = 0x1000
+  val wsize = burstSizeBytes * numBurstsPerCmd
+  val wdata = List.tabulate(wordsPerBurst) { i => i + 0xcafe }
+  val masks = List.tabulate(wordsPerBurst * numBurstsPerCmd) { i => i % 2 }
+  val k = 0
+
+  var counts = 0
+  println("start testing read_modify_write")
+  println("words per burst = " + wordsPerBurst)
+
+	def peekSet(k: Int) {
+ 		peek(c.mus(k).io.dram.vldOut).toInt
+ 		peek(c.mus(k).io.dram.tagOut)
+ 		peek(c.mus(k).io.dram.addr)
+		val vldIn = peek(c.mus(k).io.dram.vldIn).toInt
+		val tagIn = peek(c.mus(k).io.dram.tagIn).toInt
+    if (vldIn > 0) {
+      println("one read-modify-write-completed at channel "+ k + ", tag = " + tagIn)
+      counts = counts + 1
     }
+	}
 
-    if (dramVldIn > 0) {
-      numTransCompleted = numTransCompleted + 1
-      println("DRAM transaction completed for tag = " + dramTagIn + " at Channel " + chan)
-    }
-  }
+	def testOneStepOnAllChan(iter: Int) {
+		for (k <- 0 to 3) {
+ 			poke(c.io.interconnects(k).vldIn, 1)
+ 			poke(c.io.interconnects(k).addr(0), waddr + 0x80 * iter)
+ 			poke(c.io.interconnects(k).size, wsize)
+ 			c.io.interconnects(k).wdata.zip(wdata) foreach { case(in, i ) => poke(in,i) }
+ 			c.io.interconnects(k).masksIn.zip(masks) foreach { case(in, i ) => poke(in,i) }
+ 			poke(c.io.interconnects(k).dataVldIn, 1)
 
-  def peekOnAllChan() {
-    for (k <- 0 to 3) {
-      peekOnChan(k)
-    }
+			peekSet(k)
 
+ 			step(1)
+ 			poke(c.io.interconnects(k).vldIn, 0)
+ 			poke(c.io.interconnects(k).addr(0), 0x0000)
+ 			poke(c.io.interconnects(k).size, 0)
+ 			c.io.interconnects(k).wdata.zip(wdata) foreach { case(in, i ) => poke(in,0) }
+ 			c.io.interconnects(k).masksIn.zip(masks) foreach { case(in, i ) => poke(in,0) }
+ 			poke(c.io.interconnects(k).dataVldIn, 0)
+			peekSet(k)
+		}
+	}
+
+	for (i <- 0 to 50) {
+		testOneStepOnAllChan(i)
+	}
+
+  for (i <- 0 to 800)
+  {
     step(1)
-  }
-
-  def peekOnAllChanNoWait() {
-    for (k <- 0 to 3) {
-      peekOnChan(k)
-    }
-  }
-
-  def getDataInBursts(data: List[Int]) = {
-    Queue.tabulate(data.size / wordsPerBurst) { i => data.slice(i*wordsPerBurst, i*wordsPerBurst + wordsPerBurst) }
-  }
-
-  // for testing multi channels
-//  def poke1(chan: Int, data: List[Int]) {
-//    poke(c.io.interconnects(chan).vldIn, 1)
-//    poke(c.io.interconnects(chan).addr(0), waddr)
-//    poke(c.io.interconnects(chan).size, wsize)
-//    c.io.interconnects(chan).wdata.zip(data) foreach { case(in, i ) => poke(in,i) }
-//    poke(c.io.interconnects(chan).dataVldIn, 1)
-//  }
-
-
-  if (writeMode > 0) {
-    println("start testing writes")
-    val waddrs = List.tabulate(numCommands) { i => addr1 + i * 0x80 * 2 }
-    val wsizes = List.tabulate(numCommands) { i => burstSizeBytes * numBurstsPerCmd }
-    waddrs.zip(wsizes) foreach {
-      case (waddr, wsize) => {
-        println("generated addr, size pair is addr = " + waddr + ", size = " + wsize)
-        var dataInBursts = getDataInBursts(wdata)
-        var data0 = dataInBursts.dequeue
-
-        peekOnAllChanNoWait
-        for (k <- 0 to 3) {
-          peekOnAllChanNoWait
-          poke(c.io.interconnects(k).vldIn, 1)
-          poke(c.io.interconnects(k).addr(0), waddr)
-          poke(c.io.interconnects(k).size, wsize)
-          c.io.interconnects(k).wdata.zip(data0) foreach { case(in, i ) => poke(in,i) }
-          poke(c.io.interconnects(k).dataVldIn, 1)
-        }
-
-        peekOnAllChan
-
-        for (k <- 0 to 3) {
-          poke(c.io.interconnects(k).vldIn, 0)
-        }
-
-        peekOnAllChanNoWait
-        while (!dataInBursts.isEmpty) {
-          var data1 = dataInBursts.dequeue
-          for (k <- 0 to 3) {
-            c.io.interconnects(k).wdata.zip(data1) foreach { case(in, i ) => poke(in,i) }
-          }
-
-          peekOnAllChan
-        }
-
-        for (k <- 0 to 3) {
-          peekOnChan(k)
-          poke(c.io.interconnects(k).dataVldIn, 0)
-        }
-      }
-    }
-
-    while (numTransCompleted != numCommands * numBurstsPerCmd * numChans) {
-      println("numTransCompleted = " + numTransCompleted)
-      peekOnAllChan
-    }
-
-  } else {
-    println("start testing reads")
-    val raddrs = List.tabulate(numCommands) { i => addr1 + i * 0x80 }
-    val rsizes = List.tabulate(numCommands) { i => burstSizeBytes * numBurstsPerCmd}
-    raddrs.zip(rsizes) foreach {
-      case (raddr, rsize) => {
-        for (k <- 0 to 3) {
-          poke(c.io.interconnects(k).vldIn, 1)
-          poke(c.io.interconnects(k).addr(0), raddr)
-          poke(c.io.interconnects(k).size, rsize)
-        }
-
-        step(1)
-
-        for (k <- 0 to 3) {
-          peekOnChan(k)
-          poke(c.io.interconnects(k).vldIn, 0)
-          poke(c.io.interconnects(k).dataVldIn, 0)
-        }
-      }
-    }
-
-    while (numTransCompleted != numCommands * numBurstsPerCmd) {
-      println("numTransCompleted = " + numTransCompleted)
-      step(1)
-      for (k <- 0 to 3) {
-        peekOnChan(k)
-      }
-    }
+		for (k <- 0 to 3) {
+			peekSet(k)
+		}
   }
 }
 

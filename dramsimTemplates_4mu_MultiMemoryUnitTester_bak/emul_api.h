@@ -111,9 +111,6 @@ protected:
   MultiChannelMemorySystem *mcMem;
   std::map<uint64_t, vector<dat_t<32> > > dataMap;
   std::map<uint64_t, dat_t<32> > tagMap;
-	std::map<uint64_t, vector<dat_t<32> > > rmwDataMap;
-	std::map<uint64_t, vector<dat_t<1> > > rmwMasksMap;
-	std::map<uint64_t, dat_t<32> > rmwTagMap;
 
 private:
   static void power_callback(double a, double b, double c, double d)
@@ -162,56 +159,6 @@ private:
 	  // check for channel
 	  if (id == 0)
 	  {
-			if (rmwTagMap.count(address))
-			{
-				vector<dat_t<32> > rmwRdataVec = dataMap[address];
-				dat_t<32> rmwTag = rmwTagMap[address];
-				vector<dat_t<32> > rmwWdataVec = rmwDataMap[address];
-				vector<dat_t<1> > rmwMasksVec = rmwMasksMap[address];
-				vector<dat_t<32> > writeInData;
-
-	     	printf("[Callback] read complete: channel=%d, address=0x%lx, cycle=%lu, tag=%lu \n", id, address, clock_cycle, rmwTag.values[0]);
-				if (rmwRdataVec.size() == 0)
-				{
-					for (int i = 0; i < 16; i ++)
-					{
-						dat_t<36> zeroData;
-						zeroData.values[0] = 0;
-						writeInData.push_back(zeroData);
-					}
-				}
-				else
-				{
-					for (int i = 0; i < 16; i ++)
-					{
-						writeInData.push_back(rmwRdataVec[i]);
-					}
-				}
-
-				for (int i = 0; i < 16; i ++)
-				{
-					if (rmwMasksVec[i].values[0] == 0)
-					{
-						rmwWdataVec[i] = writeInData[i];
-					}
-				}
-
-				dataMap[address] = rmwWdataVec;
-				// print to check data...
-				for (int i = 0; i < 16; i ++)
-				{
-					cout << "i = " << i << ", rmwWdataVec[i] = " << rmwWdataVec[i].values[0] << endl;
-				}
-
-				tagMap[address] = rmwTag;
-				rmwTagMap.erase(address);
-				rmwMasksMap.erase(address);
-				rmwDataMap.erase(address);
-				bool transSuccess = mcMem->addTransaction(true, address);
-				if (!transSuccess) cout << ">>>>>>>>>> warning: cannot enqueue a read_modify_write transaction to DRAMSim at channel 0" << endl;
-				return;
-			}
-
       MultiMemoryUnitTester_DRAMSimulator__io_vldOut.values[0] = 1;
      	printf("[Callback] read complete: channel = %d, address = 0x%lx, cycle = %lu\n", id, address, clock_cycle);
      	printf("starting getting tags \n");
@@ -262,56 +209,6 @@ private:
 
 		if (id == 1)
 	  {
-			if (rmwTagMap.count(address))
-			{
-				vector<dat_t<32> > rmwRdataVec = dataMap[address];
-				dat_t<32> rmwTag = rmwTagMap[address];
-				vector<dat_t<32> > rmwWdataVec = rmwDataMap[address];
-				vector<dat_t<1> > rmwMasksVec = rmwMasksMap[address];
-				vector<dat_t<32> > writeInData;
-
-	     	printf("[Callback] read complete: channel=%d, address=0x%lx, cycle=%lu, tag=%lu \n", id, address, clock_cycle, rmwTag.values[0]);
-				if (rmwRdataVec.size() == 0)
-				{
-					for (int i = 0; i < 16; i ++)
-					{
-						dat_t<36> zeroData;
-						zeroData.values[0] = 0;
-						writeInData.push_back(zeroData);
-					}
-				}
-				else
-				{
-					for (int i = 0; i < 16; i ++)
-					{
-						writeInData.push_back(rmwRdataVec[i]);
-					}
-				}
-
-				for (int i = 0; i < 16; i ++)
-				{
-					if (rmwMasksVec[i].values[0] == 0)
-					{
-						rmwWdataVec[i] = writeInData[i];
-					}
-				}
-
-				dataMap[address] = rmwWdataVec;
-				// print to check data...
-				for (int i = 0; i < 16; i ++)
-				{
-					cout << "i = " << i << ", rmwWdataVec[i] = " << rmwWdataVec[i].values[0] << endl;
-				}
-
-				tagMap[address] = rmwTag;
-				rmwTagMap.erase(address);
-				rmwMasksMap.erase(address);
-				rmwDataMap.erase(address);
-				bool transSuccess = mcMem->addTransaction(true, address);
-				if (!transSuccess) cout << ">>>>>>>>>> warning: cannot enqueue a read_modify_write transaction to DRAMSim at channel 1" << endl;
-				return;
-			}
-
       MultiMemoryUnitTester_DRAMSimulator_1__io_vldOut.values[0] = 1;
      	printf("[Callback] read complete: channel = %d, address = 0x%lx, cycle = %lu\n", id, address, clock_cycle);
      	printf("starting getting tags \n");
@@ -362,56 +259,6 @@ private:
 
 	  if (id == 2)
 	  {
-			if (rmwTagMap.count(address))
-			{
-				vector<dat_t<32> > rmwRdataVec = dataMap[address];
-				dat_t<32> rmwTag = rmwTagMap[address];
-				vector<dat_t<32> > rmwWdataVec = rmwDataMap[address];
-				vector<dat_t<1> > rmwMasksVec = rmwMasksMap[address];
-				vector<dat_t<32> > writeInData;
-
-	     	printf("[Callback] read complete: channel=%d, address=0x%lx, cycle=%lu, tag=%lu \n", id, address, clock_cycle, rmwTag.values[0]);
-				if (rmwRdataVec.size() == 0)
-				{
-					for (int i = 0; i < 16; i ++)
-					{
-						dat_t<36> zeroData;
-						zeroData.values[0] = 0;
-						writeInData.push_back(zeroData);
-					}
-				}
-				else
-				{
-					for (int i = 0; i < 16; i ++)
-					{
-						writeInData.push_back(rmwRdataVec[i]);
-					}
-				}
-
-				for (int i = 0; i < 16; i ++)
-				{
-					if (rmwMasksVec[i].values[0] == 0)
-					{
-						rmwWdataVec[i] = writeInData[i];
-					}
-				}
-
-				dataMap[address] = rmwWdataVec;
-				// print to check data...
-				for (int i = 0; i < 16; i ++)
-				{
-					cout << "i = " << i << ", rmwWdataVec[i] = " << rmwWdataVec[i].values[0] << endl;
-				}
-
-				tagMap[address] = rmwTag;
-				rmwTagMap.erase(address);
-				rmwMasksMap.erase(address);
-				rmwDataMap.erase(address);
-				bool transSuccess = mcMem->addTransaction(true, address);
-				if (!transSuccess) cout << ">>>>>>>>>> warning: cannot enqueue a read_modify_write transaction to DRAMSim at channel 2" << endl;
-				return;
-			}
-
       MultiMemoryUnitTester_DRAMSimulator_2__io_vldOut.values[0] = 1;
      	printf("[Callback] read complete: channel = %d, address = 0x%lx, cycle = %lu\n", id, address, clock_cycle);
      	printf("starting getting tags \n");
@@ -462,56 +309,6 @@ private:
 
 	  if (id == 3)
 	  {
-			if (rmwTagMap.count(address))
-			{
-				vector<dat_t<32> > rmwRdataVec = dataMap[address];
-				dat_t<32> rmwTag = rmwTagMap[address];
-				vector<dat_t<32> > rmwWdataVec = rmwDataMap[address];
-				vector<dat_t<1> > rmwMasksVec = rmwMasksMap[address];
-				vector<dat_t<32> > writeInData;
-
-	     	printf("[Callback] read complete: channel=%d, address=0x%lx, cycle=%lu, tag=%lu \n", id, address, clock_cycle, rmwTag.values[0]);
-				if (rmwRdataVec.size() == 0)
-				{
-					for (int i = 0; i < 16; i ++)
-					{
-						dat_t<36> zeroData;
-						zeroData.values[0] = 0;
-						writeInData.push_back(zeroData);
-					}
-				}
-				else
-				{
-					for (int i = 0; i < 16; i ++)
-					{
-						writeInData.push_back(rmwRdataVec[i]);
-					}
-				}
-
-				for (int i = 0; i < 16; i ++)
-				{
-					if (rmwMasksVec[i].values[0] == 0)
-					{
-						rmwWdataVec[i] = writeInData[i];
-					}
-				}
-
-				dataMap[address] = rmwWdataVec;
-				// print to check data...
-				for (int i = 0; i < 16; i ++)
-				{
-					cout << "i = " << i << ", rmwWdataVec[i] = " << rmwWdataVec[i].values[0] << endl;
-				}
-
-				tagMap[address] = rmwTag;
-				rmwTagMap.erase(address);
-				rmwMasksMap.erase(address);
-				rmwDataMap.erase(address);
-				bool transSuccess = mcMem->addTransaction(true, address);
-				if (!transSuccess) cout << ">>>>>>>>>> warning: cannot enqueue a read_modify_write transaction to DRAMSim at channel 3" << endl;
-				return;
-			}
-
       MultiMemoryUnitTester_DRAMSimulator_3__io_vldOut.values[0] = 1;
      	printf("[Callback] read complete: channel = %d, address = 0x%lx, cycle = %lu\n", id, address, clock_cycle);
      	printf("starting getting tags \n");
@@ -596,73 +393,22 @@ private:
   virtual inline void step() {
     mcMem->update();
   	MultiMemoryUnitTester_t *pctrl = (MultiMemoryUnitTester_t *)module;
+//		cout << ">>>>>>>>>> start step <<<<<<<<<<" << endl;
+
+//		cout << ">>>>>>>>>> start clock_lo  <<<<<<<<<<" << endl;
     module->clock(LIT<1>(0));
     // FIXME: should call twice to get the output for now
     module->clock_lo(LIT<1>(0), false);
+//		cout << ">>>>>>>>>> end clock_lo  <<<<<<<<<<" << endl;
+//		cout << ">>>>>>>>>> start injection  <<<<<<<<<<" << endl;
 		// channel 0
   	if (MultiMemoryUnitTester_DRAMSimulator__io_vldIn.values[0] > 0)
   	{
+//			cout << ">>>>>>>>>> addTransaction to channel 0 <<<<<<<<<<" << endl;
   	  dat_t<32> transTag = MultiMemoryUnitTester_DRAMSimulator__io_tagIn;
   	  bool isWR = MultiMemoryUnitTester_DRAMSimulator__io_isWr.values[0];
   	  uint64_t addr = MultiMemoryUnitTester_DRAMSimulator__io_addr.values[0];
 			addr = addr;
-
-			printf(">>>>>>>>>> addTransaction to channel 0 <<<<<<<<<<, address = %lu, tag = %lu\n", addr, transTag.values[0]);
-			vector<dat_t<1> > masksVec;
-	    masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_0);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_1);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_2);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_3);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_4);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_5);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_6);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_7);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_8);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_9);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_10);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_11);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_12);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_13);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_14);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_masksIn_15);
-
-			uint32_t RdModWr = 1;
-			for (int i = 0; i < masksVec.size(); i ++)
-			{
-				RdModWr = RdModWr & masksVec[i].values[0];
-			}
-
-			bool isRdModWr = (RdModWr == 0);
-			if (isRdModWr)
-			{
-				// add a read
-				bool rmwReadTransSuccess = mcMem->addTransaction(false, addr);
-				if (!rmwReadTransSuccess) cout << "error: cannot add transaction in channel 0" << endl;
-				rmwTagMap[addr] = transTag;
-				rmwMasksMap[addr] = masksVec;
-
-  	  	vector<dat_t<32> > wdataVec;
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_0);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_1);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_2);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_3);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_4);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_5);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_6);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_7);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_8);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_9);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_10);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_11);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_12);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_13);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_14);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator__io_wdata_15);
-				rmwDataMap[addr] = wdataVec;
-
-				return;
-			}
-
   	  tagMap[addr] = transTag;
   	  bool transSuccess = mcMem->addTransaction(isWR, addr);
   	  // TODO: need to take the case where a transaction
@@ -702,67 +448,11 @@ private:
 		// channel 1
 		if (MultiMemoryUnitTester_DRAMSimulator_1__io_vldIn.values[0] > 0)
   	{
+//			cout << ">>>>>>>>>> addTransaction to channel 1 <<<<<<<<<<" << endl;
   	  dat_t<32> transTag = MultiMemoryUnitTester_DRAMSimulator_1__io_tagIn;
   	  bool isWR = MultiMemoryUnitTester_DRAMSimulator_1__io_isWr.values[0];
   	  uint64_t addr = MultiMemoryUnitTester_DRAMSimulator_1__io_addr.values[0];
 			addr = addr | 0x400000000;
-
-			printf(">>>>>>>>>> addTransaction to channel 1 <<<<<<<<<<, address = %lu, tag = %lu\n", addr, transTag.values[0]);
-			vector<dat_t<1> > masksVec;
-	    masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_0);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_1);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_2);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_3);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_4);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_5);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_6);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_7);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_8);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_9);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_10);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_11);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_12);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_13);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_14);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_masksIn_15);
-
-			uint32_t RdModWr = 1;
-			for (int i = 0; i < masksVec.size(); i ++)
-			{
-				RdModWr = RdModWr & masksVec[i].values[0];
-			}
-
-			bool isRdModWr = (RdModWr == 0);
-			if (isRdModWr)
-			{
-				// add a read
-				bool rmwReadTransSuccess = mcMem->addTransaction(false, addr);
-				if (!rmwReadTransSuccess) cout << "error: cannot add transaction in channel 0" << endl;
-				rmwTagMap[addr] = transTag;
-				rmwMasksMap[addr] = masksVec;
-
-  	  	vector<dat_t<32> > wdataVec;
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_0);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_1);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_2);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_3);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_4);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_5);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_6);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_7);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_8);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_9);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_10);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_11);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_12);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_13);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_14);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_1__io_wdata_15);
-				rmwDataMap[addr] = wdataVec;
-
-				return;
-			}
-
   	  tagMap[addr] = transTag;
   	  bool transSuccess = mcMem->addTransaction(isWR, addr);
   	  // TODO: need to take the case where a transaction
@@ -808,63 +498,6 @@ private:
   	  bool isWR = MultiMemoryUnitTester_DRAMSimulator_2__io_isWr.values[0];
   	  uint64_t addr = MultiMemoryUnitTester_DRAMSimulator_2__io_addr.values[0];
 			addr = addr | 0x800000000;
-
-			printf(">>>>>>>>>> addTransaction to channel 2 <<<<<<<<<<, address = %lu, tag = %lu\n", addr, transTag.values[0]);
-			vector<dat_t<1> > masksVec;
-	    masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_0);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_1);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_2);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_3);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_4);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_5);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_6);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_7);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_8);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_9);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_10);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_11);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_12);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_13);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_14);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_masksIn_15);
-
-			uint32_t RdModWr = 1;
-			for (int i = 0; i < masksVec.size(); i ++)
-			{
-				RdModWr = RdModWr & masksVec[i].values[0];
-			}
-
-			bool isRdModWr = (RdModWr == 0);
-			if (isRdModWr)
-			{
-				// add a read
-				bool rmwReadTransSuccess = mcMem->addTransaction(false, addr);
-				if (!rmwReadTransSuccess) cout << "error: cannot add transaction in channel 0" << endl;
-				rmwTagMap[addr] = transTag;
-				rmwMasksMap[addr] = masksVec;
-
-  	  	vector<dat_t<32> > wdataVec;
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_0);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_1);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_2);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_3);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_4);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_5);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_6);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_7);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_8);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_9);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_10);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_11);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_12);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_13);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_14);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_2__io_wdata_15);
-				rmwDataMap[addr] = wdataVec;
-
-				return;
-			}
-
   	  tagMap[addr] = transTag;
   	  bool transSuccess = mcMem->addTransaction(isWR, addr);
 			if (!transSuccess) cout << ">>>>>>>>>> warning: cannot enqueue a transaction to DRAMSim! <<<<<<<<<<" << endl;
@@ -911,63 +544,6 @@ private:
   	  uint64_t addr = MultiMemoryUnitTester_DRAMSimulator_3__io_addr.values[0];
 			// TODO: warning: somehow channel addr in hardware is not working... need to fix it
 			addr = addr | 0xC00000000;
-
-			printf(">>>>>>>>>> addTransaction to channel 3 <<<<<<<<<<, address = %lu, tag = %lu\n", addr, transTag.values[0]);
-			vector<dat_t<1> > masksVec;
-	    masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_0);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_1);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_2);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_3);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_4);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_5);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_6);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_7);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_8);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_9);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_10);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_11);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_12);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_13);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_14);
-  		masksVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_masksIn_15);
-
-			uint32_t RdModWr = 1;
-			for (int i = 0; i < masksVec.size(); i ++)
-			{
-				RdModWr = RdModWr & masksVec[i].values[0];
-			}
-
-			bool isRdModWr = (RdModWr == 0);
-			if (isRdModWr)
-			{
-				// add a read
-				bool rmwReadTransSuccess = mcMem->addTransaction(false, addr);
-				if (!rmwReadTransSuccess) cout << "error: cannot add transaction in channel 0" << endl;
-				rmwTagMap[addr] = transTag;
-				rmwMasksMap[addr] = masksVec;
-
-  	  	vector<dat_t<32> > wdataVec;
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_0);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_1);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_2);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_3);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_4);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_5);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_6);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_7);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_8);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_9);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_10);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_11);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_12);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_13);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_14);
-  	  	wdataVec.push_back(MultiMemoryUnitTester_DRAMSimulator_3__io_wdata_15);
-				rmwDataMap[addr] = wdataVec;
-
-				return;
-			}
-
   	  tagMap[addr] = transTag;
   	  bool transSuccess = mcMem->addTransaction(isWR, addr);
 			if (!transSuccess) cout << ">>>>>>>>>> warning: cannot enqueue a transaction to DRAMSim! <<<<<<<<<<" << endl;

@@ -33,7 +33,6 @@ abstract class AbstractMemoryCmdInterface(w: Int, v: Int, dir: IODirection) exte
     case OUTPUT => INPUT
     case NODIR => NODIR
   }
-
 }
 
 class PlasticineMemoryCmdInterface(w: Int, v: Int) extends Bundle {
@@ -58,6 +57,7 @@ class DRAMCmdInterface(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, 
   val isWr = Bool(OUTPUT) // 1
   val tagIn = UInt(INPUT, width=w)
   val tagOut = UInt(OUTPUT, width=w)
+  val masksOut = Vec.fill(v) { Bool(OUTPUT) } // v
 }
 
 class DRAMSimCmdIn(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPUT) {
@@ -73,6 +73,7 @@ class DRAMSimCmdIn(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPU
   val isWr = Bool(INPUT)
   val wdata = Vec.fill(v) { UInt(INPUT, width=w) }
   val rdata = Vec.fill(v) { UInt(OUTPUT, width=w) }
+  val masksIn = Vec.fill(v) { Bool(INPUT) }
 
   // used for reserving simulation wires
   val addrSimOut = UInt(OUTPUT, width=w)
@@ -81,6 +82,7 @@ class DRAMSimCmdIn(w: Int, v: Int) extends AbstractMemoryCmdInterface(w, v, INPU
   val wdataSimOut = Vec.fill(v) { UInt(OUTPUT, width=w) }
   val vldInSimOut = Bool(OUTPUT)
   val rdyInSimOut = Bool(OUTPUT)
+  val masksInSimOut = Vec.fill(v) { Bool(OUTPUT) }
 }
 
 class DRAMSimulator(val w: Int, val burstSizeBytes: Int) extends BlackBox {
@@ -93,6 +95,7 @@ class DRAMSimulator(val w: Int, val burstSizeBytes: Int) extends BlackBox {
   io.wdataSimOut := io.wdata
   io.vldInSimOut := io.vldIn
   io.rdyInSimOut := io.rdyIn
+  io.masksInSimOut := io.masksIn
 }
 
 abstract class AbstractMemoryUnit(
@@ -113,6 +116,7 @@ abstract class AbstractMemoryUnit(
     val config_enable = Bool(INPUT)
     val interconnect = new PlasticineMemoryCmdInterface(w, v)
     val dram = new DRAMCmdInterface(w, v) // Should not have to pass vector width; must be DRAM burst width
+    val masksIn = Vec.fill(v) { Bool(INPUT) }
   }
 
   val configType = MemoryUnitOpcode()
@@ -225,6 +229,13 @@ class MemoryUnit(
   dataFifo.io.enq := wdata
   dataFifo.io.enqVld := dataVldIn
 
+  // mask fifo
+  val maskFifo = Module(new FIFOCore(1, d, v))
+  maskFifo.io.chainWrite := UInt(0)
+  maskFifo.io.chainRead := UInt(0)
+  maskFifo.io.enq := io.masksIn
+  maskFifo.io.enqVld := dataVldIn
+
   // Burst offset counter
   val burstCounter = Module(new Counter(w))
   burstCounter.io.data.max := Mux(config.scatterGather, UInt(1), sizeInBursts)
@@ -255,7 +266,7 @@ class MemoryUnit(
 
   addrFifo.io.deqVld := burstCounter.io.control.done & ~ccache.io.full
   dataFifo.io.deqVld := Mux(config.scatterGather, burstCounter.io.control.done & ~ccache.io.full, config.isWr & burstVld)
-
+  maskFifo.io.deqVld := Mux(config.scatterGather, burstCounter.io.control.done & ~ccache.io.full, config.isWr & burstVld)
 
   // Parse Metadata line
   def parseMetadataLine(m: UInt) = {
@@ -354,6 +365,7 @@ class MemoryUnit(
   io.dram.wdata := dataFifo.io.deq
   io.dram.vldOut := Mux(config.scatterGather, ccache.io.miss, burstVld)
   io.dram.isWr := config.isWr
+  io.dram.masksOut := maskFifo.io.deq
 
   rdata := Mux(config.scatterGather, gatherData, io.dram.rdata)
   vldOut := Mux(config.scatterGather, completed, io.dram.vldIn)

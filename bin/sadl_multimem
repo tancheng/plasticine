@@ -88,7 +88,8 @@ def stage(app, params, opts):
         print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
         os.system("cp ./dramsimTemplates_4mu_MultiMemoryUnitTester/libdramsim.so ./dramsimTemplates_4mu_MultiMemoryUnitTester/DRAMSim.h ./dramsimTemplates_4mu_MultiMemoryUnitTester/Callback.h ./generated")
         os.system("cp ./dramsimTemplates_4mu_MultiMemoryUnitTester/Makefile ./dramsimTemplates_4mu_MultiMemoryUnitTester/chopper.sh ./dramsimTemplates_4mu_MultiMemoryUnitTester/dramInit.txt ./dramsimTemplates_4mu_MultiMemoryUnitTester/dramRandInit.txt ./dramsimTemplates_4mu_MultiMemoryUnitTester/comment.sh ./dramsimTemplates_4mu_MultiMemoryUnitTester/emul_api.h ./dramsimTemplates_4mu_MultiMemoryUnitTester/sim_api.h ./generated/%s" %(app))
-        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh MultiMemoryUnitTester.cpp  && make -j32" %(app))
+#        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh MultiMemoryUnitTester.cpp  && make -j32" %(app))
+        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh MultiMemoryUnitTester.cpp" %(app))
 #        os.system("cd ./generated/%s && bash comment.sh" %(app))
         os.system("cd ../../")
 
