@@ -14,7 +14,10 @@ class BFS(val numInputs: Int) extends Module {
   }
 
   val tileSize = 23040
-  val layers = 8
+  val layers = 10
+  val nextLen = 8
+  val concatReg = 96 // rough average at steady state
+  val numEdges = concatReg*nextLen // rough average at steady state
 
   //  Pipe top { // Container pipe
   //    Parallel par1 {
@@ -69,7 +72,7 @@ class BFS(val numInputs: Int) extends Module {
     top.io.stageDone(1) := s1.io.done
 
       val m1 = Module(new Metapipe(6))
-      m1.io.numIter := UInt(64) // data-dependent
+      m1.io.numIter := UInt(numEdges) // data-dependent
       m1.io.enable := s1.io.stageEnable(0)
       s1.io.stageDone := m1.io.done
 
@@ -92,7 +95,7 @@ class BFS(val numInputs: Int) extends Module {
         val tl3 = Module(new Counter(32))
         tl3.io.control.saturate := Bool(false)
         tl3.io.control.reset := Bool(false)
-        tl3.io.data.max := UInt(64) // data-depedent
+        tl3.io.data.max := UInt(nextLen) // data-depedent
         tl3.io.data.stride := UInt(1)
         tl3.io.control.enable := m1.io.stageEnable(2)
         m1.io.stageDone(2) := tl3.io.control.done
@@ -100,7 +103,7 @@ class BFS(val numInputs: Int) extends Module {
         val p5 = Module(new Counter(32))
         p5.io.control.saturate := Bool(false)
         p5.io.control.reset := Bool(false)
-        p5.io.data.max := UInt(64) // data-dependent
+        p5.io.data.max := UInt(nextLen) // data-dependent
         p5.io.data.stride := UInt(1)
         p5.io.control.enable := m1.io.stageEnable(3)
         m1.io.stageDone(3) := p5.io.control.done
@@ -108,7 +111,7 @@ class BFS(val numInputs: Int) extends Module {
         val p6 = Module(new Counter(32))
         p6.io.control.saturate := Bool(false)
         p6.io.control.reset := Bool(false)
-        p6.io.data.max := UInt(64) // data-dependent
+        p6.io.data.max := UInt(nextLen) // data-dependent
         p6.io.data.stride := UInt(1)
         p6.io.control.enable := m1.io.stageEnable(4)
         m1.io.stageDone(4) := p6.io.control.done
@@ -116,7 +119,7 @@ class BFS(val numInputs: Int) extends Module {
         val p7 = Module(new Counter(32))
         p7.io.control.saturate := Bool(false)
         p7.io.control.reset := Bool(false)
-        p7.io.data.max := UInt(64) // data-dependent
+        p7.io.data.max := UInt(1)
         p7.io.data.stride := UInt(1)
         p7.io.control.enable := m1.io.stageEnable(5)
         m1.io.stageDone(5) := p7.io.control.done
@@ -124,7 +127,7 @@ class BFS(val numInputs: Int) extends Module {
       val p8 = Module(new Counter(32))
       p8.io.control.saturate := Bool(false)
       p8.io.control.reset := Bool(false)
-      p8.io.data.max := UInt(64) // data-dependent
+      p8.io.data.max := UInt(concatReg) // data-dependent
       p8.io.data.stride := UInt(1)
       p8.io.control.enable := s1.io.stageEnable(1)
       s1.io.stageDone(1) := p8.io.control.done
@@ -132,7 +135,7 @@ class BFS(val numInputs: Int) extends Module {
       val p9 = Module(new Counter(32))
       p9.io.control.saturate := Bool(false)
       p9.io.control.reset := Bool(false)
-      p9.io.data.max := UInt(64) // data-dependent
+      p9.io.data.max := UInt(concatReg) // data-dependent
       p9.io.data.stride := UInt(1)
       p9.io.control.enable := s1.io.stageEnable(2)
       s1.io.stageDone(2) := p9.io.control.done

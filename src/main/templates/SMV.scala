@@ -15,6 +15,7 @@ class SMV(val numInputs: Int) extends Module {
 
   val tileSize = 3840
   val N = 384000
+  val len = 60
 
   //  meta m1 {              
   //    TileLoad() tl1            
@@ -76,7 +77,7 @@ class SMV(val numInputs: Int) extends Module {
         val tl2 = Module(new Counter(32))
         tl2.io.control.saturate := Bool(false)
         tl2.io.control.reset := Bool(false)
-        tl2.io.data.max := UInt(64) // data-dependent
+        tl2.io.data.max := UInt(len) // data-dependent
         tl2.io.data.stride := UInt(1)
         tl2.io.control.enable := par1.io.stageEnable(0)
         par1.io.stageDone(0) := tl2.io.control.done
@@ -84,7 +85,7 @@ class SMV(val numInputs: Int) extends Module {
         val tl3 = Module(new Counter(32))
         tl3.io.control.saturate := Bool(false)
         tl3.io.control.reset := Bool(false)
-        tl3.io.data.max := UInt(64) // data-dependent
+        tl3.io.data.max := UInt(len) // data-dependent
         tl3.io.data.stride := UInt(1)
         tl3.io.control.enable := par1.io.stageEnable(1)
         par1.io.stageDone(1) := tl3.io.control.done
@@ -100,7 +101,7 @@ class SMV(val numInputs: Int) extends Module {
       val p3 = Module(new Counter(32))
       p3.io.control.saturate := Bool(false)
       p3.io.control.reset := Bool(false)
-      p3.io.data.max := UInt(64) // data-dependent
+      p3.io.data.max := UInt(len) // data-dependent
       p3.io.data.stride := UInt(1)
       p3.io.control.enable := m2.io.stageEnable(4)
       m2.io.stageDone(4) := p3.io.control.done

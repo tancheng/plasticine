@@ -16,6 +16,7 @@ class Pagerank(val numInputs: Int) extends Module {
   val iters = 10
   val tileSize = 768
   val NP = 7680
+  val numEdges = 16
 
   //  Sequential s1 {
   //    Sequential s2 {
@@ -96,7 +97,7 @@ class Pagerank(val numInputs: Int) extends Module {
           val tl5 = Module(new Counter(32))
           tl5.io.control.saturate := Bool(false)
           tl5.io.control.reset := Bool(false)
-          tl5.io.data.max := UInt(64) // data-dependent
+          tl5.io.data.max := UInt(numEdges) // data-dependent
           tl5.io.data.stride := UInt(1)
           tl5.io.control.enable := par1.io.stageEnable(0)
           par1.io.stageDone(0) := tl5.io.control.done
@@ -104,13 +105,13 @@ class Pagerank(val numInputs: Int) extends Module {
           val tl6 = Module(new Counter(32))
           tl6.io.control.saturate := Bool(false)
           tl6.io.control.reset := Bool(false)
-          tl6.io.data.max := UInt(64) // data-dependent
+          tl6.io.data.max := UInt(numEdges) // data-dependent
           tl6.io.data.stride := UInt(1)
           tl6.io.control.enable := s2.io.stageEnable(1)
           par1.io.stageDone(1) := tl6.io.control.done
 
         val s4 = Module(new Sequential(4))
-        s4.io.numIter := UInt(64) // data-dependent
+        s4.io.numIter := UInt(numEdges) // data-dependent
         s4.io.enable := s3.io.stageEnable(2)
         s3.io.stageDone(2) := s4.io.done
         
@@ -149,7 +150,7 @@ class Pagerank(val numInputs: Int) extends Module {
         val p6 = Module(new Counter(32))
         p6.io.control.saturate := Bool(false)
         p6.io.control.reset := Bool(false)
-        p6.io.data.max := UInt(64) // data-dependent
+        p6.io.data.max := UInt(numEdges) // data-dependent
         p6.io.data.stride := UInt(1)
         p6.io.control.enable := s3.io.stageEnable(3)
         s3.io.stageDone(3) := p6.io.control.done
@@ -165,7 +166,7 @@ class Pagerank(val numInputs: Int) extends Module {
         val p7 = Module(new Counter(32))
         p7.io.control.saturate := Bool(false)
         p7.io.control.reset := Bool(false)
-        p7.io.data.max := UInt(64) // data-dependent
+        p7.io.data.max := UInt(numEdges) // data-dependent
         p7.io.data.stride := UInt(1)
         p7.io.control.enable := s3.io.stageEnable(5)
         s3.io.stageDone(5) := p7.io.control.done
