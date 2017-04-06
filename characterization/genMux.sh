@@ -1,9 +1,10 @@
 #!/bin/bash
 
-W="1 2 4 8 16 32 64 128 256 512 1024"
-NUMINPUTS="2 3 4 6 8 10 16"
+#W="1 2 4 8 16 32 64 128 256 512 1024"
+W="32"
+NUMINPUTS="2 3 4 6 8 10 16 32 64 128 256 512 1024"
 
-MODULE=MuxN
+MODULE=MuxNArea
 RUNNER_NAME="${MODULE}Char"
 OUT=$RUNNER_NAME
 TMPDIR="char_tmp"
@@ -15,7 +16,7 @@ mkdir $OUT $TMPDIR
 for w in $W; do
   for inputs in $NUMINPUTS; do
     echo "Generating $RUNNER_NAME for $w word width, $inputs inputs"
-    bin/sadl --verilog --dest $TMPDIR $RUNNER_NAME $w $inputs 2>&1 >> $LOG
+    bin/sadl --verilog --dest $TMPDIR $RUNNER_NAME $w $inputs >> $LOG 2>&1
     if [ $? -ne 0 ]; then
       echo "Microbenchmark generation failed, exit code $?"
       exit -1
