@@ -39,6 +39,10 @@ def stage(app, params, opts):
     build_dir = opts.build_dir + os.sep + "generated" + os.sep + app + os.sep
     static_dir = os.getenv("PWD") + os.sep + "static"
 
+#    if not opts.runPrep:
+#        print("Clearing build directory %s..." %(build_dir))
+#        os.system("rm -rf %s" %(build_dir))
+
     sbt_opts = sbt_opts + " --targetDir " + build_dir
     if (opts.sim == True | opts.hex == True | opts.verilog == True):
         sbt_opts = sbt_opts + " --genHarness"
@@ -52,15 +56,17 @@ def stage(app, params, opts):
         sbt_opts = sbt_opts + " --backend flo"
     if opts.vcd == True:
         sbt_opts = sbt_opts + " --vcd"
+#    if opts.prep == True or opts.prep_4mu == True:
+#        sbt_opts = sbt_opts + " --debug --backend c --genHarness --vcd"
     if opts.dramSim == True:
         sbt_opts = sbt_opts + " --debug --backend c --genHarness"
-        os.system("cp -r ./dramsimTemplates_4mu_plasticineTop/ini ../")
-        os.system("cp -r ./dramsimTemplates_4mu_plasticineTop/ini ../")
-        os.system("cp ./dramsimTemplates_4mu_plasticineTop/system.ini ../")
-        os.system("cp ./dramsimTemplates_4mu_plasticineTop/libdramsim.so ../")
+        os.system("cp -r ./dramsimTemplates_4mu_GatherApp/ini ../")
+        os.system("cp -r ./dramsimTemplates_4mu_GatherApp/ini ../")
+        os.system("cp ./dramsimTemplates_4mu_GatherApp/system.ini ../")
+        os.system("cp ./dramsimTemplates_4mu_GatherApp/libdramsim.so ../")
     if opts.runDramSim == True:
 						# sbt_opts = sbt_opts + " --test --backend v"
-        sbt_opts = sbt_opts + " --test --backend null --testCommand %s/PlasticineTop" %(build_dir)
+        sbt_opts = sbt_opts + " --test --backend null --testCommand %s/GatherApp" %(build_dir)
 
     cp = "../target/scala-2.11/classes"
     app_prefix = "plasticine.templates"
@@ -70,35 +76,37 @@ def stage(app, params, opts):
     print("Invoking Chisel...")
     ecode = os.system(sbt_cmd)
 
+#    if opts.runDramSim == True:
+#        print("Running Test DramSim Test")
+#        sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s \"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
+#        print sbt_cmd
+#        ecode = os.system(sbt_cmd)
+#        if ecode != 0:
+#            err("SADL compilation failed")
+
     if opts.dramSim == True:
         print("Copying lidramsim.so, Makefile, DRAMSim.h, Callback.h into generated folder")
-        os.system("cp ./dramsimTemplates_4mu_plasticineTop/libdramsim.so ./dramsimTemplates_4mu_plasticineTop/DRAMSim.h ./dramsimTemplates_4mu_plasticineTop/Callback.h ./generated")
-        os.system("cp ./dramsimTemplates_4mu_plasticineTop/Makefile ./dramsimTemplates_4mu_plasticineTop/chopper.sh ./dramsimTemplates_4mu_plasticineTop/dramInit.txt ./dramsimTemplates_4mu_plasticineTop/dramRandInit.txt ./dramsimTemplates_4mu_plasticineTop/comment.sh ./dramsimTemplates_4mu_plasticineTop/emul_api.h ./generated/%s" %(app))
-        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh PlasticineTop.cpp  && make -j64" %(app))
+        os.system("cp ./dramsimTemplates_4mu_GatherApp/libdramsim.so ./dramsimTemplates_4mu_GatherApp/DRAMSim.h ./dramsimTemplates_4mu_GatherApp/Callback.h ./generated")
+        os.system("cp ./dramsimTemplates_4mu_GatherApp/Makefile ./dramsimTemplates_4mu_GatherApp/chopper.sh ./dramsimTemplates_4mu_GatherApp/dramInit.txt ./dramsimTemplates_4mu_GatherApp/dramRandInit.txt ./dramsimTemplates_4mu_GatherApp/comment.sh ./dramsimTemplates_4mu_GatherApp/emul_api.h ./dramsimTemplates_4mu_GatherApp/sim_api.h ./generated/%s" %(app))
+        os.system("cd ./generated/%s && bash comment.sh && bash chopper.sh GatherApp.cpp  && make -j32" %(app))
+#        os.system("cd ./generated/%s && bash comment.sh" %(app))
         os.system("cd ../../")
 
         if ecode != 0:
             err("SADL compilation failed")
+#    if ecode != 0:
+#        err("SADL compilation failed")
 
-    if opts.sim == True:
-        print("Performing static copying...")
+    elif opts.sim == True:
+        print("Performing Split C++ compilation...")
         os.system("cp %s/* %s" %(static_dir, build_dir))
-
-        print("Making a copy of generated simulator code as gold..")
-        os.system("mkdir %s/gold && cp %s/* %s/gold" %(build_dir, build_dir, build_dir))
-
-
-#        print("Performing chopping...")
-#        ecode = os.system("pushd %s && time ./chopper.sh Plasticine.cpp && popd" %(build_dir))
-
-        print("Performing parallel make..")
-        ecode = os.system("pushd %s && make -j12 && popd" %(build_dir))
+        ecode = os.system("pushd %s && time ./splitMethods.sh && time make -j16 && popd" %(build_dir))
         if (ecode != 0):
-            err("C compilation failed")
+            err("SADL compilation failed")
 
         print("Running test...")
         sbt_cmd = "CLASSPATH=%s:$CLASSPATH sbt \"; run-main %s.%s %s %s --targetDir %s --test\"" %(cp, app_prefix, app, ' '.join(params), app_args_end, build_dir)
-#        print sbt_cmd
+        print sbt_cmd
         ecode = os.system(sbt_cmd)
         if ecode != 0:
             err("SADL compilation failed")
