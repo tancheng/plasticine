@@ -122,6 +122,11 @@ class FFTests(c: FF) extends Tester(c) {
   reset(1)
   expect(c.io.data.out, initval)
 
+  println("Poking register directly")
+  poke(c.ff, 1000)
+  val out = peek(c.io.data.out)
+  println(s"out = $out, poked 1000")
+
   val numCycles = 10
   for (i <- 0 until numCycles) {
     val newenable = rnd.nextInt(2)

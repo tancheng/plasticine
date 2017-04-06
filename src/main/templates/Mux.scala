@@ -114,3 +114,18 @@ object MuxNChar {
     }
   }
 }
+
+object MuxNAreaChar {
+  def main(args: Array[String]): Unit = {
+    val appArgs = args.take(args.indexOf("end"))
+    if (appArgs.size < 2) {
+      println("Usage: MuxNAreaChar <wordWidth> <numInputs>")
+      sys.exit(-1)
+    }
+    val w = appArgs(0).toInt
+    val numInputs = appArgs(1).toInt
+    chiselMainTest(args, () => Module(new MuxN(numInputs, w))) {
+      c => new MuxNTests(c)
+    }
+  }
+}
