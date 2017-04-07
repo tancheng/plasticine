@@ -1,7 +1,7 @@
-package plasticine.templates
+package fringe
 
-import Chisel._
-import plasticine.Globals
+import chisel3._
+import chisel3.util._
 
 /**
  * Counter: 1-dimensional counter. Counts upto 'max', each time incrementing
@@ -9,217 +9,94 @@ import plasticine.Globals
  * @param w: Word width
  */
 class Counter(val w: Int) extends Module {
-  val io = new Bundle {
-    val data = new Bundle {
-      val max      = UInt(INPUT,  w)
-      val stride   = UInt(INPUT,  w)
-      val out      = UInt(OUTPUT, w)
-      val next     = UInt(OUTPUT, w)
-    }
-    val control = new Bundle {
-      val reset  = Bool(INPUT)
-      val enable = Bool(INPUT)
-      val saturate = Bool(INPUT)
-      val done   = Bool(OUTPUT)
-    }
-  }
+  val io = IO(new Bundle {
+    val max      = Input(UInt(w.W))
+    val stride   = Input(UInt(w.W))
+    val out      = Output(UInt(w.W))
+    val next     = Output(UInt(w.W))
+    val reset  = Input(Bool())
+    val enable = Input(Bool())
+    val saturate = Input(Bool())
+    val done   = Output(Bool())
+  })
 
 //  val reg = Module(new FF(w))
-  val reg = if (Globals.noModule) new FFL(w) else Module(new FF(w))
-  val init = UInt(0, width = w)
-  reg.io.data.init := init
-  reg.io.control.enable := io.control.reset | io.control.enable
+  val reg = Module(new FF(w))
+  val init = 0.U(w.W)
+  reg.io.init := init
+  reg.io.enable := io.reset | io.enable
 
-  val count = Cat(UInt(0, width=1), reg.io.data.out)
-  val newval = count + io.data.stride
-  val isMax = newval >= io.data.max
-  val next = Mux(isMax, Mux(io.control.saturate, count, init), newval)
-  when (io.control.reset) {
-    reg.io.data.in := init
+  val count = Cat(0.U(1.W), reg.io.out)
+  val newval = count + io.stride
+  val isMax = newval >= io.max
+  val next = Mux(isMax, Mux(io.saturate, count, init), newval)
+  when (io.reset) {
+    reg.io.in := init
   } .otherwise {
-    reg.io.data.in := next
+    reg.io.in := next
   }
 
-  io.data.out := count
-  io.data.next := next
-  io.control.done := io.control.enable & isMax
+  io.out := count
+  io.next := next
+  io.done := io.enable & isMax
 }
 
 class CounterReg(val w: Int) extends Module {
-  val io = new Bundle {
-    val data = new Bundle {
-      val max      = UInt(INPUT,  w)
-      val stride   = UInt(INPUT,  w)
-      val out      = UInt(OUTPUT, w)
-    }
-    val control = new Bundle {
-      val reset = Bool(INPUT)
-      val enable = Bool(INPUT)
-      val saturate = Bool(INPUT)
-      val done   = Bool(OUTPUT)
-    }
-  }
+  val io = IO(new Bundle {
+    val max      = Input(UInt(w.W))
+    val stride   = Input(UInt(w.W))
+    val out      = Output(UInt(w.W))
+    val reset = Input(Bool())
+    val enable = Input(Bool())
+    val saturate = Input(Bool())
+    val done   = Output(Bool())
+  })
 
   // Register the inputs
   val maxReg = Module(new FF(w))
-  maxReg.io.control.enable := Bool(true)
-  maxReg.io.data.in := io.data.max
-  val max = maxReg.io.data.out
+  maxReg.io.enable := true.B
+  maxReg.io.in := io.max
+  val max = maxReg.io.out
 
   val strideReg = Module(new FF(w))
-  strideReg.io.control.enable := Bool(true)
-  strideReg.io.data.in := io.data.stride
-  val stride = strideReg.io.data.out
+  strideReg.io.enable := true.B
+  strideReg.io.in := io.stride
+  val stride = strideReg.io.out
 
   val rstReg = Module(new FF(1))
-  rstReg.io.control.enable := Bool(true)
-  rstReg.io.data.in := io.control.reset
-  val rst = rstReg.io.data.out
+  rstReg.io.enable := true.B
+  rstReg.io.in := io.reset
+  val rst = rstReg.io.out
 
   val enableReg = Module(new FF(1))
-  enableReg.io.control.enable := Bool(true)
-  enableReg.io.data.in := io.control.enable
-  val enable = enableReg.io.data.out
+  enableReg.io.enable := true.B
+  enableReg.io.in := io.enable
+  val enable = enableReg.io.out
 
   val saturateReg = Module(new FF(1))
-  saturateReg.io.control.enable := Bool(true)
-  saturateReg.io.data.in := io.control.saturate
-  val saturate = saturateReg.io.data.out
+  saturateReg.io.enable := true.B
+  saturateReg.io.in := io.saturate
+  val saturate = saturateReg.io.out
 
   // Instantiate counter
   val counter = Module(new Counter(w))
-  counter.io.data.max := max
-  counter.io.data.stride := stride
-  counter.io.control.enable := enable
-  counter.io.control.reset := rst
-  counter.io.control.enable := enable
-  counter.io.control.saturate := saturate
+  counter.io.max := max
+  counter.io.stride := stride
+  counter.io.enable := enable
+  counter.io.reset := rst
+  counter.io.enable := enable
+  counter.io.saturate := saturate
 
   // Register outputs
   val outReg = Module(new FF(w))
-  outReg.io.control.enable := Bool(true)
-  outReg.io.data.in := counter.io.data.out
-  io.data.out := outReg.io.data.out
+  outReg.io.enable := true.B
+  outReg.io.in := counter.io.out
+  io.out := outReg.io.out
   val doneReg = Module(new FF(1))
-  doneReg.io.control.enable := Bool(true)
-  doneReg.io.data.in := counter.io.control.done
-  io.control.done := doneReg.io.data.out
+  doneReg.io.enable := true.B
+  doneReg.io.in := counter.io.done
+  io.done := doneReg.io.out
 }
 
 
-/**
- * Counter test harness
- */
-class CounterTests(c: Counter) extends Tester(c) {
-  val saturationVal = (1 << c.w) - 1  // Based on counter width
 
-  val max = 10 % saturationVal
-  val stride = 6
-  val saturate = 0
-
-  poke(c.io.data.max, max)
-  poke(c.io.data.stride, stride)
-  poke(c.io.control.enable, 1)
-  poke(c.io.control.saturate, saturate)
-  poke(c.io.control.reset, 0)
-
-  val expectedCounts = 0 until max by stride toList
-
-  var numEnabledCycles = 0
-  var expectedCount = 0
-  var expectedDone = 0
-  def testOneStep() = {
-    step(1)
-    numEnabledCycles += 1
-    val (count, done) = saturate match {
-      case 1 =>
-        val count = if (numEnabledCycles < expectedCounts.size) expectedCounts(numEnabledCycles) else expectedCounts.last
-        val done = if (count == expectedCounts.last) 1 else 0
-        (count, done)
-      case 0 =>
-        val count = expectedCounts(numEnabledCycles % expectedCounts.size)
-        val done = if (count == expectedCounts.last)  1 else 0
-        (count, done)
-    }
-    expect(c.io.data.out, count)
-    expect(c.io.control.done, done)
-    expectedCount = count
-    expectedDone = done
-  }
-
-  println("[reset = 0, enable = 1]")
-  expect(c.io.data.out, expectedCount)
-  expect(c.io.control.done, expectedDone)
-
-  for (i <- 1 until (max+10)) {
-    testOneStep()
-  }
-
-  println("[reset = 1, enable = 1]")
-  poke(c.io.control.reset, 1)
-  numEnabledCycles = 0
-  expect(c.io.data.out, expectedCounts.last)
-  expect(c.io.control.done, 1)
-  for (i <- 0 until 5) {
-    step(1)
-    expect(c.io.data.out, 0)
-    expect(c.io.control.done, 0)
-  }
-
-  println("[reset = 1, enable = 0]")
-  poke(c.io.control.enable, 0)
-  for (i <- 0 until 5) {
-    step(1)
-    expect(c.io.data.out, 0)
-    expect(c.io.control.done, 0)
-  }
-
-  println("[reset = 0, enable = 1]")
-  poke(c.io.control.reset, 0)
-  poke(c.io.control.enable, 1)
-  expect(c.io.data.out, 0)
-  expect(c.io.control.done, 0)
-  for (i <- 1 until 5) {
-    testOneStep()
-  }
-  println("[reset = 0, enable = 0]")
-  poke(c.io.control.enable, 0)
-  for (i <- 0 until 5) {
-    step(1)
-    expect(c.io.data.out, expectedCount)
-    expect(c.io.control.done, expectedDone)
-  }
-
-  println("[reset = 0, enable = 1]")
-  poke(c.io.control.enable, 1)
-  expect(c.io.data.out, expectedCount)
-  expect(c.io.control.done, expectedDone)
-  for (i <- 1 until max+10) {
-    testOneStep()
-  }
-}
-
-
-class CounterCharTests(c: CounterReg) extends Tester(c)
-
-object CounterChar {
-  def main(args: Array[String]): Unit = {
-    val appArgs = args.take(args.indexOf("end"))
-    if (appArgs.size < 1) {
-      println("Usage: CounterChar <w>")
-      sys.exit(-1)
-    }
-    val w = appArgs(0).toInt
-    chiselMainTest(args, () => Module(new CounterReg(w))) {
-      c => new CounterCharTests(c)
-    }
-  }
-}
-
-object CounterTest {
-  def main(args: Array[String]): Unit = {
-    chiselMainTest(args, () => Module(new Counter(4))) {
-      c => new CounterTests(c)
-    }
-  }
-}
