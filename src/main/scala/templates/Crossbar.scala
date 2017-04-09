@@ -5,7 +5,6 @@ import chisel3.util._
 
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
-import plasticine.Globals
 
 /**
  * Crossbar config register format
