@@ -1,6 +1,6 @@
 // See LICENSE for license details.
 
-package fringe
+package plasticine
 
 import chisel3.core.Module
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
