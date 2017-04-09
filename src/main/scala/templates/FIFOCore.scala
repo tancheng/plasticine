@@ -1,8 +1,8 @@
-package fringe
+package plasticine.templates
 
 import chisel3._
 import chisel3.util.{log2Ceil, isPow2}
-import templates.Utils.log2Up
+//import templates.Utils.log2Up
 
 
 /**

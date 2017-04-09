@@ -1,4 +1,4 @@
-package fringe
+package plasticine.templates
 
 import chisel3._
 

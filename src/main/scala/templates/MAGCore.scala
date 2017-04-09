@@ -1,10 +1,12 @@
-package fringe
+package plasticine.templates
 
 import util._
 import chisel3._
 import chisel3.util._
 import templates.SRFF
-import templates.Utils.log2Up
+import fringe._
+
+//import templates.Utils.log2Up
 
 class MAGCore(
   val w: Int,
