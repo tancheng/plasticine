@@ -1,7 +1,7 @@
 package plasticine.pisa
 
 import java.io.File
-import _root_.scala.util.parsing.json.JSON
+//import _root_.scala.util.parsing.json.JSON
 import scala.collection.mutable.HashMap
 import scala.util.Random
 import plasticine.pisa.parser.Parser

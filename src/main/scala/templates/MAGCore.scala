@@ -3,10 +3,10 @@ package plasticine.templates
 import util._
 import chisel3._
 import chisel3.util._
-import templates.SRFF
 import fringe._
 
-//import templates.Utils.log2Up
+import plasticine.templates.Utils.log2Up
+import plasticine.templates.Utils.delay
 
 class MAGCore(
   val w: Int,
@@ -274,7 +274,7 @@ class MAGCore(
 //  io.dram.cmd.valid := Mux(config.scatterGather, ccache.io.miss, burstVld)
   io.dram.cmd.bits.isWr := isWrFifo.io.deq(0)
   wrPhase.io.input.set := (~isWrFifo.io.empty & isWrFifo.io.deq(0))
-  wrPhase.io.input.reset := templates.Utils.delay(burstVld,1)
+  wrPhase.io.input.reset := delay(burstVld,1)
   io.dram.cmd.valid := burstVld & ~issued
 
   val issuedTag = Wire(UInt(w.W))

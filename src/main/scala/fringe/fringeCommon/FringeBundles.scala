@@ -3,8 +3,8 @@ package fringe
 import util._
 import chisel3._
 import chisel3.util._
-import templates.SRFF
-import templates.Utils.log2Up
+import plasticine.templates.SRFF
+import plasticine.templates.Utils.log2Up
 
 /**
  * DRAM Memory Access Generator

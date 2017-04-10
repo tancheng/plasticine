@@ -1,14 +1,14 @@
 package plasticine.pisa.ir
 
 import java.io.File
-import _root_.scala.util.parsing.json.JSON
+//import _root_.scala.util.parsing.json.JSON
 import scala.collection.immutable.Map
 import plasticine.ArchConfig
 import plasticine.pisa.parser._
 import plasticine.templates.Opcodes
 import scala.collection.mutable.HashMap
 import scala.util.Random
-import Chisel._
+//import Chisel._
 
 /**
  * Base class for all Config nodes

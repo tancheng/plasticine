@@ -6,7 +6,7 @@ import chisel3._
 import chisel3.util._
 import diplomacy._
 import scala.math.max
-import templates.Utils.log2Up
+import plasticine.templates.Utils.log2Up
 
 case class AXI4SlaveParameters(
   address:       Seq[AddressSet],

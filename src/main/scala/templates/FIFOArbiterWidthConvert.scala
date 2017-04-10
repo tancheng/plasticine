@@ -3,7 +3,7 @@ package plasticine.templates
 import util.HVec
 import chisel3._
 import chisel3.util._
-//import templates.Utils.log2Up
+import plasticine.templates.Utils.log2Up
 
 class FIFOArbiterWidthConvert(
   val win: List[Int],

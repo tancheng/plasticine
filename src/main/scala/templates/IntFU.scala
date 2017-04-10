@@ -4,6 +4,8 @@ import chisel3._
 import chisel3.util._
 //import plasticine.templates.hardfloat._
 
+import plasticine.templates.Utils.log2Up
+
 import scala.collection.immutable.Map
 
 /**

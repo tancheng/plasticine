@@ -2,7 +2,10 @@ package fringe
 
 import chisel3._
 import chisel3.util._
-import templates.Utils.log2Up
+import plasticine.templates.Utils.log2Up
+import plasticine.templates.RegFile
+import plasticine.templates.Depulser
+import plasticine.templates.MAGCore
 
 /**
  * Fringe: Top module for FPGA shell

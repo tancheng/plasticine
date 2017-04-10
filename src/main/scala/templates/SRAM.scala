@@ -2,7 +2,7 @@ package plasticine.templates
 
 import chisel3._
 import chisel3.util._
-//import templates.Utils.log2Up
+import plasticine.templates.Utils.log2Up
 
 class SRAM(val w: Int, val d: Int) extends Module {
   val addrWidth = log2Up(d)
