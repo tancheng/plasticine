@@ -7,30 +7,6 @@ import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
-trait Params
-
-case class CUBundle(p:PCUParams, cuConfig:Bundle) extends Bundle {
-    // Vector IO
-  val vecIn = Vec(p.numVectorIn, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
-  val vecOut = Vec(p.numVectorOut, Decoupled(Vec(p.v, UInt(p.w.W))))
-
-  // Scalar IO
-  val scalarIn = Vec(p.numScalarIn, Flipped(Decoupled(UInt(p.w.W))))
-  val scalarOut = Vec(p.numScalarOut, Decoupled(UInt(p.w.W)))
-
-  // Control IO
-  val controlIn = Input(Vec(p.numControlIn, Bool()))
-  val controlOut = Output(Vec(p.numControlOut, Bool()))
-
-  val config = cuConfig
-}
-
-trait CU extends Module {
-  def io:CUBundle
-  def p: PCUParams
-}
-
-
 /**
  * Compute Unit module
  * @param w: Word width
@@ -109,7 +85,7 @@ case class PCUConfig(p: PCUParams) extends Bundle {
 }
 
 class PCU(val p: PCUParams) extends CU {
-  val io = IO(CUBundle(p, Input(PCUConfig(p))))
+  val io = IO(CUIO(p, Input(PCUConfig(p))))
 
   val numReduceStages = log2Up(p.v)
 

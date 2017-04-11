@@ -35,7 +35,7 @@ trait PMUParams extends PCUParams {
   //val numControlIn: Int
   //val numControlOut: Int
   //val numWriteStages: Int
-  val wd:Int 
+  val wd: Int
 }
 
 case class PMUConfig(p: PMUParams) extends Bundle {
@@ -46,5 +46,5 @@ case class PMUConfig(p: PMUParams) extends Bundle {
 }
 
 class PMU(val p: PMUParams) extends CU {
-  val io = IO(CUBundle(p, Input(PMUConfig(p))))
+  val io = IO(CUIO(p, Input(PMUConfig(p))))
 }
