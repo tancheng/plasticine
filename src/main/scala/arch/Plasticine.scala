@@ -64,6 +64,12 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
 
   val cuParams = cus.map { cuCol => cuCol.map {_.p} }
 
+//  val argOutMuxes = List.tabulate(p.numArgOuts) { i =>
+//    Module(new MuxN(..))
+//  }
+//
+//  argOutMuxes.io.ins(?) := ?
+
   // PCUs
 //  val pcus = ListBuffer.tabulate(p.numCols) { i =>
 //      ListBuffer.tabulate(p.numRows) { j =>

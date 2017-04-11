@@ -26,7 +26,7 @@ abstract class AbstractBits {
 
   def toBinary[TP<:Any](x: TP, w: Int): List[Int] = x match {
     case num: Int => List.tabulate(w) { j => if (BigInt(num).testBit(j)) 1 else 0 }
-    case num: Float => toBinary(java.lang.Float.floatToRawIntBits(num), 32)
+    case num: Float => toBinary(java.lang.Float.floatToRawIntBits(num), w)
     case l: List[Any] => l.map { e => toBinary(e, w/l.size) }.flatten
     case s: AbstractBits => s.toBinary
     case _ => throw new Exception("Unsupported type for toBinary")
@@ -157,7 +157,6 @@ extends AbstractBits {
       toBinary(elem, w)
     }.flatten
   }
-
 }
 object PipeStageBits {
   def getRandom = {
@@ -408,10 +407,9 @@ object TopUnitBits {
  * Plasticine config information
  */
 case class PlasticineBits(
-  cu: List[ComputeUnitBits],
-  dataSwitch: List[CrossbarBits],
-  controlSwitch: List[CrossbarBits],
-  mu: List[MemoryUnitBits],
+  cu: List[List[ComputeUnitBits]],
+  dataSwitch: List[List[CrossbarBits]],
+  controlSwitch: List[List[CrossbarBits]],
   top: TopUnitBits
 ) extends AbstractBits
 
@@ -424,13 +422,13 @@ object PlasticineBits {
     numTokenOut: Int,
     numCounters: Int,
     numScratchpads: Int,
-    numMemoryUnits: Int
+//    numMemoryUnits: Int
   ) = {
     new PlasticineBits(
       List.tabulate(rows*cols) { i => ComputeUnitBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
       List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
       List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
-      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.getRandom },
+//      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.getRandom },
       TopUnitBits.getRandom(8))
       }
 
