@@ -425,9 +425,9 @@ object PlasticineBits {
 //    numMemoryUnits: Int
   ) = {
     new PlasticineBits(
-      List.tabulate(rows*cols) { i => ComputeUnitBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
+      List.tabulate(rows, cols) { case (i, j) => ComputeUnitBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) },
+      List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) },
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.getRandom },
       TopUnitBits.getRandom(8))
       }
@@ -443,10 +443,10 @@ object PlasticineBits {
     numMemoryUnits: Int
   ) = {
     new PlasticineBits(
-      List.tabulate(rows*cols) { i => ComputeUnitBits.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.zeroes(100) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.zeroes(100) },
-      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
+      List.tabulate(rows, cols) { case (i, j) => ComputeUnitBits.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) },
+      List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) },
+      //List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
       TopUnitBits.zeroes(8))
       }
 }
