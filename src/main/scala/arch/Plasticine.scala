@@ -1,13 +1,14 @@
 package plasticine.arch
 
+import util.HVec
 import chisel3._
 import chisel3.util._
 
 import plasticine.ArchConfig
+import plasticine.templates._
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import fringe._
-
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Set
 import scala.collection.mutable.ListBuffer
@@ -20,6 +21,16 @@ case class PlasticineParams(
   val pcuParams: List[PCUParams],
   val pmuParams: List[PMUParams]
 )
+
+case class PlasticineConfig(p: PlasticineParams) extends Bundle {
+
+  val pcuConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+
+  override def cloneType(): this.type = {
+    new PlasticineConfig(p).asInstanceOf[this.type]
+  }
+}
+
 
 class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module {
   val io = IO(new Bundle {
@@ -40,6 +51,11 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module {
 
 
   // Reconfiguration network: ASIC or CGRA?
+  val configSR = Module(new ShiftRegister(new PlasticineConfig(p)))
+  configSR.io.in.bits := io.config.bits
+  configSR.io.in.valid := io.config.valid
+
+  val config = configSR.io.config
 
   // PCUs
   val pcus = ListBuffer.tabulate(p.numCols) { i =>
