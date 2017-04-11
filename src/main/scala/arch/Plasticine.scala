@@ -30,12 +30,12 @@ case class PlasticineParams(
 
 case class PlasticineConfig(p: PlasticineParams, f: FringeParams) extends Bundle {
 
-  val pcuConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+  val cu = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
 
   // Dummy placeholders for real switch config interface
-  val vecSwitchConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
-  val scalarSwitchConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
-  val controlSwitchConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+  val vectorSwitch = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+  val scalarSwitch = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+  val controlSwitch = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
 
   val argOutMuxSelect = Vec(f.numArgOuts, UInt(log2Up(p.numArgOutSelections).W))
   override def cloneType(): this.type = {

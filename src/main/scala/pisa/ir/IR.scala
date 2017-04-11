@@ -384,7 +384,8 @@ case class PlasticineBits(
   cu: List[List[ComputeUnitBits]],
   vectorSwitch: List[List[CrossbarBits]],
   scalarSwitch: List[List[CrossbarBits]],
-  controlSwitch: List[List[CrossbarBits]]
+  controlSwitch: List[List[CrossbarBits]],
+  argOutMuxSelect: List[Int]
 ) extends AbstractBits
 
 object PlasticineBits {
@@ -402,7 +403,8 @@ object PlasticineBits {
       List.tabulate(rows, cols) { case (i, j) => ComputeUnitBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) },
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) },
-      List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) }
+      List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) },
+      List.fill(32) { math.abs(Random.nextInt()) }
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.getRandom },
   )}
 
@@ -420,7 +422,8 @@ object PlasticineBits {
       List.tabulate(rows, cols) { case (i, j) => ComputeUnitBits.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) },
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) },
-      List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) }
+      List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) },
+      List.fill(32) { 0 }
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
   )}
 }
