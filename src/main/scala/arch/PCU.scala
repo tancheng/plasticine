@@ -77,7 +77,7 @@ class PipeStageBundle(r: Int, w: Int) extends Bundle {
 }
 
 case class PCUConfig(p: PCUParams) extends Bundle {
-  var stages = Vec(p.d, new PipeStageBundle(p.r, p.w))
+  val stages = Vec(p.d, new PipeStageBundle(p.r, p.w))
 
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]
