@@ -27,6 +27,7 @@ case class CUBundle(p:PCUParams, cuConfig:Bundle) extends Bundle {
 
 trait CU extends Module {
   def io:CUBundle
+  def p: PCUParams
 }
 
 
@@ -107,7 +108,7 @@ case class PCUConfig(p: PCUParams) extends Bundle {
   }
 }
 
-class PCU(p: PCUParams) extends CU {
+class PCU(val p: PCUParams) extends CU {
   val io = IO(CUBundle(p, Input(PCUConfig(p))))
 
   val numReduceStages = log2Up(p.v)

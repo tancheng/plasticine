@@ -6,6 +6,7 @@ import plasticine.templates.Opcodes
 import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
+import plasticine.templates.{CrossbarOpcode, CrossbarCore}
 
 case class VectorSwitchParams(numIns:Int, numOuts:Int, w:Int, v:Int)
 case class ScalarSwitchParams(numIns:Int, numOuts:Int, w:Int)
@@ -16,6 +17,7 @@ class VectorSwitch(p: VectorSwitchParams) extends Module {
     // Vector IO
     val ins = Vec(p.numIns, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
     val outs = Vec(p.numOuts, Decoupled(Vec(p.v, UInt(p.w.W))))
+    val config = Input(CrossbarOpcode(p.numIns, p.numOuts))
   })
 }
 
@@ -24,6 +26,7 @@ class ScalarSwitch(p: ScalarSwitchParams) extends Module {
     //// Scalar IO
     val ins = Vec(p.numIns, Flipped(Decoupled(UInt(p.w.W))))
     val outs = Vec(p.numOuts, Decoupled(UInt(p.w.W)))
+    val config = Input(CrossbarOpcode(p.numIns, p.numOuts))
   })
 }
 
@@ -32,6 +35,7 @@ class ControlSwitch(p: ControlSwitchParams) extends Module {
     //// Scalar IO
     val ins = Input(Vec(p.numIns, Bool()))
     val outs = Output(Vec(p.numOuts, Bool()))
+    val config = Input(CrossbarOpcode(p.numIns, p.numOuts))
   })
 }
 

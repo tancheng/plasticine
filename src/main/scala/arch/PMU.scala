@@ -45,6 +45,6 @@ case class PMUConfig(p: PMUParams) extends Bundle {
   }
 }
 
-class PMU(p: PMUParams) extends CU {
+class PMU(val p: PMUParams) extends CU {
   val io = IO(CUBundle(p, Input(PMUConfig(p))))
 }

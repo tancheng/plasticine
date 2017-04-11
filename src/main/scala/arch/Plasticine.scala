@@ -62,6 +62,8 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
 
   val config = configSR.io.config
 
+  val cuParams = cus.map { cuCol => cuCol.map {_.p} }
+
   // PCUs
 //  val pcus = ListBuffer.tabulate(p.numCols) { i =>
 //      ListBuffer.tabulate(p.numRows) { j =>
