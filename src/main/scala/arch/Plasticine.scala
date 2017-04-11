@@ -15,14 +15,20 @@ import scala.collection.mutable.ListBuffer
 
 import java.io.PrintWriter
 
+trait GeneratedPlasticineParams {
+  val numRows: Int = 2
+  val numCols: Int = 2
+  val w: Int = 32
+  val numArgOutSelections: Int = (numRows+1) * 2
+}
+
 case class PlasticineParams(
-  val numRows: Int,
-  val numCols: Int,
   val pcuParams: List[PCUParams],
   val pmuParams: List[PMUParams]
-)
+) extends GeneratedPlasticineParams
 
-case class PlasticineConfig(p: PlasticineParams) extends Bundle {
+
+case class PlasticineConfig(p: PlasticineParams, f: FringeParams) extends Bundle {
 
   val pcuConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
 
@@ -31,8 +37,9 @@ case class PlasticineConfig(p: PlasticineParams) extends Bundle {
   val scalarSwitchConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
   val controlSwitchConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
 
+  val argOutMuxSelect = Vec(f.numArgOuts, UInt(log2Up(p.numArgOutSelections).W))
   override def cloneType(): this.type = {
-    new PlasticineConfig(p).asInstanceOf[this.type]
+    new PlasticineConfig(p, f).asInstanceOf[this.type]
   }
 }
 
@@ -56,7 +63,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
 
 
   // Reconfiguration network: ASIC or CGRA?
-  val configSR = Module(new ShiftRegister(new PlasticineConfig(p)))
+  val configSR = Module(new ShiftRegister(new PlasticineConfig(p, f)))
   configSR.io.in.bits := io.config.bits
   configSR.io.in.valid := io.config.valid
 
@@ -64,9 +71,13 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
 
   val cuParams = cus.map { cuCol => cuCol.map {_.p} }
 
-//  val argOutMuxes = List.tabulate(p.numArgOuts) { i =>
-//    Module(new MuxN(..))
-//  }
+  val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
+    val mux = Module(new MuxN(p.numArgOutSelections, p.w))
+    io.argOuts(i).bits := mux.io.out
+    mux.io.sel := config.argOutMuxSelect(i)
+    mux
+  }
+
 //
 //  argOutMuxes.io.ins(?) := ?
 

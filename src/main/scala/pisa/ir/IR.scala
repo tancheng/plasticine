@@ -378,75 +378,48 @@ object ConnBoxBits {
 }
 
 /**
- * TopUnitBits
- */
-case class TopUnitBits(
-  doneConnBox: ConnBoxBits,
-//  dataVldConnBox: ConnBoxBits,
-  argOutConnBox: ConnBoxBits
-) extends AbstractBits
-object TopUnitBits {
-  def getRandom(numInputs: Int) = {
-    new TopUnitBits(
-      ConnBoxBits.getRandom(numInputs),
-//      ConnBoxBits.getRandom(numInputs),
-      ConnBoxBits.getRandom(numInputs)
-      )
-  }
-  def zeroes(numInputs: Int) = {
-    new TopUnitBits(
-      ConnBoxBits.zeroes(numInputs),
-//      ConnBoxBits.zeroes(numInputs),
-      ConnBoxBits.zeroes(numInputs)
-      )
-  }
-}
-
-
-/**
  * Plasticine config information
  */
 case class PlasticineBits(
   cu: List[List[ComputeUnitBits]],
   dataSwitch: List[List[CrossbarBits]],
-  controlSwitch: List[List[CrossbarBits]],
-  top: TopUnitBits
+  controlSwitch: List[List[CrossbarBits]]
 ) extends AbstractBits
 
 object PlasticineBits {
-  def getRandom(
-    d: Int,
-    rows: Int,
-    cols: Int,
-    numTokenIn: Int,
-    numTokenOut: Int,
-    numCounters: Int,
-    numScratchpads: Int,
+//  def getRandom(
+//    d: Int,
+//    rows: Int,
+//    cols: Int,
+//    numTokenIn: Int,
+//    numTokenOut: Int,
+//    numCounters: Int,
+//    numScratchpads: Int
+////    numMemoryUnits: Int
+//  ) = {
+//    new PlasticineBits(
+//      List.tabulate(rows*cols) { i => ComputeUnitBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+//      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
+//      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) }
+////      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.getRandom },
+////      TopUnitBits.getRandom(8))
+//  )}
+//
+//  def zeroes(
+//    d: Int,
+//    rows: Int,
+//    cols: Int,
+//    numTokenIn: Int,
+//    numTokenOut: Int,
+//    numCounters: Int,
+//    numScratchpads: Int,
 //    numMemoryUnits: Int
-  ) = {
-    new PlasticineBits(
-      List.tabulate(rows*cols) { i => ComputeUnitBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
-//      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.getRandom },
-      TopUnitBits.getRandom(8))
-      }
-
-  def zeroes(
-    d: Int,
-    rows: Int,
-    cols: Int,
-    numTokenIn: Int,
-    numTokenOut: Int,
-    numCounters: Int,
-    numScratchpads: Int,
-    numMemoryUnits: Int
-  ) = {
-    new PlasticineBits(
-      List.tabulate(rows*cols) { i => ComputeUnitBits.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.zeroes(100) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.zeroes(100) },
-      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
-      TopUnitBits.zeroes(8))
-      }
+//  ) = {
+//    new PlasticineBits(
+//      List.tabulate(rows*cols) { i => ComputeUnitBits.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+//      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.zeroes(100) },
+//      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.zeroes(100) }
+////      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
+////      TopUnitBits.zeroes(8))
+//  )}
 }
