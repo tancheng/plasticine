@@ -421,7 +421,7 @@ object PlasticineBits {
     numTokenIn: Int,
     numTokenOut: Int,
     numCounters: Int,
-    numScratchpads: Int,
+    numScratchpads: Int
 //    numMemoryUnits: Int
   ) = {
     new PlasticineBits(
