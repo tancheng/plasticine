@@ -1,5 +1,5 @@
 package plasticine.templates
-import plasticine.CommonMain
+import plasticine.templates.CommonMain
 
 import chisel3._
 import chisel3.util._
@@ -7,6 +7,7 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 import scala.collection.mutable.Queue
 import scala.collection.mutable.HashMap
+import fringe._
 
 class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester(c) {
   val size = 64

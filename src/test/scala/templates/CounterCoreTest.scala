@@ -1,7 +1,7 @@
 // See LICENSE for license details.
 
 package plasticine.templates
-import plasticine.CommonMain
+import plasticine.templates.CommonMain
 
 import chisel3.core.Module
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
