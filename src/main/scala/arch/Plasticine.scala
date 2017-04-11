@@ -26,6 +26,11 @@ case class PlasticineConfig(p: PlasticineParams) extends Bundle {
 
   val pcuConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
 
+  // Dummy placeholders for real switch config interface
+  val vecSwitchConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+  val scalarSwitchConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+  val controlSwitchConfig = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+
   override def cloneType(): this.type = {
     new PlasticineConfig(p).asInstanceOf[this.type]
   }
@@ -61,6 +66,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module {
   val pcus = ListBuffer.tabulate(p.numCols) { i =>
       ListBuffer.tabulate(p.numRows) { j =>
         val pcu = Module(new PCU(p.pcuParams(i*p.numCols+j)))
+        pcu.io.config := config.pcuConfig(i*p.numCols+j)
         pcu
       }
     }
