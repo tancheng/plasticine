@@ -3,7 +3,7 @@ import chisel3._
 import chisel3.util._
 import scala.collection.mutable.ListBuffer
 
-case class MyPCUParams(numScalarIn:Int, numScalarOut:Int, numVectorIn:Int, numVectorOut:Int, numControlIn:Int, numControlOut:Int) extends PCUParams {
+case class GeneratedPCUParams(numScalarIn:Int, numScalarOut:Int, numVectorIn:Int, numVectorOut:Int, numControlIn:Int, numControlOut:Int) extends PCUParams {
   val w = 32
   val v = 16
   val numCounters = 8
@@ -29,11 +29,11 @@ case class MyPCUParams(numScalarIn:Int, numScalarOut:Int, numVectorIn:Int, numVe
   val r = regColors.size
 }
 
-case class MyPMUParams(numScalarIn:Int, numScalarOut:Int, numVectorIn:Int, numVectorOut:Int, numControlIn:Int, numControlOut:Int) extends PMUParams {
+case class GeneratedPMUParams(numScalarIn:Int, numScalarOut:Int, numVectorIn:Int, numVectorOut:Int, numControlIn:Int, numControlOut:Int) extends PMUParams {
   val w = 32
   val v = 16
   val numCounters = 8
-  val numUDCs = 4
+  val numUDCs = 0
   val regColors = ListBuffer[List[RegColor]]()
   regColors += List(CounterReg)
   regColors += List(CounterReg)
@@ -62,4 +62,10 @@ trait PlasticineArch extends PlasticineArch0 with PlasticineArch1 with Plasticin
   val csbs = Array.fill(3)(Array.ofDim[ControlSwitch](3))
   val vsbs = Array.fill(3)(Array.ofDim[VectorSwitch](3))
   val ssbs = Array.fill(3)(Array.ofDim[ScalarSwitch](3))
+}
+trait GeneratedFringeParams {
+  self:FringeParams =>
+  val numArgIns = 3
+  val numArgOuts = 3
+  val numArgOutSelections = List(6,6,6)
 }

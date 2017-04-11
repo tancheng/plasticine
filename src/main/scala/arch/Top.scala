@@ -9,11 +9,9 @@ import plasticine.templates.Utils.log2Up
 case class FringeParams(
   val addrWidth: Int,
   val dataWidth: Int,
-  val numArgIns: Int,
-  val numArgOuts: Int,
   val loadStreamInfo: List[StreamParInfo],
   val storeStreamInfo: List[StreamParInfo]
-)
+) extends GeneratedFringeParams
 
 case class TopParams(
   val plasticineParams: PlasticineParams,
