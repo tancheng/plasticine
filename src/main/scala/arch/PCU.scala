@@ -85,13 +85,14 @@ case class PCUConfig(p: PCUParams) extends Bundle {
 }
 
 class PCU(val p: PCUParams) extends CU {
-  val io = IO(CUIO(p, Input(PCUConfig(p))))
+  val io = IO(CUIO(p, PCUConfig(p)))
 
   val numReduceStages = log2Up(p.v)
 
   // Which stages contain the fused multiply-add (FMA) unit?
   val fmaStages = (p.d/2 until p.d).toList
 
+  io.scalarOut(0).bits := io.config.stages(0).opcode
   // Sanity check parameters for validity
   // #stages: Currently there must be at least one 'regular' stage
   // after 'rwStages' and before 'reduction' stages because of the way
