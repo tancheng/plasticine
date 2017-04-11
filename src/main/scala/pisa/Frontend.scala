@@ -17,7 +17,7 @@ object Frontend {
     }
 
     val file = args(0)
-    val parsedNode: AbstractConfig = Parser(file)
+    val parsedNode: AbstractBits = Parser(file)
     println(s"Parsed successfully, parsedNode = $parsedNode")
   }
 

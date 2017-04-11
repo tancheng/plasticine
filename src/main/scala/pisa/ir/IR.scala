@@ -16,7 +16,7 @@ import plasticine.arch._
 /**
  * Base class for all Config nodes
  */
-abstract class AbstractConfig {
+abstract class AbstractBits {
   protected def encodeOneHot(x: Int) = 1 << x
   protected def getRegNum(s: String) = if (s.size <= 1) 0 else s.drop(1).toInt
   def parseValue(x: String):Int = x(0) match {
@@ -28,7 +28,7 @@ abstract class AbstractConfig {
     case num: Int => List.tabulate(w) { j => if (BigInt(num).testBit(j)) 1 else 0 }
     case num: Float => toBinary(java.lang.Float.floatToRawIntBits(num), 32)
     case l: List[Any] => l.map { e => toBinary(e, w/l.size) }.flatten
-    case s: AbstractConfig => s.toBinary
+    case s: AbstractBits => s.toBinary
     case _ => throw new Exception("Unsupported type for toBinary")
   }
 
@@ -52,7 +52,7 @@ case class TREE() extends DataSource
 /**
  * Parsed config information for a single counter
  */
-case class CounterRCConfig(
+case class CounterRCBits(
   max: Int = 0,
   stride: Int = 0,
   maxConst: Int = 0,
@@ -60,11 +60,11 @@ case class CounterRCConfig(
   startDelay: Int = 0,
   endDelay: Int = 0,
   onlyDelay: Int = 0
-) extends AbstractConfig {
+) extends AbstractBits {
 }
-object CounterRCConfig {
+object CounterRCBits {
   def getRandom = {
-    new CounterRCConfig(
+    new CounterRCBits(
         math.abs(Random.nextInt(16)),
         math.abs(Random.nextInt(16)),
         Random.nextInt(2),
@@ -75,31 +75,31 @@ object CounterRCConfig {
       )
   }
   def zeroes = {
-    new CounterRCConfig()
+    new CounterRCBits()
   }
 }
 
 /**
  * CounterChain config information
  */
-case class CounterChainConfig(chain: List[Int], counters: List[CounterRCConfig]) extends AbstractConfig
-object CounterChainConfig {
+case class CounterChainBits(chain: List[Int], counters: List[CounterRCBits]) extends AbstractBits
+object CounterChainBits {
   def getRandom(numCounters: Int) = {
-    new CounterChainConfig(
+    new CounterChainBits(
       List.fill(numCounters) { Random.nextInt(16) },
-      List.fill(numCounters) { CounterRCConfig.getRandom }
+      List.fill(numCounters) { CounterRCBits.getRandom }
       )
   }
   def zeroes(numCounters: Int) = {
-    new CounterChainConfig(
+    new CounterChainBits(
       List.fill(numCounters) { 0 },
-      List.fill(numCounters) { CounterRCConfig.zeroes }
+      List.fill(numCounters) { CounterRCBits.zeroes }
       )
   }
 }
 
-case class OperandConfig(dataSrc: Int = 0, value: Int = 0)(t: OperandBundle)
-extends AbstractConfig {
+case class OperandBits(dataSrc: Int = 0, value: Int = 0)(t: OperandBundle)
+extends AbstractBits {
   // Get names of case class fields
   def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
       case m: MethodSymbol if m.isCaseAccessor => m
@@ -120,25 +120,25 @@ extends AbstractConfig {
   }
 
 }
-object OperandConfig {
+object OperandBits {
   def getRandom = {
-    new OperandConfig(math.abs(Random.nextInt) % 4, math.abs(Random.nextInt) % 4)(new OperandBundle(4))
+    new OperandBits(math.abs(Random.nextInt) % 4, math.abs(Random.nextInt) % 4)(new OperandBundle(4))
   }
   def zeroes = {
-    new OperandConfig()(new OperandBundle(4))
+    new OperandBits()(new OperandBundle(4))
   }
 
 }
 
-case class PipeStageConfig(
-  opA: OperandConfig = OperandConfig()(null),
-  opB: OperandConfig = OperandConfig()(null),
-  opC: OperandConfig = OperandConfig()(null),
+case class PipeStageBits(
+  opA: OperandBits = OperandBits()(null),
+  opB: OperandBits = OperandBits()(null),
+  opC: OperandBits = OperandBits()(null),
   opcode: Int = 0,
   result: Int = 0,
   fwd: Map[Int, Int] = Map[Int, Int]()
 )(t: PipeStageBundle)
-extends AbstractConfig {
+extends AbstractBits {
   // Get names of case class fields
   def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
       case m: MethodSymbol if m.isCaseAccessor => m
@@ -159,19 +159,19 @@ extends AbstractConfig {
   }
 
 }
-object PipeStageConfig {
+object PipeStageBits {
   def getRandom = {
-    new PipeStageConfig(
-        OperandConfig.getRandom,
-        OperandConfig.getRandom,
-        OperandConfig.getRandom,
+    new PipeStageBits(
+        OperandBits.getRandom,
+        OperandBits.getRandom,
+        OperandBits.getRandom,
         math.abs(Random.nextInt) % Opcodes.size,
         math.abs(Random.nextInt) % 4,
         Map[Int,Int]()
       )(null)
   }
   def zeroes = {
-    new PipeStageConfig()(null)
+    new PipeStageBits()(null)
   }
 }
 
@@ -182,9 +182,9 @@ object PipeStageConfig {
  */
 case class SrcValueTuple(val src: Int = 0, val value: Int = 0)
 
-case class BankingConfig(mode: Int = 0, strideLog2: Int = 0) extends AbstractConfig
+case class BankingBits(mode: Int = 0, strideLog2: Int = 0) extends AbstractBits
 
-case class ScratchpadConfig(
+case class ScratchpadBits(
   wa: SrcValueTuple = SrcValueTuple(),
   ra: SrcValueTuple = SrcValueTuple(),
   wd: Int = 0,
@@ -193,15 +193,15 @@ case class ScratchpadConfig(
   rswap: Int = 0,
   enqEn: Int = 0,
   deqEn: Int = 0,
-  banking: BankingConfig = BankingConfig(),
+  banking: BankingBits = BankingBits(),
   numBufs: Int = 0,
   isReadFifo: Int = 0,
   isWriteFifo: Int = 0,
   fifoSize: Int = 0
-) extends AbstractConfig
-object ScratchpadConfig {
+) extends AbstractBits
+object ScratchpadBits {
   def getRandom = {
-    new ScratchpadConfig(
+    new ScratchpadBits(
       SrcValueTuple(0, 0), // wa
       SrcValueTuple(0, 0), // ra
       0,
@@ -210,7 +210,7 @@ object ScratchpadConfig {
       0,
       0,
       0,
-      BankingConfig(0, 1),
+      BankingBits(0, 1),
       1,
       0,
       0,
@@ -218,118 +218,118 @@ object ScratchpadConfig {
     )
   }
   def zeroes = {
-    new ScratchpadConfig()
+    new ScratchpadBits()
   }
 }
-case class FIFOConfig (
+case class FIFOBits (
   chainWrite: Int = 0,
   chainRead: Int = 0
-) extends AbstractConfig
+) extends AbstractBits
 
-case class MemoryUnitConfig (
+case class MemoryUnitBits (
   scatterGather: Int = 0,
   isWr: Int = 0,
-  counterChain: CounterChainConfig,
-  control: CUControlBoxConfig
-) extends AbstractConfig
-object MemoryUnitConfig {
+  counterChain: CounterChainBits,
+  control: CUControlBoxBits
+) extends AbstractBits
+object MemoryUnitBits {
   def getRandom = {
-    MemoryUnitConfig(0, 0, CounterChainConfig.getRandom(ArchConfig.numCounters),
-      CUControlBoxConfig.getRandom(ArchConfig.numTokens, ArchConfig.numTokens, ArchConfig.numCounters)
+    MemoryUnitBits(0, 0, CounterChainBits.getRandom(ArchConfig.numCounters),
+      CUControlBoxBits.getRandom(ArchConfig.numTokens, ArchConfig.numTokens, ArchConfig.numCounters)
       )
   }
   def zeroes = {
-    new MemoryUnitConfig(0, 0, CounterChainConfig.zeroes(ArchConfig.numCounters),
-      CUControlBoxConfig.zeroes(ArchConfig.numTokens, ArchConfig.numTokens, ArchConfig.numCounters)
+    new MemoryUnitBits(0, 0, CounterChainBits.zeroes(ArchConfig.numCounters),
+      CUControlBoxBits.zeroes(ArchConfig.numTokens, ArchConfig.numTokens, ArchConfig.numCounters)
       )
   }
 }
-case class ComputeUnitConfig(
-  counterChain: CounterChainConfig,
-  scalarXbar: CrossbarConfig,
-  scratchpads: List[ScratchpadConfig],
-  pipeStage: List[PipeStageConfig],
-  control: CUControlBoxConfig,
+case class ComputeUnitBits(
+  counterChain: CounterChainBits,
+  scalarXbar: CrossbarBits,
+  scratchpads: List[ScratchpadBits],
+  pipeStage: List[PipeStageBits],
+  control: CUControlBoxBits,
   scalarInMux: List[Int],
   scalarOutMux: Int
-//  dataInXbar: CrossbarConfig
-) extends AbstractConfig
-object ComputeUnitConfig {
+//  dataInXbar: CrossbarBits
+) extends AbstractBits
+object ComputeUnitBits {
   def getRandom(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
-    new ComputeUnitConfig (
-      CounterChainConfig.getRandom(numCounters),
-      CrossbarConfig.getRandom(ArchConfig.numScalarRegisters),
-      List.tabulate(numScratchpads) { i => ScratchpadConfig.getRandom },
-      List.tabulate(d) { i => PipeStageConfig.getRandom },
-      CUControlBoxConfig.getRandom(numTokenIn, numTokenOut, numCounters),
+    new ComputeUnitBits (
+      CounterChainBits.getRandom(numCounters),
+      CrossbarBits.getRandom(ArchConfig.numScalarRegisters),
+      List.tabulate(numScratchpads) { i => ScratchpadBits.getRandom },
+      List.tabulate(d) { i => PipeStageBits.getRandom },
+      CUControlBoxBits.getRandom(numTokenIn, numTokenOut, numCounters),
       List.fill(numScratchpads) { 0 },
       0
       )
   }
   def zeroes(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
-    new ComputeUnitConfig (
-      CounterChainConfig.zeroes(numCounters),
-      CrossbarConfig.zeroes(ArchConfig.numScalarRegisters),
-      List.tabulate(numScratchpads) { i => ScratchpadConfig.zeroes },
-      List.tabulate(d) { i => PipeStageConfig.zeroes },
-      CUControlBoxConfig.zeroes(numTokenIn, numTokenOut, numCounters),
+    new ComputeUnitBits (
+      CounterChainBits.zeroes(numCounters),
+      CrossbarBits.zeroes(ArchConfig.numScalarRegisters),
+      List.tabulate(numScratchpads) { i => ScratchpadBits.zeroes },
+      List.tabulate(d) { i => PipeStageBits.zeroes },
+      CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
       List.fill(numScratchpads) { 0 },
       0
       )
   }
 
 }
-case class CUControlBoxConfig(
-  tokenOutLUT: List[LUTConfig],
-  enableLUT: List[LUTConfig],
-  tokenDownLUT: List[LUTConfig],
+case class CUControlBoxBits(
+  tokenOutLUT: List[LUTBits],
+  enableLUT: List[LUTBits],
+  tokenDownLUT: List[LUTBits],
   udcInit: List[Int],
   udcInitAtConfig: List[Int],
-  decXbar: CrossbarConfig,
-  incXbar: CrossbarConfig,
-  tokenInXbar: CrossbarConfig,
-  doneXbar: CrossbarConfig,
+  decXbar: CrossbarBits,
+  incXbar: CrossbarBits,
+  tokenInXbar: CrossbarBits,
+  doneXbar: CrossbarBits,
   enableMux: List[Boolean],
   syncTokenMux: List[Int],
-  tokenOutXbar: CrossbarConfig,
+  tokenOutXbar: CrossbarBits,
   fifoAndTree: List[Int],
   tokenInAndTree: List[Int],
   fifoMux: List[Int]
-) extends AbstractConfig
-object CUControlBoxConfig {
+) extends AbstractBits
+object CUControlBoxBits {
   def getRandom(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
-    new CUControlBoxConfig(
-        List.fill(numTokenOut) { LUTConfig.getRandom(2) }, // tokenOutLUT
-        List.fill(numCounters) { LUTConfig.getRandom(numCounters)}, // enableLUT
-        List.fill(8) { LUTConfig.getRandom(numCounters+1) }, // tokenDownLUT,
+    new CUControlBoxBits(
+        List.fill(numTokenOut) { LUTBits.getRandom(2) }, // tokenOutLUT
+        List.fill(numCounters) { LUTBits.getRandom(numCounters)}, // enableLUT
+        List.fill(8) { LUTBits.getRandom(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
-        List.fill(numCounters) { math.abs(Random.nextInt) % 1 }, // udcInitAtConfig,
-        CrossbarConfig.getRandom(numCounters), // decXbar,
-        CrossbarConfig.getRandom(2*numCounters), // incXbar,
-        CrossbarConfig.getRandom(numCounters), // tokenInXbar,
-        CrossbarConfig.getRandom(2*numCounters), // doneXbar,
+        List.fill(numCounters) { math.abs(Random.nextInt) % 1 }, // udcInitAtBits,
+        CrossbarBits.getRandom(numCounters), // decXbar,
+        CrossbarBits.getRandom(2*numCounters), // incXbar,
+        CrossbarBits.getRandom(numCounters), // tokenInXbar,
+        CrossbarBits.getRandom(2*numCounters), // doneXbar,
         List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
         List.fill(8) { math.abs(Random.nextInt) % 2 }, // syncTokenMux
-        CrossbarConfig.getRandom(numCounters), // tokenOutXbar,
+        CrossbarBits.getRandom(numCounters), // tokenOutXbar,
         List.fill(ArchConfig.numScratchpads) { 0 },  // fifoAndTree
         List.fill(numTokenIn) { 0 },  // tokenInAndTree
         List.fill(numCounters) { 0 }  // fifoMux
       )
   }
   def zeroes(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
-    new CUControlBoxConfig(
-        List.fill(numTokenOut) { LUTConfig.zeroes(2) }, // tokenOutLUT
-        List.fill(numCounters) { LUTConfig.zeroes(numCounters)}, // enableLUT
-        List.fill(8) { LUTConfig.zeroes(numCounters+1) }, // tokenDownLUT,
+    new CUControlBoxBits(
+        List.fill(numTokenOut) { LUTBits.zeroes(2) }, // tokenOutLUT
+        List.fill(numCounters) { LUTBits.zeroes(numCounters)}, // enableLUT
+        List.fill(8) { LUTBits.zeroes(numCounters+1) }, // tokenDownLUT,
         List.fill(numCounters) { 0 }, // udcInit,
         List.fill(numCounters) { 0 }, // udcInitAtConfig,
-        CrossbarConfig.zeroes(numCounters), // decXbar,
-        CrossbarConfig.zeroes(2*numCounters), // incXbar,
-        CrossbarConfig.zeroes(numCounters), // tokenInXbar,
-        CrossbarConfig.zeroes(2*numCounters), // doneXbar,
+        CrossbarBits.zeroes(numCounters), // decXbar,
+        CrossbarBits.zeroes(2*numCounters), // incXbar,
+        CrossbarBits.zeroes(numCounters), // tokenInXbar,
+        CrossbarBits.zeroes(2*numCounters), // doneXbar,
         List.fill(numCounters) { false }, // enableMux,
         List.fill(8) { 0 }, // syncTokenMux
-        CrossbarConfig.zeroes(numCounters), // tokenOutXbar,
+        CrossbarBits.zeroes(numCounters), // tokenOutXbar,
         List.fill(ArchConfig.numScratchpads) { 0 }, // fifoAndTree
         List.fill(numTokenIn) { 0 },  // tokenInAndTree
         List.fill(numCounters) { 0 }  // fifoMux
@@ -342,63 +342,63 @@ object CUControlBoxConfig {
  * In this case, the user specifies 'x' for don't care, and 0,1,.. for actual values.
  * Add 1 to each value that is non-'x' if set to true.
  */
-case class CrossbarConfig(outSelect: List[Int]) extends AbstractConfig
-object CrossbarConfig {
+case class CrossbarBits(outSelect: List[Int]) extends AbstractBits
+object CrossbarBits {
   def getRandom(numOutputs: Int) = {
-    new CrossbarConfig(List.fill(1+numOutputs) { math.abs(Random.nextInt) % 2 })
+    new CrossbarBits(List.fill(1+numOutputs) { math.abs(Random.nextInt) % 2 })
   }
   def zeroes(numOutputs: Int) = {
-    new CrossbarConfig(List.fill(1+numOutputs) { 0 })
+    new CrossbarBits(List.fill(1+numOutputs) { 0 })
   }
 }
 
 /**
  * LUT config information
  */
-case class LUTConfig(table: List[Int]) extends AbstractConfig
-object LUTConfig {
+case class LUTBits(table: List[Int]) extends AbstractBits
+object LUTBits {
   def getRandom(numInputs: Int) = {
-    new LUTConfig(List.tabulate(1 << numInputs) { i => math.abs(Random.nextInt(2)) })
+    new LUTBits(List.tabulate(1 << numInputs) { i => math.abs(Random.nextInt(2)) })
   }
   def zeroes(numInputs: Int) = {
-    new LUTConfig(List.fill(1 << numInputs) { 0 })
+    new LUTBits(List.fill(1 << numInputs) { 0 })
   }
 }
 
 /**
  * Connection box config information
  */
-case class ConnBoxConfig(sel: Int = 0) extends AbstractConfig
-object ConnBoxConfig {
+case class ConnBoxBits(sel: Int = 0) extends AbstractBits
+object ConnBoxBits {
   def getRandom(numInputs: Int) = {
-    new ConnBoxConfig(math.abs(Random.nextInt(numInputs)))
+    new ConnBoxBits(math.abs(Random.nextInt(numInputs)))
   }
   def zeroes(numInputs: Int) = {
-    new ConnBoxConfig()
+    new ConnBoxBits()
   }
 }
 
 /**
- * TopUnitConfig
+ * TopUnitBits
  */
-case class TopUnitConfig(
-  doneConnBox: ConnBoxConfig,
-//  dataVldConnBox: ConnBoxConfig,
-  argOutConnBox: ConnBoxConfig
-) extends AbstractConfig
-object TopUnitConfig {
+case class TopUnitBits(
+  doneConnBox: ConnBoxBits,
+//  dataVldConnBox: ConnBoxBits,
+  argOutConnBox: ConnBoxBits
+) extends AbstractBits
+object TopUnitBits {
   def getRandom(numInputs: Int) = {
-    new TopUnitConfig(
-      ConnBoxConfig.getRandom(numInputs),
-//      ConnBoxConfig.getRandom(numInputs),
-      ConnBoxConfig.getRandom(numInputs)
+    new TopUnitBits(
+      ConnBoxBits.getRandom(numInputs),
+//      ConnBoxBits.getRandom(numInputs),
+      ConnBoxBits.getRandom(numInputs)
       )
   }
   def zeroes(numInputs: Int) = {
-    new TopUnitConfig(
-      ConnBoxConfig.zeroes(numInputs),
-//      ConnBoxConfig.zeroes(numInputs),
-      ConnBoxConfig.zeroes(numInputs)
+    new TopUnitBits(
+      ConnBoxBits.zeroes(numInputs),
+//      ConnBoxBits.zeroes(numInputs),
+      ConnBoxBits.zeroes(numInputs)
       )
   }
 }
@@ -407,15 +407,15 @@ object TopUnitConfig {
 /**
  * Plasticine config information
  */
-case class PlasticineConfig(
-  cu: List[ComputeUnitConfig],
-  dataSwitch: List[CrossbarConfig],
-  controlSwitch: List[CrossbarConfig],
-  mu: List[MemoryUnitConfig],
-  top: TopUnitConfig
-) extends AbstractConfig
+case class PlasticineBits(
+  cu: List[ComputeUnitBits],
+  dataSwitch: List[CrossbarBits],
+  controlSwitch: List[CrossbarBits],
+  mu: List[MemoryUnitBits],
+  top: TopUnitBits
+) extends AbstractBits
 
-object PlasticineConfig {
+object PlasticineBits {
   def getRandom(
     d: Int,
     rows: Int,
@@ -426,12 +426,12 @@ object PlasticineConfig {
     numScratchpads: Int,
     numMemoryUnits: Int
   ) = {
-    new PlasticineConfig(
-      List.tabulate(rows*cols) { i => ComputeUnitConfig.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.getRandom(8) },
-      List.tabulate(numMemoryUnits) { i => MemoryUnitConfig.getRandom },
-      TopUnitConfig.getRandom(8))
+    new PlasticineBits(
+      List.tabulate(rows*cols) { i => ComputeUnitBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.getRandom(8) },
+      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.getRandom },
+      TopUnitBits.getRandom(8))
       }
 
   def zeroes(
@@ -444,11 +444,11 @@ object PlasticineConfig {
     numScratchpads: Int,
     numMemoryUnits: Int
   ) = {
-    new PlasticineConfig(
-      List.tabulate(rows*cols) { i => ComputeUnitConfig.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(100) },
-      List.tabulate((rows+1)*(cols+1)) { i => CrossbarConfig.zeroes(100) },
-      List.tabulate(numMemoryUnits) { i => MemoryUnitConfig.zeroes },
-      TopUnitConfig.zeroes(8))
+    new PlasticineBits(
+      List.tabulate(rows*cols) { i => ComputeUnitBits.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.zeroes(100) },
+      List.tabulate((rows+1)*(cols+1)) { i => CrossbarBits.zeroes(100) },
+      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
+      TopUnitBits.zeroes(8))
       }
 }
