@@ -8,6 +8,9 @@ import plasticine.pisa.parser._
 import plasticine.templates.Opcodes
 import scala.collection.mutable.HashMap
 import scala.util.Random
+import scala.reflect.runtime.universe._
+import plasticine.arch._
+
 //import Chisel._
 
 /**
@@ -19,6 +22,19 @@ abstract class AbstractConfig {
   def parseValue(x: String):Int = x(0) match {
     case 'x' => 0
     case _ => Integer.parseInt(x)
+  }
+
+  def toBinary[TP<:Any](x: TP, w: Int): List[Int] = x match {
+    case num: Int => List.tabulate(w) { j => if (BigInt(num).testBit(j)) 1 else 0 }
+    case num: Float => toBinary(java.lang.Float.floatToRawIntBits(num), 32)
+    case l: List[Any] => l.map { e => toBinary(e, w/l.size) }.flatten
+    case s: AbstractConfig => s.toBinary
+    case _ => throw new Exception("Unsupported type for toBinary")
+  }
+
+  def toBinary(): List[Int] = {
+    throw new Exception("Not implemented!")
+    List[Int]()
   }
 }
 
@@ -44,7 +60,8 @@ case class CounterRCConfig(
   startDelay: Int = 0,
   endDelay: Int = 0,
   onlyDelay: Int = 0
-) extends AbstractConfig
+) extends AbstractConfig {
+}
 object CounterRCConfig {
   def getRandom = {
     new CounterRCConfig(
@@ -81,25 +98,67 @@ object CounterChainConfig {
   }
 }
 
-case class OperandConfig(dataSrc: Int = 0, value: Int = 0) extends AbstractConfig
+case class OperandConfig(dataSrc: Int = 0, value: Int = 0)(t: OperandBundle)
+extends AbstractConfig {
+  // Get names of case class fields
+  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
+      case m: MethodSymbol if m.isCaseAccessor => m
+  }.toList.reverse.map {_.name.toString}
+
+  // Get width of x'th field of this class using corresponding 't' field
+  def widthOf(x: Int) = t.elements(classAccessors[this.type].apply(x)).getWidth
+
+  override def toBinary(): List[Int] = {
+    // Iterate through list elements backwards, convert to binary
+    List.tabulate(this.productArity) { i =>
+      val idx = this.productArity - 1 - i
+      val elem = this.productElement(idx)
+      val w = widthOf(idx)
+      println(s"Width of $idx = $w")
+      toBinary(elem, w)
+    }.flatten
+  }
+
+}
 object OperandConfig {
   def getRandom = {
-    new OperandConfig(math.abs(Random.nextInt) % 4, math.abs(Random.nextInt) % 4)
+    new OperandConfig(math.abs(Random.nextInt) % 4, math.abs(Random.nextInt) % 4)(new OperandBundle(4))
   }
   def zeroes = {
-    new OperandConfig()
+    new OperandConfig()(new OperandBundle(4))
   }
 
 }
 
 case class PipeStageConfig(
-  opA: OperandConfig = OperandConfig(),
-  opB: OperandConfig = OperandConfig(),
-  opC: OperandConfig = OperandConfig(),
+  opA: OperandConfig = OperandConfig()(null),
+  opB: OperandConfig = OperandConfig()(null),
+  opC: OperandConfig = OperandConfig()(null),
   opcode: Int = 0,
   result: Int = 0,
   fwd: Map[Int, Int] = Map[Int, Int]()
-) extends AbstractConfig
+)(t: PipeStageBundle)
+extends AbstractConfig {
+  // Get names of case class fields
+  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
+      case m: MethodSymbol if m.isCaseAccessor => m
+  }.toList.reverse.map {_.name.toString}
+
+  // Get width of x'th field of this class using corresponding 't' field
+  def widthOf(x: Int) = t.elements(classAccessors[this.type].apply(x)).getWidth
+
+  override def toBinary(): List[Int] = {
+    // Iterate through list elements backwards, convert to binary
+    List.tabulate(this.productArity) { i =>
+      val idx = this.productArity - 1 - i
+      val elem = this.productElement(idx)
+      val w = widthOf(idx)
+      println(s"Width of $idx = $w")
+      toBinary(elem, w)
+    }.flatten
+  }
+
+}
 object PipeStageConfig {
   def getRandom = {
     new PipeStageConfig(
@@ -109,10 +168,10 @@ object PipeStageConfig {
         math.abs(Random.nextInt) % Opcodes.size,
         math.abs(Random.nextInt) % 4,
         Map[Int,Int]()
-      )
+      )(null)
   }
   def zeroes = {
-    new PipeStageConfig()
+    new PipeStageConfig()(null)
   }
 }
 

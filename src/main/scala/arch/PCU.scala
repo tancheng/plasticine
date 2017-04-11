@@ -53,23 +53,23 @@ class ScratchpadBundle(p: PCUParams) extends Bundle {
   }
 }
 
-class OperandBundle(r: Int, w: Int) extends Bundle {
+class OperandBundle(w: Int) extends Bundle {
   var dataSrc = UInt(3.W)  // TODO: 3 ?
   var value = UInt(log2Up(w).W)
 
   override def cloneType(): this.type = {
-    new OperandBundle(r, w).asInstanceOf[this.type]
+    new OperandBundle(w).asInstanceOf[this.type]
   }
 }
 
 class PipeStageBundle(r: Int, w: Int) extends Bundle {
-  var opA = new OperandBundle(r, w)
-  var opB = new OperandBundle(r, w)
-  var opC = new OperandBundle(r, w)
+  var opA = new OperandBundle(w)
+  var opB = new OperandBundle(w)
+  var opC = new OperandBundle(w)
 
   var opcode = UInt(log2Up(Opcodes.size).W)
   var result = UInt(r.W) // One-hot encoded
-  var fwd = Vec(r, Bool())
+//  var fwd = Vec(r, Bool())
 
   override def cloneType(): this.type = {
     new PipeStageBundle(r,w).asInstanceOf[this.type]
