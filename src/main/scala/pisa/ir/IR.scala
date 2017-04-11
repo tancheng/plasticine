@@ -243,7 +243,8 @@ object MemoryUnitBits {
       )
   }
 }
-case class ComputeUnitBits(
+
+case class PCUBits(
   counterChain: CounterChainBits,
   scalarXbar: CrossbarBits,
   scratchpads: List[ScratchpadBits],
@@ -251,11 +252,11 @@ case class ComputeUnitBits(
   control: CUControlBoxBits,
   scalarInMux: List[Int],
   scalarOutMux: Int
-//  dataInXbar: CrossbarBits
+  //  dataInXbar: CrossbarBits
 ) extends AbstractBits
-object ComputeUnitBits {
+object PCUBits {
   def getRandom(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
-    new ComputeUnitBits (
+    new PCUBits (
       CounterChainBits.getRandom(numCounters),
       CrossbarBits.getRandom(ArchConfig.numScalarRegisters),
       List.tabulate(numScratchpads) { i => ScratchpadBits.getRandom },
@@ -263,10 +264,10 @@ object ComputeUnitBits {
       CUControlBoxBits.getRandom(numTokenIn, numTokenOut, numCounters),
       List.fill(numScratchpads) { 0 },
       0
-      )
+    )
   }
   def zeroes(d: Int, numCounters: Int, numTokenIn: Int, numTokenOut: Int, numScratchpads: Int) = {
-    new ComputeUnitBits (
+    new PCUBits (
       CounterChainBits.zeroes(numCounters),
       CrossbarBits.zeroes(ArchConfig.numScalarRegisters),
       List.tabulate(numScratchpads) { i => ScratchpadBits.zeroes },
@@ -274,10 +275,10 @@ object ComputeUnitBits {
       CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
       List.fill(numScratchpads) { 0 },
       0
-      )
+    )
   }
-
 }
+
 case class CUControlBoxBits(
   tokenOutLUT: List[LUTBits],
   enableLUT: List[LUTBits],
@@ -381,7 +382,7 @@ object ConnBoxBits {
  * Plasticine config information
  */
 case class PlasticineBits(
-  cu: List[List[ComputeUnitBits]],
+  cu: List[List[PCUBits]],
   vectorSwitch: List[List[CrossbarBits]],
   scalarSwitch: List[List[CrossbarBits]],
   controlSwitch: List[List[CrossbarBits]],
@@ -400,7 +401,7 @@ object PlasticineBits {
 //    numMemoryUnits: Int
   ) = {
     new PlasticineBits(
-      List.tabulate(rows, cols) { case (i, j) => ComputeUnitBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate(rows, cols) { case (i, j) => PCUBits.getRandom(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) },
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) },
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.getRandom(8) },
@@ -419,7 +420,7 @@ object PlasticineBits {
     //numMemoryUnits: Int
   ) = {
     new PlasticineBits(
-      List.tabulate(rows, cols) { case (i, j) => ComputeUnitBits.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
+      List.tabulate(rows, cols) { case (i, j) => PCUBits.zeroes(d, numCounters, numTokenIn, numTokenOut, numScratchpads)},
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) },
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) },
       List.tabulate((rows+1), (cols+1)) { case (i, j) => CrossbarBits.zeroes(100) },
