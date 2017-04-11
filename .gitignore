@@ -12,3 +12,4 @@ build/
 generated/
 lib_managed/
 target/
+.DS_Store
