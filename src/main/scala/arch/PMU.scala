@@ -20,20 +20,23 @@ import scala.collection.mutable.ListBuffer
  * @param numVectorOut: Output vectors
  * @param numControlIn: Input controls
  * @param numControlOut: Output controls
+ * @param wd: Number of stages that can be configured to write address calculation
  */
-case class PMUParams(
-  val w: Int,
-  val d: Int,
-  val v: Int,
-  val r: Int,
-  val numCounters: Int,
-  val numScalarIn: Int,
-  val numScalarOut: Int,
-  val numVectorIn: Int,
-  val numVectorOut: Int,
-  val numControlIn: Int,
-  val numControlOut: Int
-)
+trait PMUParams extends PCUParams {
+  //val w: Int
+  //val d: Int
+  //val v: Int
+  //val r: Int
+  //val numCounters: Int
+  //val numScalarIn: Int
+  //val numScalarOut: Int
+  //val numVectorIn: Int
+  //val numVectorOut: Int
+  //val numControlIn: Int
+  //val numControlOut: Int
+  //val numWriteStages: Int
+  val wd:Int 
+}
 
 case class PMUConfig(p: PMUParams) extends Bundle {
 
@@ -42,22 +45,6 @@ case class PMUConfig(p: PMUParams) extends Bundle {
   }
 }
 
-class PMU(p: PMUParams) extends Module {
-
-  val io = IO(new Bundle {
-    // Vector IO
-    val vecIn = Vec(p.numVectorIn, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
-    val vecOut = Vec(p.numVectorOut, Decoupled(Vec(p.v, UInt(p.w.W))))
-
-    // Scalar IO
-    val scalarIn = Vec(p.numScalarIn, Flipped(Decoupled(UInt(p.w.W))))
-    val scalarOut = Vec(p.numScalarOut, Decoupled(UInt(p.w.W)))
-
-    // Control IO
-    val controlIn = Input(Vec(p.numControlIn, Bool()))
-    val controlOut = Output(Vec(p.numControlOut, Bool()))
-
-    val config = Input(PMUConfig(p))
-  })
-
+class PMU(p: PMUParams) extends CU {
+  val io = IO(CUBundle(p, Input(PMUConfig(p))))
 }

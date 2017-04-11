@@ -7,6 +7,29 @@ import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
+trait Params
+
+case class CUBundle(p:PCUParams, cuConfig:Bundle) extends Bundle {
+    // Vector IO
+  val vecIn = Vec(p.numVectorIn, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
+  val vecOut = Vec(p.numVectorOut, Decoupled(Vec(p.v, UInt(p.w.W))))
+
+  // Scalar IO
+  val scalarIn = Vec(p.numScalarIn, Flipped(Decoupled(UInt(p.w.W))))
+  val scalarOut = Vec(p.numScalarOut, Decoupled(UInt(p.w.W)))
+
+  // Control IO
+  val controlIn = Input(Vec(p.numControlIn, Bool()))
+  val controlOut = Output(Vec(p.numControlOut, Bool()))
+
+  val config = cuConfig
+}
+
+trait CU extends Module {
+  def io:CUBundle
+}
+
+
 /**
  * Compute Unit module
  * @param w: Word width
@@ -21,19 +44,19 @@ import scala.collection.mutable.ListBuffer
  * @param numControlIn: Input controls
  * @param numControlOut: Output controls
  */
-case class PCUParams(
-  val w: Int,
-  val d: Int,
-  val v: Int,
-  val r: Int,
-  val numCounters: Int,
-  val numScalarIn: Int,
-  val numScalarOut: Int,
-  val numVectorIn: Int,
-  val numVectorOut: Int,
-  val numControlIn: Int,
+trait PCUParams extends Params {
+  val w: Int
+  val d: Int
+  val v: Int
+  val r: Int
+  val numCounters: Int
+  val numScalarIn: Int
+  val numScalarOut: Int
+  val numVectorIn: Int
+  val numVectorOut: Int
+  val numControlIn: Int
   val numControlOut: Int
-)
+}
 
 class ScratchpadBundle(p: PCUParams) extends Bundle {
   var raSrc = UInt(width=1)
@@ -84,23 +107,8 @@ case class PCUConfig(p: PCUParams) extends Bundle {
   }
 }
 
-class PCU(p: PCUParams) extends Module {
-
-  val io = IO(new Bundle {
-    // Vector IO
-    val vecIn = Vec(p.numVectorIn, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
-    val vecOut = Vec(p.numVectorOut, Decoupled(Vec(p.v, UInt(p.w.W))))
-
-    // Scalar IO
-    val scalarIn = Vec(p.numScalarIn, Flipped(Decoupled(UInt(p.w.W))))
-    val scalarOut = Vec(p.numScalarOut, Decoupled(UInt(p.w.W)))
-
-    // Control IO
-    val controlIn = Input(Vec(p.numControlIn, Bool()))
-    val controlOut = Output(Vec(p.numControlOut, Bool()))
-
-    val config = Input(PCUConfig(p))
-  })
+class PCU(p: PCUParams) extends CU {
+  val io = IO(CUBundle(p, Input(PCUConfig(p))))
 
   val numReduceStages = log2Up(p.v)
 
