@@ -7,29 +7,30 @@ import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import plasticine.templates.Utils.log2Up
 
+import plasticine.arch.SwitchParams
 /**
  * Crossbar config register format
  */
-case class CrossbarOpcode(val numInputs: Int, val numOutputs: Int) extends Bundle {
-  var outSelect = Vec(numOutputs, UInt(log2Up(numInputs).W))
+case class CrossbarConfig(p: SwitchParams) extends Bundle {
+  var outSelect = Vec(p.numOuts, UInt(log2Up(p.numIns).W))
 
   override def cloneType(): this.type = {
-    new CrossbarOpcode(numInputs, numOutputs).asInstanceOf[this.type]
+    new CrossbarConfig(p).asInstanceOf[this.type]
   }
 }
 
 /**
  * Core logic inside a crossbar
  */
-class CrossbarCore[T<:Data](val t: T, val w: Int, val numInputs: Int, val numOutputs: Int) extends Module {
+class CrossbarCore[T<:Data](val t: T, val p: SwitchParams) extends Module {
   val io = new Bundle {
-    val ins = Input(Vec(numInputs, t.cloneType))
-    val outs = Output(Vec(numOutputs, t.cloneType))
-    val config = Input(CrossbarOpcode(numInputs, numOutputs))
+    val ins = Input(Vec(p.numIns, t.cloneType))
+    val outs = Output(Vec(p.numOuts, t.cloneType))
+    val config = Input(CrossbarConfig(p))
   }
 
   io.outs.zipWithIndex.foreach { case(out,i) =>
-    val outMux = Module(new MuxN(numInputs, w))
+    val outMux = Module(new MuxN(p.numIns, t.getWidth))
     outMux.io.ins := io.ins
     outMux.io.sel := io.config.outSelect(i)
     out := outMux.io.out

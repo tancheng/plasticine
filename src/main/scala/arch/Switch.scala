@@ -6,36 +6,38 @@ import plasticine.templates.Opcodes
 import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
-import plasticine.templates.{CrossbarOpcode, CrossbarCore}
+import plasticine.templates.{CrossbarConfig, CrossbarCore}
 
-case class VectorSwitchParams(numIns:Int, numOuts:Int, w:Int, v:Int)
-case class ScalarSwitchParams(numIns:Int, numOuts:Int, w:Int)
-case class ControlSwitchParams(numIns:Int, numOuts:Int)
+abstract class SwitchParams(val numIns: Int, val numOuts: Int)
 
-class VectorSwitch(p: VectorSwitchParams) extends Module {
+case class VectorSwitchParams(override val numIns:Int, override val numOuts:Int, w:Int, v:Int) extends SwitchParams(numIns, numOuts)
+case class ScalarSwitchParams(override val numIns:Int, override val numOuts:Int, w:Int) extends SwitchParams(numIns, numOuts)
+case class ControlSwitchParams(override val numIns:Int, override val numOuts:Int) extends SwitchParams(numIns, numOuts)
+
+class VectorSwitch(val p: VectorSwitchParams) extends Module {
   val io = IO(new Bundle {
     // Vector IO
     val ins = Vec(p.numIns, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
     val outs = Vec(p.numOuts, Decoupled(Vec(p.v, UInt(p.w.W))))
-    val config = Input(CrossbarOpcode(p.numIns, p.numOuts))
+    val config = Input(CrossbarConfig(p))
   })
 }
 
-class ScalarSwitch(p: ScalarSwitchParams) extends Module {
+class ScalarSwitch(val p: ScalarSwitchParams) extends Module {
   val io = IO(new Bundle {
     //// Scalar IO
     val ins = Vec(p.numIns, Flipped(Decoupled(UInt(p.w.W))))
     val outs = Vec(p.numOuts, Decoupled(UInt(p.w.W)))
-    val config = Input(CrossbarOpcode(p.numIns, p.numOuts))
+    val config = Input(CrossbarConfig(p))
   })
 }
 
-class ControlSwitch(p: ControlSwitchParams) extends Module {
+class ControlSwitch(val p: ControlSwitchParams) extends Module {
   val io = IO(new Bundle {
     //// Scalar IO
     val ins = Input(Vec(p.numIns, Bool()))
     val outs = Output(Vec(p.numOuts, Bool()))
-    val config = Input(CrossbarOpcode(p.numIns, p.numOuts))
+    val config = Input(CrossbarConfig(p))
   })
 }
 
