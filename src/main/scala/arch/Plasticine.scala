@@ -28,18 +28,24 @@ case class PlasticineParams(
 ) extends GeneratedPlasticineParams
 
 
-case class PlasticineConfig(p: PlasticineParams, f: FringeParams) extends Bundle {
+case class PlasticineConfig(
+  pcuParams:    Array[Array[PCUParams]],
+  vectorParams: Array[Array[VectorSwitchParams]],
+  scalarParams: Array[Array[ScalarSwitchParams]],
+  controlParams: Array[Array[ControlSwitchParams]],
+  p: PlasticineParams,
+  f: FringeParams) extends Bundle {
 
-  val cu = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+  val cu = HVec.tabulate(pcuParams.size) { i => HVec.tabulate(pcuParams(i).size) { j => new PCUConfig(pcuParams(i)(j)) } }
 
   // Dummy placeholders for real switch config interface
-  val vectorSwitch = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
-  val scalarSwitch = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
-  val controlSwitch = HVec.tabulate(p.pcuParams.size) { i => new PCUConfig(p.pcuParams(i)) }
+  val vectorSwitch = HVec.tabulate(vectorParams.size) { i => HVec.tabulate(vectorParams(i).size) { j => new CrossbarConfig(vectorParams(i)(j)) } }
+  val scalarSwitch = HVec.tabulate(scalarParams.size) { i => HVec.tabulate(scalarParams(i).size) { j => new CrossbarConfig(scalarParams(i)(j)) } }
+  val controlSwitch = HVec.tabulate(controlParams.size) { i => HVec.tabulate(controlParams(i).size) { j => new CrossbarConfig(controlParams(i)(j)) } }
 
   val argOutMuxSelect = Vec(f.numArgOuts, UInt(log2Up(p.numArgOutSelections).W))
   override def cloneType(): this.type = {
-    new PlasticineConfig(p, f).asInstanceOf[this.type]
+    new PlasticineConfig(pcuParams, vectorParams, scalarParams, controlParams, p, f).asInstanceOf[this.type]
   }
 }
 
@@ -61,16 +67,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     val config = Flipped(Decoupled(Bool()))
   })
 
-
-  // Reconfiguration network: ASIC or CGRA?
-  val configSR = Module(new ShiftRegister(new PlasticineConfig(p, f)))
-  configSR.io.in.bits := io.config.bits
-  configSR.io.in.valid := io.config.valid
-
-  val config = configSR.io.config
-
-  val cuParams = cus.map { cuCol => cuCol.map {_.p} }
-
+  // Create argOut Muxes
   val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
     val mux = Module(new MuxN(p.numArgOutSelections, p.w))
     io.argOuts(i).bits := mux.io.out
@@ -78,7 +75,23 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     mux
   }
 
-//
+  // Extract parameters from generated PCUs and PMUs
+  // TODO: Assumed execution order seems to be 'mixed traits first, then this class'
+  // However, the traits require the existence of the io declaration above.
+  // This must be resolved: perhaps emit methods in the traits, and call them here?
+  val cuParams = cus.map { col => col.map {_.p} }
+  val vectorParams = vsbs.map { col => col.map {_.p} }
+  val scalarParams = ssbs.map { col => col.map {_.p} }
+  val controlParams = csbs.map { col => col.map {_.p} }
+
+  // Wire up the reconfiguration network: ASIC or CGRA?
+  val configSR = Module(new ShiftRegister(new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f)))
+  configSR.io.in.bits := io.config.bits
+  configSR.io.in.valid := io.config.valid
+
+  val config = configSR.io.config
+
+
 //  argOutMuxes.io.ins(?) := ?
 
   // PCUs
