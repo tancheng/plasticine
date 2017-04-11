@@ -37,7 +37,7 @@ case class PlasticineConfig(p: PlasticineParams) extends Bundle {
 }
 
 
-class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module {
+class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module with PlasticineArch {
   val io = IO(new Bundle {
     // Scalar IO
     val argIns = Input(Vec(f.numArgIns, UInt(f.dataWidth.W)))
@@ -63,13 +63,13 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module {
   val config = configSR.io.config
 
   // PCUs
-  val pcus = ListBuffer.tabulate(p.numCols) { i =>
-      ListBuffer.tabulate(p.numRows) { j =>
-        val pcu = Module(new PCU(p.pcuParams(i*p.numCols+j)))
-        pcu.io.config := config.pcuConfig(i*p.numCols+j)
-        pcu
-      }
-    }
+//  val pcus = ListBuffer.tabulate(p.numCols) { i =>
+//      ListBuffer.tabulate(p.numRows) { j =>
+//        val pcu = Module(new PCU(p.pcuParams(i*p.numCols+j)))
+//        pcu.io.config := config.pcuConfig(i*p.numCols+j)
+//        pcu
+//      }
+//    }
 
   // Control network + Little CUs
   //// Map enable to control network
