@@ -247,10 +247,10 @@ object MemoryUnitBits {
 case class PCUBits(
   counterChain: CounterChainBits,
   scalarXbar: CrossbarBits,
-  scratchpads: List[ScratchpadBits],
-  pipeStage: List[PipeStageBits],
+  scratchpads: Array[ScratchpadBits],
+  pipeStage: Array[PipeStageBits],
   control: CUControlBoxBits,
-  scalarInMux: List[Int],
+  scalarInMux: Array[Int],
   scalarOutMux: Int
   //  dataInXbar: CrossbarBits
 ) extends AbstractBits
@@ -259,10 +259,10 @@ object PCUBits {
     new PCUBits (
       CounterChainBits.getRandom(numCounters),
       CrossbarBits.getRandom(ArchConfig.numScalarRegisters),
-      List.tabulate(numScratchpads) { i => ScratchpadBits.getRandom },
-      List.tabulate(d) { i => PipeStageBits.getRandom },
+      Array.tabulate(numScratchpads) { i => ScratchpadBits.getRandom },
+      Array.tabulate(d) { i => PipeStageBits.getRandom },
       CUControlBoxBits.getRandom(numTokenIn, numTokenOut, numCounters),
-      List.fill(numScratchpads) { 0 },
+      Array.fill(numScratchpads) { 0 },
       0
     )
   }
@@ -270,10 +270,10 @@ object PCUBits {
     new PCUBits (
       CounterChainBits.zeroes(numCounters),
       CrossbarBits.zeroes(ArchConfig.numScalarRegisters),
-      List.tabulate(numScratchpads) { i => ScratchpadBits.zeroes },
-      List.tabulate(d) { i => PipeStageBits.zeroes },
+      Array.tabulate(numScratchpads) { i => ScratchpadBits.zeroes },
+      Array.tabulate(d) { i => PipeStageBits.zeroes },
       CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
-      List.fill(numScratchpads) { 0 },
+      Array.fill(numScratchpads) { 0 },
       0
     )
   }

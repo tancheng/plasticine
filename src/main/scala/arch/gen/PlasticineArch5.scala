@@ -2,10 +2,10 @@ package plasticine.arch
 import chisel3._
 import chisel3.util._
 import scala.collection.mutable.ListBuffer
+import plasticine.templates.MuxN
 
-trait PlasticineArch5 {
-  self:PlasticineArch with Plasticine =>
-  def connect5(cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]]):Unit = {
+trait PlasticineArch5 extends PlasticineArch4{
+  def connect5(io:PlasticineIO, argOutMuxes:List[MuxN], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]]):Unit = {
     cus(0)(1).io.controlOut(1) <> csbs(1)(2).io.ins(17)
     cus(0)(1).io.controlOut(2) <> csbs(1)(1).io.ins(4)
     cus(0)(1).io.controlOut(3) <> csbs(0)(1).io.ins(4)

@@ -42,23 +42,24 @@ case class PlasticineConfig(
   }
 }
 
+case class PlasticineIO(f: FringeParams) extends Bundle {
+  // Scalar IO
+  val argIns = Input(Vec(f.numArgIns, UInt(f.dataWidth.W)))
+  val argOuts = Vec(f.numArgOuts, Decoupled(UInt(f.dataWidth.W)))
+
+  // Memory IO
+  val memStreams = Flipped(new AppStreams(f.loadStreamInfo, f.storeStreamInfo))
+
+  // Control IO
+  val enable = Input(Bool())
+  val done = Output(Bool())
+
+  // Config IO: Shift register
+  val config = Flipped(Decoupled(Bool())) //TODO: Yaqi: should this be PlasticineConfig
+}
 
 class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module with PlasticineArch {
-  val io = IO(new Bundle {
-    // Scalar IO
-    val argIns = Input(Vec(f.numArgIns, UInt(f.dataWidth.W)))
-    val argOuts = Vec(f.numArgOuts, Decoupled(UInt(f.dataWidth.W)))
-
-    // Memory IO
-    val memStreams = Flipped(new AppStreams(f.loadStreamInfo, f.storeStreamInfo))
-
-    // Control IO
-    val enable = Input(Bool())
-    val done = Output(Bool())
-
-    // Config IO: Shift register
-    val config = Flipped(Decoupled(Bool())) //TODO: Yaqi: should this be PlasticineConfig
-  })
+  val io = IO(PlasticineIO(f)) //Yaqi: refactored this from new Bundle to PlasticineIO
 
   val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
     val mux = Module(new MuxN(p.numArgOutSelections(i), p.w))
