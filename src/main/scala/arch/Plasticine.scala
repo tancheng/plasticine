@@ -24,9 +24,9 @@ case class PlasticineConfig(
   p: PlasticineParams,
   f: FringeParams) extends Bundle {
 
-  val cu = HVec.tabulate(cuParams.size) { i => HVec.tabulate(cuParams(i).size) { j => 
+  val cu = HVec.tabulate(cuParams.size) { i => HVec.tabulate(cuParams(i).size) { j =>
     cuParams(i)(j) match {
-      case p:PCUParams => new PCUConfig(p) 
+      case p:PCUParams => new PCUConfig(p)
       case p:PMUParams => new PMUConfig(p)
     }
   } }
@@ -55,11 +55,11 @@ case class PlasticineIO(f: FringeParams) extends Bundle {
   val done = Output(Bool())
 
   // Config IO: Shift register
-  val config = Flipped(Decoupled(Bool())) //TODO: Yaqi: should this be PlasticineConfig
+  val config = Flipped(Decoupled(Bool()))
 }
 
 class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module with PlasticineArch {
-  val io = IO(PlasticineIO(f)) //Yaqi: refactored this from new Bundle to PlasticineIO
+  val io = IO(PlasticineIO(f))
 
   val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
     val mux = Module(new MuxN(p.numArgOutSelections(i), p.w))
@@ -68,10 +68,10 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     mux
   }
 
-  val cuParams = p.cuParams 
+  val cuParams = p.cuParams
   val vectorParams = p.vectorSwitchParams
-  val scalarParams = p.scalarSwitchParams 
-  val controlParams = p.controlSwitchParams 
+  val scalarParams = p.scalarSwitchParams
+  val controlParams = p.controlSwitchParams
 
   // Wire up the reconfiguration network: ASIC or CGRA?
   val configSR = Module(new ShiftRegister(new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f)))
