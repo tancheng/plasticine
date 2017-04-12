@@ -7,6 +7,8 @@ import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
+import plasticine.templates._
+
 import plasticine.spade._
 
 /**
@@ -65,6 +67,7 @@ class PipeStageBundle(r: Int, w: Int) extends Bundle {
 }
 
 case class PCUConfig(p: PCUParams) extends Bundle {
+  val counterChain = CounterChainConfig(p.w, p.numCounters)
   val stages = Vec(p.d, new PipeStageBundle(p.r, p.w))
 
   override def cloneType(): this.type = {

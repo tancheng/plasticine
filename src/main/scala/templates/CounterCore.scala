@@ -10,7 +10,7 @@ import scala.collection.mutable.HashMap
 /**
  * Counter configuration format
  */
-case class CounterOpcode(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int) extends Bundle {
+case class CounterConfig(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int) extends Bundle {
   val max = UInt(w.W)
   val stride = UInt(w.W)
   val maxConst = Bool()
@@ -27,7 +27,7 @@ case class CounterOpcode(val w: Int, val startDelayWidth: Int, val endDelayWidth
   val onlyDelay = Bool()
 
   override def cloneType(): this.type = {
-    new CounterOpcode(w, startDelayWidth, endDelayWidth).asInstanceOf[this.type]
+    new CounterConfig(w, startDelayWidth, endDelayWidth).asInstanceOf[this.type]
   }
 }
 
@@ -50,7 +50,7 @@ class CounterCore(val w: Int, val startDelayWidth: Int = 0, val endDelayWidth: I
     val waitOut    = Output(Bool())
     val done   = Output(Bool())
     val isMax  = Output(Bool())
-    val config = Input(CounterOpcode(w, startDelayWidth, endDelayWidth))
+    val config = Input(CounterConfig(w, startDelayWidth, endDelayWidth))
   })
 
   // Actual counter
