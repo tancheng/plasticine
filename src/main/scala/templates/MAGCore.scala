@@ -215,47 +215,6 @@ class MAGCore(
 //  }
 //  completed := completionMask.map { _.io.data.out }.reduce { _ & _ }
 
-  // FIFO for sizes to be received
-//  val receivedFifo = Module(new FIFOCore(w, d, v))
-//  val receivedFifoConfig = Wire(new FIFOOpcode(d, v))
-//  receivedFifoConfig.chainRead := 1.U
-//  receivedFifoConfig.chainWrite := 1.U
-//  receivedFifo.io.config := receivedFifoConfig
-//
-//  receivedFifo.io.enq := Vec(List.tabulate(v) { i => if (i == 0) sizeInBursts else 0.U})
-//  receivedFifo.io.enqVld := burstVld & burstCounter.io.out === 0.U
-//
-//  val maxReceivedSizeBursts = receivedFifo.io.deq(0)
-//
-//  // Burst received counter
-//  val receivedCounter = Module(new Counter(w))
-//  receivedCounter.io.max := maxReceivedSizeBursts
-//  receivedCounter.io.stride := 1.U
-//  receivedCounter.io.reset := 0.U
-//  receivedCounter.io.enable := Mux(io.config.scatterGather, 0.U, io.dram.resp.valid)
-//  receivedCounter.io.saturate := 0.U
-//  receivedFifo.io.deqVld := receivedCounter.io.done
-
-  // Counter chain, where innermost counter is chained to receivedCounter
-//  val counterChain = Module(new CounterChainCore(w, numCounters, startDelayWidth, endDelayWidth))
-//  val counterEnable = counterChain.io.enable
-//  val counterDone = counterChain.io.done
-
-  // Control block for memory unit
-//  val controlBox = Module(new CUControlBox(tokenIns.size, inst.control))
-//  controlBox.io.config_enable := io.config_enable
-//  controlBox.io.config_data := io.config_data
-//  controlBox.io.tokenIns := tokenIns
-//  counterEnable.zipWithIndex foreach { case (en, i) =>
-//    if (i == 0) { // Chain counter 0 to receivedCounter
-//      counterEnable(i) := receivedCounter.io.control.done
-//    } else {
-//      counterEnable(i) := controlBox.io.enable(i)
-//    }
-//  }
-//  controlBox.io.done.zip(counterDone) foreach { case (done, d) => done := d }
-//  tokenOuts.zip(controlBox.io.tokenOuts) foreach { case (out, o) => out := o }
-
   class Tag extends Bundle {
     val streamTag = UInt(tagWidth.W)
     val burstTag = UInt((w-tagWidth).W)
