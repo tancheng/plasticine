@@ -42,25 +42,25 @@ case class PlasticineConfig(
   }
 }
 
+case class PlasticineIO(f: FringeParams) extends Bundle {
+  // Scalar IO
+  val argIns = Input(Vec(f.numArgIns, UInt(f.dataWidth.W)))
+  val argOuts = Vec(f.numArgOuts, Decoupled(UInt(f.dataWidth.W)))
+
+  // Memory IO
+  val memStreams = Flipped(new AppStreams(f.loadStreamInfo, f.storeStreamInfo))
+
+  // Control IO
+  val enable = Input(Bool())
+  val done = Output(Bool())
+
+  // Config IO: Shift register
+  val config = Flipped(Decoupled(Bool())) //TODO: Yaqi: should this be PlasticineConfig
+}
 
 class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module with PlasticineArch {
-  val io = IO(new Bundle {
-    // Scalar IO
-    val argIns = Input(Vec(f.numArgIns, UInt(f.dataWidth.W)))
-    val argOuts = Vec(f.numArgOuts, Decoupled(UInt(f.dataWidth.W)))
+  val io = IO(PlasticineIO(f)) //Yaqi: refactored this from new Bundle to PlasticineIO
 
-    // Memory IO
-    val memStreams = Flipped(new AppStreams(f.loadStreamInfo, f.storeStreamInfo))
-
-    // Control IO
-    val enable = Input(Bool())
-    val done = Output(Bool())
-
-    // Config IO: Shift register
-    val config = Flipped(Decoupled(Bool()))
-  })
-
-  // Create argOut Muxes
   val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
     val mux = Module(new MuxN(p.numArgOutSelections(i), p.w))
     io.argOuts(i).bits := mux.io.out
@@ -68,14 +68,10 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     mux
   }
 
-  // Extract parameters from generated PCUs and PMUs
-  // TODO: Assumed execution order seems to be 'mixed traits first, then this class'
-  // However, the traits require the existence of the io declaration above.
-  // This must be resolved: perhaps emit methods in the traits, and call them here?
-  val cuParams = cus.map { col => col.map {_.p} }
-  val vectorParams = vsbs.map { col => col.map {_.p} }
-  val scalarParams = ssbs.map { col => col.map {_.p} }
-  val controlParams = csbs.map { col => col.map {_.p} }
+  val cuParams = p.cuParams 
+  val vectorParams = p.vectorSwitchParams
+  val scalarParams = p.scalarSwitchParams 
+  val controlParams = p.controlSwitchParams 
 
   // Wire up the reconfiguration network: ASIC or CGRA?
   val configSR = Module(new ShiftRegister(new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f)))
