@@ -87,7 +87,7 @@ object CounterChainBits {
   }
 }
 
-case class OperandBits(src: SrcValueTuple = SrcValueTuple)(t: OperandBundle)
+case class OperandBits(src: SrcValueTuple = SrcValueTuple())(t: OperandBundle)
 extends AbstractBits {
   // Get names of case class fields
   def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
@@ -120,7 +120,7 @@ case class PipeStageBits(
   opB: OperandBits,
   opC: OperandBits,
   opcode: Opcode = XOp,
-  result: SrcValueTuple = SrcValueTuple(),
+  result: List[SrcValueTuple] = Nil,
   fwd: Map[Int, Int] = Map[Int, Int]()
 )(t: PipeStageBundle)
 extends AbstractBits {
@@ -159,7 +159,7 @@ object PipeStageBits {
  * to hold scratchpad config info.
  * TODO: Use this to hold operand info as well
  */
-case class SrcValueTuple(src: SelectSource=XSrc, value: Int = -1)
+case class SrcValueTuple(src: SelectSource=XSrc, value: AnyVal = -1)
 
 //case class BankingBits(mode: Int = 0, strideLog2: Int = 0) extends AbstractBits
 //

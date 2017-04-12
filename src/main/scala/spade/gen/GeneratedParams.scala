@@ -4,9 +4,9 @@ import chisel3.util._
 import scala.collection.mutable.ListBuffer
 
 object GeneratedTopParams extends TopParams with GeneratedParams {
-  val fringeParams = new FringeParams {
-    val numArgIns = 3
-    val numArgOuts = 3
+  override val fringeParams = new FringeParams {
+    override val numArgIns = 3
+    override val numArgOuts = 3
     override val dataWidth = 32
   }
   val plasticineParams = new PlasticineParams {
