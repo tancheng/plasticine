@@ -87,7 +87,7 @@ object CounterChainBits {
   }
 }
 
-case class OperandBits(src: SrcValueTuple = SrcValueTuple)(t: OperandBundle)
+case class OperandBits(src: SrcValueTuple = SrcValueTuple())(t: OperandBundle)
 extends AbstractBits {
   // Get names of case class fields
   def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
