@@ -18,7 +18,7 @@ trait CUParams extends Params {
   val v: Int = 16
   val numCounters: Int = 8
   val numUDCs: Int = 5
-  val regColors: ListBuffer[List[RegColor]]
+  val regColors = ListBuffer[List[RegColor]]()
   val d: Int = 8
   val r: Int = 16
   val numScalarIn: Int = 4
@@ -37,13 +37,12 @@ object PCUParams {
 }
 
 trait PMUParams extends CUParams {
-  val wd: Int
+  val wd = 5
 }
 object PMUParams {
   def apply(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int) = {
     new PMUParams {
       val regColors = ListBuffer[List[RegColor]]()
-      val wd = 5
     }
   }
 }
@@ -53,6 +52,9 @@ trait PlasticineParams extends Params {
   val numRows: Int = 2
   val numCols: Int = 2
   val pcuParams: List[List[PCUParams]]
+  val vectorSwitchParams:List[List[VectorSwitchParams]] 
+  val scalarSwitchParams:List[List[ScalarSwitchParams]] 
+  val controlSwitchParams:List[List[ControlSwitchParams]] 
   val numArgOutSelections: List[Int]   //  = List(6,6,6)
 }
 
@@ -68,7 +70,6 @@ trait FringeParams extends Params {
 trait TopParams {
   val plasticineParams: PlasticineParams
   val fringeParams: FringeParams
-  val target: String
 }
 
 abstract class SwitchParams(val numIns: Int, val numOuts: Int) extends Params
