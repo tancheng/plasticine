@@ -17,14 +17,19 @@ import scala.collection.mutable.ListBuffer
 import java.io.PrintWriter
 
 case class PlasticineConfig(
-  pcuParams:    Array[Array[PCUParams]],
+  cuParams:    Array[Array[CUParams]],
   vectorParams: Array[Array[VectorSwitchParams]],
   scalarParams: Array[Array[ScalarSwitchParams]],
   controlParams: Array[Array[ControlSwitchParams]],
   p: PlasticineParams,
   f: FringeParams) extends Bundle {
 
-  val cu = HVec.tabulate(pcuParams.size) { i => HVec.tabulate(pcuParams(i).size) { j => new PCUConfig(pcuParams(i)(j)) } }
+  val cu = HVec.tabulate(cuParams.size) { i => HVec.tabulate(cuParams(i).size) { j => 
+    cuParams(i)(j) match {
+      case p:PCUParams => new PCUConfig(p) 
+      case p:PMUParams => new PMUConfig(p)
+    }
+  } }
 
   // Dummy placeholders for real switch config interface
   val vectorSwitch = HVec.tabulate(vectorParams.size) { i => HVec.tabulate(vectorParams(i).size) { j => new CrossbarConfig(vectorParams(i)(j)) } }
@@ -33,7 +38,7 @@ case class PlasticineConfig(
 
   val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
   override def cloneType(): this.type = {
-    new PlasticineConfig(pcuParams, vectorParams, scalarParams, controlParams, p, f).asInstanceOf[this.type]
+    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f).asInstanceOf[this.type]
   }
 }
 

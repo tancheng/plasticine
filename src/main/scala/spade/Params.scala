@@ -36,7 +36,7 @@ object PCUParams {
   }
 }
 
-trait PMUParams extends PCUParams {
+trait PMUParams extends CUParams {
   val wd: Int
 }
 object PMUParams {
