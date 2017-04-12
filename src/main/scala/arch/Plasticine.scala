@@ -57,10 +57,9 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     val done = Output(Bool())
 
     // Config IO: Shift register
-    val config = Flipped(Decoupled(Bool()))
+    val config = Flipped(Decoupled(Bool())) //TODO: Yaqi: should this be PlasticineConfig
   })
 
-  // Create argOut Muxes
   val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
     val mux = Module(new MuxN(p.numArgOutSelections(i), p.w))
     io.argOuts(i).bits := mux.io.out
@@ -68,14 +67,10 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     mux
   }
 
-  // Extract parameters from generated PCUs and PMUs
-  // TODO: Assumed execution order seems to be 'mixed traits first, then this class'
-  // However, the traits require the existence of the io declaration above.
-  // This must be resolved: perhaps emit methods in the traits, and call them here?
-  val cuParams = cus.map { col => col.map {_.p} }
-  val vectorParams = vsbs.map { col => col.map {_.p} }
-  val scalarParams = ssbs.map { col => col.map {_.p} }
-  val controlParams = csbs.map { col => col.map {_.p} }
+  val cuParams = p.cuParams 
+  val vectorParams = p.vectorSwitchParams
+  val scalarParams = p.scalarSwitchParams 
+  val controlParams = p.controlSwitchParams 
 
   // Wire up the reconfiguration network: ASIC or CGRA?
   val configSR = Module(new ShiftRegister(new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f)))
