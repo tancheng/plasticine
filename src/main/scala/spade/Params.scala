@@ -49,8 +49,8 @@ trait PlasticineParams extends Params {
 trait FringeParams extends Params {
   val addrWidth: Int = 32
   val dataWidth: Int = 32
-  val numArgIns: Int
-  val numArgOuts: Int
+  val numArgIns: Int = 16
+  val numArgOuts: Int = 8
   val loadStreamInfo = List[StreamParInfo]()
   val storeStreamInfo = List[StreamParInfo]()
 }
