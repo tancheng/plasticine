@@ -7,12 +7,7 @@ import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 import plasticine.templates.{CrossbarConfig, CrossbarCore}
-
-abstract class SwitchParams(val numIns: Int, val numOuts: Int)
-
-case class VectorSwitchParams(override val numIns:Int, override val numOuts:Int, w:Int, v:Int) extends SwitchParams(numIns, numOuts)
-case class ScalarSwitchParams(override val numIns:Int, override val numOuts:Int, w:Int) extends SwitchParams(numIns, numOuts)
-case class ControlSwitchParams(override val numIns:Int, override val numOuts:Int) extends SwitchParams(numIns, numOuts)
+import plasticine.spade._
 
 class VectorSwitch(val p: VectorSwitchParams) extends Module {
   val io = IO(new Bundle {

@@ -8,25 +8,13 @@ import plasticine.ArchConfig
 import plasticine.templates._
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
+import plasticine.spade._
 import fringe._
+
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Set
 import scala.collection.mutable.ListBuffer
-
 import java.io.PrintWriter
-
-trait GeneratedPlasticineParams {
-  val numRows: Int = 2
-  val numCols: Int = 2
-  val w: Int = 32
-  val numArgOutSelections: Int = (numRows+1) * 2
-}
-
-case class PlasticineParams(
-  val pcuParams: List[PCUParams],
-  val pmuParams: List[PMUParams]
-) extends GeneratedPlasticineParams
-
 
 case class PlasticineConfig(
   pcuParams:    Array[Array[PCUParams]],
@@ -43,7 +31,7 @@ case class PlasticineConfig(
   val scalarSwitch = HVec.tabulate(scalarParams.size) { i => HVec.tabulate(scalarParams(i).size) { j => new CrossbarConfig(scalarParams(i)(j)) } }
   val controlSwitch = HVec.tabulate(controlParams.size) { i => HVec.tabulate(controlParams(i).size) { j => new CrossbarConfig(controlParams(i)(j)) } }
 
-  val argOutMuxSelect = Vec(f.numArgOuts, UInt(log2Up(p.numArgOutSelections).W))
+  val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
   override def cloneType(): this.type = {
     new PlasticineConfig(pcuParams, vectorParams, scalarParams, controlParams, p, f).asInstanceOf[this.type]
   }
@@ -69,7 +57,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
 
   // Create argOut Muxes
   val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
-    val mux = Module(new MuxN(p.numArgOutSelections, p.w))
+    val mux = Module(new MuxN(p.numArgOutSelections(i), p.w))
     io.argOuts(i).bits := mux.io.out
     mux.io.sel := config.argOutMuxSelect(i)
     mux

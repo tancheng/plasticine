@@ -7,6 +7,8 @@ import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
+import plasticine.spade._
+
 /**
  * Compute Unit module
  * @param w: Word width
@@ -21,20 +23,6 @@ import scala.collection.mutable.ListBuffer
  * @param numControlIn: Input controls
  * @param numControlOut: Output controls
  */
-trait PCUParams extends Params {
-  val w: Int
-  val d: Int
-  val v: Int
-  val r: Int
-  val numCounters: Int
-  val numScalarIn: Int
-  val numScalarOut: Int
-  val numVectorIn: Int
-  val numVectorOut: Int
-  val numControlIn: Int
-  val numControlOut: Int
-}
-
 class ScratchpadBundle(p: PCUParams) extends Bundle {
   var raSrc = UInt(width=1)
   var raValue = UInt(width=log2Up(math.max(p.numCounters, p.d)))

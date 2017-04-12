@@ -2,13 +2,14 @@ package plasticine.arch
 import chisel3._
 import chisel3.util._
 import scala.collection.mutable.ListBuffer
+import plasticine.spade._
 
 trait PlasticineArch0{
   self:PlasticineArch with Plasticine =>
-  cus(0)(0) = Module(new PMU(GeneratedPMUParams(4, 4, 4, 4, 8, 4)))
-  cus(0)(1) = Module(new PCU(GeneratedPCUParams(4, 4, 4, 4, 8, 4)))
-  cus(1)(0) = Module(new PCU(GeneratedPCUParams(4, 4, 4, 4, 8, 4)))
-  cus(1)(1) = Module(new PMU(GeneratedPMUParams(4, 4, 4, 4, 8, 4)))
+  cus(0)(0) = Module(new PMU(PMUParams(4, 4, 4, 4, 8, 4)))
+  cus(0)(1) = Module(new PCU(PCUParams(4, 4, 4, 4, 8, 4)))
+  cus(1)(0) = Module(new PCU(PCUParams(4, 4, 4, 4, 8, 4)))
+  cus(1)(1) = Module(new PMU(PMUParams(4, 4, 4, 4, 8, 4)))
   vsbs(0)(0) = Module(new VectorSwitch(VectorSwitchParams(numIns=9, numOuts=9, v=16, w=32)))
   ssbs(0)(0) = Module(new ScalarSwitch(ScalarSwitchParams(numIns=14, numOuts=14, w=32)))
   csbs(0)(0) = Module(new ControlSwitch(ControlSwitchParams(numIns=13, numOuts=19)))

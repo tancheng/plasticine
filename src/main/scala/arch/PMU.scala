@@ -7,6 +7,8 @@ import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
+import plasticine.spade._
+
 /**
  * Plasticine Memory Unit
  * @param w: Word width
@@ -22,22 +24,6 @@ import scala.collection.mutable.ListBuffer
  * @param numControlOut: Output controls
  * @param wd: Number of stages that can be configured to write address calculation
  */
-trait PMUParams extends PCUParams {
-  //val w: Int
-  //val d: Int
-  //val v: Int
-  //val r: Int
-  //val numCounters: Int
-  //val numScalarIn: Int
-  //val numScalarOut: Int
-  //val numVectorIn: Int
-  //val numVectorOut: Int
-  //val numControlIn: Int
-  //val numControlOut: Int
-  //val numWriteStages: Int
-  val wd: Int
-}
-
 case class PMUConfig(p: PMUParams) extends Bundle {
 
   override def cloneType(): this.type = {
