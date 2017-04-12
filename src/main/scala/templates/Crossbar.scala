@@ -7,7 +7,8 @@ import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import plasticine.templates.Utils.log2Up
 
-import plasticine.arch.SwitchParams
+import plasticine.spade._
+
 /**
  * Crossbar config register format
  */

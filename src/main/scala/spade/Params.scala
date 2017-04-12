@@ -71,4 +71,10 @@ trait TopParams {
   val target: String
 }
 
+abstract class SwitchParams(val numIns: Int, val numOuts: Int) extends Params
+
+case class VectorSwitchParams(override val numIns:Int, override val numOuts:Int, w:Int, v:Int) extends SwitchParams(numIns, numOuts)
+case class ScalarSwitchParams(override val numIns:Int, override val numOuts:Int, w:Int) extends SwitchParams(numIns, numOuts)
+case class ControlSwitchParams(override val numIns:Int, override val numOuts:Int) extends SwitchParams(numIns, numOuts)
+
 
