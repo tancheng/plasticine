@@ -12,6 +12,7 @@ import scala.reflect.runtime.universe._
 import plasticine.arch._
 import plasticine.templates._
 import plasticine.spade._
+import plasticine.pisa.enums._
 //import Chisel._
 
 /**
@@ -54,13 +55,15 @@ case class TREE() extends DataSource
  * Parsed config information for a single counter
  */
 case class CounterRCBits(
-  max: Int = 0,
-  stride: Int = 0,
-  maxConst: Int = 0,
-  strideConst: Int = 0,
-  startDelay: Int = 0,
-  endDelay: Int = 0,
-  onlyDelay: Int = 0
+  max: SrcValueTuple = SrcValueTuple(),
+  stride: SrcValueTuple = SrcValueTuple(),
+  min: SrcValueTuple = SrcValueTuple(),
+  par:Int = 1
+  //maxConst: Int = 0,
+  //strideConst: Int = 0,
+  //startDelay: Int = 0,
+  //endDelay: Int = 0,
+  //onlyDelay: Int = 0
 )(t: CounterConfig) extends AbstractBits {
 }
 object CounterRCBits {
@@ -84,7 +87,7 @@ object CounterChainBits {
   }
 }
 
-case class OperandBits(dataSrc: Int = 0, value: Int = 0)(t: OperandBundle)
+case class OperandBits(src: SrcValueTuple = SrcValueTuple)(t: OperandBundle)
 extends AbstractBits {
   // Get names of case class fields
   def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
@@ -116,8 +119,8 @@ case class PipeStageBits(
   opA: OperandBits,
   opB: OperandBits,
   opC: OperandBits,
-  opcode: Int = 0,
-  result: Int = 0,
+  opcode: Opcode = XOp,
+  result: SrcValueTuple = SrcValueTuple(),
   fwd: Map[Int, Int] = Map[Int, Int]()
 )(t: PipeStageBundle)
 extends AbstractBits {
@@ -146,10 +149,7 @@ object PipeStageBits {
     new PipeStageBits(
       OperandBits.zeroes(width),
       OperandBits.zeroes(width),
-      OperandBits.zeroes(width),
-      0,
-      0,
-      Map[Int, Int]()
+      OperandBits.zeroes(width)
     )(config)
   }
 }
@@ -159,7 +159,7 @@ object PipeStageBits {
  * to hold scratchpad config info.
  * TODO: Use this to hold operand info as well
  */
-case class SrcValueTuple(val src: Int = 0, val value: Int = 0)
+case class SrcValueTuple(src: SelectSource=XSrc, value: Int = -1)
 
 //case class BankingBits(mode: Int = 0, strideLog2: Int = 0) extends AbstractBits
 //
