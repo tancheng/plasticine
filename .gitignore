@@ -13,3 +13,5 @@ generated/
 lib_managed/
 target/
 .DS_Store
+genVerilog/
+test_run_dir/
