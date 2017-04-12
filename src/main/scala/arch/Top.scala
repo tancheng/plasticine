@@ -5,19 +5,8 @@ import chisel3.util._
 import fringe._
 
 import plasticine.templates.Utils.log2Up
+import plasticine.spade._
 
-case class FringeParams(
-  val addrWidth: Int,
-  val dataWidth: Int,
-  val loadStreamInfo: List[StreamParInfo],
-  val storeStreamInfo: List[StreamParInfo]
-) extends GeneratedFringeParams
-
-case class TopParams(
-  val plasticineParams: PlasticineParams,
-  val fringeParams: FringeParams,
-  target: String
-)
 
 class VerilatorInterface(p: TopParams) extends Bundle {
   // Host scalar interface

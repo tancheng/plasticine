@@ -6,8 +6,7 @@ import plasticine.templates.Opcodes
 import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
-
-trait Params
+import plasticine.spade._
 
 case class CUIO[+T<:Bundle](p:PCUParams, cuConfig: T) extends Bundle {
     // Vector IO

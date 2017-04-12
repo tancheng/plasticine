@@ -1,4 +1,4 @@
-package plasticine.arch
+package plasticine.spade
 
 trait RegColor
 case object VecInReg extends RegColor
