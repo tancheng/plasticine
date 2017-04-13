@@ -8,6 +8,7 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
 import plasticine.spade._
+import plasticine.config._
 
 /**
  * Plasticine Memory Unit
@@ -24,13 +25,6 @@ import plasticine.spade._
  * @param numControlOut: Output controls
  * @param wd: Number of stages that can be configured to write address calculation
  */
-case class PMUConfig(p: PMUParams) extends Bundle {
-
-  override def cloneType(): this.type = {
-    new PMUConfig(p).asInstanceOf[this.type]
-  }
-}
-
 class PMU(val p: PMUParams) extends CU {
   val io = IO(CUIO(p, PMUConfig(p)))
 }

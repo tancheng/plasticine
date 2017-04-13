@@ -3,18 +3,7 @@ package plasticine.templates
 import chisel3._
 
 import scala.collection.mutable.HashMap
-
-/**
- * CounterChain config register format
- */
-case class CounterChainConfig(val w: Int, val numCounters: Int, val startDelayWidth: Int = 0, val endDelayWidth: Int = 0) extends Bundle {
-  val chain = Vec(numCounters-1, Bool())
-  val counterConfig = Vec(numCounters, CounterConfig(w, startDelayWidth, endDelayWidth))
-
-  override def cloneType(): this.type = {
-    new CounterChainConfig(w, numCounters, startDelayWidth, endDelayWidth).asInstanceOf[this.type]
-  }
-}
+import plasticine.config.{CounterConfig, CounterChainConfig}
 
 class CounterChainCore(
   val w: Int,
@@ -39,7 +28,7 @@ class CounterChainCore(
     c.io.max := io.max(i)
     io.configuredMax(i) := c.io.configuredMax
     c.io.stride := io.stride(i)
-    c.io.config := io.config.counterConfig(i)
+    c.io.config := io.config.counters(i)
     io.out(i) := c.io.out
     io.next(i) := c.io.next
     c

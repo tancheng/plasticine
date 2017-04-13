@@ -8,8 +8,8 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
 import plasticine.templates._
-
 import plasticine.spade._
+import plasticine.config._
 
 /**
  * Compute Unit module
@@ -25,61 +25,6 @@ import plasticine.spade._
  * @param numControlIn: Input controls
  * @param numControlOut: Output controls
  */
-class ScratchpadBundle(p: PCUParams) extends Bundle {
-  var raSrc = UInt(width=1)
-  var raValue = UInt(width=log2Up(math.max(p.numCounters, p.d)))
-  var waSrc = UInt(width=2)
-  var waValue = UInt(width=log2Up(math.max(p.numCounters, p.d)))
-  var wdSrc = UInt(width=1)
-  var wen = UInt(width=log2Up(p.numCounters+1))
-  val wswap = UInt(width=log2Up(p.numCounters+1))
-  val rswap = UInt(width=log2Up(p.numCounters+1))
-  val enqEn = UInt(width=log2Up(p.numCounters+1))
-  val deqEn = UInt(width=log2Up(p.numCounters+1))
-
-
-  override def cloneType(): this.type = {
-    new ScratchpadBundle(p).asInstanceOf[this.type]
-  }
-}
-
-class OperandBundle(w: Int) extends Bundle {
-  var dataSrc = UInt(3.W)  // TODO: 3 ?
-  var value = UInt(log2Up(w).W)
-
-  override def cloneType(): this.type = {
-    new OperandBundle(w).asInstanceOf[this.type]
-  }
-}
-
-class PipeStageBundle(r: Int, w: Int) extends Bundle {
-  var opA = new OperandBundle(w)
-  var opB = new OperandBundle(w)
-  var opC = new OperandBundle(w)
-
-  var opcode = UInt(log2Up(Opcodes.size).W)
-  var result = UInt(r.W) // One-hot encoded
-//  var fwd = Vec(r, Bool())
-
-  override def cloneType(): this.type = {
-    new PipeStageBundle(r,w).asInstanceOf[this.type]
-  }
-}
-
-case class PCUConfig(p: PCUParams) extends Bundle {
-  val counterChain = CounterChainConfig(p.w, p.numCounters)
-  val stages = Vec(p.d, new PipeStageBundle(p.r, p.w))
-
-  override def cloneType(): this.type = {
-    new PCUConfig(p).asInstanceOf[this.type]
-  }
-}
-object PCUConfig {
-  def apply(p:CUParams):PCUConfig = {
-    PCUConfig(p.asInstanceOf[PCUParams])
-  }
-}
-
 class PCU(val p: PCUParams) extends CU {
   val io = IO(CUIO(p, PCUConfig(p)))
 
@@ -130,13 +75,13 @@ class PCU(val p: PCUParams) extends CU {
     // max
     val maxMux = Module(new MuxN(ctrMaxStrideSources.size, p.w))
     maxMux.io.ins := ctrMaxStrideSources
-    maxMux.io.sel := io.config.counterChain.counterConfig(i).max.value
+    maxMux.io.sel := io.config.counterChain.counters(i).max.value
     counterChain.io.max(i) := maxMux.io.out
 
     // stride
     val strideMux = Module(new MuxN(ctrMaxStrideSources.size, p.w))
     strideMux.io.ins := ctrMaxStrideSources
-    strideMux.io.sel := io.config.counterChain.counterConfig(i).stride.value
+    strideMux.io.sel := io.config.counterChain.counters(i).stride.value
     counterChain.io.stride(i) := strideMux.io.out
   }
 

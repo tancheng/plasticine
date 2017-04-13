@@ -8,17 +8,7 @@ import plasticine.pisa.ir._
 import plasticine.templates.Utils.log2Up
 
 import plasticine.spade._
-
-/**
- * Crossbar config register format
- */
-case class CrossbarConfig(p: SwitchParams) extends Bundle {
-  var outSelect = Vec(p.numOuts, UInt(log2Up(p.numIns).W))
-
-  override def cloneType(): this.type = {
-    new CrossbarConfig(p).asInstanceOf[this.type]
-  }
-}
+import plasticine.config.CrossbarConfig
 
 /**
  * Core logic inside a crossbar

@@ -5,20 +5,7 @@ import chisel3.util.{log2Ceil, isPow2}
 import plasticine.templates.Utils.log2Up
 
 import plasticine.pisa.enums._
-
-/**
- * FIFO config register format
- */
-case class FIFOConfig(val d: Int, val v: Int) extends Bundle {
-  def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
-
-  var chainWrite = Bool()
-  var chainRead = Bool()
-
-  override def cloneType(): this.type = {
-    new FIFOConfig(d, v).asInstanceOf[this.type]
-  }
-}
+import plasticine.config.{FIFOConfig, CounterChainConfig}
 
 abstract class FIFOBase(val w: Int, val d: Int, val v: Int) extends Module {
   val io = IO(new Bundle {
@@ -86,13 +73,13 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
   wptrConfig.chain(0) := io.config.chainWrite
   (0 until 2) foreach { i => i match {
       case 1 => // Localaddr: max = bankSize, stride = 1
-        val cfg = wptrConfig.counterConfig(i)
+        val cfg = wptrConfig.counters(i)
         cfg.max.src := cfg.max.srcIdx(ConstSrc).U
         cfg.max.value := bankSize.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
       case 0 => // Bankaddr: max = v, stride = 1
-        val cfg = wptrConfig.counterConfig(i)
+        val cfg = wptrConfig.counters(i)
         cfg.max.value := v.U
         cfg.max.src := cfg.max.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
@@ -111,13 +98,13 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
   rptrConfig.chain(0) := io.config.chainRead
   (0 until 2) foreach { i => i match {
       case 1 => // Localaddr: max = bankSize, stride = 1
-        val cfg = rptrConfig.counterConfig(i)
+        val cfg = rptrConfig.counters(i)
         cfg.max.src := cfg.max.srcIdx(ConstSrc).U
         cfg.max.value := bankSize.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
       case 0 => // Bankaddr: max = v, stride = 1
-        val cfg = rptrConfig.counterConfig(i)
+        val cfg = rptrConfig.counters(i)
         cfg.max.src := cfg.max.srcIdx(ConstSrc).U
         cfg.max.value := v.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U

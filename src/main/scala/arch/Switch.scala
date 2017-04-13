@@ -6,7 +6,8 @@ import plasticine.templates.Opcodes
 import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
-import plasticine.templates.{CrossbarConfig, CrossbarCore}
+import plasticine.templates.CrossbarCore
+import plasticine.config.{CrossbarConfig}
 import plasticine.spade._
 
 class VectorSwitch(val p: VectorSwitchParams) extends Module {

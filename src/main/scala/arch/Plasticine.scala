@@ -1,6 +1,5 @@
 package plasticine.arch
 
-import util.HVec
 import chisel3._
 import chisel3.util._
 
@@ -9,38 +8,13 @@ import plasticine.templates._
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import plasticine.spade._
+import plasticine.config._
 import fringe._
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Set
 import scala.collection.mutable.ListBuffer
 import java.io.PrintWriter
-
-case class PlasticineConfig(
-  cuParams:    Array[Array[CUParams]],
-  vectorParams: Array[Array[VectorSwitchParams]],
-  scalarParams: Array[Array[ScalarSwitchParams]],
-  controlParams: Array[Array[ControlSwitchParams]],
-  p: PlasticineParams,
-  f: FringeParams) extends Bundle {
-
-  val cu = HVec.tabulate(cuParams.size) { i => HVec.tabulate(cuParams(i).size) { j =>
-    cuParams(i)(j) match {
-      case p:PCUParams => new PCUConfig(p)
-      case p:PMUParams => new PMUConfig(p)
-    }
-  } }
-
-  // Dummy placeholders for real switch config interface
-  val vectorSwitch = HVec.tabulate(vectorParams.size) { i => HVec.tabulate(vectorParams(i).size) { j => new CrossbarConfig(vectorParams(i)(j)) } }
-  val scalarSwitch = HVec.tabulate(scalarParams.size) { i => HVec.tabulate(scalarParams(i).size) { j => new CrossbarConfig(scalarParams(i)(j)) } }
-  val controlSwitch = HVec.tabulate(controlParams.size) { i => HVec.tabulate(controlParams(i).size) { j => new CrossbarConfig(controlParams(i)(j)) } }
-
-  val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
-  override def cloneType(): this.type = {
-    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f).asInstanceOf[this.type]
-  }
-}
 
 case class PlasticineIO(f: FringeParams) extends Bundle {
   // Scalar IO

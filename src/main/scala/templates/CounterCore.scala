@@ -6,72 +6,9 @@ import chisel3._
 import plasticine.pisa.ir._
 import plasticine.pisa.enums._
 import plasticine.templates.Utils.log2Up
-//
+import plasticine.config.{CounterConfig, SrcValueBundle}
 import scala.collection.mutable.HashMap
 import scala.collection.immutable.Set
-
-/**
- * SrcValueBundle: Generic tuple that holds a list of sources and a value
- * @param validSources: List of valid/allowed 'SelectSource' Enums for this instance.
- *                      The order of validSources determines the index order given to each source
- * @param valueWidth:   Width in bits of value field
- */
-case class SrcValueBundle(validSources: List[SelectSource], valueWidth: Int) extends Bundle {
-  // XSrc must be a member of validSources all the time
-  Predef.assert(validSources.contains(XSrc), s"ERROR: Xsrc must be among validSources for every SrcValueBundle! validSources: ${validSources}")
-
-  private val nonXSources = validSources.filterNot { _ == XSrc }
-  val srcWidth = log2Up(nonXSources.size)
-
-  val src = UInt(srcWidth.W)
-  val value = UInt(valueWidth.W)
-
-  // Get the index of a given source for this SrcValueBundle
-  def srcIdx(s: SelectSource) = {
-    Predef.assert(validSources.contains(s), s"ERROR: Source $s not present in validSources: $validSources")
-    s match {
-      case XSrc => 0
-      case _ => validSources.indexOf(s)
-    }
-  }
-
-  // Convenience method that creates a comparator that checks if 'src' is a given SelectSource value
-  // Used during mux creation based on source
-  def is(s: SelectSource) = {
-    val idx = srcIdx(s)
-    (src === idx.U)
-  }
-
-  override def cloneType(): this.type = {
-    new SrcValueBundle(validSources, valueWidth).asInstanceOf[this.type]
-  }
-}
-/**
- * Counter configuration format
- */
-case class CounterConfig(val w: Int, val startDelayWidth: Int, val endDelayWidth: Int) extends Bundle {
-
-  private val validSources = List[SelectSource](XSrc, ConstSrc, ScalarFIFOSrc)
-  val max = SrcValueBundle(validSources, w)
-  val stride = SrcValueBundle(validSources, w)
-
-//  val maxConst = Bool()
-//  val strideConst = Bool()
-//  val startDelay = {
-//    val delayWidth = math.max(startDelayWidth, 1)
-//    UInt(delayWidth.W)
-//  }
-//  var endDelay = {
-//    val delayWidth = math.max(startDelayWidth, 1)
-//    UInt(delayWidth.W)
-//  }
-//
-//  val onlyDelay = Bool()
-
-  override def cloneType(): this.type = {
-    new CounterConfig(w, startDelayWidth, endDelayWidth).asInstanceOf[this.type]
-  }
-}
 
 /**
  * CounterCore: Counter with optional start and end delays
