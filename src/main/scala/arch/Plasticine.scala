@@ -35,13 +35,6 @@ case class PlasticineIO(f: FringeParams) extends Bundle {
 class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module with PlasticineArch {
   val io = IO(PlasticineIO(f))
 
-  val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
-    val mux = Module(new MuxN(p.numArgOutSelections(i), p.w))
-    io.argOuts(i).bits := mux.io.out
-    mux.io.sel := config.argOutMuxSelect(i)
-    mux
-  }
-
   val cuParams = p.cuParams
   val vectorParams = p.vectorSwitchParams
   val scalarParams = p.scalarSwitchParams
@@ -53,6 +46,13 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
   configSR.io.in.valid := io.config.valid
 
   val config = configSR.io.config
+
+  val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
+    val mux = Module(new MuxN(p.numArgOutSelections(i), p.w))
+    io.argOuts(i).bits := mux.io.out
+    mux.io.sel := config.argOutMuxSelect(i)
+    mux
+  }
 
 
   // PCUs, PMUs
