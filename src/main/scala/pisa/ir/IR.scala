@@ -80,52 +80,52 @@ object CounterRCBits {
 /**
  * CounterChain config information
  */
-case class CounterChainBits(chain: List[Int], counters: List[CounterRCBits])(t: CounterChainConfig) extends AbstractBits
+case class CounterChainBits(chain: List[Int], counters: Array[CounterRCBits])(t: CounterChainConfig) extends AbstractBits
 object CounterChainBits {
   def zeroes(width: Int, numCounters: Int) = {
     val config = new CounterChainConfig(width, numCounters, 0, 0)
     new CounterChainBits(
       List.fill(numCounters) { 0 },
-      List.fill(numCounters) { CounterRCBits.zeroes(width) }
+      Array.fill(numCounters) { CounterRCBits.zeroes(width) }
     )(config)
   }
 }
 
-case class OperandBits(src: SrcValueTuple)(t: OperandBundle)
-extends AbstractBits {
-  // Get names of case class fields
-  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
-      case m: MethodSymbol if m.isCaseAccessor => m
-  }.toList.reverse.map {_.name.toString}
+//case class OperandBits(src: SrcValueTuple = SrcValueTuple())(t: OperandBundle)
+//extends AbstractBits {
+  //// Get names of case class fields
+  //def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
+      //case m: MethodSymbol if m.isCaseAccessor => m
+  //}.toList.reverse.map {_.name.toString}
 
-  // Get width of x'th field of this class using corresponding 't' field
-  def widthOf(x: Int) = t.elements(classAccessors[this.type].apply(x)).getWidth
+  //// Get width of x'th field of this class using corresponding 't' field
+  //def widthOf(x: Int) = t.elements(classAccessors[this.type].apply(x)).getWidth
 
-  override def toBinary(): List[Int] = {
-    // Iterate through list elements backwards, convert to binary
-    List.tabulate(this.productArity) { i =>
-      val idx = this.productArity - 1 - i
-      val elem = this.productElement(idx)
-      val w = widthOf(idx)
-      println(s"Width of $idx = $w")
-      toBinary(elem, w)
-    }.flatten
-  }
+  //override def toBinary(): List[Int] = {
+    //// Iterate through list elements backwards, convert to binary
+    //List.tabulate(this.productArity) { i =>
+      //val idx = this.productArity - 1 - i
+      //val elem = this.productElement(idx)
+      //val w = widthOf(idx)
+      //println(s"Width of $idx = $w")
+      //toBinary(elem, w)
+    //}.flatten
+  //}
 
-}
-object OperandBits {
-  def zeroes(width: Int) = {
-    new OperandBits(SrcValueTuple.zeroes(width))(new OperandBundle(width))
-  }
-}
+//}
+//object OperandBits {
+  //def zeroes(width: Int) = {
+    //new OperandBits()(new OperandBundle(width))
+  //}
+//}
 
 case class PipeStageBits(
-  opA: OperandBits,
-  opB: OperandBits,
-  opC: OperandBits,
+  opA: SrcValueTuple,
+  opB: SrcValueTuple,
+  opC: SrcValueTuple,
   opcode: Opcode = XOp,
-  result: List[SrcValueTuple] = Nil,
-  fwd: Map[Int, Int] = Map[Int, Int]()
+  result: Array[SrcValueTuple] = Array(),
+  fwd: Array[SrcValueTuple] 
 )(t: PipeStageBundle)
 extends AbstractBits {
   // Get names of case class fields
@@ -151,10 +151,10 @@ object PipeStageBits {
   def zeroes(numRegs: Int, width: Int) = {
     val config = new PipeStageBundle(numRegs, width)
     new PipeStageBits(
-      OperandBits.zeroes(width),
-      OperandBits.zeroes(width),
-      OperandBits.zeroes(width)
-    )(config)
+      opA = SrcValueTuple.zeroes(width),
+      opB = SrcValueTuple.zeroes(width),
+      opC = SrcValueTuple.zeroes(width),
+      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width)))(config)
   }
 }
 
@@ -247,7 +247,7 @@ object SrcValueTuple {
 trait CUBits extends AbstractBits
 
 case class PCUBits(
-  stages: List[PipeStageBits],
+  stages: Array[PipeStageBits],
   counterChain: CounterChainBits
 //  control: CUControlBoxBits
 )(t: PCUConfig) extends CUBits
@@ -255,7 +255,7 @@ object PCUBits {
   def zeroes(p: PCUParams) = {
     val config = new PCUConfig(p)
     new PCUBits (
-      List.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
+      Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
       CounterChainBits.zeroes(p.w, p.numCounters)
 //      CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
     )(config)
@@ -263,7 +263,7 @@ object PCUBits {
 }
 
 case class PMUBits(
-  stages: List[PipeStageBits],
+  stages: Array[PipeStageBits],
   counterChain: CounterChainBits
 //  control: CUControlBoxBits
 )(t: PMUConfig) extends CUBits
@@ -271,7 +271,7 @@ object PMUBits {
   def zeroes(p: PMUParams) = {
     val config = new PMUConfig(p)
     new PMUBits (
-      List.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
+      Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
       CounterChainBits.zeroes(p.w, p.numCounters)
 //      CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
     )(config)
@@ -342,10 +342,10 @@ object PMUBits {
  * In this case, the user specifies 'x' for don't care, and 0,1,.. for actual values.
  * Add 1 to each value that is non-'x' if set to true.
  */
-case class CrossbarBits(outSelect: List[Int])(t: CrossbarConfig) extends AbstractBits
+case class CrossbarBits(outSelect: Array[Int])(t: CrossbarConfig) extends AbstractBits
 object CrossbarBits {
   def zeroes(p: SwitchParams) = {
-    new CrossbarBits(List.fill(1+p.numOuts) { 0 })(new CrossbarConfig(p))
+    new CrossbarBits(Array.fill(1+p.numOuts) { 0 })(new CrossbarConfig(p))
   }
 }
 
@@ -379,10 +379,10 @@ object CrossbarBits {
  * Plasticine config information
  */
 case class PlasticineBits(
-  cu: List[List[CUBits]],
-  vectorSwitch: List[List[CrossbarBits]],
-  scalarSwitch: List[List[CrossbarBits]],
-  controlSwitch: List[List[CrossbarBits]],
+  cu: Array[Array[CUBits]],
+  vectorSwitch: Array[Array[CrossbarBits]],
+  scalarSwitch: Array[Array[CrossbarBits]],
+  controlSwitch: Array[Array[CrossbarBits]],
   argOutMuxSelect: List[Int]
 )(t: PlasticineConfig) extends AbstractBits
 
@@ -397,13 +397,13 @@ object PlasticineBits {
   ) = {
     val config = PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f)
     new PlasticineBits(
-      List.tabulate(p.numRows, p.numCols) { case (i, j) => cuParams(i)(j) match {
+      Array.tabulate(p.numRows, p.numCols) { case (i, j) => cuParams(i)(j) match {
         case pcu: PCUParams => PCUBits.zeroes(pcu)
         case pmu: PMUParams => PMUBits.zeroes(pmu)
       }},
-      List.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(vectorParams(i)(j)) },
-      List.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(scalarParams(i)(j)) },
-      List.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(controlParams(i)(j)) },
+      Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(vectorParams(i)(j)) },
+      Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(scalarParams(i)(j)) },
+      Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(controlParams(i)(j)) },
       List.fill(f.numArgOuts) { 0 }
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
   )(config)}
