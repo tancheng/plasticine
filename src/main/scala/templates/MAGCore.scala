@@ -58,7 +58,7 @@ class MAGCore(
   val addrWidth = 64
   // Addr FIFO
   val addrFifo = Module(new FIFOArbiter(addrWidth, d, v, numStreams))
-  val addrFifoConfig = Wire(new FIFOOpcode(d, v))
+  val addrFifoConfig = Wire(new FIFOConfig(d, v))
   addrFifoConfig.chainRead := 1.U
   addrFifoConfig.chainWrite := ~io.config.scatterGather
   addrFifo.io.config := addrFifoConfig
@@ -74,7 +74,7 @@ class MAGCore(
   // isWr FIFO: Currently a 1-bit FIFO. Ideally we would have a single FIFO
   // for the entire 'cmd' struct, which would require changes to the FIFO and SRAM templates.
   val isWrFifo = Module(new FIFOArbiter(1, d, v, numStreams))
-  val isWrFifoConfig = Wire(new FIFOOpcode(d, v))
+  val isWrFifoConfig = Wire(new FIFOConfig(d, v))
   isWrFifoConfig.chainRead := 1.U
   isWrFifoConfig.chainWrite := 1.U
   isWrFifo.io.config := isWrFifoConfig
@@ -85,7 +85,7 @@ class MAGCore(
 
   // Size FIFO
   val sizeFifo = Module(new FIFOArbiter(w, d, v, numStreams))
-  val sizeFifoConfig = Wire(new FIFOOpcode(d, v))
+  val sizeFifoConfig = Wire(new FIFOConfig(d, v))
   sizeFifoConfig.chainRead := 1.U
   sizeFifoConfig.chainWrite := 1.U
   sizeFifo.io.config := sizeFifoConfig

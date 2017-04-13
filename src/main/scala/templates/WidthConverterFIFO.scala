@@ -47,7 +47,7 @@ class WidthConverterFIFO(val win: Int, val vin: Int, val wout: Int, val vout: In
     Predef.assert(outWidth % inWidth == 0, s"ERROR: Width conversion attempted between widths that are not multiples (in: $inWidth, out: $outWidth)")
     val v = outWidth / inWidth
     val fifo = Module(new FIFOCore(inWidth, d, v))
-    val fifoConfig = Wire(new FIFOOpcode(d, v))
+    val fifoConfig = Wire(new FIFOConfig(d, v))
     fifoConfig.chainWrite := 1.U
     fifoConfig.chainRead := 0.U
     fifo.io.config := fifoConfig
@@ -63,7 +63,7 @@ class WidthConverterFIFO(val win: Int, val vin: Int, val wout: Int, val vout: In
     Predef.assert(inWidth % outWidth == 0, s"ERROR: Width conversion attempted between widths that are not multiples (in: $inWidth, out: $outWidth)")
     val v = inWidth / outWidth
     val fifo = Module(new FIFOCore(outWidth, d, v))
-    val fifoConfig = Wire(new FIFOOpcode(d, v))
+    val fifoConfig = Wire(new FIFOConfig(d, v))
     fifoConfig.chainWrite := 0.U
     fifoConfig.chainRead := 1.U
     fifo.io.config := fifoConfig
@@ -80,7 +80,7 @@ class WidthConverterFIFO(val win: Int, val vin: Int, val wout: Int, val vout: In
     fifo.io.deqVld := io.deqVld
   } else {
     val fifo = Module(new FIFOCore(win, d, vin))
-    val fifoConfig = Wire(new FIFOOpcode(d, vin))
+    val fifoConfig = Wire(new FIFOConfig(d, vin))
     fifoConfig.chainWrite := 0.U
     fifoConfig.chainRead := 0.U
     fifo.io.config := fifoConfig

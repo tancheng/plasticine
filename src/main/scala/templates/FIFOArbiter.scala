@@ -24,7 +24,7 @@ class FIFOArbiter(
     val empty = Output(Bool())
     val forceTag = Flipped(Decoupled(UInt(tagWidth.W)))
     val tag = Output(UInt(tagWidth.W))
-    val config = Input(new FIFOOpcode(d, v))
+    val config = Input(new FIFOConfig(d, v))
   })
 
   val tagFF = Module(new FF(tagWidth))
@@ -35,7 +35,7 @@ class FIFOArbiter(
   if (numStreams > 0) {
     val fifos = List.tabulate(numStreams) { i =>
       val m = Module(new FIFOCore(w, d, v))
-      val fifoConfig = Wire(new FIFOOpcode(d, v))
+      val fifoConfig = Wire(new FIFOConfig(d, v))
       fifoConfig.chainRead := io.config.chainRead
       fifoConfig.chainWrite := io.config.chainWrite
       m.io.config := fifoConfig
