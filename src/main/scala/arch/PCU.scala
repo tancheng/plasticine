@@ -83,7 +83,6 @@ class PCU(val p: PCUParams) extends CU {
   // Which stages contain the fused multiply-add (FMA) unit?
   val fmaStages = (p.d/2 until p.d).toList
 
-  io.scalarOut(0).bits := io.config.stages(0).opcode
   // Sanity check parameters for validity
   // #stages: Currently there must be at least one 'regular' stage
   // after 'rwStages' and before 'reduction' stages because of the way
@@ -91,6 +90,64 @@ class PCU(val p: PCUParams) extends CU {
   // i.e., d >= rwStages + 1 + numReduceStages + numStagesAfterReduction
   Predef.assert(p.d >= (1 + numReduceStages), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages)!""")
 
+  // Scalar input FIFOs
+  val scalarFIFOs = List.tabulate(p.numScalarIn) { i =>
+    val fifo = Module(new FIFOCore(p.w, p.scalarFIFODepth, 1))
+    val config = Wire(FIFOConfig(p.scalarFIFODepth, p.v))
+    config.chainWrite := true.B
+    config.chainRead := true.B
+    fifo.io.config := config
+    fifo.io.enq(0) := io.scalarIn(i).bits
+    fifo.io.enqVld := io.scalarIn(i).valid
+    fifo
+  }
+
+  // Vector input FIFOs
+  val vectorFIFOs = List.tabulate(p.numVectorIn) { i =>
+    val fifo = Module(new FIFOCore(p.w, p.vectorFIFODepth, p.v))
+    val config = Wire(FIFOConfig(p.vectorFIFODepth, p.v))
+    config.chainWrite := false.B
+    config.chainRead := false.B
+    fifo.io.config := config
+    fifo.io.enq := io.vecIn(i).bits
+    fifo.io.enqVld := io.vecIn(i).valid
+    io.vecIn(i).ready := ~(fifo.io.almostFull | fifo.io.full)
+    fifo
+  }
+
+  // Counter chain
+  val counterChain = Module(new CounterChainCore(p.w, p.numCounters))
+  counterChain.io.config := io.config.counterChain
+
+  // Connect max and stride
+  val ctrMaxStrideSources = Vec(scalarFIFOs.map { _.io.deq(0) })
+  for (i <- 0 until p.numCounters) {
+    // max
+    val maxMux = Module(new MuxN(ctrMaxStrideSources.size, p.w))
+    maxMux.io.ins := ctrMaxStrideSources
+    maxMux.io.sel := io.config.counterChain.counterConfig(i).max.value
+    counterChain.io.max(i) := maxMux.io.out
+
+    // stride
+    val strideMux = Module(new MuxN(ctrMaxStrideSources.size, p.w))
+    strideMux.io.ins := ctrMaxStrideSources
+    strideMux.io.sel := io.config.counterChain.counterConfig(i).stride.value
+    counterChain.io.stride(i) := strideMux.io.out
+  }
+
+  // Control Block
+  // Pipeline with FUs and registers
+
+  // Output assignment
+  io.scalarOut.zipWithIndex.foreach { case (out, i) =>
+    out.bits := scalarFIFOs(i).io.deq(0)
+    out.valid := ~scalarFIFOs(i).io.empty
+  }
+
+  io.vecOut.zipWithIndex.foreach { case (out, i) =>
+    out.bits := vectorFIFOs(i).io.deq
+    out.valid := ~vectorFIFOs(i).io.empty
+  }
 }
 
 
