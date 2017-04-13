@@ -12,7 +12,7 @@ object ConstSrc extends SelectSource
 object XSrc extends SelectSource
 
 sealed trait Opcode 
-case object Mux extends Opcode
+case object MuxOp extends Opcode
 case object Bypass extends Opcode
 
 sealed trait FixOpcode extends Opcode 
