@@ -55,27 +55,50 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
   val config = configSR.io.config
 
 
-//  argOutMuxes.io.ins(?) := ?
+  // PCUs, PMUs
+  val cus = Array.tabulate(p.numCols) { i =>
+      Array.tabulate(p.numRows) { j =>
+        cuParams(i)(j) match {
+          case p: PCUParams =>
+            val cu = Module(new PCU(p))
+            cu.io.config := config.cu(i)(j).asInstanceOf[PCUConfig]
+            cu
+          case p: PMUParams => Module(new PMU(p))
+            val cu = Module(new PMU(p))
+            cu.io.config := config.cu(i)(j).asInstanceOf[PMUConfig]
+            cu
+        }
+      }
+    }
 
-  // PCUs
-//  val pcus = ListBuffer.tabulate(p.numCols) { i =>
-//      ListBuffer.tabulate(p.numRows) { j =>
-//        val pcu = Module(new PCU(p.pcuParams(i*p.numCols+j)))
-//        pcu.io.config := config.pcuConfig(i*p.numCols+j)
-//        pcu
-//      }
-//    }
-
-  // Control network + Little CUs
-  //// Map enable to control network
-  //// Map done to control network
-
-  // Vector network
-  //// Connect load and store streams to vector switches
+  // Vector switches
+  val vsbs = Array.tabulate(vectorParams.size) { i =>
+    Array.tabulate(vectorParams(i).size) { j =>
+      val switch = Module(new VectorSwitch(vectorParams(i)(j)))
+      switch.io.config := config.vectorSwitch(i)(j)
+      switch
+    }
+  }
 
   // Scalar network
-  //// Map argIns to scalar switches
-  //// Map argOuts to scalar switches
+  val ssbs = Array.tabulate(scalarParams.size) { i =>
+    Array.tabulate(scalarParams(i).size) { j =>
+      val switch = Module(new ScalarSwitch(scalarParams(i)(j)))
+      switch.io.config := config.scalarSwitch(i)(j)
+      switch
+    }
+  }
+
+  // Control network + Little CUs
+  val csbs = Array.tabulate(controlParams.size) { i =>
+    Array.tabulate(controlParams(i).size) { j =>
+      val switch = Module(new ControlSwitch(controlParams(i)(j)))
+      switch.io.config := config.controlSwitch(i)(j)
+      switch
+    }
+  }
+
+  connect(io, argOutMuxes, cus, vsbs, ssbs, csbs)
 }
 
 //trait DirectionOps {
