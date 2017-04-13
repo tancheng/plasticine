@@ -99,8 +99,14 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
   }
 
   // Switch CUs
-//  val switchCUs = 
-//
+//  val switchCUs = Array.tabulate(switchCUParams.size) { i =>
+//    Array.tabulate(switchCUParams(i).size) { j =>
+//      val cu= Module(new PMU(switchCUParams(i)(j)))
+//      cu.io.config := config.switchCU(i)(j)
+//      cu
+//    }
+//  }
+
   connect(io, argOutMuxes, cus, vsbs, ssbs, csbs)
 }
 
