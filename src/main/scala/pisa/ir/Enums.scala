@@ -5,22 +5,24 @@ import plasticine.pisa._
 sealed trait Enum
 
 sealed trait SelectType extends Enum
-sealed trait SelectSrc extends SelectType // Input type
+sealed trait XType extends SelectType
+sealed trait SelectSource extends SelectType // Input type
 sealed trait SelectDst extends SelectType // Ouptut type
 
-object CounterSrc extends SelectSrc
-object ScalarFIFOSrc extends SelectSrc
-object VectorFIFOSrc extends SelectSrc
-object ConstSrc extends SelectSrc
-object PrevStageSrc extends SelectSrc
-object CurrStageSrc extends SelectSrc
-object ALUSrc extends SelectSrc
+object CounterSrc extends SelectSource
+object ScalarFIFOSrc extends SelectSource
+object VectorFIFOSrc extends SelectSource
+object ConstSrc extends SelectSource
+object PrevStageSrc extends SelectSource
+object CurrStageSrc extends SelectSource
+object ALUSrc extends SelectSource
+object XSrc extends SelectSource with XType
 
 object CurrStageDst extends SelectDst
 object ScalarOutDst extends SelectDst
 object VectorOutDst extends SelectDst
+object XDst extends SelectDst with XType
 
-object XType extends SelectType
 
 sealed trait Opcode 
 case object MuxOp extends Opcode
