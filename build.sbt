@@ -23,3 +23,4 @@ libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.4")
 
 addCommandAlias("make", ";project plasticine; compile")
+addCommandAlias("run", ";project plasticine; compile; runMain plasticine.PlasticineGen --testArgs")
