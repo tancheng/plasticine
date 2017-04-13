@@ -55,9 +55,9 @@ case class TREE() extends DataSource
  * Parsed config information for a single counter
  */
 case class CounterRCBits(
-  max: SrcValueTuple = SrcValueTuple(),
-  stride: SrcValueTuple = SrcValueTuple(),
-  min: SrcValueTuple = SrcValueTuple(),
+  max: SrcValueTuple,
+  stride: SrcValueTuple,
+  min: SrcValueTuple,
   par:Int = 1
   //maxConst: Int = 0,
   //strideConst: Int = 0,
@@ -69,7 +69,11 @@ case class CounterRCBits(
 object CounterRCBits {
   def zeroes(width: Int) = {
     val config = new CounterConfig(width, 0, 0)
-    new CounterRCBits()(config)
+    new CounterRCBits(
+      SrcValueTuple.zeroes(width),
+      SrcValueTuple.zeroes(width),
+      SrcValueTuple.zeroes(width)
+      )(config)
   }
 }
 
@@ -87,7 +91,7 @@ object CounterChainBits {
   }
 }
 
-case class OperandBits(src: SrcValueTuple = SrcValueTuple())(t: OperandBundle)
+case class OperandBits(src: SrcValueTuple)(t: OperandBundle)
 extends AbstractBits {
   // Get names of case class fields
   def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
@@ -111,7 +115,7 @@ extends AbstractBits {
 }
 object OperandBits {
   def zeroes(width: Int) = {
-    new OperandBits()(new OperandBundle(width))
+    new OperandBits(SrcValueTuple.zeroes(width))(new OperandBundle(width))
   }
 }
 
@@ -159,7 +163,39 @@ object PipeStageBits {
  * to hold scratchpad config info.
  * TODO: Use this to hold operand info as well
  */
-case class SrcValueTuple(src: SelectSource=XSrc, value: AnyVal = -1)
+case class SrcValueTuple(src: SelectSource = XSrc, value: AnyVal = -1)(t: SrcValueBundle)
+extends AbstractBits {
+  // Check if 'src' is in the list of valid sources
+  Predef.assert(t.validSources.contains(src), s"ERROR: Invalid source $src in SrcValueTuple (allowed sources: ${t.validSources})")
+
+  // Get names of case class fields
+  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
+      case m: MethodSymbol if m.isCaseAccessor => m
+  }.toList.reverse.map {_.name.toString}
+
+  // Get width of x'th field of this class using corresponding 't' field
+  def widthOf(x: Int) = t.elements(classAccessors[this.type].apply(x)).getWidth
+
+  override def toBinary(): List[Int] = {
+    // Iterate through list elements backwards, convert to binary
+    List.tabulate(this.productArity) { i =>
+      val idx = this.productArity - 1 - i
+      val elem = this.productElement(idx)
+      val w = widthOf(idx)
+      println(s"Width of $idx = $w")
+      elem match {
+        case s: SelectSource => toBinary(t.srcIdx(s), w)
+        case _ => toBinary(elem, w)
+      }
+    }.flatten
+  }
+}
+object SrcValueTuple {
+  def zeroes(width: Int) = {
+    val config = SrcValueBundle(List(XSrc), width)
+    new SrcValueTuple()(config)
+  }
+}
 
 //case class BankingBits(mode: Int = 0, strideLog2: Int = 0) extends AbstractBits
 //

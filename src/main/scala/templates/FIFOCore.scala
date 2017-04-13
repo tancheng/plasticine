@@ -4,18 +4,19 @@ import chisel3._
 import chisel3.util.{log2Ceil, isPow2}
 import plasticine.templates.Utils.log2Up
 
+import plasticine.pisa.enums._
 
 /**
  * FIFO config register format
  */
-case class FIFOOpcode(val d: Int, val v: Int) extends Bundle {
+case class FIFOConfig(val d: Int, val v: Int) extends Bundle {
   def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
 
   var chainWrite = Bool()
   var chainRead = Bool()
 
   override def cloneType(): this.type = {
-    new FIFOOpcode(d, v).asInstanceOf[this.type]
+    new FIFOConfig(d, v).asInstanceOf[this.type]
   }
 }
 
@@ -29,7 +30,7 @@ abstract class FIFOBase(val w: Int, val d: Int, val v: Int) extends Module {
     val empty = Output(Bool())
     val almostFull = Output(Bool())
     val almostEmpty = Output(Bool())
-    val config = Input(new FIFOOpcode(d, v))
+    val config = Input(new FIFOConfig(d, v))
   })
 
   val addrWidth = log2Up(d/v)
@@ -86,16 +87,16 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
   (0 until 2) foreach { i => i match {
       case 1 => // Localaddr: max = bankSize, stride = 1
         val cfg = wptrConfig.counterConfig(i)
-        cfg.max := bankSize.U
-        cfg.stride := 1.U
-        cfg.maxConst := true.B
-        cfg.strideConst := true.B
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := bankSize.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
       case 0 => // Bankaddr: max = v, stride = 1
         val cfg = wptrConfig.counterConfig(i)
-        cfg.max := v.U
-        cfg.stride := 1.U
-        cfg.maxConst := true.B
-        cfg.strideConst := true.B
+        cfg.max.value := v.U
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
   }}
   val wptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
   wptr.io.enable(0) := writeEn & io.config.chainWrite
@@ -111,16 +112,16 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
   (0 until 2) foreach { i => i match {
       case 1 => // Localaddr: max = bankSize, stride = 1
         val cfg = rptrConfig.counterConfig(i)
-        cfg.max := bankSize.U
-        cfg.stride := 1.U
-        cfg.maxConst := true.B
-        cfg.strideConst := true.B
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := bankSize.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
       case 0 => // Bankaddr: max = v, stride = 1
         val cfg = rptrConfig.counterConfig(i)
-        cfg.max := v.U
-        cfg.stride := 1.U
-        cfg.maxConst := true.B
-        cfg.strideConst := true.B
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := v.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
     }}
   val rptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
   rptr.io.enable(0) := readEn & io.config.chainRead
@@ -157,7 +158,7 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
     val rdata = i match {
       case 0 =>
         val rdata0Mux = Module(new MuxN(v, w))
-        val addrFF = Module(new FF(log2Ceil(v)))
+        val addrFF = Module(new FF(log2Up(v)))
         addrFF.io.in := Mux(readEn, nextHeadBankAddr, headBankAddr)
         addrFF.io.enable := true.B
 
