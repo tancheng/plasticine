@@ -124,7 +124,7 @@ case class PipeStageBits(
   opB: SrcValueTuple,
   opC: SrcValueTuple,
   opcode: Opcode = XOp,
-  result: Array[SrcValueTuple] = Array(),
+  result: List[SrcValueTuple] = Nil,
   fwd: Array[SrcValueTuple] 
 )(t: PipeStageBundle)
 extends AbstractBits {

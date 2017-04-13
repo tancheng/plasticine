@@ -22,3 +22,4 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.5",
   "org.scalacheck" %% "scalacheck" % "1.12.4")
 
+addCommandAlias("make", ";project plasticine; compile")
