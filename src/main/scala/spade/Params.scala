@@ -29,7 +29,7 @@ trait CUParams extends Params {
   val numControlOut: Int = 8
 
   val scalarFIFODepth: Int = 32 // Depth of each scalar FIFO
-  val vectorFIFODepth: Int = 8 * v // Depth of each vector FIFO
+  val vectorFIFODepth: Int = 8 * 16 // Depth of each vector FIFO
 }
 
 trait PCUParams extends CUParams
