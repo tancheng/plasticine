@@ -3,13 +3,13 @@ import chisel3._
 import chisel3.util._
 import scala.collection.mutable.ListBuffer
 
-object GeneratedTopParams extends TopParams with GeneratedParams {
+object GeneratedTopParams extends TopParams { // with GeneratedParams {
   override val fringeParams = new FringeParams {
     override val numArgIns = 3
     override val numArgOuts = 3
     override val dataWidth = 32
   }
-  val plasticineParams = new PlasticineParams {
+  val plasticineParams = new PlasticineParams with GeneratedParams1 {
     override val w = 32
     override val numRows = 2
     override val numCols = 2
@@ -18,6 +18,8 @@ object GeneratedTopParams extends TopParams with GeneratedParams {
     val scalarSwitchParams = Array.fill(3)(Array.ofDim[ScalarSwitchParams](3))
     val controlSwitchParams = Array.fill(3)(Array.ofDim[ControlSwitchParams](3))
     val numArgOutSelections = List(6,6,6)
+
+    doIt()
   }
 }
 case class GeneratedPCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numVectorIn:Int, override val numVectorOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends PCUParams {
@@ -70,7 +72,7 @@ case class GeneratedPMUParams(override val numScalarIn:Int, override val numScal
   override val wd = 3
   override val r = regColors.size
 }
-trait GeneratedParams extends GeneratedParams1 {
-  self:TopParams =>
-  import plasticineParams._
-}
+//trait GeneratedParams extends GeneratedParams1 {
+//  self:TopParams =>
+//  import plasticineParams._
+//}
