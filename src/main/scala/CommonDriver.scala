@@ -39,6 +39,12 @@ trait CommonDriver {
   }
 }
 
+object PlasticineGen extends CommonDriver {
+  type DUTType = Plasticine
+  override val moduleName = "Plasticine"
+  def dut = () => new Plasticine(GeneratedTopParams.plasticineParams, GeneratedTopParams.fringeParams)
+}
+
 object PCUGen extends CommonDriver {
   type DUTType = PCU
   override val moduleName = "PCU"
