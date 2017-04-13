@@ -89,7 +89,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     }
   }
 
-  // Control network + Little CUs
+  // Control network
   val csbs = Array.tabulate(controlParams.size) { i =>
     Array.tabulate(controlParams(i).size) { j =>
       val switch = Module(new ControlSwitch(controlParams(i)(j)))
@@ -98,6 +98,9 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     }
   }
 
+  // Switch CUs
+//  val switchCUs = 
+//
   connect(io, argOutMuxes, cus, vsbs, ssbs, csbs)
 }
 
