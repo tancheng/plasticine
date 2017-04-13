@@ -120,7 +120,7 @@ case class PipeStageBits(
   opB: SrcValueTuple = SrcValueTuple(),
   opC: SrcValueTuple = SrcValueTuple(),
   opcode: Opcode = XOp,
-  result: Array[SrcValueTuple] = Array(),
+  result: List[SrcValueTuple] = Nil,
   fwd: Array[SrcValueTuple] 
 )(t: PipeStageBundle)
 extends AbstractBits {
@@ -155,7 +155,7 @@ object PipeStageBits {
  * to hold scratchpad config info.
  * TODO: Use this to hold operand info as well
  */
-case class SrcValueTuple(src: SelectSource=XSrc, value: AnyVal = -1)
+case class SrcValueTuple(src: SelectType=XType, value: AnyVal = -1)
 
 //case class BankingBits(mode: Int = 0, strideLog2: Int = 0) extends AbstractBits
 //

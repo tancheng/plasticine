@@ -74,6 +74,11 @@ case class PCUConfig(p: PCUParams) extends Bundle {
     new PCUConfig(p).asInstanceOf[this.type]
   }
 }
+object PCUConfig {
+  def apply(p:CUParams):PCUConfig = {
+    PCUConfig(p.asInstanceOf[PCUParams])
+  }
+}
 
 class PCU(val p: PCUParams) extends CU {
   val io = IO(CUIO(p, PCUConfig(p)))
