@@ -3,24 +3,24 @@ import chisel3._
 import chisel3.util._
 import scala.collection.mutable.ListBuffer
 
-object GeneratedTopParams extends TopParams { // with GeneratedParams {
-  override val fringeParams = new FringeParams {
+object GeneratedTopParams extends TopParams with GeneratedParams {
+  override lazy val fringeParams = new FringeParams {
     override val numArgIns = 3
     override val numArgOuts = 3
     override val dataWidth = 32
   }
-  val plasticineParams = new PlasticineParams with GeneratedParams1 {
+  override lazy val plasticineParams = new PlasticineParams {
     override val w = 32
     override val numRows = 2
     override val numCols = 2
     override val cuParams = Array.fill(2)(Array.ofDim[CUParams](2))
-    val vectorSwitchParams = Array.fill(3)(Array.ofDim[VectorSwitchParams](3))
-    val scalarSwitchParams = Array.fill(3)(Array.ofDim[ScalarSwitchParams](3))
-    val controlSwitchParams = Array.fill(3)(Array.ofDim[ControlSwitchParams](3))
-    val numArgOutSelections = List(6,6,6)
-
-    doIt()
+    override val vectorSwitchParams = Array.fill(3)(Array.ofDim[VectorSwitchParams](3))
+    override val scalarSwitchParams = Array.fill(3)(Array.ofDim[ScalarSwitchParams](3))
+    override val controlSwitchParams = Array.fill(3)(Array.ofDim[ControlSwitchParams](3))
+    override val switchCUParams = Array.fill(3)(Array.ofDim[PMUParams](3))
+    override val numArgOutSelections = List(6,6,6)
   }
+  genParams
 }
 case class GeneratedPCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numVectorIn:Int, override val numVectorOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends PCUParams {
   override val w = 32
@@ -72,7 +72,10 @@ case class GeneratedPMUParams(override val numScalarIn:Int, override val numScal
   override val wd = 3
   override val r = regColors.size
 }
-//trait GeneratedParams extends GeneratedParams1 {
-//  self:TopParams =>
-//  import plasticineParams._
-//}
+trait GeneratedParams extends GeneratedParams1 {
+  self:TopParams =>
+  import plasticineParams._
+  def genParams:Unit = {
+    genParams1
+  }
+}

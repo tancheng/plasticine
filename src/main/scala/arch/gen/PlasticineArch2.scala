@@ -5,7 +5,7 @@ import scala.collection.mutable.ListBuffer
 import plasticine.templates.MuxN
 
 trait PlasticineArch2 extends PlasticineArch1{
-  def connect2(io:PlasticineIO, argOutMuxes:List[MuxN], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]]):Unit = {
+  def connect2(io:PlasticineIO, argOutMuxes:List[MuxN], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[PMU]]):Unit = {
     vsbs(1)(2).io.outs(8) <> cus(1)(1).io.vecIn(0)
     vsbs(1)(2).io.outs(9) <> vsbs(1)(1).io.ins(5)
     vsbs(1)(2).io.outs(10) <> vsbs(1)(1).io.ins(6)
@@ -45,24 +45,24 @@ trait PlasticineArch2 extends PlasticineArch1{
     vsbs(2)(2).io.outs(7) <> vsbs(2)(1).io.ins(8)
     vsbs(2)(2).io.outs(8) <> cus(1)(1).io.vecIn(1)
     // ScalarNetwork Connection
-    io.argIns(0) <> ssbs(0)(0).io.ins(11).bits
-    io.argIns(0) <> ssbs(1)(0).io.ins(16).bits
-    io.argIns(0) <> ssbs(2)(0).io.ins(11).bits
-    io.argIns(0) <> ssbs(0)(2).io.ins(0).bits
-    io.argIns(0) <> ssbs(1)(2).io.ins(4).bits
-    io.argIns(0) <> ssbs(2)(2).io.ins(4).bits
-    io.argIns(1) <> ssbs(0)(0).io.ins(12).bits
-    io.argIns(1) <> ssbs(1)(0).io.ins(17).bits
-    io.argIns(1) <> ssbs(2)(0).io.ins(12).bits
-    io.argIns(1) <> ssbs(0)(2).io.ins(1).bits
-    io.argIns(1) <> ssbs(1)(2).io.ins(5).bits
-    io.argIns(1) <> ssbs(2)(2).io.ins(5).bits
-    io.argIns(2) <> ssbs(0)(0).io.ins(13).bits
-    io.argIns(2) <> ssbs(1)(0).io.ins(18).bits
-    io.argIns(2) <> ssbs(2)(0).io.ins(13).bits
-    io.argIns(2) <> ssbs(0)(2).io.ins(2).bits
-    io.argIns(2) <> ssbs(1)(2).io.ins(6).bits
-    io.argIns(2) <> ssbs(2)(2).io.ins(6).bits
+    io.argIns(0) <> ssbs(0)(0).io.ins(11)
+    io.argIns(0) <> ssbs(1)(0).io.ins(16)
+    io.argIns(0) <> ssbs(2)(0).io.ins(11)
+    io.argIns(0) <> ssbs(0)(2).io.ins(0)
+    io.argIns(0) <> ssbs(1)(2).io.ins(4)
+    io.argIns(0) <> ssbs(2)(2).io.ins(4)
+    io.argIns(1) <> ssbs(0)(0).io.ins(12)
+    io.argIns(1) <> ssbs(1)(0).io.ins(17)
+    io.argIns(1) <> ssbs(2)(0).io.ins(12)
+    io.argIns(1) <> ssbs(0)(2).io.ins(1)
+    io.argIns(1) <> ssbs(1)(2).io.ins(5)
+    io.argIns(1) <> ssbs(2)(2).io.ins(5)
+    io.argIns(2) <> ssbs(0)(0).io.ins(13)
+    io.argIns(2) <> ssbs(1)(0).io.ins(18)
+    io.argIns(2) <> ssbs(2)(0).io.ins(13)
+    io.argIns(2) <> ssbs(0)(2).io.ins(2)
+    io.argIns(2) <> ssbs(1)(2).io.ins(6)
+    io.argIns(2) <> ssbs(2)(2).io.ins(6)
     cus(0)(0).io.scalarOut(0) <> ssbs(0)(1).io.ins(11)
     cus(0)(0).io.scalarOut(1) <> ssbs(1)(1).io.ins(21)
     cus(0)(0).io.scalarOut(2) <> ssbs(1)(0).io.ins(4)
@@ -79,23 +79,23 @@ trait PlasticineArch2 extends PlasticineArch1{
     cus(1)(0).io.scalarOut(1) <> ssbs(2)(1).io.ins(15)
     cus(1)(0).io.scalarOut(2) <> ssbs(2)(0).io.ins(4)
     cus(1)(0).io.scalarOut(3) <> ssbs(1)(0).io.ins(9)
-    cus(0)(0).io.scalarOut(0) <> ssbs(0)(0).io.ins(9)
-    cus(0)(0).io.scalarOut(1) <> ssbs(0)(0).io.ins(10)
-    cus(0)(1).io.scalarOut(0) <> ssbs(0)(1).io.ins(9)
-    cus(0)(1).io.scalarOut(1) <> ssbs(0)(1).io.ins(10)
-//    cus(0)(2).io.scalarOut(0) <> ssbs(0)(2).io.ins(7)
-//    cus(0)(2).io.scalarOut(1) <> ssbs(0)(2).io.ins(8)
-    cus(1)(0).io.scalarOut(0) <> ssbs(1)(0).io.ins(14)
-    cus(1)(0).io.scalarOut(1) <> ssbs(1)(0).io.ins(15)
-    cus(1)(1).io.scalarOut(0) <> ssbs(1)(1).io.ins(14)
-    cus(1)(1).io.scalarOut(1) <> ssbs(1)(1).io.ins(15)
-//    cus(1)(2).io.scalarOut(0) <> ssbs(1)(2).io.ins(11)
-//    cus(1)(2).io.scalarOut(1) <> ssbs(1)(2).io.ins(12)
-//    cus(2)(0).io.scalarOut(0) <> ssbs(2)(0).io.ins(9)
-//    cus(2)(0).io.scalarOut(1) <> ssbs(2)(0).io.ins(10)
-//    cus(2)(1).io.scalarOut(0) <> ssbs(2)(1).io.ins(9)
-//    cus(2)(1).io.scalarOut(1) <> ssbs(2)(1).io.ins(10)
-//    cus(2)(2).io.scalarOut(0) <> ssbs(2)(2).io.ins(7)
-//    cus(2)(2).io.scalarOut(1) <> ssbs(2)(2).io.ins(8)
+    lcus(0)(0).io.scalarOut(0) <> ssbs(0)(0).io.ins(9)
+    lcus(0)(0).io.scalarOut(1) <> ssbs(0)(0).io.ins(10)
+    lcus(0)(1).io.scalarOut(0) <> ssbs(0)(1).io.ins(9)
+    lcus(0)(1).io.scalarOut(1) <> ssbs(0)(1).io.ins(10)
+    lcus(0)(2).io.scalarOut(0) <> ssbs(0)(2).io.ins(7)
+    lcus(0)(2).io.scalarOut(1) <> ssbs(0)(2).io.ins(8)
+    lcus(1)(0).io.scalarOut(0) <> ssbs(1)(0).io.ins(14)
+    lcus(1)(0).io.scalarOut(1) <> ssbs(1)(0).io.ins(15)
+    lcus(1)(1).io.scalarOut(0) <> ssbs(1)(1).io.ins(14)
+    lcus(1)(1).io.scalarOut(1) <> ssbs(1)(1).io.ins(15)
+    lcus(1)(2).io.scalarOut(0) <> ssbs(1)(2).io.ins(11)
+    lcus(1)(2).io.scalarOut(1) <> ssbs(1)(2).io.ins(12)
+    lcus(2)(0).io.scalarOut(0) <> ssbs(2)(0).io.ins(9)
+    lcus(2)(0).io.scalarOut(1) <> ssbs(2)(0).io.ins(10)
+    lcus(2)(1).io.scalarOut(0) <> ssbs(2)(1).io.ins(9)
+    lcus(2)(1).io.scalarOut(1) <> ssbs(2)(1).io.ins(10)
+    lcus(2)(2).io.scalarOut(0) <> ssbs(2)(2).io.ins(7)
+    lcus(2)(2).io.scalarOut(1) <> ssbs(2)(2).io.ins(8)
   }
 }

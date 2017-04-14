@@ -43,7 +43,7 @@ trait PlasticineParams extends Params {
   val numRows: Int = 2
   val numCols: Int = 2
   val cuParams: Array[Array[CUParams]]
-//  val switchCUParams: Array[Array[CUParams]]
+  val switchCUParams: Array[Array[PMUParams]] //TODO
   val vectorSwitchParams:Array[Array[VectorSwitchParams]]
   val scalarSwitchParams:Array[Array[ScalarSwitchParams]]
   val controlSwitchParams:Array[Array[ControlSwitchParams]]

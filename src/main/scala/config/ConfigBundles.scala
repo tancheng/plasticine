@@ -183,6 +183,7 @@ case class PlasticineConfig(
   vectorParams: Array[Array[VectorSwitchParams]],
   scalarParams: Array[Array[ScalarSwitchParams]],
   controlParams: Array[Array[ControlSwitchParams]],
+  switchCUParams: Array[Array[PMUParams]], //TODO
   p: PlasticineParams,
   f: FringeParams) extends AbstractConfig {
 
@@ -198,9 +199,11 @@ case class PlasticineConfig(
   val scalarSwitch = HVec.tabulate(scalarParams.size) { i => HVec.tabulate(scalarParams(i).size) { j => new CrossbarConfig(scalarParams(i)(j)) } }
   val controlSwitch = HVec.tabulate(controlParams.size) { i => HVec.tabulate(controlParams(i).size) { j => new CrossbarConfig(controlParams(i)(j)) } }
 
+  val switchCU = HVec.tabulate(switchCUParams.size) { i => HVec.tabulate(switchCUParams(i).size) { j => new PMUConfig(switchCUParams(i)(j)) } } //TODO
+
   val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
   override def cloneType(): this.type = {
-    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f).asInstanceOf[this.type]
+    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f).asInstanceOf[this.type]
   }
 }
 

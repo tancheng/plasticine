@@ -26,12 +26,15 @@ trait InOutArg extends InOutArg1 {
   val vsbs = Array.tabulate(3, 3) {    case (i,j) =>
     CrossbarBits.zeroes(vectorSwitchParams(i)(j))
   }
-
+  val lcus = Array.tabulate(3, 3) {    case (i,j) =>
+    PMUBits.zeroes(switchCUParams(i)(j))
+  }
   val plasticineBits = PlasticineBits (
     cu=cus,
     vectorSwitch=vsbs,
     scalarSwitch=ssbs,
     controlSwitch=csbs,
+    switchCU=lcus,
     argOutMuxSelect=List(1,-1,-1)
-  )
+  )  
 }

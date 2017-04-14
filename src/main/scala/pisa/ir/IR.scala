@@ -45,7 +45,7 @@ abstract class AbstractBits {
  * to hold scratchpad config info.
  * TODO: Use this to hold operand info as well
  */
-case class SrcValueTuple(src: SelectSource = XSrc, value: AnyVal = -1)
+case class SrcValueTuple(src: SelectType = XSrc, value: AnyVal = -1)
 extends AbstractBits {
 //  // Check if 'src' is in the list of valid sources
 //  Predef.assert(t.validSources.contains(src), s"ERROR: Invalid source $src in SrcValueTuple (allowed sources: ${t.validSources})")
@@ -101,6 +101,14 @@ object CounterRCBits {
 //      SrcValueTuple.zeroes(width)
       )
   }
+  def apply(
+    max: SrcValueTuple,
+    stride: SrcValueTuple,
+    min: SrcValueTuple,
+    par:Int = 1
+  ):CounterRCBits = {
+    CounterRCBits(max, stride) //TODO: add min, par back
+  }
 }
 
 /**
@@ -149,10 +157,13 @@ case class PipeStageBits(
   opB: SrcValueTuple,
   opC: SrcValueTuple,
   opcode: Opcode = XOp,
-  result: List[Int] = Nil
-//  fwd: Array[SrcValueTuple] 
+  res: List[SrcValueTuple] = Nil,
+  fwd: Array[SrcValueTuple] 
 )
 extends AbstractBits {
+  val result = res.map{
+    case SrcValueTuple(CurrStageDst, idx:Int) => idx
+  }
   // Get names of case class fields
 //  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
 //      case m: MethodSymbol if m.isCaseAccessor => m
@@ -177,8 +188,8 @@ object PipeStageBits {
     new PipeStageBits(
       opA = SrcValueTuple.zeroes(width),
       opB = SrcValueTuple.zeroes(width),
-      opC = SrcValueTuple.zeroes(width)
-//      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width))
+      opC = SrcValueTuple.zeroes(width),
+      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width))
     )
   }
 }
@@ -230,7 +241,10 @@ object PipeStageBits {
 //  }
 //}
 
-trait CUBits extends AbstractBits
+trait CUBits extends AbstractBits {
+  def stages: Array[PipeStageBits]
+  def counterChain: CounterChainBits
+}
 
 case class PCUBits(
   stages: Array[PipeStageBits],
@@ -367,6 +381,7 @@ case class PlasticineBits(
   vectorSwitch: Array[Array[CrossbarBits]],
   scalarSwitch: Array[Array[CrossbarBits]],
   controlSwitch: Array[Array[CrossbarBits]],
+  switchCU: Array[Array[PMUBits]], //TODO
   argOutMuxSelect: List[Int]
 ) extends AbstractBits
 
@@ -376,6 +391,7 @@ object PlasticineBits {
       vectorParams: Array[Array[VectorSwitchParams]],
       scalarParams: Array[Array[ScalarSwitchParams]],
       controlParams: Array[Array[ControlSwitchParams]],
+      switchCUParams:    Array[Array[PMUParams]],
       p: PlasticineParams,
       f: FringeParams
   ) = {
@@ -387,6 +403,7 @@ object PlasticineBits {
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(vectorParams(i)(j)) },
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(scalarParams(i)(j)) },
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(controlParams(i)(j)) },
+      Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { PMUBits.zeroes(switchCUParams(i)(j)) }}, //TODO
       List.fill(f.numArgOuts) { 0 }
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
   )}

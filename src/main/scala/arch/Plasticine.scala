@@ -39,9 +39,10 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
   val vectorParams = p.vectorSwitchParams
   val scalarParams = p.scalarSwitchParams
   val controlParams = p.controlSwitchParams
+  val switchCUParams = p.switchCUParams
 
   // Wire up the reconfiguration network: ASIC or CGRA?
-  val configSR = Module(new ShiftRegister(new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, p, f)))
+  val configSR = Module(new ShiftRegister(new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f)))
   configSR.io.in.bits := io.config.bits
   configSR.io.in.valid := io.config.valid
 
@@ -98,16 +99,16 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     }
   }
 
-  // Switch CUs
-//  val switchCUs = Array.tabulate(switchCUParams.size) { i =>
-//    Array.tabulate(switchCUParams(i).size) { j =>
-//      val cu= Module(new PMU(switchCUParams(i)(j)))
-//      cu.io.config := config.switchCU(i)(j)
-//      cu
-//    }
-//  }
+   //Switch CUs
+  val switchCUs = Array.tabulate(switchCUParams.size) { i =>
+    Array.tabulate(switchCUParams(i).size) { j =>
+      val cu= Module(new PMU(switchCUParams(i)(j)))
+      cu.io.config := config.switchCU(i)(j)
+      cu
+    }
+  }
 
-  connect(io, argOutMuxes, cus, vsbs, ssbs, csbs)
+  connect(io, argOutMuxes, cus, vsbs, ssbs, csbs, switchCUs)
 }
 
 //trait DirectionOps {

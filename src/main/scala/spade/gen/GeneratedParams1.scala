@@ -4,10 +4,9 @@ import chisel3.util._
 import scala.collection.mutable.ListBuffer
 
 trait GeneratedParams1 {
-  self:PlasticineParams =>
-//  import plasticineParams._
-
-  def doIt() {
+  self:TopParams =>
+  import plasticineParams._
+  def genParams1:Unit = {
     cuParams(0)(0) = GeneratedPMUParams(4, 4, 4, 4, 8, 4)
     cuParams(0)(1) = GeneratedPCUParams(4, 4, 4, 4, 8, 4)
     cuParams(1)(0) = GeneratedPCUParams(4, 4, 4, 4, 8, 4)
@@ -39,6 +38,14 @@ trait GeneratedParams1 {
     vectorSwitchParams(2)(2) = VectorSwitchParams(numIns=9, numOuts=9, v=16, w=32)
     scalarSwitchParams(2)(2) = ScalarSwitchParams(numIns=14, numOuts=14, w=32)
     controlSwitchParams(2)(2) = ControlSwitchParams(numIns=13, numOuts=19)
-
+    switchCUParams(0)(0) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
+    switchCUParams(0)(1) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
+    switchCUParams(0)(2) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
+    switchCUParams(1)(0) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
+    switchCUParams(1)(1) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
+    switchCUParams(1)(2) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
+    switchCUParams(2)(0) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
+    switchCUParams(2)(1) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
+    switchCUParams(2)(2) = GeneratedPMUParams(4, 2, 0, 0, 8, 3)
   }
 }
