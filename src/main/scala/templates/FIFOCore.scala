@@ -144,7 +144,7 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
     // Read data output
     val rdata = i match {
       case 0 =>
-        val rdata0Mux = Module(new MuxN(v, w))
+        val rdata0Mux = Module(new MuxN(UInt(w.W), v))
         val addrFF = Module(new FF(log2Up(v)))
         addrFF.io.in := Mux(readEn, nextHeadBankAddr, headBankAddr)
         addrFF.io.enable := true.B

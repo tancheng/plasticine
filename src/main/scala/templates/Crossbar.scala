@@ -21,7 +21,7 @@ class CrossbarCore[T<:Data](val t: T, val p: SwitchParams) extends Module {
   }
 
   io.outs.zipWithIndex.foreach { case(out,i) =>
-    val outMux = Module(new MuxN(p.numIns, t.getWidth))
+    val outMux = Module(new MuxN(t, p.numIns))
     outMux.io.ins := io.ins
     outMux.io.sel := io.config.outSelect(i)
     out := outMux.io.out

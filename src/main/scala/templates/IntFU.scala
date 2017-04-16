@@ -132,7 +132,7 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
   val ins = Vec.tabulate(Opcodes.opcodes.size) { i =>
     Opcodes.getOp(i, io.a, io.b, io.c)
   }
-  val m = Module(new MuxN(Opcodes.opcodes.size, w))
+  val m = Module(new MuxN(UInt(w.W), Opcodes.opcodes.size))
   m.io.ins.zip(ins).foreach { case (in, i) =>
     in := i
   }

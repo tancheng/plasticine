@@ -51,7 +51,7 @@ class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: In
     ff
   }
 
-  val rport = Module(new MuxN(d, w))
+  val rport = Module(new MuxN(UInt(w.W), d))
   val regOuts = Vec(regs.map{_.io.out})
   rport.io.ins := regOuts
   rport.io.sel := io.raddr

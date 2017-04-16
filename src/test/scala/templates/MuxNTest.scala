@@ -1,15 +1,14 @@
 // See LICENSE for license details.
 
 package plasticine.templates
-import plasticine.templates.CommonMain
 
-import chisel3.core.Module
+import chisel3.core._
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 /**
  * FF test harness
  */
-class MuxNUnitTester(c: MuxN)(implicit args: Array[String]) extends ArgsTester(c) {
+class MuxNUnitTester(c: MuxN[UInt])(implicit args: Array[String]) extends ArgsTester(c) {
     val ins = List.tabulate(c.numInputs) { i =>
       math.abs(scala.util.Random.nextInt % (1 << 4))
     }
@@ -25,8 +24,8 @@ class MuxNUnitTester(c: MuxN)(implicit args: Array[String]) extends ArgsTester(c
 
 
 object MuxNTest extends CommonMain {
-  type DUTType = MuxN
-  def dut = () => new MuxN(args(0).toInt, args(1).toInt)
+  type DUTType = MuxN[UInt]
+  def dut = () => new MuxN(UInt(args(1).toInt.W), args(0).toInt)
   def tester = { c: DUTType => new MuxNUnitTester(c) }
 }
 

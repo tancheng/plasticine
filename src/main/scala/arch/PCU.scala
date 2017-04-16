@@ -73,13 +73,13 @@ class PCU(val p: PCUParams) extends CU {
   val ctrMaxStrideSources = Vec(scalarFIFOs.map { _.io.deq(0) })
   for (i <- 0 until p.numCounters) {
     // max
-    val maxMux = Module(new MuxN(ctrMaxStrideSources.size, p.w))
+    val maxMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
     maxMux.io.ins := ctrMaxStrideSources
     maxMux.io.sel := io.config.counterChain.counters(i).max.value
     counterChain.io.max(i) := maxMux.io.out
 
     // stride
-    val strideMux = Module(new MuxN(ctrMaxStrideSources.size, p.w))
+    val strideMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
     strideMux.io.ins := ctrMaxStrideSources
     strideMux.io.sel := io.config.counterChain.counters(i).stride.value
     counterChain.io.stride(i) := strideMux.io.out
