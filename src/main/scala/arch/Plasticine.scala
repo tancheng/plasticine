@@ -18,7 +18,7 @@ import java.io.PrintWriter
 
 case class PlasticineIO(f: FringeParams) extends Bundle {
   // Scalar IO
-  val argIns = Input(Vec(f.numArgIns, UInt(f.dataWidth.W)))
+  val argIns = Vec(f.numArgIns, Flipped(Decoupled(UInt(f.dataWidth.W))))
   val argOuts = Vec(f.numArgOuts, Decoupled(UInt(f.dataWidth.W)))
 
   // Memory IO
@@ -48,13 +48,18 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
 
   val config = configSR.io.config
 
+  val argOutMuxIns = List.tabulate(f.numArgOuts) { i =>
+    Wire(Vec(p.numArgOutSelections(i), Flipped(Decoupled(UInt(f.dataWidth.W)))))
+  }
+
   val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
-    val mux = Module(new MuxN(p.numArgOutSelections(i), p.w))
+    val mux = Module(new MuxN(UInt(f.dataWidth.W), p.numArgOutSelections(i)))
     io.argOuts(i).bits := mux.io.out
+//    io.argOuts(i).valid := mux.io.out.valid
+    mux.io.ins := Vec(argOutMuxIns(i).map { _.bits })
     mux.io.sel := config.argOutMuxSelect(i)
     mux
   }
-
 
   // PCUs, PMUs
   val cus = Array.tabulate(p.numCols) { i =>
@@ -102,13 +107,13 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
    //Switch CUs
   val switchCUs = Array.tabulate(switchCUParams.size) { i =>
     Array.tabulate(switchCUParams(i).size) { j =>
-      val cu= Module(new PMU(switchCUParams(i)(j)))
+      val cu = Module(new SwitchCU(switchCUParams(i)(j)))
       cu.io.config := config.switchCU(i)(j)
       cu
     }
   }
 
-  connect(io, argOutMuxes, cus, vsbs, ssbs, csbs, switchCUs)
+//  connect(io, argOutMuxes, cus, vsbs, ssbs, csbs, switchCUs)
 }
 
 //trait DirectionOps {

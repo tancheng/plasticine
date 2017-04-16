@@ -135,6 +135,14 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   }
 }
 
+case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
+  val counterChain = CounterChainConfig(p.w, p.numCounters)
+
+  override def cloneType(): this.type = {
+    new SwitchCUConfig(p).asInstanceOf[this.type]
+  }
+}
+
 /**
  * Crossbar config register format
  */
@@ -183,7 +191,7 @@ case class PlasticineConfig(
   vectorParams: Array[Array[VectorSwitchParams]],
   scalarParams: Array[Array[ScalarSwitchParams]],
   controlParams: Array[Array[ControlSwitchParams]],
-  switchCUParams: Array[Array[PMUParams]], //TODO
+  switchCUParams: Array[Array[SwitchCUParams]],
   p: PlasticineParams,
   f: FringeParams) extends AbstractConfig {
 
@@ -199,7 +207,7 @@ case class PlasticineConfig(
   val scalarSwitch = HVec.tabulate(scalarParams.size) { i => HVec.tabulate(scalarParams(i).size) { j => new CrossbarConfig(scalarParams(i)(j)) } }
   val controlSwitch = HVec.tabulate(controlParams.size) { i => HVec.tabulate(controlParams(i).size) { j => new CrossbarConfig(controlParams(i)(j)) } }
 
-  val switchCU = HVec.tabulate(switchCUParams.size) { i => HVec.tabulate(switchCUParams(i).size) { j => new PMUConfig(switchCUParams(i)(j)) } } //TODO
+  val switchCU = HVec.tabulate(switchCUParams.size) { i => HVec.tabulate(switchCUParams(i).size) { j => new SwitchCUConfig(switchCUParams(i)(j)) } }
 
   val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
   override def cloneType(): this.type = {
