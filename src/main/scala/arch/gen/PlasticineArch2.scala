@@ -5,7 +5,7 @@ import scala.collection.mutable.ListBuffer
 import plasticine.templates.MuxN
 
 trait PlasticineArch2 extends PlasticineArch1{
-  def connect2(io:PlasticineIO, argOutMuxes:List[MuxN], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[PMU]]):Unit = {
+  def connect2(io:PlasticineIO, argOutMuxes:Array[Array[DecoupledIO[UInt]]], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[SwitchCU]]):Unit = {
     vsbs(1)(2).io.outs(8) <> cus(1)(1).io.vecIn(0)
     vsbs(1)(2).io.outs(9) <> vsbs(1)(1).io.ins(5)
     vsbs(1)(2).io.outs(10) <> vsbs(1)(1).io.ins(6)

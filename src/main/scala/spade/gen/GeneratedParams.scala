@@ -17,11 +17,13 @@ object GeneratedTopParams extends TopParams with GeneratedParams {
     override val vectorSwitchParams = Array.fill(3)(Array.ofDim[VectorSwitchParams](3))
     override val scalarSwitchParams = Array.fill(3)(Array.ofDim[ScalarSwitchParams](3))
     override val controlSwitchParams = Array.fill(3)(Array.ofDim[ControlSwitchParams](3))
-    override val switchCUParams = Array.fill(3)(Array.ofDim[PMUParams](3))
+    override val switchCUParams = Array.fill(3)(Array.ofDim[SwitchCUParams](3))
     override val numArgOutSelections = List(6,6,6)
   }
+
   genParams
 }
+
 case class GeneratedPCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numVectorIn:Int, override val numVectorOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends PCUParams {
   override val w = 32
   override val v = 16
@@ -72,6 +74,12 @@ case class GeneratedPMUParams(override val numScalarIn:Int, override val numScal
   override val wd = 3
   override val r = regColors.size
 }
+
+case class GeneratedSwitchCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends SwitchCUParams {
+  override val w = 32
+  override val numCounters = 8
+}
+
 trait GeneratedParams extends GeneratedParams1 {
   self:TopParams =>
   import plasticineParams._

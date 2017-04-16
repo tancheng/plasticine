@@ -24,7 +24,7 @@ trait InOutArg1 {
     val sts_0_0 = Array.tabulate(20) { i => PipeStageBits.zeroes(16, 32)}
     cus(0)(0) = PCUBits(counterChain=cc_0_0, stages=sts_0_0)
     cus(0)(0).counterChain.counters(0) = CounterRCBits(max=SrcValueTuple(ConstSrc, 1), stride=SrcValueTuple(ConstSrc, 1), min=SrcValueTuple(ConstSrc, 1), par=1)
-    cus(0)(0).stages(0) = PipeStageBits(SrcValueTuple(ScalarFIFOSrc, 0),SrcValueTuple(ConstSrc, 4),SrcValueTuple(), FixAdd, List(SrcValueTuple(CurrStageDst, 0),SrcValueTuple(CurrStageDst, 10)), Array.tabulate(16) { i => SrcValueTuple() })
+//    cus(0)(0).stages(0) = PipeStageBits(SrcValueTuple(ScalarFIFOSrc, 0),SrcValueTuple(ConstSrc, 4),SrcValueTuple(), FixAdd, List(SrcValueTuple(CurrStageDst, 10),SrcValueTuple(CurrStageDst, 0)), Array.tabulate(${pst.prs.size}) { i => SrcValueTuple() })
     cus(0)(0).stages(0).fwd(0) = SrcValueTuple(ALUSrc, 0)
     cus(0)(0).stages(0).fwd(10) = SrcValueTuple(ALUSrc, 0)
     cus(0)(0).stages(1).fwd(10) = SrcValueTuple(PrevStageSrc, 10)

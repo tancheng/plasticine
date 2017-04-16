@@ -5,7 +5,7 @@ import scala.collection.mutable.ListBuffer
 import plasticine.templates.MuxN
 
 trait PlasticineArch3 extends PlasticineArch2{
-  def connect3(io:PlasticineIO, argOutMuxes:List[MuxN], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[PMU]]):Unit = {
+  def connect3(io:PlasticineIO, argOutMuxIns:Array[Array[DecoupledIO[UInt]]], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[SwitchCU]]):Unit = {
     ssbs(0)(0).io.outs(0) <> ssbs(0)(1).io.ins(12)
     ssbs(0)(0).io.outs(1) <> ssbs(0)(1).io.ins(13)
     ssbs(0)(0).io.outs(2) <> ssbs(0)(1).io.ins(14)
@@ -19,9 +19,9 @@ trait PlasticineArch3 extends PlasticineArch2{
     ssbs(0)(0).io.outs(10) <> lcus(0)(0).io.scalarIn(1)
     ssbs(0)(0).io.outs(11) <> lcus(0)(0).io.scalarIn(2)
     ssbs(0)(0).io.outs(12) <> lcus(0)(0).io.scalarIn(3)
-    ssbs(0)(0).io.outs(13) <> argOutMuxes(0).io.ins(0)
-    ssbs(0)(0).io.outs(13) <> argOutMuxes(1).io.ins(0)
-    ssbs(0)(0).io.outs(13) <> argOutMuxes(2).io.ins(0)
+    ssbs(0)(0).io.outs(13) <> argOutMuxIns(0)(0)
+    ssbs(0)(0).io.outs(13) <> argOutMuxIns(1)(0)
+    ssbs(0)(0).io.outs(13) <> argOutMuxIns(2)(0)
     ssbs(0)(1).io.outs(0) <> ssbs(0)(2).io.ins(10)
     ssbs(0)(1).io.outs(1) <> ssbs(0)(2).io.ins(11)
     ssbs(0)(1).io.outs(2) <> ssbs(0)(2).io.ins(12)
@@ -40,9 +40,9 @@ trait PlasticineArch3 extends PlasticineArch2{
     ssbs(0)(1).io.outs(15) <> ssbs(0)(0).io.ins(1)
     ssbs(0)(1).io.outs(16) <> ssbs(0)(0).io.ins(2)
     ssbs(0)(1).io.outs(17) <> ssbs(0)(0).io.ins(3)
-    ssbs(0)(2).io.outs(0) <> argOutMuxes(0).io.ins(3)
-    ssbs(0)(2).io.outs(0) <> argOutMuxes(1).io.ins(3)
-    ssbs(0)(2).io.outs(0) <> argOutMuxes(2).io.ins(3)
+    ssbs(0)(2).io.outs(0) <> argOutMuxIns(0)(3)
+    ssbs(0)(2).io.outs(0) <> argOutMuxIns(1)(3)
+    ssbs(0)(2).io.outs(0) <> argOutMuxIns(2)(3)
     ssbs(0)(2).io.outs(1) <> ssbs(1)(2).io.ins(0)
     ssbs(0)(2).io.outs(2) <> ssbs(1)(2).io.ins(1)
     ssbs(0)(2).io.outs(3) <> ssbs(1)(2).io.ins(2)
@@ -74,9 +74,9 @@ trait PlasticineArch3 extends PlasticineArch2{
     ssbs(1)(0).io.outs(15) <> lcus(1)(0).io.scalarIn(1)
     ssbs(1)(0).io.outs(16) <> lcus(1)(0).io.scalarIn(2)
     ssbs(1)(0).io.outs(17) <> lcus(1)(0).io.scalarIn(3)
-    ssbs(1)(0).io.outs(18) <> argOutMuxes(0).io.ins(1)
-    ssbs(1)(0).io.outs(18) <> argOutMuxes(1).io.ins(1)
-    ssbs(1)(0).io.outs(18) <> argOutMuxes(2).io.ins(1)
+    ssbs(1)(0).io.outs(18) <> argOutMuxIns(0)(1)
+    ssbs(1)(0).io.outs(18) <> argOutMuxIns(1)(1)
+    ssbs(1)(0).io.outs(18) <> argOutMuxIns(2)(1)
     ssbs(1)(1).io.outs(0) <> ssbs(0)(1).io.ins(5)
     ssbs(1)(1).io.outs(1) <> ssbs(0)(1).io.ins(6)
     ssbs(1)(1).io.outs(2) <> ssbs(0)(1).io.ins(7)

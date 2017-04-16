@@ -27,7 +27,7 @@ trait InOutArg extends InOutArg1 {
     CrossbarBits.zeroes(vectorSwitchParams(i)(j))
   }
   val lcus = Array.tabulate(3, 3) {    case (i,j) =>
-    PMUBits.zeroes(switchCUParams(i)(j))
+    SwitchCUBits.zeroes(switchCUParams(i)(j))
   }
   val plasticineBits = PlasticineBits (
     cu=cus,
