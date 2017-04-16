@@ -7,10 +7,10 @@ trait GeneratedParams1 {
   self:TopParams =>
   import plasticineParams._
   def genParams1:Unit = {
-    cuParams(0)(0) = GeneratedPMUParams(4, 4, 4, 4, 8, 4)
-    cuParams(0)(1) = GeneratedPCUParams(4, 4, 4, 4, 8, 4)
-    cuParams(1)(0) = GeneratedPCUParams(4, 4, 4, 4, 8, 4)
-    cuParams(1)(1) = GeneratedPMUParams(4, 4, 4, 4, 8, 4)
+    cuParams(0)(0) = GeneratedPCUParams(4, 4, 4, 4, 8, 4)
+    cuParams(0)(1) = GeneratedPMUParams(4, 4, 4, 4, 8, 4)
+    cuParams(1)(0) = GeneratedPMUParams(4, 4, 4, 4, 8, 4)
+    cuParams(1)(1) = GeneratedPCUParams(4, 4, 4, 4, 8, 4)
     vectorSwitchParams(0)(0) = VectorSwitchParams(numIns=9, numOuts=9, v=16, w=32)
     scalarSwitchParams(0)(0) = ScalarSwitchParams(numIns=14, numOuts=14, w=32)
     controlSwitchParams(0)(0) = ControlSwitchParams(numIns=13, numOuts=19)
