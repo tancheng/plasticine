@@ -52,6 +52,12 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     Wire(Vec(p.numArgOutSelections(i), Flipped(Decoupled(UInt(f.dataWidth.W)))))
   }
 
+  val argOutMuxInData = Array.tabulate(f.numArgOuts) { i =>
+    Array.tabulate(p.numArgOutSelections(i)) { j =>
+      argOutMuxIns(i)(j)
+    }
+  }
+
   val argOutMuxes = List.tabulate(f.numArgOuts) { i =>
     val mux = Module(new MuxN(UInt(f.dataWidth.W), p.numArgOutSelections(i)))
     io.argOuts(i).bits := mux.io.out
@@ -113,7 +119,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
     }
   }
 
-//  connect(io, argOutMuxes, cus, vsbs, ssbs, csbs, switchCUs)
+  connect(io, argOutMuxInData, cus, vsbs, ssbs, csbs, switchCUs)
 }
 
 //trait DirectionOps {
