@@ -21,7 +21,7 @@
   }
 
 
-int getFileSize(char *filename) {
+int getFileSize(const char *filename) {
   ASSERT(filename, "filename is NULL");
   FILE *ifile = fopen(filename, "rb");
   ASSERT(ifile, "Could not open file %s for reading\n", filename);
@@ -31,11 +31,11 @@ int getFileSize(char *filename) {
   fclose(ifile);
 }
 
-int fileToBuf(unsigned char *buf, char *filename, uint32_t max_bytes)
+int fileToBuf(unsigned char *buf, const char *filename, uint32_t max_bytes)
 {
   ASSERT(buf, "buf is NULL");
   ASSERT(filename, "filename is NULL");
-  ASSERT(max_bytes > 0, "Trying to read invalid (%lu) number of bytes from %s\n", max_bytes, filename);
+  ASSERT(max_bytes > 0, "Trying to read invalid (%u) number of bytes from %s\n", max_bytes, filename);
 
   FILE *ifile = fopen(filename, "rb");
   int bytesRead = 0;
