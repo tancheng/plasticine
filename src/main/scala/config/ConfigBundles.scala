@@ -7,6 +7,7 @@ import chisel3.util._
 import plasticine.spade._
 import plasticine.pisa.enums._
 import plasticine.templates.Opcodes
+import plasticine.templates.Utils.log2Up
 
 abstract class AbstractConfig extends Bundle
 
@@ -26,9 +27,13 @@ case class SrcValueBundle(validSources: List[SelectSource], valueWidth: Int) ext
   val src = UInt(srcWidth.W)
   val value = UInt(valueWidth.W)
 
+  def isValidSource(s: SelectSource) = {
+    validSources.contains(s)
+  }
+
   // Get the index of a given source for this SrcValueBundle
   def srcIdx(s: SelectSource) = {
-    Predef.assert(validSources.contains(s), s"ERROR: Source $s not present in validSources: $validSources")
+    Predef.assert(isValidSource(s), s"ERROR: Source $s not present in validSources: $validSources")
     s match {
       case XSrc => 0
       case _ => validSources.indexOf(s)
@@ -98,7 +103,7 @@ case class CounterChainConfig(val w: Int, val numCounters: Int, val startDelayWi
 //}
 
 class PipeStageConfig(r: Int, w: Int) extends AbstractConfig {
-  val operandSources = List[SelectSource](XSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc)
+  val operandSources = List[SelectSource](XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc)
   var opA = new SrcValueBundle(operandSources, w)
   var opB = new SrcValueBundle(operandSources, w)
   var opC = new SrcValueBundle(operandSources, w)
