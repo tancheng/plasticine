@@ -19,7 +19,7 @@ typedef FringeContextVCS FringeContext;
 
 #elif defined PLASTICINE
 #include "FringeContextPlasticine.h"
-typedef FringeContextVCS FringeContext;
+typedef FringeContextPlasticine FringeContext;
 
 #endif
 
