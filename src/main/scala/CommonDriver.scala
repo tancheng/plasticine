@@ -94,3 +94,10 @@ object FringeGen extends CommonDriver {
     List[StreamParInfo](),
     false)
 }
+
+object TopGen extends CommonDriver {
+  type DUTType = Top
+  override val moduleName = "Top"
+  def dut = () => new Top(GeneratedTopParams)
+}
+

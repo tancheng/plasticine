@@ -18,6 +18,9 @@ class VerilatorInterface(p: TopParams) extends Bundle {
 
   // DRAM interface - currently only one stream
   val dram = new DRAMStream(32, 16)
+
+  // Configuration interface
+  val config = Flipped(Decoupled(Bool()))
 }
 
 /**
@@ -61,7 +64,7 @@ class Top(p: TopParams) extends Module {
       // Fringe <-> DRAM connections
       topIO.dram <> fringe.io.dram
 
-      plasticine.io.argIns := fringe.io.argIns
+      plasticine.io.argIns.zip(fringe.io.argIns) foreach { case (pArgIn, fArgIn) => pArgIn.bits := fArgIn }
       fringe.io.argOuts.zip(plasticine.io.argOuts) foreach { case (fringeArgOut, accelArgOut) =>
           fringeArgOut.bits := accelArgOut.bits
           fringeArgOut.valid := 1.U
@@ -70,6 +73,7 @@ class Top(p: TopParams) extends Module {
       plasticine.io.enable := fringe.io.enable
       fringe.io.done := plasticine.io.done
 
+      plasticine.io.config <> topIO.config
     case _ =>
       throw new Exception(s"Unknown target '${io.target}'")
   }

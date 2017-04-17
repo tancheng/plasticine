@@ -69,7 +69,7 @@ trait FringeParams extends Params {
 trait TopParams {
   val plasticineParams: PlasticineParams
   val fringeParams: FringeParams
-  val target:String = ""
+  val target:String = "vcs"
 }
 
 abstract class SwitchParams(val numIns: Int, val numOuts: Int) extends Params
