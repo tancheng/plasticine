@@ -23,7 +23,7 @@ class FringeContextPlasticine : public FringeContextBase<void> {
 
   pid_t sim_pid;
   std::string configPath;
-  std::string simPath = "./psim/psim.bin"
+  std::string simPath = std::string(getenv("PLASTICINE_HOME")) + "/psim/psim.bin";
   Channel *cmdChannel;
   Channel *respChannel;
   uint64_t numCycles = 0;
@@ -206,9 +206,9 @@ public:
     ASSERT(ldPath != NULL, "ldPath is NULL");
     ASSERT(dramPath != NULL, "dramPath is NULL");
 
-    std::string ldLib = "LD_LIBRARY_PATH=" + string(getenv("LD_LIBRARY_PATH"));
-    std::string dramSimHome = "DRAMSIM_HOME=" + string(getenv("DRAMSIM_HOME"));
-    std::string idealDram = "USE_IDEAL_DRAM=" + string(getenv("USE_IDEAL_DRAM"));
+    std::string ldLib = "LD_LIBRARY_PATH=" + std::string(getenv("LD_LIBRARY_PATH"));
+    std::string dramSimHome = "DRAMSIM_HOME=" + std::string(getenv("DRAMSIM_HOME"));
+    std::string idealDram = "USE_IDEAL_DRAM=" + std::string(getenv("USE_IDEAL_DRAM"));
     std::string envstrings[] = {ldLib, dramSimHome, idealDram};
     char *envs[] = {&envstrings[0][0], &envstrings[1][0], &envstrings[2][0], nullptr};
 
@@ -238,7 +238,7 @@ public:
     // 1. Read config file contents into a buf
     size_t size = getFileSize(path.c_str());
     uint8_t *buf = (uint8_t*) malloc(size);
-    int nbytes = fileToBuf(buf, path.c_str(), INT_MAX);
+    int nbytes = fileToBuf(buf, path.c_str(), size);
     ASSERT(nbytes == size, "Bytes read (%d) does not match file size %lu!\n", nbytes, size);
 
     // 2a. Send CONFIG to simulator, similar to memcpy

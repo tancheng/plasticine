@@ -1,5 +1,5 @@
 TOP=Top
-EXE=accel.bit.bin
+EXE=psim.bin
 
 CC=g++
 VCS_OPTS=-full64 -quiet -timescale=1ns/1ps -sverilog -debug_pp -Mdir=${TOP}.csrc +v2k +vcs+lic+wait +vcs+initreg+random +define+CLOCK_PERIOD=1 +lint=TFIPC-L
