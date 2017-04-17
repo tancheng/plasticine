@@ -2,6 +2,7 @@ package plasticine.apps
 import plasticine.arch._
 import chisel3._
 import plasticine.spade._
+import plasticine.pisa.PISADesign
 import plasticine.pisa.ir._
 import chisel3.util._
 import scala.collection.mutable.ListBuffer
@@ -10,7 +11,8 @@ import GeneratedTopParams._
 import plasticine.templates._
 import plasticine.pisa.enums._
 
-trait InOutArg extends InOutArg1 {
+object InOutArg extends PISADesign with InOutArgTrait
+trait InOutArgTrait extends InOutArgTrait1 {
   val cus:Array[Array[CUBits]] = Array.tabulate(2, 2) {    case (i,j) =>
     cuParams(i)(j) match {
       case p:PCUParams => PCUBits.zeroes(p)
@@ -36,5 +38,6 @@ trait InOutArg extends InOutArg1 {
     controlSwitch=csbs,
     switchCU=lcus,
     argOutMuxSelect=List(1,-1,-1)
-  )  
+  )
+  def main(args: String*) = plasticineBits
 }

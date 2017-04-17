@@ -2,6 +2,7 @@ package plasticine.apps
 import plasticine.arch._
 import chisel3._
 import plasticine.spade._
+import plasticine.pisa.PISADesign
 import plasticine.pisa.ir._
 import chisel3.util._
 import scala.collection.mutable.ListBuffer
@@ -10,8 +11,8 @@ import GeneratedTopParams._
 import plasticine.templates._
 import plasticine.pisa.enums._
 
-trait InOutArg1 {
-  self:InOutArg =>
+trait InOutArgTrait1 {
+  self:InOutArgTrait =>
   ssbs(1)(0).outSelect(4) = 18
   ssbs(1)(0).outSelect(18) = 4
   csbs(1)(0).outSelect(5) = 16
