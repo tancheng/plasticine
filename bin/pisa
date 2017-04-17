@@ -1,13 +1,32 @@
 #!/bin/bash
 
+APP_OUT_DIR=app_out
 if [ $# -lt 1 ]; then
   echo "Usage: $0 <App> <arg0> <arg1> .. <argN>"
   exit -1
 fi
 
+APP=$1
 argsArray=( "$@" )
 
 sbtArgs=${argsArray[@]:0:$#}
 
+# Generate binary
 echo "Running $sbtArgs.."
 sbt "; run-main plasticine.apps.$sbtArgs"
+
+# Create new output directory (and nuke the old one)
+OUTDIR=${APP_OUT_DIR}/${APP}
+rm -rf ${OUTDIR}
+mkdir -p ${OUTDIR}
+
+# Move 'accel.bit.bin' to OUTDIR
+mv accel.bit.bin ${OUTDIR}
+
+# Copy 'src/main/scala/apps/$APP/Driver.cpp' to OUTDIR
+cp src/main/scala/apps/$APP/Driver.cpp ${OUTDIR}
+
+# Copy Makefile
+cp static/fringeVCS/sw/Makefile ${OUTDIR}
+
+# Build manually

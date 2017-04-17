@@ -88,22 +88,23 @@ trait PISADesign extends ConfigFileInterface {
     val binaryGen = new BinaryCodegen()
 		val binData = binaryGen.genBinary(top, configTop)
 
+    val fileName = "accel.bit.bin"
 
     // Print to file
-    toFile("out.bin", binData)
+    toFile(fileName, binData)
 
     // Read from file
-    val readBinData = unpack(fromFile("out.bin"))
-
-
-    println(s"binData[size = ${binData.size}] = $binData")
-    println(s"readBinData[size = ${readBinData.size}] = $readBinData")
-
-    // Check: Print both
-    binData.zipWithIndex.foreach { case (bit, i) =>
-      if (bit != readBinData(i)) {
-        println(s"ERROR at pos $i: Expected $bit, found ${readBinData(i)}")
-      }
-    }
+//    val readBinData = unpack(fromFile(fileName))
+//
+//
+//    println(s"binData[size = ${binData.size}] = $binData")
+//    println(s"readBinData[size = ${readBinData.size}] = $readBinData")
+//
+//    // Check: Print both
+//    binData.zipWithIndex.foreach { case (bit, i) =>
+//      if (bit != readBinData(i)) {
+//        println(s"ERROR at pos $i: Expected $bit, found ${readBinData(i)}")
+//      }
+//    }
 	}
 }
