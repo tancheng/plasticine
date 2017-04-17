@@ -20,8 +20,7 @@
     assert(0);  \
   }
 
-
-int getFileSize(const char *filename) {
+size_t getFileSize(const char *filename) {
   ASSERT(filename, "filename is NULL");
   FILE *ifile = fopen(filename, "rb");
   ASSERT(ifile, "Could not open file %s for reading\n", filename);
@@ -29,6 +28,7 @@ int getFileSize(const char *filename) {
   size_t sz = ftell(ifile);
   rewind(ifile);
   fclose(ifile);
+  return sz;
 }
 
 int fileToBuf(unsigned char *buf, const char *filename, uint32_t max_bytes)
