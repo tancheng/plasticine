@@ -50,7 +50,10 @@ int sendResp(simCmd *cmd) {
 
 uint64_t numCycles = 0;
 queue<simCmd*> pendingOps;
-
+uint8_t *configBuf = NULL;
+bool configMode = false;
+int configPos = 0;
+int configCmdID = -1;
 //extern "C" {
 //  // Callback function from SV when there is valid data
 //  // Currently output stream is always ready, so there is no feedback going from C++ -> SV
@@ -66,6 +69,16 @@ queue<simCmd*> pendingOps;
 //}
 
 extern "C" {
+  void outConfigValid() {
+    configMode = false;
+    // Send ack back indicating end of config
+    simCmd resp;
+    resp.id = configCmdID;
+    resp.cmd = CONFIG;
+    resp.size = 0;
+    respChannel->send(&resp);
+  }
+
   // Function is called every clock cycle
   int tick() {
     bool exitTick = false;
@@ -105,110 +118,137 @@ extern "C" {
     // Check if input stream has new data
 //    inStream->send();
 
-    // Handle new incoming operations
-    while (!exitTick) {
-      simCmd *cmd = (simCmd*) cmdChannel->recv();
-      simCmd readResp;
-      uint32_t reg = 0;
-      uint64_t data = 0;
-      switch (cmd->cmd) {
-        case MALLOC: {
-          size_t size = *(size_t*)cmd->data;
-          int fd = open("/dev/zero", O_RDWR);
-          void *ptr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
-          close(fd);
+    if (configMode) {  // Config mode: Poke 1 bit every cycle
+      int bytePos = configPos / 8;
+      int bitPos = configPos % 8;
+      uint8_t configBit = (configBuf[bytePos] >> bitPos) & 0x1;
+      writeConfig(configBit);
+      configPos++;
+      exitTick = true;
+    } else { // Handle new incoming operations
+      while (!exitTick) {
+        simCmd *cmd = (simCmd*) cmdChannel->recv();
+        simCmd readResp;
+        uint32_t reg = 0;
+        uint64_t data = 0;
+        switch (cmd->cmd) {
+          case MALLOC: {
+            size_t size = *(size_t*)cmd->data;
+            int fd = open("/dev/zero", O_RDWR);
+            void *ptr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
+            close(fd);
 
-          simCmd resp;
-          resp.id = cmd->id;
-          resp.cmd = cmd->cmd;
-          *(uint64_t*)resp.data = (uint64_t)ptr;
-          resp.size = sizeof(size_t);
-          EPRINTF("[SIM] MALLOC(%lu), returning %p\n", size, (void*)ptr);
-          respChannel->send(&resp);
-          break;
-        }
-        case FREE: {
-          void *ptr = (void*)(*(uint64_t*)cmd->data);
-          ASSERT(ptr != NULL, "Attempting to call free on null pointer\n");
-          EPRINTF("[SIM] FREE(%p)\n", ptr);
-          break;
-        }
-        case MEMCPY_H2D: {
-          uint64_t *data = (uint64_t*)cmd->data;
-          void *dst = (void*)data[0];
-          size_t size = data[1];
-
-          EPRINTF("[SIM] Received memcpy request to %p, size %lu\n", (void*)dst, size);
-
-          // Now to receive 'size' bytes from the cmd stream
-          cmdChannel->recvFixedBytes(dst, size);
-
-          // Send ack back indicating end of memcpy
-          simCmd resp;
-          resp.id = cmd->id;
-          resp.cmd = cmd->cmd;
-          resp.size = 0;
-          respChannel->send(&resp);
-          break;
-        }
-        case MEMCPY_D2H: {
-          // Transfer 'size' bytes from src
-          uint64_t *data = (uint64_t*)cmd->data;
-          void *src = (void*)data[0];
-          size_t size = data[1];
-
-          // Now to receive 'size' bytes from the cmd stream
-          respChannel->sendFixedBytes(src, size);
-          break;
-        }
-        case RESET:
-          rst();
-          exitTick = true;
-          break;
-        case START:
-          start();
-          exitTick = true;
-          break;
-        case STEP:
-          exitTick = true;
-          if (!useIdealDRAM) {
-            mem->update();
-          }
-          break;
-        case READ_REG: {
-            reg = *((uint32_t*)cmd->data);
-
-            // Issue read addr
-            readRegRaddr(reg);
-
-            // Append to pending ops - will return in the next cycle
-            simCmd *pendingCmd = (simCmd*) malloc(sizeof(simCmd));
-            memcpy(pendingCmd, cmd, sizeof(simCmd));
-            pendingOps.push(pendingCmd);
-
-            exitTick = true;
-            break;
-         }
-        case WRITE_REG: {
-            reg = *((uint32_t*)cmd->data);
-            data = *((uint64_t*)((uint32_t*)cmd->data + 1));
-
-            // Perform write
-            writeReg(reg, data);
-            exitTick = true;
+            simCmd resp;
+            resp.id = cmd->id;
+            resp.cmd = cmd->cmd;
+            *(uint64_t*)resp.data = (uint64_t)ptr;
+            resp.size = sizeof(size_t);
+            EPRINTF("[SIM] MALLOC(%lu), returning %p\n", size, (void*)ptr);
+            respChannel->send(&resp);
             break;
           }
-        case FIN:
-          if (!useIdealDRAM) {
-            mem->printStats(true);
+          case FREE: {
+            void *ptr = (void*)(*(uint64_t*)cmd->data);
+            ASSERT(ptr != NULL, "Attempting to call free on null pointer\n");
+            EPRINTF("[SIM] FREE(%p)\n", ptr);
+            break;
           }
-          finishSim = 1;
-          exitTick = true;
-          break;
-        default:
-          break;
+          case CONFIG: {
+            uint64_t *data = (uint64_t*)cmd->data;
+            size_t size = data[0];
+
+            EPRINTF("[SIM] Received CONFIG, size %lu\n", size);
+            configMode = true;
+
+            if (configBuf == NULL) {
+              configBuf = (uint8_t*) malloc(size);
+            }
+
+            configCmdID = cmd->id;
+
+            // Now to receive 'size' bytes from the cmd stream
+            cmdChannel->recvFixedBytes(configBuf, size);
+
+            break;
+          }
+          case MEMCPY_H2D: {
+            uint64_t *data = (uint64_t*)cmd->data;
+            void *dst = (void*)data[0];
+            size_t size = data[1];
+
+            EPRINTF("[SIM] Received memcpy request to %p, size %lu\n", (void*)dst, size);
+
+            // Now to receive 'size' bytes from the cmd stream
+            cmdChannel->recvFixedBytes(dst, size);
+
+            // Send ack back indicating end of memcpy
+            simCmd resp;
+            resp.id = cmd->id;
+            resp.cmd = cmd->cmd;
+            resp.size = 0;
+            respChannel->send(&resp);
+            break;
+          }
+          case MEMCPY_D2H: {
+            // Transfer 'size' bytes from src
+            uint64_t *data = (uint64_t*)cmd->data;
+            void *src = (void*)data[0];
+            size_t size = data[1];
+
+            // Now to receive 'size' bytes from the cmd stream
+            respChannel->sendFixedBytes(src, size);
+            break;
+          }
+          case RESET:
+            rst();
+            exitTick = true;
+            break;
+          case START:
+            start();
+            exitTick = true;
+            break;
+          case STEP:
+            exitTick = true;
+            if (!useIdealDRAM) {
+              mem->update();
+            }
+            break;
+          case READ_REG: {
+              reg = *((uint32_t*)cmd->data);
+
+              // Issue read addr
+              readRegRaddr(reg);
+
+              // Append to pending ops - will return in the next cycle
+              simCmd *pendingCmd = (simCmd*) malloc(sizeof(simCmd));
+              memcpy(pendingCmd, cmd, sizeof(simCmd));
+              pendingOps.push(pendingCmd);
+
+              exitTick = true;
+              break;
+           }
+          case WRITE_REG: {
+              reg = *((uint32_t*)cmd->data);
+              data = *((uint64_t*)((uint32_t*)cmd->data + 1));
+
+              // Perform write
+              writeReg(reg, data);
+              exitTick = true;
+              break;
+            }
+          case FIN:
+            if (!useIdealDRAM) {
+              mem->printStats(true);
+            }
+            finishSim = 1;
+            exitTick = true;
+            break;
+          default:
+            break;
+        }
       }
     }
+
     return finishSim;
   }
 

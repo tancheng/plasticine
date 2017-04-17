@@ -16,6 +16,11 @@ typedef FringeContextZynq FringeContext;
 #elif defined VCS
 #include "FringeContextVCS.h"
 typedef FringeContextVCS FringeContext;
+
+#elif defined PLASTICINE
+#include "FringeContextPlasticine.h"
+typedef FringeContextVCS FringeContext;
+
 #endif
 
 #endif

@@ -19,9 +19,11 @@
 #include "channel.h"
 
 //Source: http://stackoverflow.com/questions/13893085/posix-spawnp-and-piping-child-output-to-a-string
-class FringeContextVCS : public FringeContextBase<void> {
+class FringeContextPlasticine : public FringeContextBase<void> {
 
   pid_t sim_pid;
+  std::string configPath;
+  std::string simPath = "./psim/psim.bin"
   Channel *cmdChannel;
   Channel *respChannel;
   uint64_t numCycles = 0;
@@ -178,7 +180,8 @@ public:
     EPRINTF("Connection successful!\n");
   }
 
-  FringeContextVCS(std::string path = "") : FringeContextBase(path) {
+  FringeContextPlasticine(std::string path = "") : FringeContextBase(path) {
+    configPath = path;
     cmdChannel = new Channel(sizeof(simCmd));
     respChannel = new Channel(sizeof(simCmd));
 
@@ -191,7 +194,7 @@ public:
     posix_spawn_file_actions_adddup2(&action, cmdChannel->readFd(), SIM_CMD_FD);
     posix_spawn_file_actions_adddup2(&action, respChannel->writeFd(), SIM_RESP_FD);
 
-    std::string argsmem[] = {path};
+    std::string argsmem[] = {simPath};
     char *args[] = {&argsmem[0][0],nullptr};
 
     // Pass required environment variables to simulator
@@ -223,10 +226,39 @@ public:
   }
 
   virtual void load() {
+    // Apply board reset for a few cycles
     for (int i=0; i<5; i++) {
       reset();
     }
+
+    // Lower board reset
     start();
+
+    // Pass config data
+    // 1. Read config file contents into a buf
+    size_t size = getFileSize(path.c_str());
+    uint8_t *buf = (uint8_t*) malloc(size);
+    int nbytes = fileToBuf(buf, path.c_str(), INT_MAX);
+    ASSERT(nbytes == size, "Bytes read (%d) does not match file size %lu!\n", nbytes, size);
+
+    // 2a. Send CONFIG to simulator, similar to memcpy
+    simCmd cmd;
+    cmd.id = globalID++;
+    cmd.cmd = CONFIG;
+    uint64_t *data = (uint64_t*)cmd.data;
+    data[0] = size;
+    cmd.size = sizeof(uint64_t);
+    cmdChannel->send(&cmd);
+
+    // 2b. Now send config bytes
+    cmdChannel->sendFixedBytes(buf, size);
+
+    // 3. Wait for sim response
+    //    Simulator must independently advance clock
+    //    without waiting for step in 'config' mode
+    simCmd *resp = recvResp();
+    ASSERT(cmd.id == resp->id, "load resp->id does not match cmd.id!");
+    ASSERT(cmd.cmd == resp->cmd, "load resp->cmd does not match cmd.cmd!");
   }
 
   virtual void run() {
@@ -265,7 +297,7 @@ public:
     return readReg(numArgIns+2+arg);
   }
 
-  ~FringeContextVCS() {
+  ~FringeContextPlasticine() {
     finish();
   }
 };
