@@ -1,11 +1,16 @@
+OUT_DIR=psim
 
-all:
+vcs: build
+	sbt "; run-main plasticine.TopGen --testArgs --outdir ${OUT_DIR}"
+	cp -r static/fringeVCS/* ${OUT_DIR}
+	make -C ${OUT_DIR}
+
+build:
 	sbt compile
 
-clean:
-	sbt clean
-	rm -rf generated
+vcs-clean:
+	make -C ${OUT_DIR} clean
 
-wave_%:
-	@echo 'Generating waveform for $(patsubst wave_%,%,$@)'
-	gtkwave -f generated/$(patsubst wave_%,%,$@)/$(patsubst wave_%Test,%,$@).vcd &
+distclean: clean
+	sbt clean
+	rm -rf ${OUT_DIR}
