@@ -17,11 +17,11 @@ trait ConfigFileInterface {
   // so that it can be written to a config file
   def pack(data: List[Int]): List[Int] = {
     // First, padd data to make it a multiple of 8
-    val padded = data ++ List.fill(data.size % 8) { 0 }
+    val padded = data ++ List.fill(8 - data.size % 8) { 0 }
 
     // Pack from LSB to MSB
     List.tabulate(padded.size / 8) { i =>
-      val bits = padded.slice(i*8, 8)
+      val bits = padded.slice(i*8, i*8+8)
       bits.zipWithIndex.map { case (bit, idx) => bit << idx }.reduce {_|_}
     }
   }
@@ -45,10 +45,13 @@ trait ConfigFileInterface {
   def fromFile(inFileName: String): List[Int] = {
     val istream = new DataInputStream(new FileInputStream(inFileName))
     val lb = ListBuffer[Int]()
-    try {
-      lb.append(istream.readUnsignedByte())
-    } catch {
-      case e: EOFException => // EOF reached, don't do anything
+    var eof = false
+    while (!eof) {
+      try {
+        lb.append(istream.readUnsignedByte())
+      } catch {
+        case e: EOFException => eof = true // EOF reached
+      }
     }
     istream.close
     lb.toList
@@ -83,13 +86,18 @@ trait PISADesign extends ConfigFileInterface {
 
 		// Generate binary
     val binaryGen = new BinaryCodegen()
-		val binData = binaryGen.genBinary(top, configTop);
+		val binData = binaryGen.genBinary(top, configTop)
+
 
     // Print to file
     toFile("out.bin", binData)
 
     // Read from file
-    val readBinData = fromFile("out.bin")
+    val readBinData = unpack(fromFile("out.bin"))
+
+
+    println(s"binData[size = ${binData.size}] = $binData")
+    println(s"readBinData[size = ${readBinData.size}] = $readBinData")
 
     // Check: Print both
     binData.zipWithIndex.foreach { case (bit, i) =>

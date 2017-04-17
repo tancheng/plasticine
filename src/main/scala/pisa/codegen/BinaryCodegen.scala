@@ -36,9 +36,9 @@ class BinaryCodegen() extends Traversal {
     case num: Int => List.tabulate(w) { j => if (BigInt(num).testBit(j)) 1 else 0 }
     case num: Float => toBinary(java.lang.Float.floatToRawIntBits(num), w)
     case l: List[Any] => l.map { e => toBinary(e, w/l.size) }.flatten
-    case l: Array[Any] => l.map { e => toBinary(e, w/l.size) }.toList.flatten
-    case s: AbstractBits => s.toBinary
-    case _ => throw new Exception("Unsupported type for toBinary")
+    case l: Array[Int] => l.map { e => toBinary(e, w/l.size) }.toList.flatten
+//    case s: AbstractBits => s.toBinary
+    case f@_ => throw new Exception(s"Unsupported type for toBinary: (${x.getClass()})")
   }
 
 //  override def toBinary(): List[Int] = {
@@ -53,7 +53,7 @@ class BinaryCodegen() extends Traversal {
 //  }
 
   def encodeOneHot(x: Int): Int = 1 << x
-  def encodeOneHot(x: List[Int]): Int = x.map {encodeOneHot(_) }.reduce {_|_}
+  def encodeOneHot(x: List[Int]): Int = if (x.size == 0) 0 else x.map {encodeOneHot(_) }.reduce {_|_}
 
   def genBinary(node: AbstractBits, cnode: AbstractConfig) : List[Int] = {
     checkFriendship(node, cnode)
@@ -85,12 +85,6 @@ class BinaryCodegen() extends Traversal {
         genBinary(n.opC, cn.opC) ++
         genBinary(n.opB, cn.opB) ++
         genBinary(n.opA, cn.opA)
-//        List.tabulate(n.productArity) { i =>
-//          val idx = n.productArity - 1 - i
-//          val elem = n.productElement(idx)
-//          val w = cn.elements(classAccessors[PipeStageBits].apply(idx)).getWidth
-//          toBinary(elem, w)
-//        }.flatten
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         toBinary(n.argOutMuxSelect, cn.argOutMuxSelect.getWidth) ++
@@ -115,24 +109,31 @@ class BinaryCodegen() extends Traversal {
           }.flatten
         }.flatten
 //        List.tabulate(n.productArity) { i =>
-//          val idx = n.productArity - 1 - i
+//          val idx = n.productArity - 2 - i
 //          val elem = n.productElement(idx)
 //          val cnElem = cn.elements(classAccessors[PlasticineBits].apply(idx))
 //          genBinary(elem, cnElem)
 //        }.flatten
       case (n: SrcValueTuple, cn: SrcValueBundle)         =>
-        List.tabulate(n.productArity) { i =>
-          val idx = n.productArity - 1 - i
-          val elem = n.productElement(idx)
-          val w = cn.elements(classAccessors[SrcValueTuple].apply(idx)).getWidth
-          elem match {
-            case s: SelectSource => toBinary(cn.srcIdx(s), w)
-            case _ => toBinary(elem, w)
-          }
-        }.flatten
+        // First value, then src
+        toBinary(n.value, cn.value.getWidth) ++
+        (n.src match {
+          case s: SelectSource => toBinary(cn.srcIdx(s), cn.src.getWidth)
+          case _ => List[Int]()
+        })
+//        List.tabulate(n.productArity) { i =>
+//          val idx = n.productArity - 1 - i
+//          val elem = n.productElement(idx)
+//          println(s"[SrcValueTuple] elements = ${cn.elements}")
+//          val w = cn.elements(classAccessors[SrcValueTuple].apply(idx)).getWidth
+//          elem match {
+//            case s: SelectSource => toBinary(cn.srcIdx(s), w)
+//            case _ => toBinary(elem, w)
+//          }
+//        }.flatten
      case _ =>
+        throw new Exception(s"Don't know how to visit node combo ($node, $cnode)")
     }
-    throw new Exception(s"Don't know how to visit node combo ($node, $cnode)")
   }
 
 }
