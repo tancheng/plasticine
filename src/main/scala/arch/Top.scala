@@ -21,6 +21,7 @@ class VerilatorInterface(p: TopParams) extends Bundle {
 
   // Configuration interface
   val config = Flipped(Decoupled(Bool()))
+  val configDone = Output(Bool())
 }
 
 /**
@@ -74,6 +75,7 @@ class Top(p: TopParams) extends Module {
       fringe.io.done := plasticine.io.done
 
       plasticine.io.config <> topIO.config
+      topIO.configDone := plasticine.io.configDone
     case _ =>
       throw new Exception(s"Unknown target '${io.target}'")
   }

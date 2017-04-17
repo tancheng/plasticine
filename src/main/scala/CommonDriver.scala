@@ -35,7 +35,8 @@ trait CommonDriver {
   def main(args: Array[String]) {
     val splitArgs = separateChiselArgs(args)
     this.args = splitArgs.testArgs
-    chisel3.Driver.execute(Array[String]("--target-dir", s"genVerilog/${moduleName}"), dut)
+    val targetDir = if (this.args.contains("--outdir")) this.args(this.args.indexOf("--outdir") + 1) else s"genVerilog/${moduleName}"
+    chisel3.Driver.execute(Array[String]("--target-dir", targetDir), dut)
   }
 }
 

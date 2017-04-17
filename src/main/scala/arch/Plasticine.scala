@@ -30,6 +30,7 @@ case class PlasticineIO(f: FringeParams) extends Bundle {
 
   // Config IO: Shift register
   val config = Flipped(Decoupled(Bool()))
+  val configDone = Output(Bool())
 }
 
 class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module with PlasticineArch {
@@ -45,6 +46,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
   val configSR = Module(new ShiftRegister(new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f)))
   configSR.io.in.bits := io.config.bits
   configSR.io.in.valid := io.config.valid
+  io.configDone := configSR.io.out.valid
 
   val config = configSR.io.config
 
