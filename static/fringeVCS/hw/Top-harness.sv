@@ -9,7 +9,7 @@ module test;
   export "DPI" function rst;
   export "DPI" function writeReg;
   export "DPI" function readRegRaddr;
-  export "DPI" function readRegRdataHi32;
+//  export "DPI" function readRegRdataHi32;
   export "DPI" function readRegRdataLo32;
   export "DPI" function pokeDRAMResponse;
   export "DPI" function getDRAMRespReady;
@@ -36,11 +36,11 @@ module test;
   reg [31:0] io_raddr;
   reg io_wen;
   reg [31:0] io_waddr;
-  reg [63:0] io_wdata;
-  wire [63:0] io_rdata;
+  reg [31:0] io_wdata;
+  wire [31:0] io_rdata;
   reg io_dram_cmd_ready;
   wire  io_dram_cmd_valid;
-  wire [63:0] io_dram_cmd_bits_addr;
+  wire [31:0] io_dram_cmd_bits_addr;
   wire  io_dram_cmd_bits_isWr;
   wire [31:0] io_dram_cmd_bits_streamId;
   wire [31:0] io_dram_cmd_bits_tag;
@@ -147,9 +147,9 @@ module test;
     io_raddr = r;
   endfunction
 
-  function void readRegRdataHi32(output bit [31:0] rdatahi);
-    rdatahi = io_rdata[63:32];
-  endfunction
+//  function void readRegRdataHi32(output bit [31:0] rdatahi);
+//    rdatahi = io_rdata[63:32];
+//  endfunction
 
   function void readRegRdataLo32(output bit [31:0] rdatalo);
     rdatalo = io_rdata[31:0];

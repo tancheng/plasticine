@@ -83,13 +83,13 @@ extern "C" {
           simCmd resp;
           resp.id = cmd->id;
           resp.cmd = cmd->cmd;
-          SV_BIT_PACKED_ARRAY(32, rdataHi);
+//          SV_BIT_PACKED_ARRAY(32, rdataHi);
           SV_BIT_PACKED_ARRAY(32, rdataLo);
-          readRegRdataHi32((svBitVec32*)&rdataHi);
+//          readRegRdataHi32((svBitVec32*)&rdataHi);
           readRegRdataLo32((svBitVec32*)&rdataLo);
           *(uint32_t*)resp.data = (uint32_t)*rdataLo;
-          *((uint32_t*)resp.data + 1) = (uint32_t)*rdataHi;
-          resp.size = sizeof(uint64_t);
+//          *((uint32_t*)resp.data + 1) = (uint32_t)*rdataHi;
+          resp.size = sizeof(uint32_t);
           respChannel->send(&resp);
           break;
         default:
