@@ -4,6 +4,7 @@ import plasticine.pisa.ir._
 import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.pisa.Traversal
+import plasticine.templates.Opcodes
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable.Set
@@ -58,7 +59,7 @@ class ConfigInitializer() extends Traversal {
         for(i <- 0 until n.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
         cn.result := encodeOneHot(n.result).U
-        cn.opcode := 5.U
+        cn.opcode := Opcodes.getCode(n.opcode).U
         init(n.opC, cn.opC)
         init(n.opB, cn.opB)
         init(n.opA, cn.opA)

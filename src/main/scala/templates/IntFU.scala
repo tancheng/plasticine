@@ -7,6 +7,7 @@ import chisel3.util._
 import plasticine.templates.Utils.log2Up
 
 import scala.collection.immutable.Map
+import plasticine.pisa.enums._
 
 /**
  * Integer Functional Unit module. Represents the basic workhorse
@@ -18,43 +19,47 @@ import scala.collection.immutable.Map
 object Opcodes {
   // HACK: Duplicated with IntFU. Need to refactor this into
   // a separate Decode table
-  private var _opcodes = List[(String, (UInt, UInt, UInt) => UInt)](
-    ("+" , (a,b,c)    => a+b),
-    ("-" , (a,b,c)    => a-b),
-    ("*" , (a,b,c)    => a*b),
-    ("/" , (a,b,c)    => a*b),  // No divider temporarily
-    ("&" , (a,b,c)    => a&b),
-    ("|" , (a,b,c)    => a|b),
-    ("==" , (a,b,c)   => a===b),
-    (">" , (a,b,c)   => a>b),
-    ("<" , (a,b,c)   => a<b),
-    ("<<" , (a,b,c)   => a<<b),
-    (">>" , (a,b,c)   => a>>b),
-    ("f<" , (a,b,c)   => UInt(0)),
-    ("f==" , (a,b,c)  => UInt(0)),
-    ("f>" , (a,b,c) => UInt(0)),
-    ("f*" , (a,b,c) => UInt(0)),
-    ("f+" , (a,b,c) => UInt(0)),
-    ("mux" , (a,b,c) => Mux(c(0), a, b)),
-    ("min" , (a,b,c) => Mux(a<b, a, b)),
-    ("max" , (a,b,c) => Mux(a>b, a, b)),
-    ("passA" , (a,b,c) => a),
-    ("passB" , (a,b,c) => b)
+  private var _opcodes = List[(Opcode, (UInt, UInt, UInt) => UInt)](
+    (FixAdd , (a,b,c)    => a+b),
+    (FixSub , (a,b,c)    => a-b),
+    (FixMul , (a,b,c)    => a*b),
+    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
+    (FixAnd , (a,b,c)    => a&b),
+    (FixOr , (a,b,c)    => a|b),
+    (FixEql , (a,b,c)   => a===b),
+    (FixGt , (a,b,c)   => a>b),
+    (FixLt , (a,b,c)   => a<b),
+    (FixSHL , (a,b,c)   => a<<b),
+    (FixSHR , (a,b,c)   => a>>b),
+    (FltLt , (a,b,c)   => UInt(0)),
+    (FltEql , (a,b,c)  => UInt(0)),
+    (FltGt , (a,b,c) => UInt(0)),
+    (FltMul , (a,b,c) => UInt(0)),
+    (FltAdd , (a,b,c) => UInt(0)),
+    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
+    (FixMin , (a,b,c) => Mux(a<b, a, b)),
+    (FixMax , (a,b,c) => Mux(a>b, a, b)),
+    (BypassA , (a,b,c) => a),
+    (BypassB , (a,b,c) => b),
+    (BypassC , (a,b,c) => c)
   )
   def opcodes = _opcodes
-  def opcodes_=(x: List[(String, (UInt, UInt, UInt) => UInt)]) { _opcodes = x }
+  def opcodes_=(x: List[(Opcode, (UInt, UInt, UInt) => UInt)]) { _opcodes = x }
 
   def size = opcodes.size
 
-  def getCode(op: String): Int = {
-    opcodes.indexWhere (_._1 == op)
+  def getCode(op: Opcode): Int = {
+    op match {
+      case XOp => 0
+      case _ => opcodes.indexWhere (_._1 == op)
+    }
   }
 
   def getOp(i: Int, a: UInt, b: UInt, c: UInt = UInt(0)): UInt = {
     opcodes(i)._2(a, b, c)
   }
 
-  def getOpLambda(op: String) = {
+  def getOpLambda(op: Opcode) = {
     opcodes(getCode(op))._2
   }
 
@@ -92,28 +97,29 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
   val fmaOut = Wire(UInt(w.W))
 
   // Populate opcode table
-  Opcodes.opcodes = List[(String, (UInt, UInt, UInt) => UInt)](
-    ("+" , (a,b,c)    => a+b),
-    ("-" , (a,b,c)    => a-b),
-    ("*" , (a,b,c)    => a*b),
-    ("/" , (a,b,c)    => a*b),  // No divider temporarily
-    ("&" , (a,b,c)    => a&b),
-    ("|" , (a,b,c)    => a|b),
-    ("==" , (a,b,c)   => a===b),
-    (">" , (a,b,c)   => a>b),
-    ("<" , (a,b,c)   => a<b),
-    ("<<" , (a,b,c)   => a<<b),
-    (">>" , (a,b,c)   => a>>b),
-    ("f<" , (a,b,c)   => fpLt),
-    ("f==" , (a,b,c)  => fpEq),
-    ("f>" , (a,b,c) => fpGt),
-    ("f*" , (a,b,c) => fmaOut),
-    ("f+" , (a,b,c) => fmaOut),
-    ("mux" , (a,b,c) => Mux(c(0), a, b)),
-    ("min" , (a,b,c) => Mux(a<b, a, b)),
-    ("max" , (a,b,c) => Mux(a>b, a, b)),
-    ("passA" , (a,b,c) => a),
-    ("passB" , (a,b,c) => b)
+  Opcodes.opcodes = List[(Opcode, (UInt, UInt, UInt) => UInt)](
+    (FixAdd , (a,b,c)    => a+b),
+    (FixSub , (a,b,c)    => a-b),
+    (FixMul , (a,b,c)    => a*b),
+    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
+    (FixAnd , (a,b,c)    => a&b),
+    (FixOr , (a,b,c)    => a|b),
+    (FixEql , (a,b,c)   => a===b),
+    (FixGt , (a,b,c)   => a>b),
+    (FixLt , (a,b,c)   => a<b),
+    (FixSHL , (a,b,c)   => a<<b),
+    (FixSHR , (a,b,c)   => a>>b),
+    (FltLt , (a,b,c)   => fpLt),
+    (FltEql , (a,b,c)  => fpEq),
+    (FltGt , (a,b,c) => fpGt),
+    (FltMul , (a,b,c) => fmaOut),
+    (FltAdd , (a,b,c) => fmaOut),
+    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
+    (FixMin , (a,b,c) => Mux(a<b, a, b)),
+    (FixMax , (a,b,c) => Mux(a>b, a, b)),
+    (BypassA , (a,b,c) => a),
+    (BypassB , (a,b,c) => b),
+    (BypassC , (a,b,c) => c)
   )
 
 //  if (useFMA) {

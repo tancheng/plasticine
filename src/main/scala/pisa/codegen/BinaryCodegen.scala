@@ -4,6 +4,7 @@ import plasticine.pisa.ir._
 import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.pisa.Traversal
+import plasticine.templates.Opcodes
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable.Set
@@ -85,7 +86,7 @@ class BinaryCodegen() extends Traversal {
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
 //        toBinary(encodeOneHot(n.result), cn.result.getWidth) ++
 //        toBinary(5, cn.opcode.getWidth)
-      val valueBin = toBinary(encodeOneHot(n.result), cn.result.getWidth) ++ toBinary(5, cn.opcode.getWidth) ++ genBinary(n.opC, cn.opC) ++ genBinary(n.opB, cn.opB) ++ genBinary(n.opA, cn.opA)
+      val valueBin = toBinary(encodeOneHot(n.result), cn.result.getWidth) ++ toBinary(Opcodes.getCode(n.opcode), cn.opcode.getWidth) ++ genBinary(n.opC, cn.opC) ++ genBinary(n.opB, cn.opB) ++ genBinary(n.opA, cn.opA)
 
       println(s"[PipeStageBits] $valueBin")
       valueBin

@@ -26,15 +26,22 @@ object XDst extends SelectDst with XType
 
 sealed trait Opcode 
 case object MuxOp extends Opcode
-case object Bypass extends Opcode
+case object BypassA extends Opcode
+case object BypassB extends Opcode
+case object BypassC extends Opcode
 
 sealed trait FixOpcode extends Opcode 
 case object FixAdd extends FixOpcode 
 case object FixSub extends FixOpcode 
 case object FixMul extends FixOpcode 
 case object FixDiv extends FixOpcode 
+case object FixSHL  extends FixOpcode
+case object FixSHR  extends FixOpcode
+case object FixAnd extends FixOpcode 
+case object FixOr extends FixOpcode 
 case object FixMin extends FixOpcode
 case object FixMax extends FixOpcode 
+case object FixGt  extends FixOpcode
 case object FixLt  extends FixOpcode
 case object FixLeq extends FixOpcode
 case object FixEql extends FixOpcode
@@ -50,6 +57,7 @@ case object FltMul extends FltOpcode
 case object FltDiv extends FltOpcode 
 case object FltMin extends FltOpcode 
 case object FltMax extends FltOpcode 
+case object FltGt  extends FltOpcode
 case object FltLt  extends FltOpcode
 case object FltLeq extends FltOpcode
 case object FltEql extends FltOpcode
