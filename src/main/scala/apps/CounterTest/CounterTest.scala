@@ -15,6 +15,6 @@ object CounterTest extends PISADesign with CounterTestTrait
 trait CounterTestTrait {
 
   def main(args: String*) = {
-    CounterRCBits(max=SrcValueTuple(ConstSrc, 1), stride=SrcValueTuple(ConstSrc, 1), min=SrcValueTuple(ConstSrc, 1), par=1)
+    CounterRCBits(max=SrcValueTuple(ConstSrc, 100), stride=SrcValueTuple(ConstSrc, 5), min=SrcValueTuple(ConstSrc, 1), par=1)
   }
 }
