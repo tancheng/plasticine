@@ -38,7 +38,7 @@ class PCU(val p: PCUParams) extends CU {
   // after 'rwStages' and before 'reduction' stages because of the way
   // the dataSrc muxes are created.
   // i.e., d >= rwStages + 1 + numReduceStages + numStagesAfterReduction
-//  Predef.assert(p.d >= (1 + numReduceStages), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages)!""")
+  Predef.assert(p.d >= (1 + numReduceStages), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages)!""")
 
   // Scalar input FIFOs
   val scalarFIFOs = List.tabulate(p.numScalarIn) { i =>
@@ -67,7 +67,7 @@ class PCU(val p: PCUParams) extends CU {
 
   // Counter chain
   val counterChain = Module(new CounterChainCore(p.w, p.numCounters))
-//  counterChain.io.config := io.config.counterChain
+  counterChain.io.config := io.config.counterChain
 
   // Connect max and stride
   val ctrMaxStrideSources = Vec(scalarFIFOs.map { _.io.deq(0) })
@@ -75,13 +75,13 @@ class PCU(val p: PCUParams) extends CU {
     // max
     val maxMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
     maxMux.io.ins := ctrMaxStrideSources
-//    maxMux.io.sel := io.config.counterChain.counters(i).max.value
+    maxMux.io.sel := io.config.counterChain.counters(i).max.value
     counterChain.io.max(i) := maxMux.io.out
 
     // stride
     val strideMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
     strideMux.io.ins := ctrMaxStrideSources
-//    strideMux.io.sel := io.config.counterChain.counters(i).stride.value
+    strideMux.io.sel := io.config.counterChain.counters(i).stride.value
     counterChain.io.stride(i) := strideMux.io.out
   }
 
