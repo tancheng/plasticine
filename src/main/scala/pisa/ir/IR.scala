@@ -73,7 +73,7 @@ extends AbstractBits {
 //  }
 }
 object SrcValueTuple {
-  def zeroes(width: Int) = new SrcValueTuple()
+  def zeroes(width: Int) = new SrcValueTuple(src = XSrc, value = 0)
 }
 
 
@@ -118,7 +118,7 @@ case class CounterChainBits(chain: List[Int], counters: Array[CounterRCBits]) ex
 object CounterChainBits {
   def zeroes(width: Int, numCounters: Int) = {
     new CounterChainBits(
-      List.fill(numCounters) { 0 },
+      List.fill(numCounters-1) { 0 },
       Array.fill(numCounters) { CounterRCBits.zeroes(width) }
     )
   }
@@ -157,12 +157,13 @@ case class PipeStageBits(
   opB: SrcValueTuple,
   opC: SrcValueTuple,
   opcode: Opcode = XOp,
-  res: List[SrcValueTuple] = Nil,
-  fwd: Array[SrcValueTuple] 
+  res: List[SrcValueTuple] = Nil
+//  fwd: Array[SrcValueTuple] 
 )
 extends AbstractBits {
   val result = res.map{
     case SrcValueTuple(CurrStageDst, idx:Int) => idx
+    case _ => 0
   }
   // Get names of case class fields
 //  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
@@ -188,8 +189,8 @@ object PipeStageBits {
     new PipeStageBits(
       opA = SrcValueTuple.zeroes(width),
       opB = SrcValueTuple.zeroes(width),
-      opC = SrcValueTuple.zeroes(width),
-      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width))
+      opC = SrcValueTuple.zeroes(width)
+//      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width))
     )
   }
 }

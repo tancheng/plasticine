@@ -68,15 +68,31 @@ int configCmdID = -1;
 //  }
 //}
 
+void writeConfigBit() {
+  int bytePos = configPos / 8;
+  int bitPos = configPos % 8;
+  uint8_t configBit = (configBuf[bytePos] >> bitPos) & 0x1;
+  writeConfig(configBit);
+  configPos++;
+}
+
+int maxExtraConfigCycles = 2;
+int numExtraShifts = 0;
+
 extern "C" {
   void outConfigValid() {
-    configMode = false;
-    // Send ack back indicating end of config
-    simCmd resp;
-    resp.id = configCmdID;
-    resp.cmd = CONFIG;
-    resp.size = 0;
-    respChannel->send(&resp);
+    writeConfigBit();
+    numExtraShifts++;
+
+    if (numExtraShifts == maxExtraConfigCycles) {
+      configMode = false;
+      // Send ack back indicating end of config
+      simCmd resp;
+      resp.id = configCmdID;
+      resp.cmd = CONFIG;
+      resp.size = 0;
+      respChannel->send(&resp);
+    }
   }
 
   // Function is called every clock cycle
@@ -119,11 +135,7 @@ extern "C" {
 //    inStream->send();
 
     if (configMode) {  // Config mode: Poke 1 bit every cycle
-      int bytePos = configPos / 8;
-      int bitPos = configPos % 8;
-      uint8_t configBit = (configBuf[bytePos] >> bitPos) & 0x1;
-      writeConfig(configBit);
-      configPos++;
+      writeConfigBit();
       exitTick = true;
     } else { // Handle new incoming operations
       while (!exitTick) {
@@ -168,7 +180,7 @@ extern "C" {
 
             // Now to receive 'size' bytes from the cmd stream
             cmdChannel->recvFixedBytes(configBuf, size);
-
+            exitTick = true;
             break;
           }
           case MEMCPY_H2D: {

@@ -17,6 +17,7 @@ trait ConfigFileInterface {
   // so that it can be written to a config file
   def pack(data: List[Int]): List[Int] = {
     // First, padd data to make it a multiple of 8
+    println(s"Padding: ${8 - data.size % 8}")
     val padded = data ++ List.fill(8 - data.size % 8) { 0 }
 
     // Pack from LSB to MSB
@@ -35,7 +36,9 @@ trait ConfigFileInterface {
   }
 
   def toFile(outFileName: String, data: List[Int]) {
+    println(s"\n\n[toFile] unpacked = $data\n\n")
     val packed = pack(data)
+    println(s"\n\n[toFile] packed = $packed\n\n")
     val os = new DataOutputStream(new FileOutputStream(outFileName))
     packed.foreach { os.writeByte(_) }
     os.flush
@@ -76,6 +79,7 @@ trait PISADesign extends ConfigFileInterface {
   def getConfigTop(node: AbstractBits): AbstractConfig = node match {
     case p: PlasticineBits => getPlasticineConfigTop
     case p: CounterRCBits  => new CounterConfig(GeneratedTopParams.plasticineParams.w, 0, 0)
+    case p: CounterChainBits => new CounterChainConfig(GeneratedTopParams.plasticineParams.w, 3)
     case p: PCUBits        => new PCUConfig(GeneratedTopParams.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams])
     case _ => throw new Exception(s"[getConfigTop] Unsupported '$node'")
   }

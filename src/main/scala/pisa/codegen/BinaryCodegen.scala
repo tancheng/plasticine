@@ -70,21 +70,27 @@ class BinaryCodegen() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         toBinary(n.outSelect, cn.outSelect.getWidth)
       case (n: PCUBits, cn: PCUConfig)                    =>
-        genBinary(n.counterChain, cn.counterChain) ++
-        List.tabulate(n.stages.size) { i =>
+        val counterBits = genBinary(n.counterChain, cn.counterChain)
+        val stageBits = List.tabulate(n.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
+        println(s"[PCUBits] counterBits = $counterBits")
+        println(s"[PCUBits] stageBits = $stageBits")
+        counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
         genBinary(n.counterChain, cn.counterChain) ++
         List.tabulate(n.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
-        toBinary(encodeOneHot(n.result), cn.result.getWidth) ++
-        toBinary(0xFF, cn.opcode.getWidth) ++
-        genBinary(n.opC, cn.opC) ++
-        genBinary(n.opB, cn.opB) ++
-        genBinary(n.opA, cn.opA)
+//        toBinary(encodeOneHot(n.result), cn.result.getWidth) ++
+//        toBinary(5, cn.opcode.getWidth)
+      val valueBin = toBinary(encodeOneHot(n.result), cn.result.getWidth) ++ toBinary(5, cn.opcode.getWidth) ++ genBinary(n.opC, cn.opC) ++ genBinary(n.opB, cn.opB) ++ genBinary(n.opA, cn.opA)
+
+      println(s"[PipeStageBits] $valueBin")
+      valueBin
+//      valueBin ++ toBinary(0, cn.opA.src.getWidth)
+
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         toBinary(n.argOutMuxSelect, cn.argOutMuxSelect.getWidth) ++
@@ -116,6 +122,7 @@ class BinaryCodegen() extends Traversal {
 //        }.flatten
       case (n: SrcValueTuple, cn: SrcValueBundle)         =>
         // First value, then src
+        println(s"[SrcValueTuple] src = ${cn.srcIdx(n.src.asInstanceOf[SelectSource])}, value = ${n.value}")
         toBinary(n.value, cn.value.getWidth) ++
         (n.src match {
           case s: SelectSource => toBinary(cn.srcIdx(s), cn.src.getWidth)

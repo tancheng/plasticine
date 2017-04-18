@@ -237,7 +237,7 @@ public:
     // Pass config data
     // 1. Read config file contents into a buf
     size_t size = getFileSize(path.c_str());
-    uint8_t *buf = (uint8_t*) malloc(size);
+    uint8_t *buf = (uint8_t*) std::malloc(size);
     int nbytes = fileToBuf(buf, path.c_str(), size);
     ASSERT(nbytes == size, "Bytes read (%d) does not match file size %lu!\n", nbytes, size);
 
@@ -259,6 +259,13 @@ public:
     simCmd *resp = recvResp();
     ASSERT(cmd.id == resp->id, "load resp->id does not match cmd.id!");
     ASSERT(cmd.cmd == resp->cmd, "load resp->cmd does not match cmd.cmd!");
+    std::free(buf);
+
+    step();
+    step();
+    step();
+    step();
+    step();
   }
 
   virtual void run() {

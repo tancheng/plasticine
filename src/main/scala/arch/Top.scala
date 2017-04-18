@@ -37,7 +37,10 @@ class Top(p: TopParams) extends Module {
   }
 
   // Accel
-  val plasticine = Module(new Plasticine(p.plasticineParams, p.fringeParams))
+//  val plasticine = Module(new Plasticine(p.plasticineParams, p.fringeParams))
+//  val plasticine = Module(new CounterWrapper(p.plasticineParams.w, 0, 0))
+//  val plasticine = Module(new CounterChainWrapper(p.plasticineParams.w, 8))
+  val plasticine = Module(new PCUWrapper(p.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]))
 
   p.target match {
     case "verilator" | "vcs" =>
@@ -65,14 +68,14 @@ class Top(p: TopParams) extends Module {
       // Fringe <-> DRAM connections
       topIO.dram <> fringe.io.dram
 
-      plasticine.io.argIns.zip(fringe.io.argIns) foreach { case (pArgIn, fArgIn) => pArgIn.bits := fArgIn }
-      fringe.io.argOuts.zip(plasticine.io.argOuts) foreach { case (fringeArgOut, accelArgOut) =>
-          fringeArgOut.bits := accelArgOut.bits
-          fringeArgOut.valid := 1.U
-      }
-      fringe.io.memStreams <> plasticine.io.memStreams
-      plasticine.io.enable := fringe.io.enable
-      fringe.io.done := plasticine.io.done
+//      plasticine.io.argIns.zip(fringe.io.argIns) foreach { case (pArgIn, fArgIn) => pArgIn.bits := fArgIn }
+//      fringe.io.argOuts.zip(plasticine.io.argOuts) foreach { case (fringeArgOut, accelArgOut) =>
+//          fringeArgOut.bits := accelArgOut.bits
+//          fringeArgOut.valid := 1.U
+//      }
+//      fringe.io.memStreams <> plasticine.io.memStreams
+//      plasticine.io.enable := fringe.io.enable
+//      fringe.io.done := plasticine.io.done
 
       plasticine.io.config <> topIO.config
       topIO.configDone := plasticine.io.configDone

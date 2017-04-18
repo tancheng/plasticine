@@ -36,7 +36,7 @@ case class SrcValueBundle(validSources: List[SelectSource], valueWidth: Int) ext
     Predef.assert(isValidSource(s), s"ERROR: Source $s not present in validSources: $validSources")
     s match {
       case XSrc => 0
-      case _ => validSources.indexOf(s)
+      case _ => nonXSources.indexOf(s)
     }
   }
 
@@ -104,12 +104,12 @@ case class CounterChainConfig(val w: Int, val numCounters: Int, val startDelayWi
 
 class PipeStageConfig(r: Int, w: Int) extends AbstractConfig {
   val operandSources = List[SelectSource](XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc)
-  var opA = new SrcValueBundle(operandSources, w)
-  var opB = new SrcValueBundle(operandSources, w)
-  var opC = new SrcValueBundle(operandSources, w)
+  val opA = SrcValueBundle(operandSources, w)
+  val opB = SrcValueBundle(operandSources, w)
+  val opC = SrcValueBundle(operandSources, w)
 
-  var opcode = UInt(log2Up(Opcodes.size).W)
-  var result = UInt(r.W) // One-hot encoded
+  val opcode = UInt(log2Up(Opcodes.size).W)
+  val result = UInt(r.W) // One-hot encoded
 //  var fwd = Vec(r, Bool())
 
   override def cloneType(): this.type = {
