@@ -89,7 +89,7 @@ class ConfigInitializer() extends Traversal {
       case (n: SrcValueTuple, cn: SrcValueBundle)         =>
         // First value, then src
         n.value match {
-          case num: Int => cn.value := num.U
+          case num: Int => cn.value := (if(num == -1) 0.U else num.U)
           case num: Float => cn.value := java.lang.Float.floatToRawIntBits(num).U
           case _ => throw new Exception(s"Unsupported initializer value ${n.value}")
         }
