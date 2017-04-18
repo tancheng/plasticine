@@ -5,7 +5,7 @@ import chisel3.util._
 
 import plasticine.ArchConfig
 import plasticine.templates._
-import plasticine.pisa.parser.Parser
+import plasticine.pisa.codegen.ConfigInitializer
 import plasticine.pisa.ir._
 import plasticine.spade._
 import plasticine.config._
@@ -33,7 +33,7 @@ case class PlasticineIO(f: FringeParams) extends Bundle {
   val configDone = Output(Bool())
 }
 
-class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module with PlasticineArch {
+class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Option[PlasticineBits] = None) extends Module with PlasticineArch {
   val io = IO(PlasticineIO(f))
 
   val cuParams = p.cuParams
@@ -43,12 +43,25 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
   val switchCUParams = p.switchCUParams
 
   // Wire up the reconfiguration network: ASIC or CGRA?
-  val configSR = Module(new ShiftRegister(new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f)))
-  configSR.io.in.bits := io.config.bits
-  configSR.io.in.valid := io.config.valid
-  io.configDone := configSR.io.out.valid
+  val configType = PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f)
+  val config = Wire(configType)
 
-  val config = configSR.io.config
+  if (initBits.isDefined) {
+    // ASIC flow
+    println(s"initBits defined, ASIC flow")
+    val configWire = Wire(configType)
+    val configInitializer = new ConfigInitializer()
+    configInitializer.init(initBits.get, configWire)
+    config := configWire
+  } else {
+    // CGRA flow
+    println(s"initBits undefined, CGRA flow")
+    val configSR = Module(new ShiftRegister(configType))
+    configSR.io.in.bits := io.config.bits
+    configSR.io.in.valid := io.config.valid
+    io.configDone := configSR.io.out.valid
+    config := configSR.io.config
+  }
 
   val argOutMuxIns = List.tabulate(f.numArgOuts) { i =>
     Wire(Vec(p.numArgOutSelections(i), Flipped(Decoupled(UInt(f.dataWidth.W)))))
@@ -77,7 +90,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams) extends Module wi
             val cu = Module(new PCU(p))
             cu.io.config := config.cu(i)(j).asInstanceOf[PCUConfig]
             cu
-          case p: PMUParams => Module(new PMU(p))
+          case p: PMUParams =>
             val cu = Module(new PMU(p))
             cu.io.config := config.cu(i)(j).asInstanceOf[PMUConfig]
             cu

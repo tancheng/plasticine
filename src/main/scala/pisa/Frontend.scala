@@ -4,8 +4,11 @@ import plasticine.spade._
 import plasticine.pisa.ir._
 import plasticine.pisa.codegen._
 //import plasticine.spade.GeneratedTopParams.plasticineParams._
+import plasticine.arch.Top
 import plasticine.spade.GeneratedTopParams
 import plasticine.config._
+
+import chisel3._
 
 import java.io._
 
@@ -87,6 +90,9 @@ trait PISADesign extends ConfigFileInterface {
 	def main(args: Array[String]): Unit = {
 		val top = main(args:_*)
 		val configTop = getConfigTop(top)
+
+    // Generate arch with given top params as initBits
+    chisel3.Driver.execute(Array[String]("--target-dir", "psim"), () => new Top(GeneratedTopParams, Some(top)))
 
 		// Generate binary
     val binaryGen = new BinaryCodegen()

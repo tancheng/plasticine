@@ -6,6 +6,7 @@ import fringe._
 
 import plasticine.templates.Utils.log2Up
 import plasticine.spade._
+import plasticine.pisa.ir._
 
 
 class VerilatorInterface(p: TopParams) extends Bundle {
@@ -30,17 +31,17 @@ class VerilatorInterface(p: TopParams) extends Bundle {
  * @param numArgIns: Number of input scalar arguments
  * @param numArgOuts: Number of output scalar arguments
  */
-class Top(p: TopParams) extends Module {
+class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
   val io = p.target match {
     case "vcs"        => IO(new VerilatorInterface(p))
     case _ => throw new Exception(s"Unknown target '${p.target}'")
   }
 
   // Accel
-//  val plasticine = Module(new Plasticine(p.plasticineParams, p.fringeParams))
+  val plasticine = Module(new Plasticine(p.plasticineParams, p.fringeParams, initBits.asInstanceOf[Option[PlasticineBits]]))
 //  val plasticine = Module(new CounterWrapper(p.plasticineParams.w, 0, 0))
 //  val plasticine = Module(new CounterChainWrapper(p.plasticineParams.w, 8))
-  val plasticine = Module(new PCUWrapper(p.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]))
+//  val plasticine = Module(new PCUWrapper(p.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]))
 
   p.target match {
     case "verilator" | "vcs" =>
