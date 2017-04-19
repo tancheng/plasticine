@@ -255,14 +255,18 @@ trait CUBits extends AbstractBits {
 
 case class PCUBits(
   stages: Array[PipeStageBits],
-  counterChain: CounterChainBits
+  counterChain: CounterChainBits,
+  scalarValidOut: Array[SrcValueTuple],
+  vectorValidOut: Array[SrcValueTuple]
 //  control: CUControlBoxBits
 ) extends CUBits
 object PCUBits {
   def zeroes(p: PCUParams) = {
     new PCUBits (
       Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
-      CounterChainBits.zeroes(p.w, p.numCounters)
+      CounterChainBits.zeroes(p.w, p.numCounters),
+      Array.fill(p.numScalarOut) { SrcValueTuple.zeroes(p.w) },
+      Array.fill(p.numVectorOut) { SrcValueTuple.zeroes(p.w) }
 //      CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
     )
   }

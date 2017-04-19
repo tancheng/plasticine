@@ -121,6 +121,10 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
 
+  val validOutSources = List[SelectSource](XSrc, EnableSrc, DoneSrc)
+  val scalarValidOut = Vec(p.numScalarOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
+  val vectorValidOut = Vec(p.numVectorOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
+
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]
   }

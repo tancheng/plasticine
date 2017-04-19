@@ -130,9 +130,11 @@ class PCU(val p: PCUParams) extends CU {
           case VectorFIFOSrc => Vec(vectorFIFOs.map { _.io.deq(lane) })
           case PrevStageSrc => if (i == 0) Vec(List.fill(2) {0.U}) else Vec(pipeRegs.last(lane).map {_.io.out})
           case CurrStageSrc => Vec(regs.map {_.io.out})
+          case EnableSrc => counterChain.io.enable
+          case DoneSrc => counterChain.io.done
           case _ => throw new Exception("Unsupported operand source!")
         }
-        val mux = Module(new MuxN(UInt(p.w.W), sources.size))
+        val mux = Module(new MuxN(sources(0).cloneType, sources.size))
         mux.io.ins := sources
         mux
       }
@@ -194,14 +196,39 @@ class PCU(val p: PCUParams) extends CU {
 //  def getStageOut(i: Int) : Vec[UInt] = getStageOut(pipeStages(i))
 
   // Output assignment
+
+  def getSourcesMux(s: SelectSource) = {
+    val sources = s match {
+      case EnableSrc => counterChain.io.enable
+      case DoneSrc => counterChain.io.done
+      case _ => throw new Exception("Unsupported operand source!")
+    }
+    val mux = Module(new MuxN(sources(0).cloneType, sources.size))
+    mux.io.ins := sources
+    mux
+  }
+
+  def getValids(opConfig: SrcValueBundle) = {
+    val sources = opConfig.nonXSources map { s => s match {
+      case _ =>
+        val m = getSourcesMux(s)
+        m.io.sel := opConfig.value
+        m.io.out
+    }}
+    val mux = Module(new MuxN(UInt(p.w.W), sources.size))
+    mux.io.ins := Vec(sources)
+    mux.io.sel := opConfig.src
+    mux.io.out
+  }
+
   io.scalarOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := pipeRegs.last(0)(i).io.out
-    out.valid := ~scalarFIFOs(i).io.empty
+    out.valid := getValids(io.config.scalarValidOut(i))
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := Vec(pipeRegs.last.map { _(i).io.out })
-    out.valid := ~vectorFIFOs(i).io.empty
+    out.valid := getValids(io.config.vectorValidOut(i))
   }
 }
 

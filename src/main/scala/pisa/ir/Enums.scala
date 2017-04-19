@@ -17,6 +17,8 @@ object PrevStageSrc extends SelectSource
 object CurrStageSrc extends SelectSource
 object ALUSrc extends SelectSource
 object XSrc extends SelectSource with XType
+object EnableSrc extends SelectSource
+object DoneSrc extends SelectSource
 
 object CurrStageDst extends SelectDst
 object ScalarOutDst extends SelectDst
