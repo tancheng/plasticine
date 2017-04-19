@@ -157,14 +157,17 @@ case class PipeStageBits(
   opB: SrcValueTuple,
   opC: SrcValueTuple,
   opcode: Opcode = XOp,
-  res: List[SrcValueTuple] = Nil
-//  fwd: Array[SrcValueTuple] 
+  res: List[SrcValueTuple] = Nil,
+  fwd: Array[SrcValueTuple]
 )
 extends AbstractBits {
   val result = res.map{
     case SrcValueTuple(CurrStageDst, idx:Int) => idx
     case _ => 0
   }
+
+  val regEnables = result ++ fwd.map { _.value.asInstanceOf[Int]}
+
   // Get names of case class fields
 //  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
 //      case m: MethodSymbol if m.isCaseAccessor => m
@@ -189,8 +192,8 @@ object PipeStageBits {
     new PipeStageBits(
       opA = SrcValueTuple.zeroes(width),
       opB = SrcValueTuple.zeroes(width),
-      opC = SrcValueTuple.zeroes(width)
-//      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width))
+      opC = SrcValueTuple.zeroes(width),
+      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width))
     )
   }
 }

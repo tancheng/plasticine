@@ -161,11 +161,11 @@ class PCU(val p: PCUParams) extends CU {
       regs.zipWithIndex.foreach { case (reg, idx) =>
         if (i != 0) {
           val prevRegs = pipeRegs.last(lane)
-          reg.io.in := Mux(stageConfig.result(idx), fu.io.out, prevRegs(idx).io.out) // TODO: Change once fwdMap is supported
+          reg.io.in := Mux(stageConfig.result(idx), fu.io.out, prevRegs(idx).io.out)
         } else {
-          reg.io.in := fu.io.out // TODO: Change once fwdMap is supported
+          reg.io.in := fu.io.out
         }
-        reg.io.enable := 1.U // TODO: Change once fwdMap is supported
+        reg.io.enable := stageConfig.regEnables(idx)
       }
     }
     pipeStages.append(fus)

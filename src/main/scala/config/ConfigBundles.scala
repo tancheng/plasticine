@@ -110,7 +110,7 @@ class PipeStageConfig(r: Int, w: Int) extends AbstractConfig {
 
   val opcode = UInt(log2Up(Opcodes.size).W)
   val result = UInt(r.W) // One-hot encoded
-//  var fwd = Vec(r, Bool())
+  var regEnables = UInt(r.W)    // One-hot encoded
 
   override def cloneType(): this.type = {
     new PipeStageConfig(r,w).asInstanceOf[this.type]
