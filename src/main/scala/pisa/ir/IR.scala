@@ -166,7 +166,10 @@ extends AbstractBits {
     case _ => 0
   }
 
-  val regEnables = result ++ fwd.map { _.value.asInstanceOf[Int]}
+  val regEnables = result ++ fwd.map { t =>
+    val n = t.value.asInstanceOf[Int]
+    if (n == -1) 0 else n
+  }
 
   // Get names of case class fields
 //  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
