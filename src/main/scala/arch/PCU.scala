@@ -49,7 +49,7 @@ class PCU(val p: PCUParams) extends CU {
     config.chainRead := true.B
     fifo.io.config := config
     fifo.io.enq(0) := io.scalarIn(i).bits
-    fifo.io.enqVld := io.scalarIn(i).valid
+//    fifo.io.enqVld := io.scalarIn(i).valid
     fifo
   }
 
@@ -87,6 +87,27 @@ class PCU(val p: PCUParams) extends CU {
   }
 
   // Control Block
+  val cbox = Module(new PCUControlBox(p))
+  cbox.io.controlIn := io.controlIn
+  io.controlOut := cbox.io.controlOut
+
+  cbox.io.fifoNotFull := Vec(scalarFIFOs.map { ~_.io.full } ++ vectorFIFOs.map { ~_.io.full })
+  cbox.io.fifoNotEmpty := Vec(scalarFIFOs.map { ~_.io.empty } ++ vectorFIFOs.map { ~_.io.empty })
+
+  scalarFIFOs.zip(cbox.io.scalarFifoDeqVld) foreach { case (fifo, deqVld) => fifo.io.deqVld := deqVld }
+  scalarFIFOs.zip(cbox.io.scalarFifoEnqVld) foreach { case (fifo, enqVld) => fifo.io.enqVld := enqVld }
+
+  // Connect enable to only the zeroth counter, as presumably the compiler
+  // always assigns counters that way
+  counterChain.io.enable.zipWithIndex.foreach {case (en, idx) => if (idx == 0) en := cbox.io.enable else en := false.B }
+
+  // Connect enable to deqVld of all vector FIFOs.
+  // Deq only if there is a valid element in the FIFO
+  vectorFIFOs.foreach { fifo => fifo.io.deqVld := cbox.io.enable & ~fifo.io.empty }
+
+  cbox.io.done := counterChain.io.done
+
+  cbox.io.config := io.config.control
 
   // Pipeline with FUs and registers
   def getPipeRegs: List[FF] = List.tabulate(p.r) { i =>

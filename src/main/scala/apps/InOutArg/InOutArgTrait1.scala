@@ -26,8 +26,8 @@ trait InOutArgTrait1 {
       val sts_0_0 = Array.tabulate(20) { i => PipeStageBits.zeroes(16, 32)}
       val scalarValidOuts = Array.tabulate(4) { i => SrcValueTuple.zeroes(32) }
       val vectorValidOuts = Array.tabulate(4) { i => SrcValueTuple.zeroes(32) }
-
-      cus(0)(0) = PCUBits(counterChain=cc_0_0, stages=sts_0_0, scalarValidOut=scalarValidOuts, vectorValidOut=vectorValidOuts)
+      val control = PCUControlBoxBits.zeroes(cuParams(0)(0).asInstanceOf[PCUParams])
+      cus(0)(0) = PCUBits(counterChain=cc_0_0, stages=sts_0_0, scalarValidOut=scalarValidOuts, vectorValidOut=vectorValidOuts, control = control)
       cus(0)(0).counterChain.counters(0) = CounterRCBits(max=SrcValueTuple(ConstSrc, 1), stride=SrcValueTuple(ConstSrc, 1), min=SrcValueTuple(ConstSrc, 1), par=1)
 //      cus(0)(0).stages(0) = PipeStageBits(SrcValueTuple(ScalarFIFOSrc, 0),SrcValueTuple(ConstSrc, 4),SrcValueTuple(), FixAdd, List(SrcValueTuple(CurrStageDst, 10),SrcValueTuple(CurrStageDst, 0)))
       cus(0)(0).stages(0) = PipeStageBits(SrcValueTuple(ScalarFIFOSrc, 0),SrcValueTuple(ConstSrc, 4),SrcValueTuple(), FixAdd, List(SrcValueTuple(CurrStageDst, 10),SrcValueTuple(CurrStageDst, 0)), Array.tabulate(16) { i => SrcValueTuple() })

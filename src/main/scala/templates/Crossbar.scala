@@ -14,11 +14,11 @@ import plasticine.config.CrossbarConfig
  * Core logic inside a crossbar
  */
 class CrossbarCore[T<:Data](val t: T, val p: SwitchParams) extends Module {
-  val io = new Bundle {
+  val io = IO(new Bundle {
     val ins = Input(Vec(p.numIns, t.cloneType))
     val outs = Output(Vec(p.numOuts, t.cloneType))
     val config = Input(CrossbarConfig(p))
-  }
+  })
 
   io.outs.zipWithIndex.foreach { case(out,i) =>
     val outMux = Module(new MuxN(t, p.numIns))

@@ -17,6 +17,7 @@ trait CUParams extends Params {
   val w: Int = 32
   val v: Int = 16
   val numCounters: Int = 8
+  val udCtrWidth = 4
   val numUDCs: Int = 5
   val regColors = ListBuffer[List[RegColor]]()
   val d: Int = 8

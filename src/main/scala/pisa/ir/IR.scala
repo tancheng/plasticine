@@ -257,8 +257,8 @@ case class PCUBits(
   stages: Array[PipeStageBits],
   counterChain: CounterChainBits,
   scalarValidOut: Array[SrcValueTuple],
-  vectorValidOut: Array[SrcValueTuple]
-//  control: CUControlBoxBits
+  vectorValidOut: Array[SrcValueTuple],
+  control: PCUControlBoxBits
 ) extends CUBits
 object PCUBits {
   def zeroes(p: PCUParams) = {
@@ -266,8 +266,8 @@ object PCUBits {
       Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
       CounterChainBits.zeroes(p.w, p.numCounters),
       Array.fill(p.numScalarOut) { SrcValueTuple.zeroes(p.w) },
-      Array.fill(p.numVectorOut) { SrcValueTuple.zeroes(p.w) }
-//      CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
+      Array.fill(p.numVectorOut) { SrcValueTuple.zeroes(p.w) },
+      PCUControlBoxBits.zeroes(p)
     )
   }
 }
@@ -300,64 +300,32 @@ object SwitchCUBits {
   }
 }
 
-
-//case class CUControlBoxBits(
-//  tokenOutLUT: List[LUTBits],
-//  enableLUT: List[LUTBits],
-//  tokenDownLUT: List[LUTBits],
-//  udcInit: List[Int],
-//  udcInitAtConfig: List[Int],
-//  decXbar: CrossbarBits,
-//  incXbar: CrossbarBits,
-//  tokenInXbar: CrossbarBits,
-//  doneXbar: CrossbarBits,
-//  enableMux: List[Boolean],
-//  syncTokenMux: List[Int],
-//  tokenOutXbar: CrossbarBits,
-//  fifoAndTree: List[Int],
-//  tokenInAndTree: List[Int],
-//  fifoMux: List[Int]
-//) extends AbstractBits
-//object CUControlBoxBits {
-//  def getRandom(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
-//    new CUControlBoxBits(
-//        List.fill(numTokenOut) { LUTBits.getRandom(2) }, // tokenOutLUT
-//        List.fill(numCounters) { LUTBits.getRandom(numCounters)}, // enableLUT
-//        List.fill(8) { LUTBits.getRandom(numCounters+1) }, // tokenDownLUT,
-//        List.fill(numCounters) { math.abs(Random.nextInt) % 4 }, // udcInit,
-//        List.fill(numCounters) { math.abs(Random.nextInt) % 1 }, // udcInitAtBits,
-//        CrossbarBits.getRandom(numCounters), // decXbar,
-//        CrossbarBits.getRandom(2*numCounters), // incXbar,
-//        CrossbarBits.getRandom(numCounters), // tokenInXbar,
-//        CrossbarBits.getRandom(2*numCounters), // doneXbar,
-//        List.fill(numCounters) { math.abs(Random.nextInt) % 2 == 0}, // enableMux,
-//        List.fill(8) { math.abs(Random.nextInt) % 2 }, // syncTokenMux
-//        CrossbarBits.getRandom(numCounters), // tokenOutXbar,
-//        List.fill(ArchConfig.numScratchpads) { 0 },  // fifoAndTree
-//        List.fill(numTokenIn) { 0 },  // tokenInAndTree
-//        List.fill(numCounters) { 0 }  // fifoMux
-//      )
-//  }
-//  def zeroes(numTokenIn: Int, numTokenOut: Int, numCounters: Int) = {
-//    new CUControlBoxBits(
-//        List.fill(numTokenOut) { LUTBits.zeroes(2) }, // tokenOutLUT
-//        List.fill(numCounters) { LUTBits.zeroes(numCounters)}, // enableLUT
-//        List.fill(8) { LUTBits.zeroes(numCounters+1) }, // tokenDownLUT,
-//        List.fill(numCounters) { 0 }, // udcInit,
-//        List.fill(numCounters) { 0 }, // udcInitAtConfig,
-//        CrossbarBits.zeroes(numCounters), // decXbar,
-//        CrossbarBits.zeroes(2*numCounters), // incXbar,
-//        CrossbarBits.zeroes(numCounters), // tokenInXbar,
-//        CrossbarBits.zeroes(2*numCounters), // doneXbar,
-//        List.fill(numCounters) { false }, // enableMux,
-//        List.fill(8) { 0 }, // syncTokenMux
-//        CrossbarBits.zeroes(numCounters), // tokenOutXbar,
-//        List.fill(ArchConfig.numScratchpads) { 0 }, // fifoAndTree
-//        List.fill(numTokenIn) { 0 },  // tokenInAndTree
-//        List.fill(numCounters) { 0 }  // fifoMux
-//      )
-//  }
-//}
+case class PCUControlBoxBits(
+  tokenInAndTree: List[Int],
+  fifoAndTree: List[Int],
+  andTreeTop: List[Int],
+  siblingAndTree: List[Int],
+  streamingMuxSelect: Int,
+  incrementXbar: CrossbarBits,
+  doneXbar: CrossbarBits,
+  swapWriteXbar: CrossbarBits,
+  tokenOutXbar: CrossbarBits
+) extends AbstractBits
+object PCUControlBoxBits {
+  def zeroes(p: PCUParams) = {
+    new PCUControlBoxBits(
+        List.fill(p.numControlIn) { 0 },   // tokenInAndTree
+        List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // fifoAndTree
+        List.fill(2) { 0 }, // andTreeTop
+        List.fill(p.numUDCs) { 0 }, // siblingAndTree
+        0,   // streamingMuxSelect
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 2)),  // doneXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
+        CrossbarBits.zeroes(ControlSwitchParams(3, p.numControlOut)) // tokenOutXbar
+      )
+  }
+}
 
 /**
  * Crossbar config information

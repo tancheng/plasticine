@@ -20,6 +20,7 @@ class BinaryCodegen() extends Traversal {
       case n: PMUBits         => Predef.assert(cnode.isInstanceOf[PMUConfig])
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
+      case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
       case _ => throw new Exception(s"Unknown node $node")
     }
@@ -71,13 +72,16 @@ class BinaryCodegen() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         toBinary(n.outSelect, cn.outSelect.getWidth)
       case (n: PCUBits, cn: PCUConfig)                    =>
+        val controlBits = genBinary(n.control, cn.control)
+        val vecValidBits = List.tabulate(cn.vectorValidOut.size) { i => genBinary(n.vectorValidOut(i), cn.vectorValidOut(i)) }.flatten
+        val scalarValidBits = List.tabulate(cn.scalarValidOut.size) { i => genBinary(n.scalarValidOut(i), cn.scalarValidOut(i)) }.flatten
         val counterBits = genBinary(n.counterChain, cn.counterChain)
         val stageBits = List.tabulate(cn.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
         println(s"[PCUBits] counterBits = $counterBits")
         println(s"[PCUBits] stageBits = $stageBits")
-        counterBits ++ stageBits
+        controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
         genBinary(n.counterChain, cn.counterChain) ++
         List.tabulate(cn.stages.size) { i =>
@@ -91,6 +95,17 @@ class BinaryCodegen() extends Traversal {
       println(s"[PipeStageBits] $valueBin")
       valueBin
 //      valueBin ++ toBinary(0, cn.opA.src.getWidth)
+
+      case (n: PCUControlBoxBits, cn: PCUControlBoxConfig)      =>
+        genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
+        genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
+        genBinary(n.doneXbar, cn.doneXbar) ++
+        genBinary(n.incrementXbar, cn.incrementXbar) ++
+        toBinary(n.streamingMuxSelect, cn.streamingMuxSelect.getWidth) ++
+        toBinary(n.siblingAndTree, cn.siblingAndTree.getWidth) ++
+        toBinary(n.andTreeTop, cn.andTreeTop.getWidth) ++
+        toBinary(n.fifoAndTree, cn.fifoAndTree.getWidth) ++
+        toBinary(n.tokenInAndTree, cn.tokenInAndTree.getWidth)
 
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect

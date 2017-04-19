@@ -124,7 +124,7 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val validOutSources = List[SelectSource](XSrc, EnableSrc, DoneSrc)
   val scalarValidOut = Vec(p.numScalarOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
   val vectorValidOut = Vec(p.numVectorOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
-
+  val control = PCUControlBoxConfig(p)
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]
   }
@@ -194,6 +194,26 @@ case class FIFOConfig(val d: Int, val v: Int) extends AbstractConfig {
 //    new ScratchpadBundle(p).asInstanceOf[this.type]
 //  }
 //}
+
+/**
+ * PCUControlBox config register format
+ */
+case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
+
+  val tokenInAndTree = Vec(p.numControlIn, Bool())
+  val fifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
+  val andTreeTop = Vec(2, Bool())
+  val siblingAndTree = Vec(p.numUDCs, Bool())
+  val streamingMuxSelect = Bool()
+  val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
+  val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 2))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(3, p.numControlOut))
+
+  override def cloneType(): this.type = {
+    new PCUControlBoxConfig(p).asInstanceOf[this.type]
+  }
+}
 
 case class PlasticineConfig(
   cuParams:    Array[Array[CUParams]],

@@ -22,6 +22,7 @@ class ConfigInitializer() extends Traversal {
       case n: PMUBits         => Predef.assert(cnode.isInstanceOf[PMUConfig])
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
+      case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
       case _ => throw new Exception(s"Unknown node $node")
     }
@@ -52,6 +53,9 @@ class ConfigInitializer() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := value.U }
       case (n: PCUBits, cn: PCUConfig)                    =>
+        init(n.control, cn.control)
+        for (i <- 0 until cn.vectorValidOut.size) init(n.vectorValidOut(i), cn.vectorValidOut(i))
+        for (i <- 0 until cn.scalarValidOut.size) init(n.scalarValidOut(i), cn.scalarValidOut(i))
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PMUBits, cn: PMUConfig)                    =>
@@ -64,6 +68,17 @@ class ConfigInitializer() extends Traversal {
         init(n.opC, cn.opC)
         init(n.opB, cn.opB)
         init(n.opA, cn.opA)
+
+      case (n: PCUControlBoxBits, cn: PCUControlBoxConfig)      =>
+        init(n.tokenOutXbar, cn.tokenOutXbar)
+        init(n.swapWriteXbar, cn.swapWriteXbar)
+        init(n.doneXbar, cn.doneXbar)
+        init(n.incrementXbar, cn.incrementXbar)
+        cn.streamingMuxSelect := n.streamingMuxSelect.U
+        cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
+        cn.andTreeTop.zip(n.andTreeTop) foreach { case (wire, value) => wire := value.U }
+        cn.fifoAndTree.zip(n.fifoAndTree) foreach { case (wire, value) => wire := value.U }
+        cn.tokenInAndTree.zip(n.tokenInAndTree) foreach { case (wire, value) => wire := value.U }
 
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
