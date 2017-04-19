@@ -74,9 +74,14 @@ class PCUControlBox(val p: PCUParams) extends Module {
   io.enable := localEnable
 
   // Token out crossbar
-  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(3, p.numControlOut)))
+  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(3+io.fifoNotFull.size, p.numControlOut)))
   tokenOutXbar.io.config := io.config.tokenOutXbar
-  tokenOutXbar.io.ins(0) := doneXbar.io.outs(1)
-  tokenOutXbar.io.ins(1) := siblingAndTree
-  tokenOutXbar.io.ins(2) := localEnable
+  for (i <- 0 until tokenOutXbar.io.ins.size) { i match {
+    case 0 => tokenOutXbar.io.ins(i) := doneXbar.io.outs(1)
+    case 1 => tokenOutXbar.io.ins(i) := siblingAndTree
+    case 2 => tokenOutXbar.io.ins(i) := localEnable
+    case _ => tokenOutXbar.io.ins(i) := io.fifoNotFull(i-3)
+  }}
+
+  io.controlOut := tokenOutXbar.io.outs
 }
