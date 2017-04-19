@@ -21,7 +21,7 @@ case class SrcValueBundle(validSources: List[SelectSource], valueWidth: Int) ext
   // XSrc must be a member of validSources all the time
   Predef.assert(validSources.contains(XSrc), s"ERROR: Xsrc must be among validSources for every SrcValueBundle! validSources: ${validSources}")
 
-  private val nonXSources = validSources.filterNot { _ == XSrc }
+  val nonXSources = validSources.filterNot { _ == XSrc }
   val srcWidth = log2Up(nonXSources.size)
 
   val src = UInt(srcWidth.W)

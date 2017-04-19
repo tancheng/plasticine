@@ -44,7 +44,7 @@ class ConfigInitializer() extends Traversal {
 
     (node, cnode) match {
       case (n: CounterChainBits, cn: CounterChainConfig)  =>
-        for(i <- 0 until n.counters.size) { init(n.counters(i), cn.counters(i)) }
+        for(i <- 0 until cn.counters.size) { init(n.counters(i), cn.counters(i)) }
         cn.chain.zip(n.chain) foreach { case (wire, value) => wire := value.U }
       case (n: CounterRCBits, cn: CounterConfig)          =>
         init(n.stride, cn.stride)
@@ -53,10 +53,10 @@ class ConfigInitializer() extends Traversal {
         cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := value.U }
       case (n: PCUBits, cn: PCUConfig)                    =>
         init(n.counterChain, cn.counterChain)
-        for(i <- 0 until n.stages.size) { init(n.stages(i), cn.stages(i)) }
+        for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PMUBits, cn: PMUConfig)                    =>
         init(n.counterChain, cn.counterChain)
-        for(i <- 0 until n.stages.size) { init(n.stages(i), cn.stages(i)) }
+        for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
         cn.result := encodeOneHot(n.result).U
         cn.opcode := Opcodes.getCode(n.opcode).U
@@ -67,23 +67,23 @@ class ConfigInitializer() extends Traversal {
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         cn.argOutMuxSelect.zip(n.argOutMuxSelect) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
-        for(i <- 0 until n.controlSwitch.size) {
-          for(j <- 0 until n.controlSwitch(i).size) {
+        for(i <- 0 until cn.controlSwitch.size) {
+          for(j <- 0 until cn.controlSwitch(i).size) {
             init(n.controlSwitch(i)(j), cn.controlSwitch(i)(j))
           }
         }
-        for(i <- 0 until n.scalarSwitch.size) {
-          for(j <- 0 until n.scalarSwitch(i).size) {
+        for(i <- 0 until cn.scalarSwitch.size) {
+          for(j <- 0 until cn.scalarSwitch(i).size) {
             init(n.scalarSwitch(i)(j), cn.scalarSwitch(i)(j))
           }
         }
-        for(i <- 0 until n.vectorSwitch.size) {
-          for(j <- 0 until n.vectorSwitch(i).size) {
+        for(i <- 0 until cn.vectorSwitch.size) {
+          for(j <- 0 until cn.vectorSwitch(i).size) {
             init(n.vectorSwitch(i)(j), cn.vectorSwitch(i)(j))
           }
         }
-        for(i <- 0 until n.cu.size) {
-          for(j <- 0 until n.cu(i).size) {
+        for(i <- 0 until cn.cu.size) {
+          for(j <- 0 until cn.cu(i).size) {
             init(n.cu(i)(j), cn.cu(i)(j))
           }
         }

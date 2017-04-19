@@ -17,31 +17,31 @@ import plasticine.pisa.enums._
  */
 
 object Opcodes {
-  // HACK: Duplicated with IntFU. Need to refactor this into
+  // HACK: Duplicated with FU. Need to refactor this into
   // a separate Decode table
   private var _opcodes = List[(Opcode, (UInt, UInt, UInt) => UInt)](
     (FixAdd , (a,b,c)    => a+b),
-    (FixSub , (a,b,c)    => a-b),
-    (FixMul , (a,b,c)    => a*b),
-    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
-    (FixAnd , (a,b,c)    => a&b),
-    (FixOr , (a,b,c)    => a|b),
-    (FixEql , (a,b,c)   => a===b),
-    (FixGt , (a,b,c)   => a>b),
-    (FixLt , (a,b,c)   => a<b),
-    (FixSHL , (a,b,c)   => a<<b),
-    (FixSHR , (a,b,c)   => a>>b),
-    (FltLt , (a,b,c)   => UInt(0)),
-    (FltEql , (a,b,c)  => UInt(0)),
-    (FltGt , (a,b,c) => UInt(0)),
-    (FltMul , (a,b,c) => UInt(0)),
-    (FltAdd , (a,b,c) => UInt(0)),
-    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
-    (FixMin , (a,b,c) => Mux(a<b, a, b)),
-    (FixMax , (a,b,c) => Mux(a>b, a, b)),
-    (BypassA , (a,b,c) => a),
-    (BypassB , (a,b,c) => b),
-    (BypassC , (a,b,c) => c)
+    (FixSub , (a,b,c)    => a-b)
+//    (FixMul , (a,b,c)    => a*b),
+//    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
+//    (FixAnd , (a,b,c)    => a&b),
+//    (FixOr , (a,b,c)    => a|b),
+//    (FixEql , (a,b,c)   => a===b),
+//    (FixGt , (a,b,c)   => a>b),
+//    (FixLt , (a,b,c)   => a<b),
+//    (FixSHL , (a,b,c)   => a<<b),
+//    (FixSHR , (a,b,c)   => a>>b),
+//    (FltLt , (a,b,c)   => UInt(0)),
+//    (FltEql , (a,b,c)  => UInt(0)),
+//    (FltGt , (a,b,c) => UInt(0)),
+//    (FltMul , (a,b,c) => UInt(0)),
+//    (FltAdd , (a,b,c) => UInt(0)),
+//    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
+//    (FixMin , (a,b,c) => Mux(a<b, a, b)),
+//    (FixMax , (a,b,c) => Mux(a>b, a, b)),
+//    (BypassA , (a,b,c) => a),
+//    (BypassB , (a,b,c) => b),
+//    (BypassC , (a,b,c) => c)
   )
   def opcodes = _opcodes
   def opcodes_=(x: List[(Opcode, (UInt, UInt, UInt) => UInt)]) { _opcodes = x }
@@ -65,7 +65,7 @@ object Opcodes {
 
 }
 
-class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends Module {
+class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends Module {
   val io = IO(new Bundle {
     val a      = Input(UInt(w.W))
     val b      = Input(UInt(w.W))
@@ -99,27 +99,27 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
   // Populate opcode table
   Opcodes.opcodes = List[(Opcode, (UInt, UInt, UInt) => UInt)](
     (FixAdd , (a,b,c)    => a+b),
-    (FixSub , (a,b,c)    => a-b),
-    (FixMul , (a,b,c)    => a*b),
-    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
-    (FixAnd , (a,b,c)    => a&b),
-    (FixOr , (a,b,c)    => a|b),
-    (FixEql , (a,b,c)   => a===b),
-    (FixGt , (a,b,c)   => a>b),
-    (FixLt , (a,b,c)   => a<b),
-    (FixSHL , (a,b,c)   => a<<b),
-    (FixSHR , (a,b,c)   => a>>b),
-    (FltLt , (a,b,c)   => fpLt),
-    (FltEql , (a,b,c)  => fpEq),
-    (FltGt , (a,b,c) => fpGt),
-    (FltMul , (a,b,c) => fmaOut),
-    (FltAdd , (a,b,c) => fmaOut),
-    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
-    (FixMin , (a,b,c) => Mux(a<b, a, b)),
-    (FixMax , (a,b,c) => Mux(a>b, a, b)),
-    (BypassA , (a,b,c) => a),
-    (BypassB , (a,b,c) => b),
-    (BypassC , (a,b,c) => c)
+    (FixSub , (a,b,c)    => a-b)
+//    (FixMul , (a,b,c)    => a*b),
+//    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
+//    (FixAnd , (a,b,c)    => a&b),
+//    (FixOr , (a,b,c)    => a|b),
+//    (FixEql , (a,b,c)   => a===b),
+//    (FixGt , (a,b,c)   => a>b),
+//    (FixLt , (a,b,c)   => a<b),
+//    (FixSHL , (a,b,c)   => a<<b),
+//    (FixSHR , (a,b,c)   => a>>b),
+//    (FltLt , (a,b,c)   => fpLt),
+//    (FltEql , (a,b,c)  => fpEq),
+//    (FltGt , (a,b,c) => fpGt),
+//    (FltMul , (a,b,c) => fmaOut),
+//    (FltAdd , (a,b,c) => fmaOut),
+//    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
+//    (FixMin , (a,b,c) => Mux(a<b, a, b)),
+//    (FixMax , (a,b,c) => Mux(a>b, a, b)),
+//    (BypassA , (a,b,c) => a),
+//    (BypassB , (a,b,c) => b),
+//    (BypassC , (a,b,c) => c)
   )
 
 //  if (useFMA) {
@@ -208,7 +208,7 @@ class IntFU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) exten
 //  io.out := outReg.io.out
 //}
 
-class IntFUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
+class FUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
   val io = new Bundle {
     val a      = Input(UInt(w.W))
     val b      = Input(UInt(w.W))
@@ -239,7 +239,7 @@ class IntFUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
   val op = opcodeReg.io.out
 
 
-  val fu = Module(new IntFU(w, useFMA, useFPComp))
+  val fu = Module(new FU(w, useFMA, useFPComp))
   fu.io.a := a
   fu.io.b := b
   fu.io.b := c
@@ -254,9 +254,9 @@ class IntFUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
 
 
 /**
- * IntFU test harness
+ * FU test harness
  */
-//class IntFUTests(c: IntFUReg) extends Tester(c) {
+//class FUTests(c: FUReg) extends Tester(c) {
 //  for (n <- 0 until 64) {
 //    val a      = rnd.nextInt(16)
 //    val b      = rnd.nextInt(16)
@@ -293,18 +293,18 @@ class IntFUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
 //class FMATests(c: FMAReg) extends Tester(c)
 //class FPCompTests(c: FPCompReg) extends Tester(c)
 //
-//object IntFUTest {
+//object FUTest {
 //  def main(args: Array[String]): Unit = {
 //    val w = 32
 //    val appArgs = args.take(args.indexOf("end"))
 //    if (appArgs.size < 2) {
-//      println("Usage: IntFUTest <useFMA> <useFPComp>")
+//      println("Usage: FUTest <useFMA> <useFPComp>")
 //      sys.exit(-1)
 //    }
 //    val useFMA = appArgs(0).toBoolean
 //    val useFPComp = appArgs(1).toBoolean
-//    chiselMainTest(args, () => Module(new IntFUReg(w, useFMA, useFPComp))) {
-//      c => new IntFUTests(c)
+//    chiselMainTest(args, () => Module(new FUReg(w, useFMA, useFPComp))) {
+//      c => new FUTests(c)
 //    }
 //  }
 //}

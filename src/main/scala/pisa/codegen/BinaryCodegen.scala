@@ -61,7 +61,7 @@ class BinaryCodegen() extends Traversal {
 
     (node, cnode) match {
       case (n: CounterChainBits, cn: CounterChainConfig)  =>
-        List.tabulate(n.counters.size) { i =>
+        List.tabulate(cn.counters.size) { i =>
           genBinary(n.counters(i), cn.counters(i))
         }.flatten ++
         toBinary(n.chain, cn.chain.getWidth)
@@ -72,7 +72,7 @@ class BinaryCodegen() extends Traversal {
         toBinary(n.outSelect, cn.outSelect.getWidth)
       case (n: PCUBits, cn: PCUConfig)                    =>
         val counterBits = genBinary(n.counterChain, cn.counterChain)
-        val stageBits = List.tabulate(n.stages.size) { i =>
+        val stageBits = List.tabulate(cn.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
         println(s"[PCUBits] counterBits = $counterBits")
@@ -80,7 +80,7 @@ class BinaryCodegen() extends Traversal {
         counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
         genBinary(n.counterChain, cn.counterChain) ++
-        List.tabulate(n.stages.size) { i =>
+        List.tabulate(cn.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
@@ -95,23 +95,23 @@ class BinaryCodegen() extends Traversal {
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         toBinary(n.argOutMuxSelect, cn.argOutMuxSelect.getWidth) ++
-        List.tabulate(n.controlSwitch.size) { i =>
-          List.tabulate(n.controlSwitch(i).size) { j =>
+        List.tabulate(cn.controlSwitch.size) { i =>
+          List.tabulate(cn.controlSwitch(i).size) { j =>
             genBinary(n.controlSwitch(i)(j), cn.controlSwitch(i)(j))
           }.flatten
         }.flatten ++
-        List.tabulate(n.scalarSwitch.size) { i =>
-          List.tabulate(n.scalarSwitch(i).size) { j =>
+        List.tabulate(cn.scalarSwitch.size) { i =>
+          List.tabulate(cn.scalarSwitch(i).size) { j =>
             genBinary(n.scalarSwitch(i)(j), cn.scalarSwitch(i)(j))
           }.flatten
         }.flatten ++
-        List.tabulate(n.vectorSwitch.size) { i =>
-          List.tabulate(n.vectorSwitch(i).size) { j =>
+        List.tabulate(cn.vectorSwitch.size) { i =>
+          List.tabulate(cn.vectorSwitch(i).size) { j =>
             genBinary(n.vectorSwitch(i)(j), cn.vectorSwitch(i)(j))
           }.flatten
         }.flatten ++
-        List.tabulate(n.cu.size) { i =>
-          List.tabulate(n.cu(i).size) { j =>
+        List.tabulate(cn.cu.size) { i =>
+          List.tabulate(cn.cu(i).size) { j =>
             genBinary(n.cu(i)(j), cn.cu(i)(j))
           }.flatten
         }.flatten

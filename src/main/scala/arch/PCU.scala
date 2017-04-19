@@ -10,6 +10,7 @@ import scala.collection.mutable.ListBuffer
 import plasticine.templates._
 import plasticine.spade._
 import plasticine.config._
+import plasticine.pisa.enums._
 
 /**
  * Compute Unit module
@@ -86,16 +87,102 @@ class PCU(val p: PCUParams) extends CU {
   }
 
   // Control Block
+
   // Pipeline with FUs and registers
+  def getPipeRegs: List[FF] = List.tabulate(p.r) { i =>
+    val ff = Module(new FF(p.w))
+    ff.io.init := 0.U
+    ff
+  }
+
+  val pipeStages = ListBuffer[List[FU]]()
+  val pipeRegs = ListBuffer[List[List[FF]]]()
+
+  // Reduction stages
+  val reduceStages = (0 until p.d).dropRight(1).takeRight(numReduceStages)  // Leave 1 stage to do in-place accumulation
+
+  for (i <- 0 until p.d) {
+//    val fus = List.fill(p.v) { Module(new FU(p.w, fmaStages.contains(i), true)) }
+    val fus = List.fill(p.v) { Module(new FU(p.w, false, false)) } // TODO :Change after Float support
+    val stageRegs = List.fill(p.v) { getPipeRegs }
+    val stageConfig = io.config.stages(i)
+
+    // Reduction tree specific:
+    // If this stage is one of the reduction stages, get its position within the reduce tree stages.
+    val isReduceStage = reduceStages.contains(i)
+    val reduceStageNum = reduceStages.indexOf(i)
+    // Lanes in the current stage that need to be forwarded values from previous stage
+    val reduceLanes = (0 until p.v by (1 << (reduceStageNum+1))).toList
+    // Forward lanes for each lane
+    val fwdLaneMap = new HashMap[Int, Int]()
+    reduceLanes.foreach { r =>
+      fwdLaneMap(r) = r + (1 << reduceStageNum)
+    }
+//    println(s"stage $i: fwdLaneMap $fwdLaneMap")
+    (0 until p.v) foreach { lane =>
+      val fu = fus(lane)
+      val regs = stageRegs(lane)
+
+      def getSourcesMux(s: SelectSource) = {
+        val sources = s match {
+          case CounterSrc => counterChain.io.out
+          case ScalarFIFOSrc => Vec(scalarFIFOs.map { _.io.deq(0) })
+          case VectorFIFOSrc => Vec(vectorFIFOs.map { _.io.deq(lane) })
+          case PrevStageSrc => if (i == 0) Vec(List.fill(2) {0.U}) else Vec(pipeRegs.last(lane).map {_.io.out})
+          case CurrStageSrc => Vec(regs.map {_.io.out})
+          case _ => throw new Exception("Unsupported operand source!")
+        }
+        val mux = Module(new MuxN(UInt(p.w.W), sources.size))
+        mux.io.ins := sources
+        mux
+      }
+
+      def getOperand(opConfig: SrcValueBundle) = {
+        val sources = opConfig.nonXSources map { s => s match {
+          case ConstSrc => opConfig.value
+          case _ =>
+            val m = getSourcesMux(s)
+            m.io.sel := opConfig.value
+            m.io.out
+        }}
+        val mux = Module(new MuxN(UInt(p.w.W), sources.size))
+        mux.io.ins := Vec(sources)
+        mux.io.sel := opConfig.src
+        mux.io.out
+      }
+
+      fu.io.a := getOperand(stageConfig.opA)
+      fu.io.b := getOperand(stageConfig.opB)
+      fu.io.c := getOperand(stageConfig.opC)
+      fu.io.opcode := stageConfig.opcode
+
+      // Handle writing to regs
+
+      regs.zipWithIndex.foreach { case (reg, idx) =>
+        if (i != 0) {
+          val prevRegs = pipeRegs.last(lane)
+          reg.io.in := Mux(stageConfig.result(idx), fu.io.out, prevRegs(idx).io.out) // TODO: Change once fwdMap is supported
+        } else {
+          reg.io.in := fu.io.out // TODO: Change once fwdMap is supported
+        }
+        reg.io.enable := 1.U // TODO: Change once fwdMap is supported
+      }
+    }
+    pipeStages.append(fus)
+    pipeRegs.append(stageRegs)
+  }
+
+//  def getStageOut(stage: List[FU]): Vec[UInt]  = Vec(stage.map { _.io.out })
+//  def getStageOut(i: Int) : Vec[UInt] = getStageOut(pipeStages(i))
 
   // Output assignment
   io.scalarOut.zipWithIndex.foreach { case (out, i) =>
-    out.bits := scalarFIFOs(i).io.deq(0)
+    out.bits := pipeRegs.last(0)(i).io.out
     out.valid := ~scalarFIFOs(i).io.empty
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
-    out.bits := vectorFIFOs(i).io.deq
+    out.bits := Vec(pipeRegs.last.map { _(i).io.out })
     out.valid := ~vectorFIFOs(i).io.empty
   }
 }
@@ -246,7 +333,7 @@ class PCU(val p: PCUParams) extends CU {
 //  }
 //
 //  // Pipe stages generation
-//  val pipeStages = ListBuffer[List[IntFU]]()
+//  val pipeStages = ListBuffer[List[FU]]()
 //  val pipeRegs = ListBuffer[List[RegisterBlock]]()
 //  pipeRegs.append(initRegblocks)
 //
@@ -269,7 +356,7 @@ class PCU(val p: PCUParams) extends CU {
 //  // Reduction stages
 //  val reduceStages = (0 until d).dropRight(numStagesAfterReduction).takeRight(numReduceStages)
 //  for (i <- 0 until d) {
-//    val stage = List.fill(v) { Module(new IntFU(w, fmaStages.contains(i), true)) }
+//    val stage = List.fill(v) { Module(new FU(w, fmaStages.contains(i), true)) }
 //    val regblockStage = List.fill(v) { Module(new RegisterBlock(w, l, r)) }
 //    val stageConfig = config.pipeStage(i)
 //
@@ -415,7 +502,7 @@ class PCU(val p: PCUParams) extends CU {
 //    pipeRegs.append(regblockStage)
 //  }
 //
-//  def getStageOut(stage: List[IntFU]): Vec[Bits]  = {
+//  def getStageOut(stage: List[FU]): Vec[Bits]  = {
 //    Vec.tabulate(v) { i => stage(i).io.out }
 //  }
 //  def getStageOut(i: Int) : Vec[Bits] = {
