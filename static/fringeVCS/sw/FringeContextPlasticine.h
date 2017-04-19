@@ -33,7 +33,7 @@ class FringeContextPlasticine : public FringeContextBase<void> {
   const uint32_t burstSizeBytes = 64;
   const uint32_t commandReg = 0;
   const uint32_t statusReg = 1;
-  const uint64_t maxCycles = 500000;
+  const uint64_t maxCycles = 5000;
 
   posix_spawn_file_actions_t action;
   int globalID = 1;
@@ -236,30 +236,30 @@ public:
 
     // Pass config data
     // 1. Read config file contents into a buf
-    size_t size = getFileSize(path.c_str());
-    uint8_t *buf = (uint8_t*) std::malloc(size);
-    int nbytes = fileToBuf(buf, path.c_str(), size);
-    ASSERT(nbytes == size, "Bytes read (%d) does not match file size %lu!\n", nbytes, size);
-
-    // 2a. Send CONFIG to simulator, similar to memcpy
-    simCmd cmd;
-    cmd.id = globalID++;
-    cmd.cmd = CONFIG;
-    uint64_t *data = (uint64_t*)cmd.data;
-    data[0] = size;
-    cmd.size = sizeof(uint64_t);
-    cmdChannel->send(&cmd);
-
-    // 2b. Now send config bytes
-    cmdChannel->sendFixedBytes(buf, size);
-
-    // 3. Wait for sim response
-    //    Simulator must independently advance clock
-    //    without waiting for step in 'config' mode
-    simCmd *resp = recvResp();
-    ASSERT(cmd.id == resp->id, "load resp->id does not match cmd.id!");
-    ASSERT(cmd.cmd == resp->cmd, "load resp->cmd does not match cmd.cmd!");
-    std::free(buf);
+//    size_t size = getFileSize(path.c_str());
+//    uint8_t *buf = (uint8_t*) std::malloc(size);
+//    int nbytes = fileToBuf(buf, path.c_str(), size);
+//    ASSERT(nbytes == size, "Bytes read (%d) does not match file size %lu!\n", nbytes, size);
+//
+//    // 2a. Send CONFIG to simulator, similar to memcpy
+//    simCmd cmd;
+//    cmd.id = globalID++;
+//    cmd.cmd = CONFIG;
+//    uint64_t *data = (uint64_t*)cmd.data;
+//    data[0] = size;
+//    cmd.size = sizeof(uint64_t);
+//    cmdChannel->send(&cmd);
+//
+//    // 2b. Now send config bytes
+//    cmdChannel->sendFixedBytes(buf, size);
+//
+//    // 3. Wait for sim response
+//    //    Simulator must independently advance clock
+//    //    without waiting for step in 'config' mode
+//    simCmd *resp = recvResp();
+//    ASSERT(cmd.id == resp->id, "load resp->id does not match cmd.id!");
+//    ASSERT(cmd.cmd == resp->cmd, "load resp->cmd does not match cmd.cmd!");
+//    std::free(buf);
 
     step();
     step();
