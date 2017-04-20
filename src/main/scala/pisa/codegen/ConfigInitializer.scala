@@ -23,6 +23,8 @@ class ConfigInitializer() extends Traversal {
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
+      case n: SwitchCUControlBoxBits => Predef.assert(cnode.isInstanceOf[SwitchCUControlBoxConfig])
+      case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
       case _ => throw new Exception(s"Unknown node $node")
     }
@@ -61,6 +63,10 @@ class ConfigInitializer() extends Traversal {
       case (n: PMUBits, cn: PMUConfig)                    =>
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
+      case (n: SwitchCUBits, cn: SwitchCUConfig)                    =>
+        init(n.control, cn.control)
+        init(n.counterChain, cn.counterChain)
+
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
         cn.regEnables := encodeOneHot(n.regEnables).U
         cn.result := encodeOneHot(n.result).U
@@ -80,9 +86,23 @@ class ConfigInitializer() extends Traversal {
         cn.fifoAndTree.zip(n.fifoAndTree) foreach { case (wire, value) => wire := value.U }
         cn.tokenInAndTree.zip(n.tokenInAndTree) foreach { case (wire, value) => wire := value.U }
 
+      case (n: SwitchCUControlBoxBits, cn: SwitchCUControlBoxConfig)      =>
+        init(n.tokenOutXbar, cn.tokenOutXbar)
+        init(n.swapWriteXbar, cn.swapWriteXbar)
+        init(n.doneXbar, cn.doneXbar)
+        init(n.incrementXbar, cn.incrementXbar)
+        cn.udcDecSelect.zip(n.udcDecSelect) foreach { case (wire, value) => wire := value.U }
+        cn.childrenAndTree.zip(n.childrenAndTree) foreach { case (wire, value) => wire := value.U }
+        cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
+
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         cn.argOutMuxSelect.zip(n.argOutMuxSelect) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
+        for(i <- 0 until cn.switchCU.size) {
+          for(j <- 0 until cn.switchCU(i).size) {
+            init(n.switchCU(i)(j), cn.switchCU(i)(j))
+          }
+        }
         for(i <- 0 until cn.controlSwitch.size) {
           for(j <- 0 until cn.controlSwitch(i).size) {
             init(n.controlSwitch(i)(j), cn.controlSwitch(i)(j))

@@ -288,14 +288,16 @@ object PMUBits {
 }
 
 case class SwitchCUBits(
-  counterChain: CounterChainBits
+  counterChain: CounterChainBits,
+  control: SwitchCUControlBoxBits
 ) extends CUBits {
   def stages = Array[PipeStageBits]()
 }
 object SwitchCUBits {
   def zeroes(p: SwitchCUParams) = {
     new SwitchCUBits (
-      CounterChainBits.zeroes(p.w, p.numCounters)
+      CounterChainBits.zeroes(p.w, p.numCounters),
+      SwitchCUControlBoxBits.zeroes(p)
     )
   }
 }
@@ -320,7 +322,30 @@ object PCUControlBoxBits {
         List.fill(p.numUDCs) { 0 }, // siblingAndTree
         0,   // streamingMuxSelect
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
-        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 2)),  // doneXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
+        CrossbarBits.zeroes(ControlSwitchParams(3, p.numControlOut)) // tokenOutXbar
+      )
+  }
+}
+
+case class SwitchCUControlBoxBits(
+  siblingAndTree: List[Int],
+  childrenAndTree: List[Int],
+  udcDecSelect: List[Int],
+  incrementXbar: CrossbarBits,
+  doneXbar: CrossbarBits,
+  swapWriteXbar: CrossbarBits,
+  tokenOutXbar: CrossbarBits
+) extends AbstractBits
+object SwitchCUControlBoxBits {
+  def zeroes(p: SwitchCUParams) = {
+    new SwitchCUControlBoxBits(
+        List.fill(p.numUDCs) { 0 }, // siblingAndTree
+        List.fill(p.numUDCs) { 0 }, // childrenAndTree
+        List.fill(p.numUDCs) { 0 }, // udcDecSelect
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
         CrossbarBits.zeroes(ControlSwitchParams(3, p.numControlOut)) // tokenOutXbar
       )

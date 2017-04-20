@@ -21,6 +21,8 @@ class BinaryCodegen() extends Traversal {
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
+      case n: SwitchCUControlBoxBits => Predef.assert(cnode.isInstanceOf[SwitchCUControlBoxConfig])
+      case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
       case _ => throw new Exception(s"Unknown node $node")
     }
@@ -87,6 +89,10 @@ class BinaryCodegen() extends Traversal {
         List.tabulate(cn.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
+      case (n: SwitchCUBits, cn: SwitchCUConfig)                    =>
+        genBinary(n.control, cn.control) ++
+        genBinary(n.counterChain, cn.counterChain)
+
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
 //        toBinary(encodeOneHot(n.result), cn.result.getWidth) ++
 //        toBinary(5, cn.opcode.getWidth)
@@ -107,9 +113,23 @@ class BinaryCodegen() extends Traversal {
         toBinary(n.fifoAndTree, cn.fifoAndTree.getWidth) ++
         toBinary(n.tokenInAndTree, cn.tokenInAndTree.getWidth)
 
+      case (n: SwitchCUControlBoxBits, cn: SwitchCUControlBoxConfig)      =>
+        genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
+        genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
+        genBinary(n.doneXbar, cn.doneXbar) ++
+        genBinary(n.incrementXbar, cn.incrementXbar) ++
+        toBinary(n.udcDecSelect, cn.udcDecSelect.getWidth) ++
+        toBinary(n.childrenAndTree, cn.childrenAndTree.getWidth) ++
+        toBinary(n.siblingAndTree, cn.siblingAndTree.getWidth)
+
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         toBinary(n.argOutMuxSelect, cn.argOutMuxSelect.getWidth) ++
+        List.tabulate(cn.switchCU.size) { i =>
+          List.tabulate(cn.switchCU(i).size) { j =>
+            genBinary(n.switchCU(i)(j), cn.switchCU(i)(j))
+          }.flatten
+        }.flatten ++
         List.tabulate(cn.controlSwitch.size) { i =>
           List.tabulate(cn.controlSwitch(i).size) { j =>
             genBinary(n.controlSwitch(i)(j), cn.controlSwitch(i)(j))

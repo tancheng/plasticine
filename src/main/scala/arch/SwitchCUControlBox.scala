@@ -8,15 +8,11 @@ import plasticine.pisa.enums._
  * Compute Unit Control Module. Handles incoming tokens, done signals,
  * and outgoing tokens.
  */
-class PCUControlBox(val p: PCUParams) extends Module {
+class SwitchCUControlBox(val p: SwitchCUParams) extends Module {
   val io = IO(new Bundle {
     // Control IO
     val controlIn = Input(Vec(p.numControlIn, Bool()))
     val controlOut = Output(Vec(p.numControlOut, Bool()))
-
-    // Local FIFO Inputs
-    val fifoNotFull = Input(Vec(p.numScalarIn+p.numVectorIn, Bool()))
-    val fifoNotEmpty = Input(Vec(p.numScalarIn+p.numVectorIn, Bool()))
 
     // Local FIFO Outputs
     val scalarFifoDeqVld = Output(Vec(p.numScalarIn, Bool()))
@@ -27,7 +23,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
     val done = Input(Vec(p.numCounters, Bool()))
 
     // Config
-    val config = Input(PCUControlBoxConfig(p))
+    val config = Input(SwitchCUControlBoxConfig(p))
   })
 
   // Increment crossbar
@@ -36,11 +32,11 @@ class PCUControlBox(val p: PCUParams) extends Module {
   incrementXbar.io.ins := io.controlIn
 
   // Done crossbar
-  val doneXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numCounters, 2)))
+  val doneXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numCounters, 1)))
   doneXbar.io.config := io.config.doneXbar
   doneXbar.io.ins := io.done
 
-  io.scalarFifoDeqVld.foreach { deq => deq := doneXbar.io.outs(1) }
+  io.scalarFifoDeqVld.foreach { deq => deq := doneXbar.io.outs(0) }
 
   // Swap Write crossbar
   val swapWriteXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numControlIn, p.numScalarIn)))
@@ -50,13 +46,14 @@ class PCUControlBox(val p: PCUParams) extends Module {
   io.scalarFifoEnqVld := swapWriteXbar.io.outs
 
   // Up-down counters to handle tokens and credits
+  val udcDec = Wire(Vec(p.numUDCs, Bool()))
   val udCounters = List.tabulate(p.numUDCs) { i =>
     val udc = Module(new UpDownCtr(p.udCtrWidth))
     udc.io.initval := 0.U
     udc.io.strideInc := 1.U
     udc.io.strideDec := 1.U
     udc.io.inc := incrementXbar.io.outs(i)
-    udc.io.dec := doneXbar.io.outs(0)
+    udc.io.dec := udcDec(i)
     udc
   }
 
@@ -66,22 +63,25 @@ class PCUControlBox(val p: PCUParams) extends Module {
     muxedSignals.reduce { _ & _ }
   }
   val siblingAndTree = createAndTree(Vec(udCounters.map { _.io.gtz}), io.config.siblingAndTree)
-  val tokenInAndTree = createAndTree(io.controlIn, io.config.tokenInAndTree)
-  val fifoAndTree = createAndTree(io.fifoNotEmpty, io.config.fifoAndTree)
-  val andTreeTop = createAndTree(Vec(tokenInAndTree, fifoAndTree), io.config.andTreeTop)
+  val childrenAndTree = createAndTree(Vec(udCounters.map { _.io.gtz}), io.config.childrenAndTree)
 
-  val localEnable = Mux(io.config.streamingMuxSelect, andTreeTop, siblingAndTree)
+  udcDec.zipWithIndex.foreach { case (dec, idx) =>
+    dec := Mux(io.config.udcDecSelect(idx), childrenAndTree, doneXbar.io.outs(0))
+  }
+
+  val localEnable = childrenAndTree
   io.enable := localEnable
 
+  // Pulser
+//  val pulser = Module(new Pulser())
+//  pulser.io.in := siblingAndTree
+
   // Token out crossbar
-  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(3+io.fifoNotFull.size, p.numControlOut)))
+  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(3, p.numControlOut)))
   tokenOutXbar.io.config := io.config.tokenOutXbar
-  for (i <- 0 until tokenOutXbar.io.ins.size) { i match {
-    case 0 => tokenOutXbar.io.ins(i) := doneXbar.io.outs(1)
-    case 1 => tokenOutXbar.io.ins(i) := siblingAndTree
-    case 2 => tokenOutXbar.io.ins(i) := localEnable
-    case _ => tokenOutXbar.io.ins(i) := io.fifoNotFull(i-3)
-  }}
+  tokenOutXbar.io.ins(0) := doneXbar.io.outs(0)
+//  tokenOutXbar.io.ins(1) := pulser.io.out
+  tokenOutXbar.io.ins(2) := siblingAndTree
 
   io.controlOut := tokenOutXbar.io.outs
 }

@@ -11,6 +11,7 @@ import plasticine.templates._
 import plasticine.spade._
 import plasticine.config._
 import plasticine.pisa.enums._
+import plasticine.templates.Utils.log2Up
 
 /**
  * Compute Unit module
