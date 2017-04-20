@@ -225,6 +225,7 @@ case class SwitchCUControlBoxConfig(val p: SwitchCUParams) extends AbstractConfi
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
   val tokenOutXbar = CrossbarConfig(ControlSwitchParams(3, p.numControlOut))
+  val pulserMax = UInt(p.udCtrWidth.W)
 
   override def cloneType(): this.type = {
     new SwitchCUControlBoxConfig(p).asInstanceOf[this.type]

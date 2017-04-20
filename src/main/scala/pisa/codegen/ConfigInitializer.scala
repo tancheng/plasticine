@@ -87,6 +87,7 @@ class ConfigInitializer() extends Traversal {
         cn.tokenInAndTree.zip(n.tokenInAndTree) foreach { case (wire, value) => wire := value.U }
 
       case (n: SwitchCUControlBoxBits, cn: SwitchCUControlBoxConfig)      =>
+        cn.pulserMax := n.pulserMax.U
         init(n.tokenOutXbar, cn.tokenOutXbar)
         init(n.swapWriteXbar, cn.swapWriteXbar)
         init(n.doneXbar, cn.doneXbar)
