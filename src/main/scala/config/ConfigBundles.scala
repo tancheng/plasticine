@@ -143,6 +143,11 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val control = PMUControlBoxConfig(p)
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w))
   val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
+  val scratchpad = ScratchpadConfig(p)
+  val wdataSelect = UInt(log2Up(p.numVectorIn).W)
+  val waddrSelect = UInt(log2Up(p.d).W)
+  val raddrSelect = UInt(log2Up(p.d).W)
+  val rdataEnable = Vec(p.numVectorOut, Bool())
 
   override def cloneType(): this.type = {
     new PMUConfig(p).asInstanceOf[this.type]
@@ -222,13 +227,13 @@ case class ScratchpadConfig(val p: PMUParams) extends AbstractConfig {
 //  val isReadFifo = if (config.isDefined) Bool(config.get.isReadFifo > 0) else Bool()
 //  val isWriteFifo = if (config.isDefined) Bool(config.get.isWriteFifo > 0) else Bool()
   val mode = UInt(2.W)  // TODO: 2 ?
-  val strideLog2 = UInt((log2Up(log2Up(p.d) - log2Up(p.v))).W)
+  val strideLog2 = UInt((log2Up(log2Up(p.scratchpadSizeWords) - log2Up(p.v))).W)
   val isReadFifo = Bool()
   val isWriteFifo = Bool()
-  val bufSize = UInt(log2Up(p.d/p.v).W)
-  val localWaddrMax = UInt((log2Up(p.d/p.v)+1).W) // localWaddrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
-  val localRaddrMax = UInt((log2Up(p.d/p.v)+1).W) // if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
-  val fifoSize = UInt((log2Up(p.d)+1).W)
+  val bufSize = UInt(log2Up(p.scratchpadSizeWords/p.v).W)
+  val localWaddrMax = UInt((log2Up(p.scratchpadSizeWords/p.v)+1).W) // localWaddrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+  val localRaddrMax = UInt((log2Up(p.scratchpadSizeWords/p.v)+1).W) // if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+  val fifoSize = UInt((log2Up(p.scratchpadSizeWords)+1).W)
 //  val fifoSize = UInt((log2Up(p.d)+1).W)
   override def cloneType(): this.type = new ScratchpadConfig(p).asInstanceOf[this.type]
 }

@@ -168,7 +168,22 @@ class PMU(val p: PMUParams) extends CU {
     pipeRegs.append(regs)
   }
 
-  val addrs = pipeRegs.map { _(p.outputRegID).io.out }
+  val addrs = pipeRegs.map { _(p.outputRegID).io.out }.toList
+
+  // Scratchpad
+  def getMux[T<:Data](ins: List[T], sel: UInt): T = {
+    val srcMux = Module(new MuxN(ins(0).cloneType, ins.size))
+    srcMux.io.ins := Vec(ins)
+    srcMux.io.sel := sel
+    srcMux.io.out
+  }
+
+  val scratchpad = Module(new Scratchpad(p))
+  scratchpad.io.config := io.config.scratchpad
+  scratchpad.io.wdata := getMux(vectorFIFOs.map {_.io.deq}, io.config.wdataSelect)
+  scratchpad.io.waddr := getMux(addrs, io.config.waddrSelect)
+  scratchpad.io.raddr := getMux(addrs, io.config.raddrSelect)
+  scratchpad.io.wen := false.B  // TODO: Fix after threading enable signals through pipeline
 
   // Output assignment
   def getSourcesMux(s: SelectSource) = {
@@ -197,20 +212,24 @@ class PMU(val p: PMUParams) extends CU {
 
   val scalarOutXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w)))
   scalarOutXbar.io.config := io.config.scalarOutXbar
-//  val scalarOutIns = Vec(pipeRegs.last.take(p.numPipelineScalarOuts).map { _.io.out } ++ scratchpad.io.rdata.getElements.take(p.numScratchpadScalarOuts))
-  scalarOutXbar.io.ins.zipWithIndex.foreach { case (in, i) =>
-    in := pipeRegs.last(i).io.out // TODO: Modify to comment above after introducing Scratchpad
-  }
+  val scalarOutIns = Vec(pipeRegs.last.take(p.numPipelineScalarOuts).map { _.io.out } ++ scratchpad.io.rdata.getElements.take(p.numScratchpadScalarOuts))
+  scalarOutXbar.io.ins := scalarOutIns
+//  scalarOutXbar.io.ins.zipWithIndex.foreach { case (in, i) =>
+//    in := scalarOutIns
+//    in := pipeRegs.last(i).io.out // TODO: Modify to comment above after introducing Scratchpad
+//  }
 
   io.scalarOut.zip(scalarOutXbar.io.outs).foreach { case (out, xbarOut) =>
     out.bits := xbarOut
     out.valid := cbox.io.enable(0)   // Output produced by read addr logic only, which is controlledby enable(0)
+                                     // TODO: Fix after threading enable signals
 //    out.valid := getValids(io.config.scalarValidOut(i))
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
-    out.bits := Wire(Vec(p.v, 0.U))  // TODO: Update after introducing Scratchpad
-    out.valid := cbox.io.enable(0) // Output produced by read addr logic only, which is controlledby enable(0)
+    out.bits := scratchpad.io.rdata
+    out.valid := cbox.io.enable(0) & io.config.rdataEnable(i) // Output produced by read addr logic only, which is controlledby enable(0)
+                                                              // TODO: Fix after threading enable signals
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }
 

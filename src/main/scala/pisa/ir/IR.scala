@@ -295,7 +295,13 @@ case class PMUBits(
   counterChain: CounterChainBits,
   control: PMUControlBoxBits,
   scalarInXbar: CrossbarBits,
-  scalarOutXbar: CrossbarBits
+  scalarOutXbar: CrossbarBits,
+  scratchpad: ScratchpadBits,
+  wdataSelect: Int,
+  waddrSelect: Int,
+  raddrSelect: Int,
+  rdataEnable: List[Int]
+
 ) extends CUBits
 object PMUBits {
   def zeroes(p: PMUParams) = {
@@ -304,7 +310,12 @@ object PMUBits {
       CounterChainBits.zeroes(p.w, p.numCounters),
       PMUControlBoxBits.zeroes(p),
       CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)),
-      CrossbarBits.zeroes(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w)),
+      ScratchpadBits.zeroes,
+      0,
+      0,
+      0,
+      List.fill(p.numVectorOut) { 0 }
     )
   }
 }

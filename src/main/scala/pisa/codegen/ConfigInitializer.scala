@@ -66,6 +66,11 @@ class ConfigInitializer() extends Traversal {
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PMUBits, cn: PMUConfig)                    =>
+        cn.rdataEnable.zip(n.rdataEnable) foreach { case (wire, value) => wire := (value > 0).B }
+        cn.raddrSelect := n.raddrSelect.U
+        cn.waddrSelect := n.waddrSelect.U
+        cn.wdataSelect := n.wdataSelect.U
+        init(n.scratchpad, cn.scratchpad)
         init(n.scalarOutXbar, cn.scalarOutXbar)
         init(n.scalarInXbar, cn.scalarInXbar)
         init(n.control, cn.control)

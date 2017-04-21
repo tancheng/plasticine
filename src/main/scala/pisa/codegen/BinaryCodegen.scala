@@ -90,6 +90,11 @@ class BinaryCodegen() extends Traversal {
         println(s"[PCUBits] stageBits = $stageBits")
         scalarOutXbarBits ++ scalarInXbarBits ++ controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
+        toBinary(n.rdataEnable, cn.rdataEnable.getWidth) ++
+        toBinary(n.raddrSelect, cn.raddrSelect.getWidth) ++
+        toBinary(n.waddrSelect, cn.waddrSelect.getWidth) ++
+        toBinary(n.wdataSelect, cn.wdataSelect.getWidth) ++
+        genBinary(n.scratchpad, cn.scratchpad) ++
         genBinary(n.scalarOutXbar, cn.scalarOutXbar) ++
         genBinary(n.scalarInXbar, cn.scalarInXbar) ++
         genBinary(n.control, cn.control) ++
