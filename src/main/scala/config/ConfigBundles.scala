@@ -140,6 +140,7 @@ object PCUConfig {
 case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
+  val control = PMUControlBoxConfig(p)
 
   override def cloneType(): this.type = {
     new PMUConfig(p).asInstanceOf[this.type]

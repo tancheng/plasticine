@@ -292,15 +292,15 @@ object PCUBits {
 
 case class PMUBits(
   stages: Array[PipeStageBits],
-  counterChain: CounterChainBits
-//  control: CUControlBoxBits
+  counterChain: CounterChainBits,
+  control: PMUControlBoxBits
 ) extends CUBits
 object PMUBits {
   def zeroes(p: PMUParams) = {
     new PMUBits (
       Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
-      CounterChainBits.zeroes(p.w, p.numCounters)
-//      CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
+      CounterChainBits.zeroes(p.w, p.numCounters),
+      PMUControlBoxBits.zeroes(p)
     )
   }
 }
