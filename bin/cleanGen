@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -o xtrace
+rm -r src/main/scala/apps/*
+git checkout src/main/scala/apps/
+rm -r src/main/scala/arch/gen/*
+git checkout src/main/scala/arch/gen/
+rm -r src/main/scala/spade/gen/*
+git checkout src/main/scala/spade/gen/
+set +o xtrace

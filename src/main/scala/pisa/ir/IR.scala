@@ -254,11 +254,11 @@ trait CUBits extends AbstractBits {
 }
 
 case class PCUBits(
-  stages: Array[PipeStageBits],
-  counterChain: CounterChainBits,
-  scalarValidOut: Array[SrcValueTuple],
-  vectorValidOut: Array[SrcValueTuple],
-  control: PCUControlBoxBits
+  var stages: Array[PipeStageBits],
+  var counterChain: CounterChainBits,
+  var scalarValidOut: Array[SrcValueTuple],
+  var vectorValidOut: Array[SrcValueTuple],
+  var control: PCUControlBoxBits
 ) extends CUBits
 object PCUBits {
   def zeroes(p: PCUParams) = {
@@ -303,15 +303,15 @@ object SwitchCUBits {
 }
 
 case class PCUControlBoxBits(
-  tokenInAndTree: List[Int],
-  fifoAndTree: List[Int],
-  andTreeTop: List[Int],
-  siblingAndTree: List[Int],
-  streamingMuxSelect: Int,
-  incrementXbar: CrossbarBits,
-  doneXbar: CrossbarBits,
-  swapWriteXbar: CrossbarBits,
-  tokenOutXbar: CrossbarBits
+  var tokenInAndTree: List[Int],
+  var fifoAndTree: List[Int],
+  var andTreeTop: List[Int],
+  var siblingAndTree: List[Int],
+  var streamingMuxSelect: Int,
+  var incrementXbar: CrossbarBits,
+  var doneXbar: CrossbarBits,
+  var swapWriteXbar: CrossbarBits,
+  var tokenOutXbar: CrossbarBits
 ) extends AbstractBits
 object PCUControlBoxBits {
   def zeroes(p: PCUParams) = {
