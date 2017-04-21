@@ -230,11 +230,11 @@ class MAGCore(
   io.dram.cmd.bits.tag := Cat(tagOut.streamTag, tagOut.burstTag)
   io.dram.cmd.bits.streamId := tagOut.streamTag
   io.dram.cmd.bits.wdata := wdataFifo.io.deq
-//  io.dram.cmd.valid := Mux(config.scatterGather, ccache.io.miss, burstVld)
   io.dram.cmd.bits.isWr := isWrFifo.io.deq(0)
   wrPhase.io.input.set := (~isWrFifo.io.empty & isWrFifo.io.deq(0))
   wrPhase.io.input.reset := delay(burstVld,1)
-  io.dram.cmd.valid := burstVld & ~issued
+  // io.dram.cmd.valid := burstVld & ~issued
+  io.dram.cmd.valid := Mux(io.config.scatterGather, ~issued, burstVld & ~issued)
 
   val issuedTag = Wire(UInt(w.W))
   if (blockingDRAMIssue) {
