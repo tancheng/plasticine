@@ -5,6 +5,7 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.pisa.Traversal
 import plasticine.templates.Opcodes
+import plasticine.templates.Utils.log2Up
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable.Set
@@ -18,9 +19,11 @@ class BinaryCodegen() extends Traversal {
       case n: CrossbarBits    => Predef.assert(cnode.isInstanceOf[CrossbarConfig])
       case n: PCUBits         => Predef.assert(cnode.isInstanceOf[PCUConfig])
       case n: PMUBits         => Predef.assert(cnode.isInstanceOf[PMUConfig])
+      case n: ScratchpadBits         => Predef.assert(cnode.isInstanceOf[ScratchpadConfig])
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
+      case n: PMUControlBoxBits => Predef.assert(cnode.isInstanceOf[PMUControlBoxConfig])
       case n: SwitchCUControlBoxBits => Predef.assert(cnode.isInstanceOf[SwitchCUControlBoxConfig])
       case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
@@ -74,6 +77,8 @@ class BinaryCodegen() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         toBinary(n.outSelect, cn.outSelect.getWidth)
       case (n: PCUBits, cn: PCUConfig)                    =>
+        val scalarOutXbarBits = genBinary(n.scalarOutXbar, cn.scalarOutXbar)
+        val scalarInXbarBits = genBinary(n.scalarInXbar, cn.scalarInXbar)
         val controlBits = genBinary(n.control, cn.control)
         val vecValidBits = List.tabulate(cn.vectorValidOut.size) { i => genBinary(n.vectorValidOut(i), cn.vectorValidOut(i)) }.flatten
         val scalarValidBits = List.tabulate(cn.scalarValidOut.size) { i => genBinary(n.scalarValidOut(i), cn.scalarValidOut(i)) }.flatten
@@ -83,8 +88,16 @@ class BinaryCodegen() extends Traversal {
         }.flatten
         println(s"[PCUBits] counterBits = $counterBits")
         println(s"[PCUBits] stageBits = $stageBits")
-        controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
+        scalarOutXbarBits ++ scalarInXbarBits ++ controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
+        toBinary(n.rdataEnable, cn.rdataEnable.getWidth) ++
+        toBinary(n.raddrSelect, cn.raddrSelect.getWidth) ++
+        toBinary(n.waddrSelect, cn.waddrSelect.getWidth) ++
+        toBinary(n.wdataSelect, cn.wdataSelect.getWidth) ++
+        genBinary(n.scratchpad, cn.scratchpad) ++
+        genBinary(n.scalarOutXbar, cn.scalarOutXbar) ++
+        genBinary(n.scalarInXbar, cn.scalarInXbar) ++
+        genBinary(n.control, cn.control) ++
         genBinary(n.counterChain, cn.counterChain) ++
         List.tabulate(cn.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
@@ -102,6 +115,17 @@ class BinaryCodegen() extends Traversal {
       valueBin
 //      valueBin ++ toBinary(0, cn.opA.src.getWidth)
 
+      case (n: ScratchpadBits, cn: ScratchpadConfig)        =>
+        val bankSize= cn.p.d / cn.p.v
+        toBinary(n.fifoSize, cn.fifoSize.getWidth) ++
+        toBinary((if (n.numBufs == 0) 0 else (bankSize - (bankSize % n.numBufs))), cn.localRaddrMax.getWidth) ++
+        toBinary((if (n.numBufs == 0) 0 else (bankSize - (bankSize % n.numBufs))), cn.localWaddrMax.getWidth) ++
+        toBinary((if (n.numBufs == 0) 1 else (math.max(1, cn.p.d / (cn.p.v*n.numBufs)))), cn.bufSize.getWidth) ++
+        toBinary(n.isWriteFifo, cn.isWriteFifo.getWidth) ++
+        toBinary(n.isReadFifo, cn.isReadFifo.getWidth) ++
+        toBinary((if (n.stride == 1) 0 else log2Up(n.stride)), cn.strideLog2.getWidth) ++
+        toBinary(n.mode, cn.mode.getWidth)
+
       case (n: PCUControlBoxBits, cn: PCUControlBoxConfig)      =>
         genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
         genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
@@ -109,9 +133,17 @@ class BinaryCodegen() extends Traversal {
         genBinary(n.incrementXbar, cn.incrementXbar) ++
         toBinary(n.streamingMuxSelect, cn.streamingMuxSelect.getWidth) ++
         toBinary(n.siblingAndTree, cn.siblingAndTree.getWidth) ++
-        toBinary(n.andTreeTop, cn.andTreeTop.getWidth) ++
         toBinary(n.fifoAndTree, cn.fifoAndTree.getWidth) ++
         toBinary(n.tokenInAndTree, cn.tokenInAndTree.getWidth)
+
+      case (n: PMUControlBoxBits, cn: PMUControlBoxConfig)      =>
+        genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
+        genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
+        genBinary(n.readDoneXbar, cn.readDoneXbar) ++
+        genBinary(n.writeDoneXbar, cn.writeDoneXbar) ++
+        toBinary(n.scalarSwapReadSelect, cn.scalarSwapReadSelect.getWidth) ++
+        toBinary(n.readFifoAndTree, cn.readFifoAndTree.getWidth) ++
+        toBinary(n.writeFifoAndTree, cn.writeFifoAndTree.getWidth)
 
       case (n: SwitchCUControlBoxBits, cn: SwitchCUControlBoxConfig)      =>
         toBinary(n.pulserMax, cn.pulserMax.getWidth) ++

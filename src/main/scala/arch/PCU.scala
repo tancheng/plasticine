@@ -14,20 +14,6 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.templates.Utils.log2Up
 
-/**
- * Compute Unit module
- * @param w: Word width
- * @param d: Pipeline depth
- * @param v: Vector length
- * @param r: Pipeline registers per lane per stage
- * @param numCounters: Number of counters
- * @param numScalarIn: Input scalars
- * @param numScalarOut: Output scalars
- * @param numVectorIn: Input vectors
- * @param numVectorOut: Output vectors
- * @param numControlIn: Input controls
- * @param numControlOut: Output controls
- */
 class PCU(val p: PCUParams) extends CU {
   val io = IO(CUIO(p, PCUConfig(p)))
 
@@ -55,6 +41,11 @@ class PCU(val p: PCUParams) extends CU {
     fifo
   }
 
+  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)))
+  scalarInXbar.io.config := io.config.scalarInXbar
+  scalarInXbar.io.ins := Vec(scalarFIFOs.map { _.io.deq(0) })
+  val scalarIns = scalarInXbar.io.outs
+
   // Vector input FIFOs
   val vectorFIFOs = List.tabulate(p.numVectorIn) { i =>
     val fifo = Module(new FIFOCore(p.w, p.vectorFIFODepth, p.v))
@@ -73,7 +64,7 @@ class PCU(val p: PCUParams) extends CU {
   counterChain.io.config := io.config.counterChain
 
   // Connect max and stride
-  val ctrMaxStrideSources = Vec(scalarFIFOs.map { _.io.deq(0) })
+  val ctrMaxStrideSources = scalarIns
   for (i <- 0 until p.numCounters) {
     // max
     val maxMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
@@ -149,7 +140,7 @@ class PCU(val p: PCUParams) extends CU {
       def getSourcesMux(s: SelectSource) = {
         val sources = s match {
           case CounterSrc => counterChain.io.out
-          case ScalarFIFOSrc => Vec(scalarFIFOs.map { _.io.deq(0) })
+          case ScalarFIFOSrc => scalarIns
           case VectorFIFOSrc => Vec(vectorFIFOs.map { _.io.deq(lane) })
           case PrevStageSrc => if (i == 0) Vec(List.fill(2) {0.U}) else Vec(pipeRegs.last(lane).map {_.io.out})
           case CurrStageSrc => Vec(regs.map {_.io.out})
@@ -244,14 +235,22 @@ class PCU(val p: PCUParams) extends CU {
     mux.io.out
   }
 
-  io.scalarOut.zipWithIndex.foreach { case (out, i) =>
-    out.bits := pipeRegs.last(0)(i).io.out
-    out.valid := getValids(io.config.scalarValidOut(i))
+  val scalarOutXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w)))
+  scalarOutXbar.io.config := io.config.scalarOutXbar
+  scalarOutXbar.io.ins.zipWithIndex.foreach { case (in, i) =>
+    in := pipeRegs.last(0)(i).io.out
+  }
+
+  io.scalarOut.zip(scalarOutXbar.io.outs).foreach { case (out, xbarOut) =>
+    out.bits := xbarOut
+    out.valid := cbox.io.enable
+//    out.valid := getValids(io.config.scalarValidOut(i))
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := Vec(pipeRegs.last.map { _(i).io.out })
-    out.valid := getValids(io.config.vectorValidOut(i))
+    out.valid := cbox.io.enable
+//    out.valid := getValids(io.config.vectorValidOut(i))
   }
 }
 

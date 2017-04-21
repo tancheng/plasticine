@@ -5,6 +5,7 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.pisa.Traversal
 import plasticine.templates.Opcodes
+import plasticine.templates.Utils.log2Up
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable.Set
@@ -20,9 +21,11 @@ class ConfigInitializer() extends Traversal {
       case n: CrossbarBits    => Predef.assert(cnode.isInstanceOf[CrossbarConfig])
       case n: PCUBits         => Predef.assert(cnode.isInstanceOf[PCUConfig])
       case n: PMUBits         => Predef.assert(cnode.isInstanceOf[PMUConfig])
+      case n: ScratchpadBits         => Predef.assert(cnode.isInstanceOf[ScratchpadConfig])
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
+      case n: PMUControlBoxBits => Predef.assert(cnode.isInstanceOf[PMUControlBoxConfig])
       case n: SwitchCUControlBoxBits => Predef.assert(cnode.isInstanceOf[SwitchCUControlBoxConfig])
       case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
@@ -55,12 +58,22 @@ class ConfigInitializer() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := value.U }
       case (n: PCUBits, cn: PCUConfig)                    =>
+        init(n.scalarOutXbar, cn.scalarOutXbar)
+        init(n.scalarInXbar, cn.scalarInXbar)
         init(n.control, cn.control)
         for (i <- 0 until cn.vectorValidOut.size) init(n.vectorValidOut(i), cn.vectorValidOut(i))
         for (i <- 0 until cn.scalarValidOut.size) init(n.scalarValidOut(i), cn.scalarValidOut(i))
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PMUBits, cn: PMUConfig)                    =>
+        cn.rdataEnable.zip(n.rdataEnable) foreach { case (wire, value) => wire := (value > 0).B }
+        cn.raddrSelect := n.raddrSelect.U
+        cn.waddrSelect := n.waddrSelect.U
+        cn.wdataSelect := n.wdataSelect.U
+        init(n.scratchpad, cn.scratchpad)
+        init(n.scalarOutXbar, cn.scalarOutXbar)
+        init(n.scalarInXbar, cn.scalarInXbar)
+        init(n.control, cn.control)
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: SwitchCUBits, cn: SwitchCUConfig)                    =>
@@ -75,6 +88,17 @@ class ConfigInitializer() extends Traversal {
         init(n.opB, cn.opB)
         init(n.opA, cn.opA)
 
+      case (n: ScratchpadBits, cn: ScratchpadConfig)        =>
+        val bankSize= cn.p.d / cn.p.v
+        cn.fifoSize := n.fifoSize.U
+        cn.localRaddrMax := (if (n.numBufs == 0) 0.U else (bankSize - (bankSize % n.numBufs)).U)
+        cn.localWaddrMax := (if (n.numBufs == 0) 0.U else (bankSize - (bankSize % n.numBufs)).U)
+        cn.bufSize := (if (n.numBufs == 0) 1.U else (math.max(1, cn.p.d / (cn.p.v*n.numBufs))).U)
+        cn.isWriteFifo := (n.isWriteFifo > 0).B
+        cn.isReadFifo := (n.isReadFifo > 0).B
+        cn.strideLog2 := (if (n.stride == 1) 0.U else log2Up(n.stride).U)
+        cn.mode := n.mode.U
+
       case (n: PCUControlBoxBits, cn: PCUControlBoxConfig)      =>
         init(n.tokenOutXbar, cn.tokenOutXbar)
         init(n.swapWriteXbar, cn.swapWriteXbar)
@@ -82,9 +106,17 @@ class ConfigInitializer() extends Traversal {
         init(n.incrementXbar, cn.incrementXbar)
         cn.streamingMuxSelect := n.streamingMuxSelect.U
         cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
-        cn.andTreeTop.zip(n.andTreeTop) foreach { case (wire, value) => wire := value.U }
         cn.fifoAndTree.zip(n.fifoAndTree) foreach { case (wire, value) => wire := value.U }
         cn.tokenInAndTree.zip(n.tokenInAndTree) foreach { case (wire, value) => wire := value.U }
+
+      case (n: PMUControlBoxBits, cn: PMUControlBoxConfig)      =>
+        init(n.tokenOutXbar, cn.tokenOutXbar)
+        init(n.swapWriteXbar, cn.swapWriteXbar)
+        init(n.readDoneXbar, cn.readDoneXbar)
+        init(n.writeDoneXbar, cn.writeDoneXbar)
+        cn.scalarSwapReadSelect.zip(n.scalarSwapReadSelect) foreach { case (wire, value) => wire := value.U }
+        cn.readFifoAndTree.zip(n.readFifoAndTree) foreach { case (wire, value) => wire := value.U }
+        cn.writeFifoAndTree.zip(n.writeFifoAndTree) foreach { case (wire, value) => wire := value.U }
 
       case (n: SwitchCUControlBoxBits, cn: SwitchCUControlBoxConfig)      =>
         cn.pulserMax := n.pulserMax.U

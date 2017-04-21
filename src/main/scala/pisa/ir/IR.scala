@@ -201,6 +201,20 @@ object PipeStageBits {
   }
 }
 
+case class ScratchpadBits(
+  mode: Int = 0,
+  stride: Int = 0,
+  numBufs: Int = 0,
+  isReadFifo: Int = 0,
+  isWriteFifo: Int = 0,
+  fifoSize: Int = 0
+) extends AbstractBits
+object ScratchpadBits {
+  def zeroes = {
+    new ScratchpadBits()
+  }
+}
+
 //case class BankingBits(mode: Int = 0, strideLog2: Int = 0) extends AbstractBits
 //
 //case class ScratchpadBits(
@@ -258,7 +272,9 @@ case class PCUBits(
   var counterChain: CounterChainBits,
   var scalarValidOut: Array[SrcValueTuple],
   var vectorValidOut: Array[SrcValueTuple],
-  var control: PCUControlBoxBits
+  var control: PCUControlBoxBits,
+  var scalarInXbar: CrossbarBits,
+  var scalarOutXbar: CrossbarBits
 ) extends CUBits
 object PCUBits {
   def zeroes(p: PCUParams) = {
@@ -267,22 +283,39 @@ object PCUBits {
       CounterChainBits.zeroes(p.w, p.numCounters),
       Array.fill(p.numScalarOut) { SrcValueTuple.zeroes(p.w) },
       Array.fill(p.numVectorOut) { SrcValueTuple.zeroes(p.w) },
-      PCUControlBoxBits.zeroes(p)
+      PCUControlBoxBits.zeroes(p),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
     )
   }
 }
 
 case class PMUBits(
   stages: Array[PipeStageBits],
-  counterChain: CounterChainBits
-//  control: CUControlBoxBits
+  counterChain: CounterChainBits,
+  control: PMUControlBoxBits,
+  scalarInXbar: CrossbarBits,
+  scalarOutXbar: CrossbarBits,
+  scratchpad: ScratchpadBits,
+  wdataSelect: Int,
+  waddrSelect: Int,
+  raddrSelect: Int,
+  rdataEnable: List[Int]
+
 ) extends CUBits
 object PMUBits {
   def zeroes(p: PMUParams) = {
     new PMUBits (
       Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
-      CounterChainBits.zeroes(p.w, p.numCounters)
-//      CUControlBoxBits.zeroes(numTokenIn, numTokenOut, numCounters),
+      CounterChainBits.zeroes(p.w, p.numCounters),
+      PMUControlBoxBits.zeroes(p),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w)),
+      ScratchpadBits.zeroes,
+      0,
+      0,
+      0,
+      List.fill(p.numVectorOut) { 0 }
     )
   }
 }
@@ -305,7 +338,6 @@ object SwitchCUBits {
 case class PCUControlBoxBits(
   var tokenInAndTree: List[Int],
   var fifoAndTree: List[Int],
-  var andTreeTop: List[Int],
   var siblingAndTree: List[Int],
   var streamingMuxSelect: Int,
   var incrementXbar: CrossbarBits,
@@ -318,13 +350,35 @@ object PCUControlBoxBits {
     new PCUControlBoxBits(
         List.fill(p.numControlIn) { 0 },   // tokenInAndTree
         List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // fifoAndTree
-        List.fill(2) { 0 }, // andTreeTop
-        List.fill(p.numUDCs) { 0 }, // siblingAndTree
+        List.fill(p.numUDCs + 1) { 0 }, // siblingAndTree
         0,   // streamingMuxSelect
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
-        CrossbarBits.zeroes(ControlSwitchParams(3, p.numControlOut)) // tokenOutXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut)) // tokenOutXbar
+      )
+  }
+}
+
+case class PMUControlBoxBits(
+  writeFifoAndTree: List[Int],
+  readFifoAndTree: List[Int],
+  scalarSwapReadSelect: List[Int],
+  writeDoneXbar: CrossbarBits,
+  readDoneXbar: CrossbarBits,
+  swapWriteXbar: CrossbarBits,
+  tokenOutXbar: CrossbarBits
+) extends AbstractBits
+object PMUControlBoxBits {
+  def zeroes(p: PMUParams) = {
+    new PMUControlBoxBits(
+        List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // writeFifoAndTree
+        List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // readFifoAndTree
+        List.fill(p.numScalarIn) { 0 }, // scalarSwapReadSelect
+        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters + p.numControlIn, 1)),  // writeDoneXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters + p.numControlIn, 1)),  // readDoneXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut)) // tokenOutXbar
       )
   }
 }

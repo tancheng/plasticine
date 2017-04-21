@@ -125,6 +125,8 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val scalarValidOut = Vec(p.numScalarOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
   val vectorValidOut = Vec(p.numVectorOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
   val control = PCUControlBoxConfig(p)
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]
   }
@@ -138,6 +140,14 @@ object PCUConfig {
 case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
+  val control = PMUControlBoxConfig(p)
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
+  val scratchpad = ScratchpadConfig(p)
+  val wdataSelect = UInt(log2Up(p.numVectorIn).W)
+  val waddrSelect = UInt(log2Up(p.d).W)
+  val raddrSelect = UInt(log2Up(p.d).W)
+  val rdataEnable = Vec(p.numVectorOut, Bool())
 
   override def cloneType(): this.type = {
     new PMUConfig(p).asInstanceOf[this.type]
@@ -197,22 +207,71 @@ case class FIFOConfig(val d: Int, val v: Int) extends AbstractConfig {
 //}
 
 /**
+ * Scratchpad config register format
+ */
+case class ScratchpadConfig(val p: PMUParams) extends AbstractConfig {
+//  def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
+//
+//  var mode = if (config.isDefined) UInt(config.get.banking.mode, width=2) else UInt(width=2)
+//  var strideLog2 = if (config.isDefined) UInt(config.get.banking.strideLog2, width=log2Up(log2Up(d)-log2Up(v))) else UInt(width = log2Up(log2Up(d) - log2Up(v)))
+//  var bufSize = if (config.isDefined) {
+//    // Clamp bufSize value to be at least 1
+//    // If bufSize is 1, the Scratchpad is configured as a FIFO
+//    // The JSON specifies the "numBufs" field - this should be set to at least (d/v) to configure scratchpad as FIFO
+//    // It can be set to an outrageous number (say INT_MAX) to be safe
+//    if (config.get.numBufs == 0) {
+//      UInt(1, width=log2Up(d/v)+1)
+//    } else UInt(math.max(1, d / (v*config.get.numBufs)), width=log2Up(d/v)+1)
+//  } else UInt(width = log2Up(d/v))
+//
+//  val isReadFifo = if (config.isDefined) Bool(config.get.isReadFifo > 0) else Bool()
+//  val isWriteFifo = if (config.isDefined) Bool(config.get.isWriteFifo > 0) else Bool()
+  val mode = UInt(2.W)  // TODO: 2 ?
+  val strideLog2 = UInt((log2Up(log2Up(p.scratchpadSizeWords) - log2Up(p.v))).W)
+  val isReadFifo = Bool()
+  val isWriteFifo = Bool()
+  val bufSize = UInt(log2Up(p.scratchpadSizeWords/p.v).W)
+  val localWaddrMax = UInt((log2Up(p.scratchpadSizeWords/p.v)+1).W) // localWaddrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+  val localRaddrMax = UInt((log2Up(p.scratchpadSizeWords/p.v)+1).W) // if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+  val fifoSize = UInt((log2Up(p.scratchpadSizeWords)+1).W)
+//  val fifoSize = UInt((log2Up(p.d)+1).W)
+  override def cloneType(): this.type = new ScratchpadConfig(p).asInstanceOf[this.type]
+}
+
+/**
  * PCUControlBox config register format
  */
 case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
 
   val tokenInAndTree = Vec(p.numControlIn, Bool())
   val fifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
-  val andTreeTop = Vec(2, Bool())
-  val siblingAndTree = Vec(p.numUDCs, Bool())
+  val siblingAndTree = Vec(p.numUDCs + 1, Bool())
   val streamingMuxSelect = Bool()
   val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
-  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(3, p.numControlOut))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut))
 
   override def cloneType(): this.type = {
     new PCUControlBoxConfig(p).asInstanceOf[this.type]
+  }
+}
+
+/**
+ * PMUControlBox config register format
+ */
+case class PMUControlBoxConfig(val p: PMUParams) extends AbstractConfig {
+
+  val writeFifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
+  val readFifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
+  val scalarSwapReadSelect = Vec(p.numScalarIn, Bool())
+  val writeDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
+  val readDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut))
+
+  override def cloneType(): this.type = {
+    new PMUControlBoxConfig(p).asInstanceOf[this.type]
   }
 }
 
