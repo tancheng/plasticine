@@ -124,7 +124,6 @@ class BinaryCodegen() extends Traversal {
         genBinary(n.incrementXbar, cn.incrementXbar) ++
         toBinary(n.streamingMuxSelect, cn.streamingMuxSelect.getWidth) ++
         toBinary(n.siblingAndTree, cn.siblingAndTree.getWidth) ++
-        toBinary(n.andTreeTop, cn.andTreeTop.getWidth) ++
         toBinary(n.fifoAndTree, cn.fifoAndTree.getWidth) ++
         toBinary(n.tokenInAndTree, cn.tokenInAndTree.getWidth)
 

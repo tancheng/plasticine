@@ -68,7 +68,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
   val siblingAndTree = createAndTree(Vec(udCounters.map { _.io.gtz}), io.config.siblingAndTree)
   val tokenInAndTree = createAndTree(io.controlIn, io.config.tokenInAndTree)
   val fifoAndTree = createAndTree(io.fifoNotEmpty, io.config.fifoAndTree)
-  val andTreeTop = createAndTree(Vec(tokenInAndTree, fifoAndTree), io.config.andTreeTop)
+  val andTreeTop = tokenInAndTree & fifoAndTree
 
   val localEnable = Mux(io.config.streamingMuxSelect, andTreeTop, siblingAndTree)
   io.enable := localEnable

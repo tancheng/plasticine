@@ -97,7 +97,6 @@ class ConfigInitializer() extends Traversal {
         init(n.incrementXbar, cn.incrementXbar)
         cn.streamingMuxSelect := n.streamingMuxSelect.U
         cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
-        cn.andTreeTop.zip(n.andTreeTop) foreach { case (wire, value) => wire := value.U }
         cn.fifoAndTree.zip(n.fifoAndTree) foreach { case (wire, value) => wire := value.U }
         cn.tokenInAndTree.zip(n.tokenInAndTree) foreach { case (wire, value) => wire := value.U }
 

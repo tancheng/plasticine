@@ -323,7 +323,6 @@ object SwitchCUBits {
 case class PCUControlBoxBits(
   tokenInAndTree: List[Int],
   fifoAndTree: List[Int],
-  andTreeTop: List[Int],
   siblingAndTree: List[Int],
   streamingMuxSelect: Int,
   incrementXbar: CrossbarBits,
@@ -336,7 +335,6 @@ object PCUControlBoxBits {
     new PCUControlBoxBits(
         List.fill(p.numControlIn) { 0 },   // tokenInAndTree
         List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // fifoAndTree
-        List.fill(2) { 0 }, // andTreeTop
         List.fill(p.numUDCs) { 0 }, // siblingAndTree
         0,   // streamingMuxSelect
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
