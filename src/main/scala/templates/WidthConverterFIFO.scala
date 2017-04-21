@@ -3,6 +3,7 @@ package plasticine.templates
 import chisel3._
 import chisel3.util._
 import plasticine.config.FIFOConfig
+import scala.language.reflectiveCalls
 
 /**
  * WidthConverterFIFO: Convert a stream of width w1 bits to

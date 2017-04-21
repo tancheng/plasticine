@@ -9,6 +9,7 @@ import plasticine.templates.Utils.log2Up
 import plasticine.config.{CounterConfig, SrcValueBundle}
 import scala.collection.mutable.HashMap
 import scala.collection.immutable.Set
+import scala.language.reflectiveCalls
 
 /**
  * CounterCore: Counter with optional start and end delays

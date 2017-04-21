@@ -2,6 +2,7 @@ package plasticine.templates
 
 import chisel3._
 import chisel3.util._
+import scala.language.reflectiveCalls
 
 /**
  * Counter: 1-dimensional counter. Counts upto 'max', each time incrementing

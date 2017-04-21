@@ -3,6 +3,7 @@ package fringe
 import chisel3._
 import chisel3.util._
 import axi4._
+import scala.language.reflectiveCalls
 
 class MAGToAXI4Bridge(val addrWidth: Int, val dataWidth: Int) extends Module {
   val idBits = 5

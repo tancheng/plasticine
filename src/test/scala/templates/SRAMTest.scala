@@ -1,10 +1,11 @@
 // See LICENSE for license details.
 
 package plasticine.templates
-import plasticine.templates.CommonMain
+//import plasticine.templates.CommonMain
 
 import chisel3.core.Module
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
+import scala.language.reflectiveCalls
 
 class SRAMUnitTester(c: SRAM)(implicit args: Array[String]) extends ArgsTester(c) {
 

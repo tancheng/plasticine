@@ -3,6 +3,7 @@ import chisel3._
 import plasticine.spade._
 import plasticine.config._
 import plasticine.pisa.enums._
+import scala.language.reflectiveCalls
 
 /**
  * Compute Unit Control Module. Handles incoming tokens, done signals,

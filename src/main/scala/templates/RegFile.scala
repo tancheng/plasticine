@@ -3,6 +3,7 @@ package plasticine.templates
 import chisel3._
 import chisel3.util._
 import plasticine.templates.Utils.log2Up
+import scala.language.reflectiveCalls
 
 /**
  * Regfile: Regfile parameterized by width and height similar to SRAM

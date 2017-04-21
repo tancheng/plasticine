@@ -9,6 +9,7 @@ import plasticine.templates.Utils.log2Up
 
 import plasticine.spade._
 import plasticine.config.CrossbarConfig
+import scala.language.reflectiveCalls
 
 /**
  * Core logic inside a crossbar

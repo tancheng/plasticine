@@ -8,6 +8,7 @@ import fringe._
 import plasticine.templates.Utils.log2Up
 import plasticine.templates.Utils.delay
 import plasticine.config.{FIFOConfig, CounterChainConfig}
+import scala.language.reflectiveCalls
 
 class MAGCore(
   val w: Int,

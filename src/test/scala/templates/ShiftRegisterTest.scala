@@ -9,6 +9,7 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import plasticine.arch._
 import plasticine.pisa.ir._
 import scala.reflect.runtime.universe._
+import scala.language.reflectiveCalls
 
 /**
  * ShiftRegister test harness

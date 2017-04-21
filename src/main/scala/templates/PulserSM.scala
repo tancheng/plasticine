@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import chisel3._
+import scala.language.reflectiveCalls
 
 /**
  * PulserSM: Hold a signal high for a few (configured) number of cycles

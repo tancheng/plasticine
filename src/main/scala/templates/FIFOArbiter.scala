@@ -5,6 +5,7 @@ import chisel3.util._
 import plasticine.templates.Utils.log2Up
 import plasticine.config.{FIFOConfig}
 
+import scala.language.reflectiveCalls
 
 class FIFOArbiter(
   val w: Int,

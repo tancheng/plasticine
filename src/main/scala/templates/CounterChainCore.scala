@@ -4,6 +4,7 @@ import chisel3._
 
 import scala.collection.mutable.HashMap
 import plasticine.config.{CounterConfig, CounterChainConfig}
+import scala.language.reflectiveCalls
 
 class CounterChainCore(
   val w: Int,

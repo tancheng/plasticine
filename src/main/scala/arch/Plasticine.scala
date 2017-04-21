@@ -15,6 +15,7 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.Set
 import scala.collection.mutable.ListBuffer
 import java.io.PrintWriter
+import scala.language.reflectiveCalls
 
 case class PlasticineIO(f: FringeParams) extends Bundle {
   // Scalar IO

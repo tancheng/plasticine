@@ -2,6 +2,7 @@ package plasticine.templates
 
 import chisel3._
 
+import scala.language.reflectiveCalls
 /**
  * FF: Flip-flop with the ability to set enable and init
  * value as IO

@@ -2,6 +2,7 @@ package plasticine.templates
 
 import chisel3._
 import chisel3.util._
+import scala.language.reflectiveCalls
 
 class ShiftRegister[T<:Data](val t: T) extends Module {
   val io = IO(new Bundle {

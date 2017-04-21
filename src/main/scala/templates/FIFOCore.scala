@@ -6,6 +6,7 @@ import plasticine.templates.Utils.log2Up
 
 import plasticine.pisa.enums._
 import plasticine.config.{FIFOConfig, CounterChainConfig}
+import scala.language.reflectiveCalls
 
 abstract class FIFOBase(val w: Int, val d: Int, val v: Int) extends Module {
   val io = IO(new Bundle {

@@ -4,6 +4,7 @@ package plasticine.templates
 
 import chisel3.core._
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
+import scala.language.reflectiveCalls
 
 /**
  * FF test harness

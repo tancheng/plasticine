@@ -7,7 +7,7 @@ import fringe._
 import plasticine.templates.Utils.log2Up
 import plasticine.spade._
 import plasticine.pisa.ir._
-
+import scala.language.reflectiveCalls
 
 class VerilatorInterface(p: TopParams) extends Bundle {
   // Host scalar interface

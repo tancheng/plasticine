@@ -14,6 +14,7 @@ import fringe._
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Set
 import scala.collection.mutable.ListBuffer
+import scala.language.reflectiveCalls
 import java.io.PrintWriter
 
 class PCUWrapper(val p: PCUParams) extends Module {

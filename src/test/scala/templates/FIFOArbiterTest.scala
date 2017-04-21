@@ -1,7 +1,7 @@
 // See LICENSE for license details.
 
 package plasticine.templates
-import plasticine.templates.CommonMain
+//import plasticine.templates.CommonMain
 
 import chisel3._
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
@@ -9,6 +9,7 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.Queue
 import scala.collection.mutable.HashMap
+import scala.language.reflectiveCalls
 
 /**
  * FIFOArbiter test harness

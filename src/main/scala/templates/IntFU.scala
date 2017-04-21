@@ -8,6 +8,7 @@ import plasticine.templates.Utils.log2Up
 
 import scala.collection.immutable.Map
 import plasticine.pisa.enums._
+import scala.language.reflectiveCalls
 
 /**
  * Integer Functional Unit module. Represents the basic workhorse

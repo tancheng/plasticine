@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import chisel3._
+import scala.language.reflectiveCalls
 
 /**
  * UpDownCtr: 1-dimensional counter. Counts upto 'max', each time incrementing

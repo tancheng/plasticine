@@ -1,11 +1,12 @@
 // See LICENSE for license details.
 
 package plasticine.templates
-import plasticine.templates.CommonMain
+//import plasticine.templates.CommonMain
 
 import chisel3.core.Module
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import scala.collection.mutable.Queue
+import scala.language.reflectiveCalls
 
 class FIFOCoreUnitTester(c: FIFOCore)(implicit args: Array[String]) extends ArgsTester(c) {
 

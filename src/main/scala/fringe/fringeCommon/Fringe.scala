@@ -6,6 +6,7 @@ import plasticine.templates.Utils.log2Up
 import plasticine.templates.RegFile
 import plasticine.templates.Depulser
 import plasticine.templates.MAGCore
+import scala.language.reflectiveCalls
 
 /**
  * Fringe: Top module for FPGA shell
