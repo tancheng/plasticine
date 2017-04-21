@@ -23,7 +23,9 @@ trait CUParams extends Params {
   val d: Int = 8
   val r: Int = 16
   val numScalarIn: Int = 4
+  val numEffectiveScalarIn: Int = 2
   val numScalarOut: Int = 4
+  val numEffectiveScalarOut: Int = 2
   val numVectorIn: Int = 4
   val numVectorOut: Int = 4
   val numControlIn: Int = 8

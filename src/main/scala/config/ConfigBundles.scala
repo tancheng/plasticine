@@ -125,6 +125,8 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val scalarValidOut = Vec(p.numScalarOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
   val vectorValidOut = Vec(p.numVectorOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
   val control = PCUControlBoxConfig(p)
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]
   }

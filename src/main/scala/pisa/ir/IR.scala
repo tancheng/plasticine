@@ -272,7 +272,9 @@ case class PCUBits(
   counterChain: CounterChainBits,
   scalarValidOut: Array[SrcValueTuple],
   vectorValidOut: Array[SrcValueTuple],
-  control: PCUControlBoxBits
+  control: PCUControlBoxBits,
+  scalarInXbar: CrossbarBits,
+  scalarOutXbar: CrossbarBits
 ) extends CUBits
 object PCUBits {
   def zeroes(p: PCUParams) = {
@@ -281,7 +283,9 @@ object PCUBits {
       CounterChainBits.zeroes(p.w, p.numCounters),
       Array.fill(p.numScalarOut) { SrcValueTuple.zeroes(p.w) },
       Array.fill(p.numVectorOut) { SrcValueTuple.zeroes(p.w) },
-      PCUControlBoxBits.zeroes(p)
+      PCUControlBoxBits.zeroes(p),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
     )
   }
 }

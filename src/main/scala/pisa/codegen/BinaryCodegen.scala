@@ -76,6 +76,8 @@ class BinaryCodegen() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         toBinary(n.outSelect, cn.outSelect.getWidth)
       case (n: PCUBits, cn: PCUConfig)                    =>
+        val scalarOutXbarBits = genBinary(n.scalarOutXbar, cn.scalarOutXbar)
+        val scalarInXbarBits = genBinary(n.scalarInXbar, cn.scalarInXbar)
         val controlBits = genBinary(n.control, cn.control)
         val vecValidBits = List.tabulate(cn.vectorValidOut.size) { i => genBinary(n.vectorValidOut(i), cn.vectorValidOut(i)) }.flatten
         val scalarValidBits = List.tabulate(cn.scalarValidOut.size) { i => genBinary(n.scalarValidOut(i), cn.scalarValidOut(i)) }.flatten
@@ -85,7 +87,7 @@ class BinaryCodegen() extends Traversal {
         }.flatten
         println(s"[PCUBits] counterBits = $counterBits")
         println(s"[PCUBits] stageBits = $stageBits")
-        controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
+        scalarOutXbarBits ++ scalarInXbarBits ++ controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
         genBinary(n.counterChain, cn.counterChain) ++
         List.tabulate(cn.stages.size) { i =>
