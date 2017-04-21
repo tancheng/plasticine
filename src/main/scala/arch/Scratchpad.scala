@@ -1,10 +1,15 @@
-//package plasticine.templates
-//
-//import Chisel._
-//import plasticine.pisa.parser.Parser
-//import plasticine.pisa.ir._
-//import scala.collection.mutable.ListBuffer
-//
+package plasticine.templates
+
+import chisel3._
+import chisel3.util._
+import plasticine.pisa.ir._
+import plasticine.pisa.enums._
+import plasticine.config._
+import plasticine.spade._
+import scala.collection.mutable.ListBuffer
+//import plasticine.config.ScratchpadConfig
+import plasticine.templates.Utils.log2Up
+
 ///**
 // * Scratchpad config register format
 // * @param d: Number of words in memory
@@ -31,66 +36,231 @@
 //    new ScratchpadOpcode(d, v, config).asInstanceOf[this.type]
 //  }
 //}
-//
-//
-///**
-// * Scratchpad Address decoder: For an input address,
-// * instantiate decode logic which outputs a bank address
-// * and local address
-// */
-//class AddrDecoder(val d: Int, val v: Int) extends Module {
-//  val addrWidth = log2Up(d)
-//  val bankAddrWidth = log2Up(v)
-//  val localAddrWidth = log2Up(d/v)
-//  val strideLog2Width = log2Up(log2Up(d) - log2Up(v))
-//  val io = new Bundle {
-//    val addr = UInt(INPUT, width = addrWidth)
-//    val strideLog2 = UInt(INPUT, width = strideLog2Width)
-//    val bankAddr = UInt(OUTPUT, width = bankAddrWidth)
-//    val localAddr = UInt(OUTPUT, width = localAddrWidth)
-//  }
-//
-//  implicit def uintToVec(x: UInt, width: Int): Vec[UInt] = {
-//    Vec.tabulate(width) { i => UInt(x(i), width=1) }
-//  }
-//
-//  implicit def vecToUInt(x: Vec[UInt]): UInt = {
-//    x.reduce{ Cat(_,_) }
-//  }
-//
-//  def getBankAddrIndices(l: Vec[UInt], size: Int) = {
-//    List.tabulate(l.size-size+1) { i => List.tabulate(size) { j => i + j } }
-//  }
-//
-//
-//  def getLocalAddrSlices(l: Vec[UInt], size: Int): Vec[UInt] = {
-//    Vec(getBankAddrIndices(l, size).map { idxs => vecToUInt(Vec(l.zipWithIndex.filterNot { i => idxs.contains(i._2) }.map { _._1 }.reverse)) }.reverse )
-//  }
-//
-//  def getBankAddrSlices(l: Vec[UInt], size: Int): Vec[UInt] = {
-//    Vec(getBankAddrIndices(l, size).map { idxs => vecToUInt(Vec(l.zipWithIndex.filter { i => idxs.contains(i._2) }.map { _._1 }.reverse)) })
-//  }
-//
-//  def getBankAddr(addr: UInt) = {
-//    val bankAddrSlices = getBankAddrSlices(uintToVec(addr, addrWidth), bankAddrWidth)
-//    val bankAddrMux = Module(new MuxN(bankAddrSlices.size, bankAddrWidth))
-//    bankAddrMux.io.ins := bankAddrSlices
-//    bankAddrMux.io.sel := io.strideLog2
-//    bankAddrMux.io.out
-//  }
-//
-//  def getLocalAddr(addr: UInt) = {
-//    val localAddrSlices = getLocalAddrSlices(uintToVec(addr, addrWidth), bankAddrWidth)
-//    val localAddrMux = Module(new MuxN(localAddrSlices.size, localAddrWidth))
-//    localAddrMux.io.ins := localAddrSlices.reverse
-//    localAddrMux.io.sel := io.strideLog2
-//    localAddrMux.io.out
-//  }
-//
-//  io.bankAddr := getBankAddr(io.addr)
-//  io.localAddr := getLocalAddr(io.addr)
-//}
-//
+
+/**
+ * Scratchpad Address decoder: For an input address,
+ * instantiate decode logic which outputs a bank address
+ * and local address
+ */
+class AddrDecoder(val d: Int, val v: Int) extends Module {
+  val addrWidth = log2Up(d)
+  val bankAddrWidth = log2Up(v)
+  val localAddrWidth = log2Up(d/v)
+  val strideLog2Width = log2Up(log2Up(d) - log2Up(v))
+  val io = IO(new Bundle {
+    val addr = Input(UInt(addrWidth.W))
+    val strideLog2 = Input(UInt(strideLog2Width.W))
+    val bankAddr = Output(UInt(bankAddrWidth.W))
+    val localAddr = Output(UInt(localAddrWidth.W))
+  })
+
+  implicit def uintToVec(x: UInt, width: Int) = {
+    Vec(List.tabulate(width) { i => x(i).asUInt})
+  }
+
+  implicit def vecToUInt(x: Vec[UInt]): UInt = {
+    x.reduce{ Cat(_,_) }
+  }
+
+  def getBankAddrIndices(l: Vec[UInt], size: Int) = {
+    List.tabulate(l.size-size+1) { i => List.tabulate(size) { j => i + j } }
+  }
+
+
+  def getLocalAddrSlices(l: Vec[UInt], size: Int): Vec[UInt] = {
+    Vec(getBankAddrIndices(l, size).map { idxs => vecToUInt(Vec(l.zipWithIndex.filterNot { i => idxs.contains(i._2) }.map { _._1 }.reverse)) }.reverse )
+  }
+
+  def getBankAddrSlices(l: Vec[UInt], size: Int): Vec[UInt] = {
+    Vec(getBankAddrIndices(l, size).map { idxs => vecToUInt(Vec(l.zipWithIndex.filter { i => idxs.contains(i._2) }.map { _._1 }.reverse)) })
+  }
+
+  def getBankAddr(addr: UInt) = {
+    val bankAddrSlices = getBankAddrSlices(uintToVec(addr, addrWidth), bankAddrWidth)
+    val bankAddrMux = Module(new MuxN(UInt(bankAddrSlices.size.W), bankAddrWidth))
+    bankAddrMux.io.ins := bankAddrSlices
+    bankAddrMux.io.sel := io.strideLog2
+    bankAddrMux.io.out
+  }
+
+  def getLocalAddr(addr: UInt) = {
+    val localAddrSlices = getLocalAddrSlices(uintToVec(addr, addrWidth), bankAddrWidth)
+    val localAddrMux = Module(new MuxN(UInt(localAddrSlices.size.W), localAddrWidth))
+    localAddrMux.io.ins := localAddrSlices.reverse
+    localAddrMux.io.sel := io.strideLog2
+    localAddrMux.io.out
+  }
+
+  io.bankAddr := getBankAddr(io.addr)
+  io.localAddr := getLocalAddr(io.addr)
+}
+
+/**
+ * Scratchpad memory that supports various banking modes
+ * and double buffering
+ * @param w: Word width in bits
+ * @param d: Total memory size
+ * @param v: Vector width
+ */
+class Scratchpad(val p: PMUParams) extends Module {
+  val addrWidth = log2Up(p.d)
+  // Check for sizes and v
+  val io = IO(new Bundle {
+    val config_enable = Input(Bool())
+    val raddr = Input(Vec(p.v, UInt(addrWidth.W)))
+    val wen = Input(Bool())
+    val waddr = Input(Vec(p.v, UInt(addrWidth.W)))
+    val wdata = Input(Vec(p.v, UInt(p.w.W)))
+    val rdata = Output(Vec(p.v, UInt(p.w.W)))
+    val rdone = Input(Bool())
+    val wdone = Input(Bool())
+    val enqEn = Input(Bool())
+    val deqEn  = Input(Bool())
+    val empty = Output(Bool())
+    val full = Output(Bool())
+    val config = Input(ScratchpadConfig(p))
+  })
+
+  // Check for sizes and v
+  Predef.assert(p.d%p.v == 0, s"Unsupported scratchpad size (${p.d})/banking(${p.v}) combination; ${p.d} must be a multiple of ${p.v}")
+  Predef.assert(isPow2(p.v), s"Unsupported banking number ${p.v}; must be a power-of-2")
+  Predef.assert(isPow2(p.d), s"Unsupported scratchpad size ${p.d}; must be a power-of-2")
+
+  // Create 'v' individual SRAM banks
+  val bankSize = p.d/p.v
+  val mems = List.fill(p.v) { Module(new SRAM(p.w, bankSize)) }
+
+  // Create size register
+//  val isFifo = config.bufSize === UInt(1)
+
+  // NOTE: Size output only makes sense of both sides (read and write)
+  // are FIFOs. Size UDC is controlled by the enqEn and deqEn signals,
+  // which are active only when configured as FIFOs. Size is not correct
+  // when one side is a FIFO
+  val sizeUDC = Module(new UpDownCtr(log2Up(p.d)+1))
+  val size = sizeUDC.io.out
+  val empty = size === UInt(0)
+  val full = sizeUDC.io.isMax
+  sizeUDC.io.initval := UInt(0)
+//  sizeUDC.io.max := (if (inst.numBufs == 0) UInt(d) else UInt(d - v * (bankSize % inst.numBufs)))
+  sizeUDC.io.max := io.config.fifoSize
+  sizeUDC.io.init := UInt(0)
+//  sizeUDC.io.strideInc := Mux(config.chainWrite, UInt(1), UInt(v))
+  sizeUDC.io.strideInc := p.v.U
+//  sizeUDC.io.strideDec := Mux(config.chainRead, UInt(1), UInt(v))
+  sizeUDC.io.strideDec := p.v.U
+
+  val writeEn = io.enqEn & ~full
+  val readEn = io.deqEn & ~empty
+  sizeUDC.io.inc := writeEn
+  sizeUDC.io.dec := readEn
+
+  val wptrConfig = Wire(new CounterChainConfig(log2Up(bankSize+1), 2, 0, 0))
+  wptrConfig.chain(0) := 0.U
+  (0 until 2) foreach { i => i match {
+      case 1 => // Localaddr: max = bankSize, stride = 1
+        val cfg = wptrConfig.counters(i)
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := io.config.localWaddrMax // localWaddrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+      case 0 => // Bankaddr: max = v, stride = 1
+        val cfg = wptrConfig.counters(i)
+        cfg.max.value := p.v.U
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+  }}
+  val wptr = Module(new CounterChainCore(log2Up(bankSize+1), 0, 0))
+  wptr.io.config := wptrConfig
+  wptr.io.enable(0) := 0.U // writeEn & config.chainWrite
+  wptr.io.enable(1) := writeEn
+  wptr.io.stride(1) := io.config.bufSize
+  val tailLocalAddr = wptr.io.out(1)
+  val tailBankAddr = wptr.io.out(0)
+
+  val rptrConfig = Wire(new CounterChainConfig(log2Up(bankSize+1), 2, 0, 0))
+  rptrConfig.chain(0) := 0.U
+  (0 until 2) foreach { i => i match {
+      case 1 => // Localaddr: max = bankSize, stride = 1
+        val cfg = rptrConfig.counters(i)
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := io.config.localRaddrMax  // if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+      case 0 => // Bankaddr: max = v, stride = 1
+        val cfg = rptrConfig.counters(i)
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := p.v.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+    }}
+
+  // Create rptr (head) counter chain
+  val rptr = Module(new CounterChainCore(log2Up(bankSize+1), 0, 0))
+  rptr.io.config := rptrConfig
+  rptr.io.enable(0) := 0.U // readEn & config.chainRead
+  rptr.io.enable(1) := readEn
+  rptr.io.stride(1) := io.config.bufSize
+  val headLocalAddr = rptr.io.out(1)
+//  val nextHeadLocalAddr = Mux(config.chainRead, Mux(rptr.io.control(0).done, rptr.io.data(1).next, rptr.io.data(1).out), rptr.io.data(1).next)
+  val nextHeadLocalAddr = rptr.io.next(1)
+  val headBankAddr = rptr.io.out(0)
+  val nextHeadBankAddr = rptr.io.next(0)
+
+  // Read address generator
+  val raddrGen = Module(new Counter(log2Up(p.d+1)))
+  raddrGen.io.max := io.config.fifoSize(io.config.fifoSize.getWidth-1, log2Up(p.v)) // Mux if non-parallel FIFO
+  raddrGen.io.stride := 1.U
+  raddrGen.io.enable := readEn
+  raddrGen.io.reset := io.rdone
+  raddrGen.io.saturate := false.B
+  val generatedRaddr = raddrGen.io.out
+  val generatedRaddrNext = raddrGen.io.next
+
+  // Write address generator
+  val waddrGen = Module(new Counter(log2Up(p.d+1)))
+  waddrGen.io.max := io.config.fifoSize(io.config.fifoSize.getWidth-1, log2Up(p.v)) // Mux if non-parallel FIFO
+  waddrGen.io.stride := 1.U
+  waddrGen.io.enable := readEn
+  waddrGen.io.reset := io.rdone
+  waddrGen.io.saturate := false.B
+  val generatedWaddr = waddrGen.io.out
+
+  io.empty := empty
+  io.full := full
+
+  // Address decoding logic
+  mems.zipWithIndex.foreach { case (m,i) =>
+    // Get the lane raddr and waddr
+    val laneRaddr = io.raddr(i)
+    val laneWaddr = io.waddr(i)
+
+    // Read address
+    val raddrDecoder = Module(new AddrDecoder(p.d, p.v))
+    raddrDecoder.io.addr := laneRaddr
+    raddrDecoder.io.strideLog2 := io.config.strideLog2
+    val localRaddr = raddrDecoder.io.localAddr
+    m.io.raddr := Mux(io.config.isReadFifo, Mux(readEn, generatedRaddrNext, generatedRaddr) + headLocalAddr, localRaddr + headLocalAddr)
+
+    // Write address
+    val waddrDecoder = Module(new AddrDecoder(p.d, p.v))
+    waddrDecoder.io.addr := laneWaddr
+    waddrDecoder.io.strideLog2 := io.config.strideLog2
+    val localWaddr = waddrDecoder.io.localAddr
+    m.io.waddr := Mux(io.config.isWriteFifo, generatedWaddr + tailLocalAddr, localWaddr + tailLocalAddr)
+
+    // Write data
+    m.io.wdata := io.wdata(i)
+
+    // Write enable
+    m.io.wen := io.wen | io.wdone // wdone becomes the 'enable' in FIFO mode
+
+    // Read data
+    io.rdata(i) := m.io.rdata
+  }
+}
+
 //class AddrDecoderReg(val d: Int, val v: Int) extends Module {
 //  val addrWidth = log2Up(d)
 //  val bankAddrWidth = log2Up(v)
@@ -126,170 +296,6 @@
 //  localAddrReg.io.control.enable := Bool(true)
 //  localAddrReg.io.data.in := decoder.io.localAddr
 //  io.localAddr := localAddrReg.io.data.out
-//}
-//
-///**
-// * Scratchpad memory that supports various banking modes
-// * and double buffering
-// * @param w: Word width in bits
-// * @param d: Total memory size
-// * @param v: Vector width
-// */
-//class Scratchpad(val w: Int, val d: Int, val v: Int, val inst: ScratchpadConfig) extends ConfigurableModule[ScratchpadOpcode] {
-//  val addrWidth = log2Up(d)
-//  val io = new ConfigInterface {
-//    val config_enable = Bool(INPUT)
-//    val raddr = Vec.fill(v) { UInt(INPUT, width = addrWidth) }
-//    val wen = Bool(INPUT)
-//    val waddr = Vec.fill(v) { UInt(INPUT, width = addrWidth) }
-//    val wdata = Vec.fill(v) { Bits(INPUT, width = w) }
-//    val rdata = Vec.fill(v) { Bits(OUTPUT, width = w) }
-//    val rdone = Bool(INPUT)
-//    val wdone = Bool(INPUT)
-//    val enqEn = Bool(INPUT)
-//    val deqEn  = Bool(INPUT)
-//    val empty = Bool(OUTPUT)
-//    val full = Bool(OUTPUT)
-//  }
-//
-//  val configType = ScratchpadOpcode(d, v)
-//  val configIn = ScratchpadOpcode(d, v)
-//  val configInit = ScratchpadOpcode(d, v, Some(inst))
-//  val config = Reg(configType, configIn, configInit)
-//  when (io.config_enable) {
-//    configIn := configType.cloneType().fromBits(Fill(configType.getWidth, io.config_data))
-//  } .otherwise {
-//    configIn := config
-//  }
-//
-//  // Check for sizes and v
-//  Predef.assert(d%v == 0, s"Unsupported scratchpad size ($d)/banking($v) combination; $d must be a multiple of $v")
-//  Predef.assert(isPow2(v), s"Unsupported banking number $v; must be a power-of-2")
-//  Predef.assert(isPow2(d), s"Unsupported scratchpad size $d; must be a power-of-2")
-//
-//  // Create 'v' individual SRAM banks
-//  val bankSize = d/v
-//  val mems = List.fill(v) { Module(new SRAM(w, bankSize)) }
-//
-//  // Create size register
-////  val isFifo = config.bufSize === UInt(1)
-//
-//  // NOTE: Size output only makes sense of both sides (read and write)
-//  // are FIFOs. Size UDC is controlled by the enqEn and deqEn signals,
-//  // which are active only when configured as FIFOs. Size is not correct
-//  // when one side is a FIFO
-//  val sizeUDC = Module(new UpDownCtr(log2Up(d)+1))
-//  val size = sizeUDC.io.out
-//  val empty = size === UInt(0)
-//  val full = sizeUDC.io.isMax
-//  sizeUDC.io.initval := UInt(0)
-////  sizeUDC.io.max := (if (inst.numBufs == 0) UInt(d) else UInt(d - v * (bankSize % inst.numBufs)))
-//  sizeUDC.io.max := config.fifoSize
-//  sizeUDC.io.init := UInt(0)
-////  sizeUDC.io.strideInc := Mux(config.chainWrite, UInt(1), UInt(v))
-//  sizeUDC.io.strideInc := UInt(v)
-////  sizeUDC.io.strideDec := Mux(config.chainRead, UInt(1), UInt(v))
-//  sizeUDC.io.strideDec := UInt(v)
-//
-//  val writeEn = io.enqEn & ~full
-//  val readEn = io.deqEn & ~empty
-//  sizeUDC.io.inc := writeEn
-//  sizeUDC.io.dec := readEn
-//
-//
-//  // Create wptr (tail) counter chain
-//  val writePtrConfig = CounterChainConfig(
-//      List(0), //  List(inst.chainWrite),
-//      List.tabulate(2) { i => i match {
-//        case 1 => // Localaddr: max = bankSize, stride = 1
-//          val ctrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
-//          CounterRCConfig(ctrMax, 1, 1, 0, 0, 0)
-//        case 0 => // Bankaddr: max = v, stride = 1
-//          CounterRCConfig(v, 1, 1, 1, 0, 0)
-//      }}
-//    )
-//
-//  val readPtrConfig = CounterChainConfig(
-//      List(0), // List(inst.chainRead),
-//      List.tabulate(2) { i => i match {
-//        case 1 => // Localaddr: max = bankSize, stride = 1
-//          val ctrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
-//          CounterRCConfig(ctrMax, 1, 1, 0, 0, 0)
-//        case 0 => // Bankaddr: max = v, stride = 1
-//          CounterRCConfig(v, 1, 1, 1, 0, 0)
-//      }}
-//    )
-//
-//  // Create wptr and rptr
-//  val wptr = Module(new CounterChain(log2Up(bankSize+1), 0, 0, 2, writePtrConfig, true))
-//  wptr.io.control(0).enable := UInt(0) // writeEn & config.chainWrite
-//  wptr.io.control(1).enable := writeEn
-//  wptr.io.data(1).stride := config.bufSize
-//  val tailLocalAddr = wptr.io.data(1).out
-//  val tailBankAddr = wptr.io.data(0).out
-//
-//  // Create rptr (head) counter chain
-//  val rptr = Module(new CounterChain(log2Up(bankSize+1), 0, 0, 2, readPtrConfig, true))
-//  rptr.io.control(0).enable := UInt(0) // readEn & config.chainRead
-//  rptr.io.control(1).enable := readEn
-//  rptr.io.data(1).stride := config.bufSize
-//  val headLocalAddr = rptr.io.data(1).out
-////  val nextHeadLocalAddr = Mux(config.chainRead, Mux(rptr.io.control(0).done, rptr.io.data(1).next, rptr.io.data(1).out), rptr.io.data(1).next)
-//  val nextHeadLocalAddr = rptr.io.data(1).next
-//  val headBankAddr = rptr.io.data(0).out
-//  val nextHeadBankAddr = rptr.io.data(0).next
-//
-//  // Read address generator
-//  val raddrGen = Module(new Counter(log2Up(d+1)))
-//  raddrGen.io.data.max := config.fifoSize(config.fifoSize.getWidth-1, log2Up(v)) // Mux if non-parallel FIFO
-//  raddrGen.io.data.stride := UInt(1)
-//  raddrGen.io.control.enable := readEn
-//  raddrGen.io.control.reset := io.rdone
-//  raddrGen.io.control.saturate := Bool(false)
-//  val generatedRaddr = raddrGen.io.data.out
-//  val generatedRaddrNext = raddrGen.io.data.next
-//
-//  // Write address generator
-//  val waddrGen = Module(new Counter(log2Up(d+1)))
-//  waddrGen.io.data.max := config.fifoSize(config.fifoSize.getWidth-1, log2Up(v)) // Mux if non-parallel FIFO
-//  waddrGen.io.data.stride := UInt(1)
-//  waddrGen.io.control.enable := readEn
-//  waddrGen.io.control.reset := io.rdone
-//  waddrGen.io.control.saturate := Bool(false)
-//  val generatedWaddr = waddrGen.io.data.out
-//
-//  io.empty := empty
-//  io.full := full
-//
-//  // Address decoding logic
-//  mems.zipWithIndex.foreach { case (m,i) =>
-//    // Get the lane raddr and waddr
-//    val laneRaddr = io.raddr(i)
-//    val laneWaddr = io.waddr(i)
-//
-//    // Read address
-//    val raddrDecoder = Module(new AddrDecoder(d, v))
-//    raddrDecoder.io.addr := laneRaddr
-//    raddrDecoder.io.strideLog2 := config.strideLog2
-//    val localRaddr = raddrDecoder.io.localAddr
-//    m.io.raddr := Mux(config.isReadFifo, Mux(readEn, generatedRaddrNext, generatedRaddr) + headLocalAddr, localRaddr + headLocalAddr)
-//
-//    // Write address
-//    val waddrDecoder = Module(new AddrDecoder(d, v))
-//    waddrDecoder.io.addr := laneWaddr
-//    waddrDecoder.io.strideLog2 := config.strideLog2
-//    val localWaddr = waddrDecoder.io.localAddr
-//    m.io.waddr := Mux(config.isWriteFifo, generatedWaddr + tailLocalAddr, localWaddr + tailLocalAddr)
-//
-//    // Write data
-//    m.io.wdata := io.wdata(i)
-//
-//    // Write enable
-//    m.io.wen := io.wen | io.wdone // wdone becomes the 'enable' in FIFO mode
-//
-//    // Read data
-//    io.rdata(i) := m.io.rdata
-//  }
 //}
 //
 //class DummyReader(w: Int, v: Int) extends Module {

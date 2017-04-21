@@ -5,6 +5,7 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.pisa.Traversal
 import plasticine.templates.Opcodes
+import plasticine.templates.Utils.log2Up
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable.Set
@@ -18,6 +19,7 @@ class BinaryCodegen() extends Traversal {
       case n: CrossbarBits    => Predef.assert(cnode.isInstanceOf[CrossbarConfig])
       case n: PCUBits         => Predef.assert(cnode.isInstanceOf[PCUConfig])
       case n: PMUBits         => Predef.assert(cnode.isInstanceOf[PMUConfig])
+      case n: ScratchpadBits         => Predef.assert(cnode.isInstanceOf[ScratchpadConfig])
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
@@ -101,6 +103,17 @@ class BinaryCodegen() extends Traversal {
       println(s"[PipeStageBits] $valueBin")
       valueBin
 //      valueBin ++ toBinary(0, cn.opA.src.getWidth)
+
+      case (n: ScratchpadBits, cn: ScratchpadConfig)        =>
+        val bankSize= cn.p.d / cn.p.v
+        toBinary(n.fifoSize, cn.fifoSize.getWidth) ++
+        toBinary((if (n.numBufs == 0) 0 else (bankSize - (bankSize % n.numBufs))), cn.localRaddrMax.getWidth) ++
+        toBinary((if (n.numBufs == 0) 0 else (bankSize - (bankSize % n.numBufs))), cn.localWaddrMax.getWidth) ++
+        toBinary((if (n.numBufs == 0) 1 else (math.max(1, cn.p.d / (cn.p.v*n.numBufs)))), cn.bufSize.getWidth) ++
+        toBinary(n.isWriteFifo, cn.isWriteFifo.getWidth) ++
+        toBinary(n.isReadFifo, cn.isReadFifo.getWidth) ++
+        toBinary((if (n.stride == 1) 0 else log2Up(n.stride)), cn.strideLog2.getWidth) ++
+        toBinary(n.mode, cn.mode.getWidth)
 
       case (n: PCUControlBoxBits, cn: PCUControlBoxConfig)      =>
         genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++

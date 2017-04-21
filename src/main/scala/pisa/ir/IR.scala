@@ -201,6 +201,20 @@ object PipeStageBits {
   }
 }
 
+case class ScratchpadBits(
+  mode: Int = 0,
+  stride: Int = 0,
+  numBufs: Int = 0,
+  isReadFifo: Int = 0,
+  isWriteFifo: Int = 0,
+  fifoSize: Int = 0
+) extends AbstractBits
+object ScratchpadBits {
+  def zeroes = {
+    new ScratchpadBits()
+  }
+}
+
 //case class BankingBits(mode: Int = 0, strideLog2: Int = 0) extends AbstractBits
 //
 //case class ScratchpadBits(

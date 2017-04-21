@@ -5,6 +5,7 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.pisa.Traversal
 import plasticine.templates.Opcodes
+import plasticine.templates.Utils.log2Up
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable.Set
@@ -20,6 +21,7 @@ class ConfigInitializer() extends Traversal {
       case n: CrossbarBits    => Predef.assert(cnode.isInstanceOf[CrossbarConfig])
       case n: PCUBits         => Predef.assert(cnode.isInstanceOf[PCUConfig])
       case n: PMUBits         => Predef.assert(cnode.isInstanceOf[PMUConfig])
+      case n: ScratchpadBits         => Predef.assert(cnode.isInstanceOf[ScratchpadConfig])
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
@@ -74,6 +76,17 @@ class ConfigInitializer() extends Traversal {
         init(n.opC, cn.opC)
         init(n.opB, cn.opB)
         init(n.opA, cn.opA)
+
+      case (n: ScratchpadBits, cn: ScratchpadConfig)        =>
+        val bankSize= cn.p.d / cn.p.v
+        cn.fifoSize := n.fifoSize.U
+        cn.localRaddrMax := (if (n.numBufs == 0) 0.U else (bankSize - (bankSize % n.numBufs)).U)
+        cn.localWaddrMax := (if (n.numBufs == 0) 0.U else (bankSize - (bankSize % n.numBufs)).U)
+        cn.bufSize := (if (n.numBufs == 0) 1.U else (math.max(1, cn.p.d / (cn.p.v*n.numBufs))).U)
+        cn.isWriteFifo := (n.isWriteFifo > 0).B
+        cn.isReadFifo := (n.isReadFifo > 0).B
+        cn.strideLog2 := (if (n.stride == 1) 0.U else log2Up(n.stride).U)
+        cn.mode := n.mode.U
 
       case (n: PCUControlBoxBits, cn: PCUControlBoxConfig)      =>
         init(n.tokenOutXbar, cn.tokenOutXbar)

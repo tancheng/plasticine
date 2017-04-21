@@ -197,6 +197,38 @@ case class FIFOConfig(val d: Int, val v: Int) extends AbstractConfig {
 //}
 
 /**
+ * Scratchpad config register format
+ */
+case class ScratchpadConfig(val p: PMUParams) extends AbstractConfig {
+//  def roundUpDivide(num: Int, divisor: Int) = (num + divisor - 1) / divisor
+//
+//  var mode = if (config.isDefined) UInt(config.get.banking.mode, width=2) else UInt(width=2)
+//  var strideLog2 = if (config.isDefined) UInt(config.get.banking.strideLog2, width=log2Up(log2Up(d)-log2Up(v))) else UInt(width = log2Up(log2Up(d) - log2Up(v)))
+//  var bufSize = if (config.isDefined) {
+//    // Clamp bufSize value to be at least 1
+//    // If bufSize is 1, the Scratchpad is configured as a FIFO
+//    // The JSON specifies the "numBufs" field - this should be set to at least (d/v) to configure scratchpad as FIFO
+//    // It can be set to an outrageous number (say INT_MAX) to be safe
+//    if (config.get.numBufs == 0) {
+//      UInt(1, width=log2Up(d/v)+1)
+//    } else UInt(math.max(1, d / (v*config.get.numBufs)), width=log2Up(d/v)+1)
+//  } else UInt(width = log2Up(d/v))
+//
+//  val isReadFifo = if (config.isDefined) Bool(config.get.isReadFifo > 0) else Bool()
+//  val isWriteFifo = if (config.isDefined) Bool(config.get.isWriteFifo > 0) else Bool()
+  val mode = UInt(2.W)  // TODO: 2 ?
+  val strideLog2 = UInt((log2Up(log2Up(p.d) - log2Up(p.v))).W)
+  val isReadFifo = Bool()
+  val isWriteFifo = Bool()
+  val bufSize = UInt(log2Up(p.d/p.v).W)
+  val localWaddrMax = UInt((log2Up(p.d/p.v)+1).W) // localWaddrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+  val localRaddrMax = UInt((log2Up(p.d/p.v)+1).W) // if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
+  val fifoSize = UInt((log2Up(p.d)+1).W)
+//  val fifoSize = UInt((log2Up(p.d)+1).W)
+  override def cloneType(): this.type = new ScratchpadConfig(p).asInstanceOf[this.type]
+}
+
+/**
  * PCUControlBox config register format
  */
 case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
