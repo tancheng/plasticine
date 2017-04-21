@@ -3,7 +3,7 @@ import plasticine.arch._
 import chisel3._
 import plasticine.spade._
 import plasticine.pisa.PISADesign
-import plasticine.pisa.ir._
+import plasticine.pisa.ir.{SrcValueTuple => SVT, _}
 import chisel3.util._
 import scala.collection.mutable.ListBuffer
 import GeneratedTopParams.plasticineParams._
@@ -38,9 +38,10 @@ trait InOutArgTrait extends InOutArgTrait1 {
     controlSwitch=csbs,
     switchCU=lcus,
     argOutMuxSelect=List(1,-1,-1)
-  )
-
-  trait1
-
+  )  
   def main(args: String*) = plasticineBits
+  def config:Unit =  {
+    config1
+  }
+  config
 }

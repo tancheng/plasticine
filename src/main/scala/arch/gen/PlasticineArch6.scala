@@ -1,11 +1,17 @@
 package plasticine.arch
 import chisel3._
 import chisel3.util._
-import scala.collection.mutable.ListBuffer
 import plasticine.templates.MuxN
+import scala.language.reflectiveCalls
+import scala.collection.mutable.ListBuffer
 
-trait PlasticineArch6 extends PlasticineArch5{
+trait PlasticineArch6 extends PlasticineArch5 {
   def connect6(io:PlasticineIO, argOutMuxIns:Array[Array[DecoupledIO[UInt]]], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[SwitchCU]]):Unit = {
+    csbs(0)(2).io.outs(9) <> lcus(0)(2).io.controlIn(4)
+    csbs(0)(2).io.outs(10) <> lcus(0)(2).io.controlIn(5)
+    csbs(0)(2).io.outs(11) <> lcus(0)(2).io.controlIn(6)
+    csbs(0)(2).io.outs(12) <> lcus(0)(2).io.controlIn(7)
+    csbs(0)(2).io.outs(13) <> cus(0)(1).io.controlIn(0)
     csbs(0)(2).io.outs(14) <> cus(0)(1).io.controlIn(1)
     csbs(0)(2).io.outs(15) <> csbs(0)(1).io.ins(0)
     csbs(0)(2).io.outs(16) <> csbs(0)(1).io.ins(1)
@@ -91,11 +97,5 @@ trait PlasticineArch6 extends PlasticineArch5{
     csbs(1)(2).io.outs(20) <> csbs(1)(1).io.ins(6)
     csbs(1)(2).io.outs(21) <> csbs(1)(1).io.ins(7)
     csbs(1)(2).io.outs(22) <> csbs(1)(1).io.ins(8)
-    csbs(1)(2).io.outs(23) <> cus(0)(1).io.controlIn(2)
-    csbs(1)(2).io.outs(24) <> cus(0)(1).io.controlIn(3)
-    csbs(2)(0).io.outs(0) <> csbs(1)(0).io.ins(10)
-    csbs(2)(0).io.outs(1) <> csbs(1)(0).io.ins(11)
-    csbs(2)(0).io.outs(2) <> csbs(1)(0).io.ins(12)
-    csbs(2)(0).io.outs(3) <> csbs(1)(0).io.ins(13)
   }
 }

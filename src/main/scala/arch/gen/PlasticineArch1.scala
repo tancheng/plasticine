@@ -1,8 +1,9 @@
 package plasticine.arch
 import chisel3._
 import chisel3.util._
-import scala.collection.mutable.ListBuffer
 import plasticine.templates.MuxN
+import scala.language.reflectiveCalls
+import scala.collection.mutable.ListBuffer
 
 trait PlasticineArch1 {
   def connect1(io:PlasticineIO, argOutMuxIns:Array[Array[DecoupledIO[UInt]]], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[SwitchCU]]):Unit = {
@@ -96,6 +97,5 @@ trait PlasticineArch1 {
     vsbs(1)(2).io.outs(4) <> vsbs(2)(2).io.ins(0)
     vsbs(1)(2).io.outs(5) <> vsbs(2)(2).io.ins(1)
     vsbs(1)(2).io.outs(6) <> vsbs(2)(2).io.ins(2)
-    vsbs(1)(2).io.outs(7) <> vsbs(2)(2).io.ins(3)
   }
 }
