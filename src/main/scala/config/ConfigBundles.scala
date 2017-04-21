@@ -242,10 +242,28 @@ case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
   val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
-  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(2, p.numControlOut))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut))
 
   override def cloneType(): this.type = {
     new PCUControlBoxConfig(p).asInstanceOf[this.type]
+  }
+}
+
+/**
+ * PMUControlBox config register format
+ */
+case class PMUControlBoxConfig(val p: PMUParams) extends AbstractConfig {
+
+  val writeFifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
+  val readFifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
+  val scalarSwapReadSelect = Vec(p.numScalarIn, Bool())
+  val writeDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
+  val readDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut))
+
+  override def cloneType(): this.type = {
+    new PMUControlBoxConfig(p).asInstanceOf[this.type]
   }
 }
 

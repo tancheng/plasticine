@@ -340,7 +340,30 @@ object PCUControlBoxBits {
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
-        CrossbarBits.zeroes(ControlSwitchParams(2, p.numControlOut)) // tokenOutXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut)) // tokenOutXbar
+      )
+  }
+}
+
+case class PMUControlBoxBits(
+  writeFifoAndTree: List[Int],
+  readFifoAndTree: List[Int],
+  scalarSwapReadSelect: List[Int],
+  writeDoneXbar: CrossbarBits,
+  readDoneXbar: CrossbarBits,
+  swapWriteXbar: CrossbarBits,
+  tokenOutXbar: CrossbarBits
+) extends AbstractBits
+object PMUControlBoxBits {
+  def zeroes(p: PMUParams) = {
+    new PMUControlBoxBits(
+        List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // writeFifoAndTree
+        List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // readFifoAndTree
+        List.fill(p.numScalarIn) { 0 }, // scalarSwapReadSelect
+        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters + p.numControlIn, 1)),  // writeDoneXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters + p.numControlIn, 1)),  // readDoneXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut)) // tokenOutXbar
       )
   }
 }

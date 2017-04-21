@@ -23,6 +23,7 @@ class BinaryCodegen() extends Traversal {
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
+      case n: PMUControlBoxBits => Predef.assert(cnode.isInstanceOf[PMUControlBoxConfig])
       case n: SwitchCUControlBoxBits => Predef.assert(cnode.isInstanceOf[SwitchCUControlBoxConfig])
       case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
@@ -126,6 +127,15 @@ class BinaryCodegen() extends Traversal {
         toBinary(n.siblingAndTree, cn.siblingAndTree.getWidth) ++
         toBinary(n.fifoAndTree, cn.fifoAndTree.getWidth) ++
         toBinary(n.tokenInAndTree, cn.tokenInAndTree.getWidth)
+
+      case (n: PMUControlBoxBits, cn: PMUControlBoxConfig)      =>
+        genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
+        genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
+        genBinary(n.readDoneXbar, cn.readDoneXbar) ++
+        genBinary(n.writeDoneXbar, cn.writeDoneXbar) ++
+        toBinary(n.scalarSwapReadSelect, cn.scalarSwapReadSelect.getWidth) ++
+        toBinary(n.readFifoAndTree, cn.readFifoAndTree.getWidth) ++
+        toBinary(n.writeFifoAndTree, cn.writeFifoAndTree.getWidth)
 
       case (n: SwitchCUControlBoxBits, cn: SwitchCUControlBoxConfig)      =>
         toBinary(n.pulserMax, cn.pulserMax.getWidth) ++

@@ -25,6 +25,7 @@ class ConfigInitializer() extends Traversal {
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
+      case n: PMUControlBoxBits => Predef.assert(cnode.isInstanceOf[PMUControlBoxConfig])
       case n: SwitchCUControlBoxBits => Predef.assert(cnode.isInstanceOf[SwitchCUControlBoxConfig])
       case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
@@ -99,6 +100,15 @@ class ConfigInitializer() extends Traversal {
         cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
         cn.fifoAndTree.zip(n.fifoAndTree) foreach { case (wire, value) => wire := value.U }
         cn.tokenInAndTree.zip(n.tokenInAndTree) foreach { case (wire, value) => wire := value.U }
+
+      case (n: PMUControlBoxBits, cn: PMUControlBoxConfig)      =>
+        init(n.tokenOutXbar, cn.tokenOutXbar)
+        init(n.swapWriteXbar, cn.swapWriteXbar)
+        init(n.readDoneXbar, cn.readDoneXbar)
+        init(n.writeDoneXbar, cn.writeDoneXbar)
+        cn.scalarSwapReadSelect.zip(n.scalarSwapReadSelect) foreach { case (wire, value) => wire := value.U }
+        cn.readFifoAndTree.zip(n.readFifoAndTree) foreach { case (wire, value) => wire := value.U }
+        cn.writeFifoAndTree.zip(n.writeFifoAndTree) foreach { case (wire, value) => wire := value.U }
 
       case (n: SwitchCUControlBoxBits, cn: SwitchCUControlBoxConfig)      =>
         cn.pulserMax := n.pulserMax.U
