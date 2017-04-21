@@ -65,23 +65,29 @@ class PCUControlBox(val p: PCUParams) extends Module {
     val muxedSignals = signals.zip(config) map { case (sig, cfg) => Mux(cfg, sig, true.B) }
     muxedSignals.reduce { _ & _ }
   }
-  val siblingAndTree = createAndTree(Vec(udCounters.map { _.io.gtz}), io.config.siblingAndTree)
-  val tokenInAndTree = createAndTree(io.controlIn, io.config.tokenInAndTree)
+  // Require this overloaded method because chisel3 makes it surprisingly hard to create
+  // Vecs out of arbitrary signals of the same type
+  def createAndTree(signals: List[Bool], config: Vec[Bool]) = {
+    val muxedSignals = signals.zip(config) map { case (sig, cfg) => Mux(cfg, sig, true.B) }
+    muxedSignals.reduce { _ & _ }
+  }
+
   val fifoAndTree = createAndTree(io.fifoNotEmpty, io.config.fifoAndTree)
+  val tokenInAndTree = createAndTree(io.controlIn, io.config.tokenInAndTree)
   val andTreeTop = tokenInAndTree & fifoAndTree
+  val siblingAndTree = createAndTree(udCounters.map { _.io.gtz} ++ List(fifoAndTree), io.config.siblingAndTree)
 
   val localEnable = Mux(io.config.streamingMuxSelect, andTreeTop, siblingAndTree)
   io.enable := localEnable
 
   // Token out crossbar
-  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(3+io.fifoNotFull.size, p.numControlOut)))
+  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(2+io.fifoNotFull.size, p.numControlOut)))
   tokenOutXbar.io.config := io.config.tokenOutXbar
-  for (i <- 0 until tokenOutXbar.io.ins.size) { i match {
-    case 0 => tokenOutXbar.io.ins(i) := doneXbar.io.outs(0)
-    case 1 => tokenOutXbar.io.ins(i) := siblingAndTree
-    case 2 => tokenOutXbar.io.ins(i) := localEnable
-    case _ => tokenOutXbar.io.ins(i) := io.fifoNotFull(i-3)
-  }}
+  for (i <- 0 until io.fifoNotFull.size) {
+    tokenOutXbar.io.ins(i) := io.fifoNotFull(i)
+  }
+  tokenOutXbar.io.ins(io.fifoNotFull.size) := doneXbar.io.outs(0)
+  tokenOutXbar.io.ins(io.fifoNotFull.size + 1) := localEnable
 
   io.controlOut := tokenOutXbar.io.outs
 }

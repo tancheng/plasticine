@@ -237,12 +237,12 @@ case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
 
   val tokenInAndTree = Vec(p.numControlIn, Bool())
   val fifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
-  val siblingAndTree = Vec(p.numUDCs, Bool())
+  val siblingAndTree = Vec(p.numUDCs + 1, Bool())
   val streamingMuxSelect = Bool()
   val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
-  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(3, p.numControlOut))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(2, p.numControlOut))
 
   override def cloneType(): this.type = {
     new PCUControlBoxConfig(p).asInstanceOf[this.type]
