@@ -39,6 +39,9 @@ trait PCUParams extends CUParams
 
 trait PMUParams extends CUParams {
   val wd = 5
+  val outputRegID = 0  // register number that is connected to Scratchpad raddr and waddr
+  val numPipelineScalarOuts = 1  // Number of output scalars from last stage of pipeline
+  val numScratchpadScalarOuts = 1 // Number of output scalars from Scratchpad rdata
 }
 
 trait SwitchCUParams extends CUParams {

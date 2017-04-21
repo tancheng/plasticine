@@ -66,6 +66,8 @@ class ConfigInitializer() extends Traversal {
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PMUBits, cn: PMUConfig)                    =>
+        init(n.scalarOutXbar, cn.scalarOutXbar)
+        init(n.scalarInXbar, cn.scalarInXbar)
         init(n.control, cn.control)
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }

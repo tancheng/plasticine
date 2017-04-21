@@ -90,6 +90,8 @@ class BinaryCodegen() extends Traversal {
         println(s"[PCUBits] stageBits = $stageBits")
         scalarOutXbarBits ++ scalarInXbarBits ++ controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
+        genBinary(n.scalarOutXbar, cn.scalarOutXbar) ++
+        genBinary(n.scalarInXbar, cn.scalarInXbar) ++
         genBinary(n.control, cn.control) ++
         genBinary(n.counterChain, cn.counterChain) ++
         List.tabulate(cn.stages.size) { i =>

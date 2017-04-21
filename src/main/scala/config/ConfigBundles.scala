@@ -141,6 +141,8 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = PMUControlBoxConfig(p)
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
 
   override def cloneType(): this.type = {
     new PMUConfig(p).asInstanceOf[this.type]
