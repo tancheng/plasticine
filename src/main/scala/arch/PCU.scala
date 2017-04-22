@@ -223,7 +223,8 @@ class PCU(val p: PCUParams) extends CU {
 
     // Assign stageEnable
     if (i == 0) {  // Pick from counter enables
-      stageEnableFF.io.in := cbox.io.enable
+//      stageEnableFF.io.in := cbox.io.enable
+      stageEnableFF.io.in := true.B  // TODO: Temporary, revert after InOutArg debugging
     } else {
       val sources = stageConfig.enableSelect.nonXSources map { m => m match {
         case PrevStageSrc => stageEnables.last.io.out
