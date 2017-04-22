@@ -125,8 +125,8 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val scalarValidOut = Vec(p.numScalarOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
   val vectorValidOut = Vec(p.numVectorOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
   val control = PCUControlBoxConfig(p)
-  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w))
-  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]
   }
@@ -141,8 +141,8 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = PMUControlBoxConfig(p)
-  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w))
-  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w))
   val scratchpad = ScratchpadConfig(p)
   val wdataSelect = UInt(log2Up(p.numVectorIn).W)
   val waddrSelect = UInt(log2Up(p.d).W)

@@ -41,7 +41,12 @@ class PCU(val p: PCUParams) extends CU {
     fifo
   }
 
-  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)))
+  val scalarInRegs = p.getRegIDs(ScalarInReg)
+  val scalarOutRegs = p.getRegIDs(ScalarOutReg)
+  val vectorInRegs = p.getRegIDs(VecInReg)
+  val vectorOutRegs = p.getRegIDs(VecOutReg)
+
+  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)))
   scalarInXbar.io.config := io.config.scalarInXbar
   scalarInXbar.io.ins := Vec(scalarFIFOs.map { _.io.deq(0) })
   val scalarIns = scalarInXbar.io.outs
@@ -235,11 +240,13 @@ class PCU(val p: PCUParams) extends CU {
     mux.io.out
   }
 
-  val scalarOutXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w)))
+  val scalarOutXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w)))
   scalarOutXbar.io.config := io.config.scalarOutXbar
-  scalarOutXbar.io.ins.zipWithIndex.foreach { case (in, i) =>
-    in := pipeRegs.last(0)(i).io.out
-  }
+  val scalarOutIns = scalarOutRegs.map { r => pipeRegs.last(0)(r).io.out }
+  scalarOutXbar.io.ins := scalarOutIns
+//  scalarOutXbar.io.ins.zipWithIndex.foreach { case (in, i) =>
+//    in := pipeRegs.last(0)(i).io.out
+//  }
 
   io.scalarOut.zip(scalarOutXbar.io.outs).foreach { case (out, xbarOut) =>
     out.bits := xbarOut
@@ -248,7 +255,7 @@ class PCU(val p: PCUParams) extends CU {
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
-    out.bits := Vec(pipeRegs.last.map { _(i).io.out })
+    out.bits := Vec(pipeRegs.last.map { _(vectorOutRegs(i)).io.out })
     out.valid := cbox.io.enable
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }

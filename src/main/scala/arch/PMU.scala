@@ -26,7 +26,11 @@ class PMU(val p: PMUParams) extends CU {
     fifo
   }
 
-  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)))
+  val scalarInRegs = p.getRegIDs(ScalarInReg)
+  val scalarOutRegs = p.getRegIDs(ScalarOutReg)
+  Predef.assert((p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts) >= 1, s"ERROR: No scalar outs defined on PMU")
+
+  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)))
   scalarInXbar.io.config := io.config.scalarInXbar
   scalarInXbar.io.ins := Vec(scalarFIFOs.map { _.io.deq(0) })
   val scalarIns = scalarInXbar.io.outs
@@ -168,7 +172,13 @@ class PMU(val p: PMUParams) extends CU {
     pipeRegs.append(regs)
   }
 
-  val addrs = pipeRegs.map { _(p.outputRegID).io.out }.toList
+  val raddrReg = p.getRegIDs(ReadAddrReg)
+  val waddrReg = p.getRegIDs(WriteAddrReg)
+  Predef.assert(raddrReg.size == 1, s"More than on register ${raddrReg} is a ReadAddrReg, currently unsupported!")
+  Predef.assert(waddrReg.size == 1, s"More than on register ${waddrReg} is a WriteAddrReg, currently unsupported!")
+
+  val raddrs = pipeRegs.map { _(raddrReg(0)).io.out }.toList
+  val waddrs = pipeRegs.map { _(waddrReg(0)).io.out }.toList
 
   // Scratchpad
   def getMux[T<:Data](ins: List[T], sel: UInt): T = {
@@ -181,8 +191,8 @@ class PMU(val p: PMUParams) extends CU {
   val scratchpad = Module(new Scratchpad(p))
   scratchpad.io.config := io.config.scratchpad
   scratchpad.io.wdata := getMux(vectorFIFOs.map {_.io.deq}, io.config.wdataSelect)
-  scratchpad.io.waddr := getMux(addrs, io.config.waddrSelect)
-  scratchpad.io.raddr := getMux(addrs, io.config.raddrSelect)
+  scratchpad.io.waddr := getMux(waddrs, io.config.waddrSelect)
+  scratchpad.io.raddr := getMux(raddrs, io.config.raddrSelect)
   scratchpad.io.wen := false.B  // TODO: Fix after threading enable signals through pipeline
 
   // Output assignment
@@ -210,9 +220,10 @@ class PMU(val p: PMUParams) extends CU {
     mux.io.out
   }
 
-  val scalarOutXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w)))
+  val scalarOutXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w)))
   scalarOutXbar.io.config := io.config.scalarOutXbar
-  val scalarOutIns = Vec(pipeRegs.last.take(p.numPipelineScalarOuts).map { _.io.out } ++ scratchpad.io.rdata.getElements.take(p.numScratchpadScalarOuts))
+  val scalarOutIns = Vec(scalarOutRegs.map { r => pipeRegs.last(r).io.out } ++ scratchpad.io.rdata.getElements.take(p.numScratchpadScalarOuts))
+//  val scalarOutIns = Vec(pipeRegs.last.take(p.numPipelineScalarOuts).map { _.io.out } ++ scratchpad.io.rdata.getElements.take(p.numScratchpadScalarOuts))
   scalarOutXbar.io.ins := scalarOutIns
 //  scalarOutXbar.io.ins.zipWithIndex.foreach { case (in, i) =>
 //    in := scalarOutIns
