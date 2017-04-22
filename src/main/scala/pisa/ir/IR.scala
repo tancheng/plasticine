@@ -71,6 +71,24 @@ extends AbstractBits {
 //      }
 //    }.flatten
 //  }
+  override def toString = {
+    val srcStr = src match {
+      case CounterSrc => "CounterSrc"
+      case ScalarFIFOSrc => "ScalarFIFOSrc"
+      case VectorFIFOSrc => "VectorFIFOSrc"
+      case ConstSrc => "ConstSrc"
+      case PrevStageSrc => "PrevStageSrc"
+      case CurrStageSrc => "CurrStageSrc"
+      case ALUSrc => "ALUSrc"
+      case XSrc => "XSrc"
+      case EnableSrc => "EnableSrc"
+      case DoneSrc => "DoneSrc"
+      case _ => "<unk>"
+    }
+
+    val valueStr = value.toString
+    s"($srcStr  $valueStr)"
+  }
 }
 object SrcValueTuple {
   def zeroes(width: Int) = new SrcValueTuple(src = XSrc, value = 0)
@@ -158,7 +176,7 @@ case class PipeStageBits(
   opC: SrcValueTuple,
   opcode: Opcode = XOp,
   res: List[SrcValueTuple] = Nil,
-  fwd: Array[SrcValueTuple],
+  fwd: Array[SrcValueTuple] = Array[SrcValueTuple](),
   enableSelect: SrcValueTuple
 )
 extends AbstractBits {
@@ -167,7 +185,7 @@ extends AbstractBits {
     case _ => 0
   }
 
-  val regEnables = result ++ fwd.map { t =>
+  lazy val regEnables = result ++ fwd.map { t =>
     val n = t.value.asInstanceOf[Int]
     if (n == -1) 0 else n
   }
