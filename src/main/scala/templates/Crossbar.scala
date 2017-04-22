@@ -14,7 +14,7 @@ import scala.language.reflectiveCalls
 /**
  * Core logic inside a crossbar
  */
-class CrossbarCore[T<:Data](val t: T, val p: SwitchParams) extends Module {
+class CrossbarCore[T<:Data](val t: T, val p: SwitchParams, val registerOutput: Boolean = false) extends Module {
   val io = IO(new Bundle {
     val ins = Input(Vec(p.numIns, t.cloneType))
     val outs = Output(Vec(p.numOuts, t.cloneType))
@@ -25,7 +25,7 @@ class CrossbarCore[T<:Data](val t: T, val p: SwitchParams) extends Module {
     val outMux = Module(new MuxN(t, p.numIns))
     outMux.io.ins := io.ins
     outMux.io.sel := io.config.outSelect(i)
-    out := outMux.io.out
+    out := (if (registerOutput) RegNext(outMux.io.out, 0.U) else outMux.io.out)
   }
 }
 
