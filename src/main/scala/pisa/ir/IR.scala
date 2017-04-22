@@ -263,8 +263,10 @@ object ScratchpadBits {
 //}
 
 trait CUBits extends AbstractBits {
-  def asPCUBits:PCUBits
-  def asPMUBits:PMUBits
+  def stages: Array[PipeStageBits]
+  def counterChain: CounterChainBits
+  def asPCUBits:PCUBits = this.asInstanceOf[PCUBits]
+  def asPMUBits:PMUBits = this.asInstanceOf[PMUBits]
 }
 
 case class PCUBits(
