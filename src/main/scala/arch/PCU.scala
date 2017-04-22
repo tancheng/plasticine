@@ -29,6 +29,13 @@ class PCU(val p: PCUParams) extends CU {
   // i.e., d >= rwStages + 1 + numReduceStages + numStagesAfterReduction
   Predef.assert(p.d >= (1 + numReduceStages), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages)!""")
 
+  def getMux[T<:Data](ins: List[T], sel: UInt): T = {
+    val srcMux = Module(new MuxN(ins(0).cloneType, ins.size))
+    srcMux.io.ins := Vec(ins)
+    srcMux.io.sel := sel
+    srcMux.io.out
+  }
+
   // Scalar input FIFOs
   val scalarFIFOs = List.tabulate(p.numScalarIn) { i =>
     val fifo = Module(new FIFOCore(p.w, p.scalarFIFODepth, 1))
@@ -116,6 +123,7 @@ class PCU(val p: PCUParams) extends CU {
 
   val pipeStages = ListBuffer[List[FU]]()
   val pipeRegs = ListBuffer[List[List[FF]]]()
+  val stageEnables = ListBuffer[FF]()
 
   // Reduction stages
   val reduceStages = (0 until p.d).dropRight(1).takeRight(numReduceStages)  // Leave 1 stage to do in-place accumulation
@@ -125,6 +133,9 @@ class PCU(val p: PCUParams) extends CU {
     val fus = List.fill(p.v) { Module(new FU(p.w, false, false)) } // TODO :Change after Float support
     val stageRegs = List.fill(p.v) { getPipeRegs }
     val stageConfig = io.config.stages(i)
+    val stageEnableFF = Module(new FF(1))
+    stageEnableFF.io.init := 0.U
+    stageEnableFF.io.enable := 1.U
 
     // Reduction tree specific:
     // If this stage is one of the reduction stages, get its position within the reduce tree stages.
@@ -204,11 +215,24 @@ class PCU(val p: PCUParams) extends CU {
           }
           reg.io.in := Mux(stageConfig.result(idx), fu.io.out, fwd)
         }
-        reg.io.enable := stageConfig.regEnables(idx)
+        reg.io.enable := stageEnableFF.io.out & stageConfig.regEnables(idx)
       }
     }
     pipeStages.append(fus)
     pipeRegs.append(stageRegs)
+
+    // Assign stageEnable
+    if (i == 0) {  // Pick from counter enables
+      stageEnableFF.io.in := cbox.io.enable
+    } else {
+      val sources = stageConfig.enableSelect.nonXSources map { m => m match {
+        case PrevStageSrc => stageEnables.last.io.out
+        case ConstSrc => stageConfig.enableSelect.value
+        case _ => throw new Exception(s"[PCU] Unsupported source type $m for stage enables")
+      }}
+      stageEnableFF.io.in := getMux(sources, stageConfig.enableSelect.src)
+    }
+    stageEnables.append(stageEnableFF)
   }
 
 //  def getStageOut(stage: List[FU]): Vec[UInt]  = Vec(stage.map { _.io.out })
@@ -250,13 +274,13 @@ class PCU(val p: PCUParams) extends CU {
 
   io.scalarOut.zip(scalarOutXbar.io.outs).foreach { case (out, xbarOut) =>
     out.bits := xbarOut
-    out.valid := cbox.io.enable
+    out.valid := stageEnables.last.io.out
 //    out.valid := getValids(io.config.scalarValidOut(i))
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := Vec(pipeRegs.last.map { _(vectorOutRegs(i)).io.out })
-    out.valid := cbox.io.enable
+    out.valid := stageEnables.last.io.out
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }
 }

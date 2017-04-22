@@ -102,7 +102,7 @@ case class CounterChainConfig(val w: Int, val numCounters: Int, val startDelayWi
 //  }
 //}
 
-class PipeStageConfig(r: Int, w: Int) extends AbstractConfig {
+class PipeStageConfig(r: Int, w: Int, numCounters: Int, val enableSources: List[SelectSource]) extends AbstractConfig {
   val operandSources = List[SelectSource](XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc)
   val opA = SrcValueBundle(operandSources, w)
   val opB = SrcValueBundle(operandSources, w)
@@ -111,14 +111,16 @@ class PipeStageConfig(r: Int, w: Int) extends AbstractConfig {
   val opcode = UInt(log2Up(Opcodes.size).W)
   val result = UInt(r.W) // One-hot encoded
   var regEnables = UInt(r.W)    // One-hot encoded
+  val enableSelect = SrcValueBundle(enableSources, log2Up(numCounters))
 
   override def cloneType(): this.type = {
-    new PipeStageConfig(r,w).asInstanceOf[this.type]
+    new PipeStageConfig(r,w,numCounters, enableSources).asInstanceOf[this.type]
   }
 }
 
 case class PCUConfig(p: PCUParams) extends AbstractConfig {
-  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w))
+  val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
 
   val validOutSources = List[SelectSource](XSrc, EnableSrc, DoneSrc)
@@ -138,7 +140,8 @@ object PCUConfig {
 }
 
 case class PMUConfig(p: PMUParams) extends AbstractConfig {
-  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w))
+  val enableSources = List[SelectSource](XSrc, PrevStageSrc, CounterSrc, ConstSrc)
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w,p.numCounters, enableSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = PMUControlBoxConfig(p)
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))

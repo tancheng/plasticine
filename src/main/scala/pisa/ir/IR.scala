@@ -158,7 +158,8 @@ case class PipeStageBits(
   opC: SrcValueTuple,
   opcode: Opcode = XOp,
   res: List[SrcValueTuple] = Nil,
-  fwd: Array[SrcValueTuple]
+  fwd: Array[SrcValueTuple],
+  enableSelect: SrcValueTuple
 )
 extends AbstractBits {
   val result = res.map{
@@ -196,7 +197,8 @@ object PipeStageBits {
       opA = SrcValueTuple.zeroes(width),
       opB = SrcValueTuple.zeroes(width),
       opC = SrcValueTuple.zeroes(width),
-      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width))
+      fwd=Array.fill(numRegs)(SrcValueTuple.zeroes(width)),
+      enableSelect = SrcValueTuple.zeroes(width)
     )
   }
 }

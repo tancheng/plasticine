@@ -81,6 +81,7 @@ class ConfigInitializer() extends Traversal {
         init(n.counterChain, cn.counterChain)
 
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
+        init(n.enableSelect, cn.enableSelect)
         cn.regEnables := encodeOneHot(n.regEnables).U
         cn.result := encodeOneHot(n.result).U
         cn.opcode := Opcodes.getCode(n.opcode).U

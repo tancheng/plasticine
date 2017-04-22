@@ -109,7 +109,7 @@ class BinaryCodegen() extends Traversal {
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
 //        toBinary(encodeOneHot(n.result), cn.result.getWidth) ++
 //        toBinary(5, cn.opcode.getWidth)
-      val valueBin = toBinary(encodeOneHot(n.regEnables), cn.regEnables.getWidth) ++ toBinary(encodeOneHot(n.result), cn.result.getWidth) ++ toBinary(Opcodes.getCode(n.opcode), cn.opcode.getWidth) ++ genBinary(n.opC, cn.opC) ++ genBinary(n.opB, cn.opB) ++ genBinary(n.opA, cn.opA)
+      val valueBin = genBinary(n.enableSelect, cn.enableSelect) ++ toBinary(encodeOneHot(n.regEnables), cn.regEnables.getWidth) ++ toBinary(encodeOneHot(n.result), cn.result.getWidth) ++ toBinary(Opcodes.getCode(n.opcode), cn.opcode.getWidth) ++ genBinary(n.opC, cn.opC) ++ genBinary(n.opB, cn.opB) ++ genBinary(n.opA, cn.opA)
 
       println(s"[PipeStageBits] $valueBin")
       valueBin

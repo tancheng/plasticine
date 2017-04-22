@@ -98,12 +98,24 @@ class PMU(val p: PMUParams) extends CU {
     ff
   }
 
+  def getMux[T<:Data](ins: List[T], sel: UInt): T = {
+    val srcMux = Module(new MuxN(ins(0).cloneType, ins.size))
+    srcMux.io.ins := Vec(ins)
+    srcMux.io.sel := sel
+    srcMux.io.out
+  }
+
   val pipeStages = ListBuffer[FU]()
   val pipeRegs = ListBuffer[List[FF]]()
+  val stageEnables = ListBuffer[FF]()
 
   for (i <- 0 until p.d) {
     val fu = Module(new FU(p.w, false, false))
     val regs = getPipeRegs
+    val stageEnableFF = Module(new FF(1))
+    stageEnableFF.io.init := 0.U
+    stageEnableFF.io.enable := 1.U
+
     val stageConfig = io.config.stages(i)
 
     def getSourcesMux(s: SelectSource) = {
@@ -166,10 +178,25 @@ class PMU(val p: PMUParams) extends CU {
         }
         reg.io.in := Mux(stageConfig.result(idx), fu.io.out, fwd)
       }
-      reg.io.enable := stageConfig.regEnables(idx)
+      reg.io.enable := stageEnableFF.io.out & stageConfig.regEnables(idx)
     }
     pipeStages.append(fu)
     pipeRegs.append(regs)
+
+    // Assign stageEnable
+    if (i == 0) {  // Pick from counter enables
+      stageEnableFF.io.in := getMux(cbox.io.enable.getElements.toList, stageConfig.enableSelect.value)
+    } else {
+      val counterEnablesMux = getMux(cbox.io.enable.getElements.toList, stageConfig.enableSelect.value)
+      val sources = stageConfig.enableSelect.nonXSources map { m => m match {
+        case PrevStageSrc => stageEnables.last.io.out
+        case CounterSrc => counterEnablesMux
+        case ConstSrc => stageConfig.enableSelect.value
+        case _ => throw new Exception(s"Unsupported source type $m for stage enables")
+      }}
+      stageEnableFF.io.in := getMux(sources, stageConfig.enableSelect.src)
+    }
+    stageEnables.append(stageEnableFF)
   }
 
   val raddrReg = p.getRegIDs(ReadAddrReg)
@@ -181,13 +208,6 @@ class PMU(val p: PMUParams) extends CU {
   val waddrs = pipeRegs.map { _(waddrReg(0)).io.out }.toList
 
   // Scratchpad
-  def getMux[T<:Data](ins: List[T], sel: UInt): T = {
-    val srcMux = Module(new MuxN(ins(0).cloneType, ins.size))
-    srcMux.io.ins := Vec(ins)
-    srcMux.io.sel := sel
-    srcMux.io.out
-  }
-
   val scratchpad = Module(new Scratchpad(p))
   scratchpad.io.config := io.config.scratchpad
   scratchpad.io.wdata := getMux(vectorFIFOs.map {_.io.deq}, io.config.wdataSelect)
@@ -232,14 +252,14 @@ class PMU(val p: PMUParams) extends CU {
 
   io.scalarOut.zip(scalarOutXbar.io.outs).foreach { case (out, xbarOut) =>
     out.bits := xbarOut
-    out.valid := cbox.io.enable(0)   // Output produced by read addr logic only, which is controlledby enable(0)
-                                     // TODO: Fix after threading enable signals
+    out.valid := stageEnables.last.io.out   // Output produced by read addr logic only, which is controlledby enable(0)
+                                            // TODO: Fix after threading enable signals
 //    out.valid := getValids(io.config.scalarValidOut(i))
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := scratchpad.io.rdata
-    out.valid := cbox.io.enable(0) & io.config.rdataEnable(i) // Output produced by read addr logic only, which is controlledby enable(0)
+    out.valid := Reg(Bool(), stageEnables.last.io.out) & io.config.rdataEnable(i) // Output produced by read addr logic only, which is controlledby enable(0)
                                                               // TODO: Fix after threading enable signals
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }
