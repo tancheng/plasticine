@@ -86,8 +86,8 @@ class BinaryCodegen() extends Traversal {
         val stageBits = List.tabulate(cn.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
-        println(s"[PCUBits] counterBits = $counterBits")
-        println(s"[PCUBits] stageBits = $stageBits")
+//        println(s"[PCUBits] counterBits = $counterBits")
+//        println(s"[PCUBits] stageBits = $stageBits")
         scalarOutXbarBits ++ scalarInXbarBits ++ controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
         toBinary(n.rdataEnable, cn.rdataEnable.getWidth) ++
@@ -111,7 +111,7 @@ class BinaryCodegen() extends Traversal {
 //        toBinary(5, cn.opcode.getWidth)
       val valueBin = genBinary(n.enableSelect, cn.enableSelect) ++ toBinary(encodeOneHot(n.regEnables), cn.regEnables.getWidth) ++ toBinary(encodeOneHot(n.result), cn.result.getWidth) ++ toBinary(Opcodes.getCode(n.opcode), cn.opcode.getWidth) ++ genBinary(n.opC, cn.opC) ++ genBinary(n.opB, cn.opB) ++ genBinary(n.opA, cn.opA)
 
-      println(s"[PipeStageBits] $valueBin")
+//      println(s"[PipeStageBits] $valueBin")
       valueBin
 //      valueBin ++ toBinary(0, cn.opA.src.getWidth)
 
@@ -191,7 +191,7 @@ class BinaryCodegen() extends Traversal {
 //        }.flatten
       case (n: SrcValueTuple, cn: SrcValueBundle)         =>
         // First value, then src
-        println(s"[SrcValueTuple] src = ${cn.srcIdx(n.src.asInstanceOf[SelectSource])}, value = ${n.value}")
+//        println(s"[SrcValueTuple] src = ${cn.srcIdx(n.src.asInstanceOf[SelectSource])}, value = ${n.value}")
         toBinary(n.value, cn.value.getWidth) ++
         (n.src match {
           case s: SelectSource => toBinary(cn.srcIdx(s), cn.src.getWidth)

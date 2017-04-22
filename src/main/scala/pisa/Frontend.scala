@@ -39,9 +39,9 @@ trait ConfigFileInterface {
   }
 
   def toFile(outFileName: String, data: List[Int]) {
-    println(s"\n\n[toFile] unpacked = $data\n\n")
+//    println(s"\n\n[toFile] unpacked = $data\n\n")
     val packed = pack(data)
-    println(s"\n\n[toFile] packed = $packed\n\n")
+//    println(s"\n\n[toFile] packed = $packed\n\n")
     val os = new DataOutputStream(new FileOutputStream(outFileName))
     packed.foreach { os.writeByte(_) }
     os.flush
@@ -90,6 +90,16 @@ trait PISADesign extends ConfigFileInterface {
 	def main(args: Array[String]): Unit = {
 		val top = main(args:_*)
 		val configTop = getConfigTop(top)
+
+    // Debugging only
+    val plTop = top.asInstanceOf[PlasticineBits]
+    plTop.cu(0)(0).stages.zipWithIndex.foreach {case (stage, idx) =>
+      println(s"[PISA] Stage $idx : ")
+      println(s" fwd: ${stage.fwd.toList}")
+      println(s" res: ${stage.res}")
+      println(s" result: ${stage.result}")
+      println(s" regEnables: ${stage.regEnables}")
+   }
 
     // Generate arch with given top params as initBits
     chisel3.Driver.execute(Array[String]("--target-dir", "psim"), () => new Top(GeneratedTopParams, Some(top)))
