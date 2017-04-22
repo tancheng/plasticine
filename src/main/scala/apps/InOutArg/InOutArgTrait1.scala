@@ -48,5 +48,14 @@ trait InOutArgTrait1 {
     cus(0)(0).asPCUBits.stages(6).fwd(8) = SVT(PrevStageSrc, 8)
     cus(0)(0).asPCUBits.stages(7).fwd(8) = SVT(PrevStageSrc, 8)
     cus(0)(0).asPCUBits.stages(8).fwd(8) = SVT(PrevStageSrc, 8)
+    // Configuring lcus(1)(0) <- SeqCU4_x193
+    val ctrs_1_0 = Array.tabulate(6) { i => CounterRCBits.zeroes(32)}
+    lcus(1)(0).counterChain = CounterChainBits(List(0,0,0,0,0), ctrs_1_0)
+    lcus(1)(0).control.childrenAndTree = List(0, 0, 0, 0)
+    lcus(1)(0).control.siblingAndTree = List(0, 0, 0, 0)
+    // lcus(1)(0).scalarInXbar=[None,None,None,None]
+    // lcus(1)(0).scalarOutXbar=[None,None]
+    lcus(1)(0).counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
+    lcus(1)(0).stages = Array.tabulate(0) { i => PipeStageBits.zeroes(0, 32)}
   }
 }
