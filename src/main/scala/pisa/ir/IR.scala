@@ -295,16 +295,16 @@ object PCUBits {
 }
 
 case class PMUBits(
-  stages: Array[PipeStageBits],
-  counterChain: CounterChainBits,
-  control: PMUControlBoxBits,
-  scalarInXbar: CrossbarBits,
-  scalarOutXbar: CrossbarBits,
-  scratchpad: ScratchpadBits,
-  wdataSelect: Int,
-  waddrSelect: Int,
-  raddrSelect: Int,
-  rdataEnable: List[Int]
+  var stages: Array[PipeStageBits],
+  var counterChain: CounterChainBits,
+  var control: PMUControlBoxBits,
+  var scalarInXbar: CrossbarBits,
+  var scalarOutXbar: CrossbarBits,
+  var scratchpad: ScratchpadBits,
+  var wdataSelect: Int,
+  var waddrSelect: Int,
+  var raddrSelect: Int,
+  var rdataEnable: List[Int]
 
 ) extends CUBits
 object PMUBits {
@@ -325,8 +325,8 @@ object PMUBits {
 }
 
 case class SwitchCUBits(
-  counterChain: CounterChainBits,
-  control: SwitchCUControlBoxBits
+  var counterChain: CounterChainBits,
+  var control: SwitchCUControlBoxBits
 ) extends CUBits {
   def stages = Array[PipeStageBits]()
 }
@@ -388,14 +388,14 @@ object PMUControlBoxBits {
 }
 
 case class SwitchCUControlBoxBits(
-  siblingAndTree: List[Int],
-  childrenAndTree: List[Int],
-  udcDecSelect: List[Int],
-  incrementXbar: CrossbarBits,
-  doneXbar: CrossbarBits,
-  swapWriteXbar: CrossbarBits,
-  tokenOutXbar: CrossbarBits,
-  pulserMax: Int
+  var siblingAndTree: List[Int],
+  var childrenAndTree: List[Int],
+  var udcDecSelect: List[Int],
+  var incrementXbar: CrossbarBits,
+  var doneXbar: CrossbarBits,
+  var swapWriteXbar: CrossbarBits,
+  var tokenOutXbar: CrossbarBits,
+  var pulserMax: Int
 ) extends AbstractBits
 object SwitchCUControlBoxBits {
   def zeroes(p: SwitchCUParams) = {
