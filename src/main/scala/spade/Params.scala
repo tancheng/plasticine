@@ -23,9 +23,9 @@ trait CUParams extends Params {
   val d: Int = 8
   val r: Int = 16
   val numScalarIn: Int = 4
-  val numEffectiveScalarIn: Int = 2
+//  val numEffectiveScalarIn: Int = 2
   val numScalarOut: Int = 4
-  val numEffectiveScalarOut: Int = 2
+//  val numEffectiveScalarOut: Int = 2
   val numVectorIn: Int = 4
   val numVectorOut: Int = 4
   val numControlIn: Int = 8
@@ -33,6 +33,13 @@ trait CUParams extends Params {
 
   val scalarFIFODepth: Int = 32 // Depth of each scalar FIFO
   val vectorFIFODepth: Int = 8 * 16 // Depth of each vector FIFO
+
+  def getRegIDs(c: RegColor) = {
+    regColors.zipWithIndex.filter { _._1.contains(c) }.map { _._2}
+  }
+  def getNumRegs(c: RegColor) = {
+    getRegIDs(c).size
+  }
 }
 
 trait PCUParams extends CUParams
@@ -40,8 +47,8 @@ trait PCUParams extends CUParams
 trait PMUParams extends CUParams {
   val wd = 5
   val scratchpadSizeBytes = 32768  // 32 KB scratchpad
-  val outputRegID = 0  // register number that is connected to Scratchpad raddr and waddr
-  val numPipelineScalarOuts = 1  // Number of output scalars from last stage of pipeline
+//  val outputRegID = 0  // register number that is connected to Scratchpad raddr and waddr
+//  val numPipelineScalarOuts = 1  // Number of output scalars from last stage of pipeline
   val numScratchpadScalarOuts = 1 // Number of output scalars from Scratchpad rdata
   def scratchpadSizeWords = scratchpadSizeBytes / (w / 8)
 }

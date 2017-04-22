@@ -286,8 +286,8 @@ object PCUBits {
       Array.fill(p.numScalarOut) { SrcValueTuple.zeroes(p.w) },
       Array.fill(p.numVectorOut) { SrcValueTuple.zeroes(p.w) },
       PCUControlBoxBits.zeroes(p),
-      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)),
-      CrossbarBits.zeroes(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w))
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
     )
   }
 }
@@ -311,8 +311,8 @@ object PMUBits {
       Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
       CounterChainBits.zeroes(p.w, p.numCounters),
       PMUControlBoxBits.zeroes(p),
-      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.numEffectiveScalarIn, p.w)),
-      CrossbarBits.zeroes(ScalarSwitchParams(p.numEffectiveScalarOut, p.numScalarOut, p.w)),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w)),
       ScratchpadBits.zeroes,
       0,
       0,
