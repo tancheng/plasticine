@@ -20,13 +20,13 @@ trait PCUTestTrait {
     val cu: CUBits = PCUBits.zeroes(cuParams(0)(0).asInstanceOf[PCUParams])
 
 
-    cu.counterChain.counters(0) = CounterRCBits(max=SrcValueTuple(ConstSrc, 10), stride=SrcValueTuple(ConstSrc, 0), min=SrcValueTuple(ConstSrc, 1), par=1)
-    cu.counterChain.counters(1) = CounterRCBits(max=SrcValueTuple(ConstSrc, 20), stride=SrcValueTuple(ConstSrc, 1), min=SrcValueTuple(ConstSrc, 1), par=1)
-    cu.counterChain.counters(2) = CounterRCBits(max=SrcValueTuple(ConstSrc, 30), stride=SrcValueTuple(ConstSrc, 2), min=SrcValueTuple(ConstSrc, 1), par=1)
-
-//    cu.stages(0) = PipeStageBits(SrcValueTuple(ScalarFIFOSrc, 0),SrcValueTuple(ConstSrc, 4),SrcValueTuple(), FixAdd, List(SrcValueTuple(CurrStageDst, 10),SrcValueTuple(CurrStageDst, 0)), Array.tabulate(16) { i => SrcValueTuple() })
-    cu.stages(0) = PipeStageBits(SrcValueTuple(ConstSrc, 100), SrcValueTuple(ConstSrc, 200), SrcValueTuple(ConstSrc, 300), FixAdd, List(SrcValueTuple(CurrStageDst, 10),SrcValueTuple(CurrStageDst, 0)), Array.tabulate(16) { i => SrcValueTuple() })
-    cu.stages(1) = PipeStageBits(SrcValueTuple(ScalarFIFOSrc, 2), SrcValueTuple(ScalarFIFOSrc, 3), SrcValueTuple(ScalarFIFOSrc, 4), FixAdd, List(SrcValueTuple(CurrStageDst, 8),SrcValueTuple(CurrStageDst, 4)),  Array.tabulate(16) { i => SrcValueTuple() })
+//    cu.counterChain.counters(0) = CounterRCBits(max=SrcValueTuple(ConstSrc, 10), stride=SrcValueTuple(ConstSrc, 0), min=SrcValueTuple(ConstSrc, 1), par=1)
+//    cu.counterChain.counters(1) = CounterRCBits(max=SrcValueTuple(ConstSrc, 20), stride=SrcValueTuple(ConstSrc, 1), min=SrcValueTuple(ConstSrc, 1), par=1)
+//    cu.counterChain.counters(2) = CounterRCBits(max=SrcValueTuple(ConstSrc, 30), stride=SrcValueTuple(ConstSrc, 2), min=SrcValueTuple(ConstSrc, 1), par=1)
+//
+////    cu.stages(0) = PipeStageBits(SrcValueTuple(ScalarFIFOSrc, 0),SrcValueTuple(ConstSrc, 4),SrcValueTuple(), FixAdd, List(SrcValueTuple(CurrStageDst, 10),SrcValueTuple(CurrStageDst, 0)), Array.tabulate(16) { i => SrcValueTuple() })
+//    cu.stages(0) = PipeStageBits(SrcValueTuple(ConstSrc, 100), SrcValueTuple(ConstSrc, 200), SrcValueTuple(ConstSrc, 300), FixAdd, List(SrcValueTuple(CurrStageDst, 10),SrcValueTuple(CurrStageDst, 0)), Array.tabulate(16) { i => SrcValueTuple() })
+//    cu.stages(1) = PipeStageBits(SrcValueTuple(ScalarFIFOSrc, 2), SrcValueTuple(ScalarFIFOSrc, 3), SrcValueTuple(ScalarFIFOSrc, 4), FixAdd, List(SrcValueTuple(CurrStageDst, 8),SrcValueTuple(CurrStageDst, 4)),  Array.tabulate(16) { i => SrcValueTuple() })
 //    cu.stages(2) = PipeStageBits(SrcValueTuple(ConstSrc, 3))
 //    cu.stages(3) = PipeStageBits(SrcValueTuple(ConstSrc, 4))
 //    cu.stages(4) = PipeStageBits(SrcValueTuple(ConstSrc, 5))
