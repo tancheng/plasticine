@@ -5,6 +5,8 @@ int main(int argc, char *argv[]) {
   FringeContext *c1 = new FringeContext("./accel.bit.bin");
   c1->load();
 //  time_t tstart = time(0);
+
+  c1->setArg(2, 10);
   c1->run();
 //  time_t tend = time(0);
 //  double elapsed = difftime(tend, tstart);
