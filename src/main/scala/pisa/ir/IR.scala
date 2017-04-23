@@ -439,7 +439,7 @@ object SwitchCUControlBoxBits {
 case class CrossbarBits(outSelect: Array[Int]) extends AbstractBits
 object CrossbarBits {
   def zeroes(p: SwitchParams) = {
-    new CrossbarBits(Array.fill(1+p.numOuts) { 0 })
+    new CrossbarBits(Array.fill(p.numOuts) { -1 })
   }
 }
 

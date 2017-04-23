@@ -170,7 +170,7 @@ case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
  * Crossbar config register format
  */
 case class CrossbarConfig(p: SwitchParams) extends AbstractConfig {
-  var outSelect = Vec(p.numOuts, UInt(log2Up(p.numIns).W))
+  var outSelect = Vec(p.numOuts, UInt(log2Up(1+p.numIns).W))
 
   override def cloneType(): this.type = {
     new CrossbarConfig(p).asInstanceOf[this.type]

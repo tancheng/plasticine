@@ -56,7 +56,7 @@ class ConfigInitializer() extends Traversal {
         init(n.stride, cn.stride)
         init(n.max, cn.max)
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
-        cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := value.U }
+        cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := (1+value).U }  // 0'th input is always 0
       case (n: PCUBits, cn: PCUConfig)                    =>
         init(n.scalarOutXbar, cn.scalarOutXbar)
         init(n.scalarInXbar, cn.scalarInXbar)

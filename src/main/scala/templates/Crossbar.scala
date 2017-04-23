@@ -22,8 +22,12 @@ class CrossbarCore[T<:Data](val t: T, val p: SwitchParams, val registerOutput: B
   })
 
   io.outs.zipWithIndex.foreach { case(out,i) =>
-    val outMux = Module(new MuxN(t, p.numIns))
-    outMux.io.ins := io.ins
+    val outMux = Module(new MuxN(t, 1 + p.numIns)) // 0'th input is always 0
+    outMux.io.ins(0) := 0.U
+    for (ii <- 0 until p.numIns) {
+      outMux.io.ins(ii+1) := io.ins(ii)
+    }
+
     outMux.io.sel := io.config.outSelect(i)
     out := (if (registerOutput) RegNext(outMux.io.out, 0.U) else outMux.io.out)
   }
