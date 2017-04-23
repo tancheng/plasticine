@@ -73,7 +73,7 @@ class PMUControlBox(val p: PMUParams) extends Module {
   val writeEn = createAndTree(io.fifoNotEmpty, io.config.writeFifoAndTree)
   val readEn = createAndTree(io.fifoNotEmpty, io.config.readFifoAndTree)
 
-  val localReadEnable = readEn & Reg(Bool(), writeDone)
+  val localReadEnable = readEn & RegNext(writeDone, 0.U)
   io.enable.zipWithIndex.foreach { case (en, i) =>
     if (i == 0) en := localReadEnable else en := writeEn
   }

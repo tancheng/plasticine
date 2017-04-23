@@ -19,6 +19,8 @@ object ALUSrc extends SelectSource
 object XSrc extends SelectSource with XType
 object EnableSrc extends SelectSource
 object DoneSrc extends SelectSource
+object ReadEnSrc extends SelectSource
+object WriteEnSrc extends SelectSource
 
 object CurrStageDst extends SelectDst
 object ScalarOutDst extends SelectDst
