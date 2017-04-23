@@ -93,6 +93,7 @@ class PCU(val p: PCUParams) extends CU {
 
   // Control Block
   val cbox = Module(new PCUControlBox(p))
+  cbox.io.config := io.config.control
   cbox.io.controlIn := io.controlIn
   io.controlOut := cbox.io.controlOut
 
@@ -110,9 +111,12 @@ class PCU(val p: PCUParams) extends CU {
   // Deq only if there is a valid element in the FIFO
   vectorFIFOs.foreach { fifo => fifo.io.deqVld := cbox.io.enable & ~fifo.io.empty }
 
-  cbox.io.done := counterChain.io.done
-
-  cbox.io.config := io.config.control
+  // TODO: Testing this
+  val localDone = Wire(Bool())
+  val donePulser = Module(new Pulser())
+  donePulser.io.in := getMux(counterChain.io.done.getElements.toList, io.config.control.doneXbar.outSelect(0) - 1.U)
+  localDone := donePulser.io.out
+//  cbox.io.done := counterChain.io.done
 
   // Pipeline with FUs and registers
   def getPipeRegs: List[FF] = List.tabulate(p.r) { i =>
@@ -133,7 +137,7 @@ class PCU(val p: PCUParams) extends CU {
     val fus = List.fill(p.v) { Module(new FU(p.w, false, false)) } // TODO :Change after Float support
     val stageRegs = List.fill(p.v) { getPipeRegs }
     val stageConfig = io.config.stages(i)
-    val stageEnableFF = Module(new FF(1))
+    val stageEnableFF = Module(new FF(2)) // MSB: 'Done/Last iter', LSB: 'Enable'
     stageEnableFF.io.init := 0.U
     stageEnableFF.io.enable := 1.U
 
@@ -215,7 +219,7 @@ class PCU(val p: PCUParams) extends CU {
           }
           reg.io.in := Mux(stageConfig.result(idx), fu.io.out, fwd)
         }
-        reg.io.enable := stageEnableFF.io.out & stageConfig.regEnables(idx)
+        reg.io.enable := stageEnableFF.io.out(0) & stageConfig.regEnables(idx)
       }
     }
     pipeStages.append(fus)
@@ -224,17 +228,21 @@ class PCU(val p: PCUParams) extends CU {
     // Assign stageEnable
     if (i == 0) {  // Pick from counter enables
 //      stageEnableFF.io.in := cbox.io.enable
-      stageEnableFF.io.in := true.B  // TODO: Temporary, revert after InOutArg debugging
+      stageEnableFF.io.in := Cat(localDone, 1.U) // TODO: Temporary, revert after InOutArg debugging
     } else {
       val sources = stageConfig.enableSelect.nonXSources map { m => m match {
-        case PrevStageSrc => stageEnables.last.io.out
+        case PrevStageSrc => stageEnables.last.io.out(0)
         case ConstSrc => stageConfig.enableSelect.value
         case _ => throw new Exception(s"[PCU] Unsupported source type $m for stage enables")
       }}
-      stageEnableFF.io.in := getMux(sources, stageConfig.enableSelect.src)
+      stageEnableFF.io.in := Cat(stageEnables.last.io.out(1), getMux(sources, stageConfig.enableSelect.src))
     }
     stageEnables.append(stageEnableFF)
   }
+
+  val delayedDone = Wire(Bool())
+  delayedDone := stageEnables.last.io.out(1)
+  cbox.io.done.foreach { d => d := delayedDone }
 
 //  def getStageOut(stage: List[FU]): Vec[UInt]  = Vec(stage.map { _.io.out })
 //  def getStageOut(i: Int) : Vec[UInt] = getStageOut(pipeStages(i))
