@@ -34,7 +34,7 @@ trait InOutArgTrait1 {
     cus(0)(0).asPCUBits.control.incrementXbar.outSelect(0) = 5
     cus(0)(0).asPCUBits.control.tokenOutXbar.outSelect(2) = 4
     cus(0)(0).asPCUBits.control.doneXbar.outSelect(0) = 0
-    cus(0)(0).asPCUBits.fifoNbufConfig=List(-1,-1,1,-1)
+    cus(0)(0).asPCUBits.fifoNbufConfig=List(1,-1,-1,-1)
     // cus(0)(0).asPCUBits.scalarInXbar=[Some(iw3234[2]),None,None,None]
     cus(0)(0).asPCUBits.scalarInXbar.outSelect(0) = 2
     // cus(0)(0).asPCUBits.scalarOutXbar=[None,None,Some(pr(st5548[8],reg13[8])),None]
