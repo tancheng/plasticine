@@ -75,8 +75,8 @@ case class GeneratedPMUParams(override val numScalarIn:Int, override val numScal
 }
 case class GeneratedSwitchCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends SwitchCUParams {
   override val w = 32
-  override val numCounters = 8
-  override val numUDCs = 5
+  override val numCounters = 6
+  override val numUDCs = 4
 }
 trait GeneratedParams extends GeneratedParams1 {
   self:TopParams =>
