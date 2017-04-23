@@ -15,26 +15,31 @@ import plasticine.templates.Utils.log2Up
 class PMU(val p: PMUParams) extends CU {
   val io = IO(CUIO(p, PMUConfig(p)))
 
+  val scalarInRegs = p.getRegIDs(ScalarInReg)
+  val scalarOutRegs = p.getRegIDs(ScalarOutReg)
+  Predef.assert((p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts) >= 1, s"ERROR: No scalar outs defined on PMU")
+
+  // Scalar in Xbar
+  val numEffectiveScalarIns = p.getNumRegs(ScalarInReg)
+  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, numEffectiveScalarIns, p.w)))
+  scalarInXbar.io.config := io.config.scalarInXbar
+  scalarInXbar.io.ins := Vec(io.scalarIn.map { _.bits })
+//  scalarInXbar.io.ins := Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
+
+
   // Scalar input FIFOs
-  val scalarFIFOs = List.tabulate(p.numScalarIn) { i =>
+  val scalarFIFOs = List.tabulate(numEffectiveScalarIns) { i =>
     val fifo = Module(new FIFOCore(p.w, p.scalarFIFODepth, 1))
     val config = Wire(FIFOConfig(p.scalarFIFODepth, p.v))
     config.chainWrite := true.B
     config.chainRead := true.B
     fifo.io.config := config
-    fifo.io.enq(0) := io.scalarIn(i).bits
+    fifo.io.enq(0) := scalarInXbar.io.outs(i)
 //    fifo.io.enqVld := io.scalarIn(i).valid
     fifo
   }
 
-  val scalarInRegs = p.getRegIDs(ScalarInReg)
-  val scalarOutRegs = p.getRegIDs(ScalarOutReg)
-  Predef.assert((p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts) >= 1, s"ERROR: No scalar outs defined on PMU")
-
-  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)))
-  scalarInXbar.io.config := io.config.scalarInXbar
-  scalarInXbar.io.ins := Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
-  val scalarIns = scalarInXbar.io.outs
+  val scalarIns = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, scalarInXbar.io.outs(i), fifo.io.deq(0)) }
 //  val scalarIns = Vec(scalarFIFOs.map { _.io.deq(0)})
 
   // Vector input FIFOs
@@ -230,7 +235,7 @@ class PMU(val p: PMUParams) extends CU {
         m.io.sel := addrConfig.value
         m.io.out
     }}
-    val mux = Module(new MuxN(UInt(log2Up(p.scratchpadSizeWords)), sources.size))
+    val mux = Module(new MuxN(UInt(log2Up(p.scratchpadSizeWords).W), sources.size))
     mux.io.ins := Vec(sources)
     mux.io.sel := addrConfig.src
     mux.io.out

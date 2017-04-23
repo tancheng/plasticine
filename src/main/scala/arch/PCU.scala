@@ -36,27 +36,32 @@ class PCU(val p: PCUParams) extends CU {
     srcMux.io.out
   }
 
-  // Scalar input FIFOs
-  val scalarFIFOs = List.tabulate(p.numScalarIn) { i =>
-    val fifo = Module(new FIFOCore(p.w, p.scalarFIFODepth, 1))
-    val config = Wire(FIFOConfig(p.scalarFIFODepth, p.v))
-    config.chainWrite := true.B
-    config.chainRead := true.B
-    fifo.io.config := config
-    fifo.io.enq(0) := io.scalarIn(i).bits
-//    fifo.io.enqVld := io.scalarIn(i).valid
-    fifo
-  }
-
   val scalarInRegs = p.getRegIDs(ScalarInReg)
   val scalarOutRegs = p.getRegIDs(ScalarOutReg)
   val vectorInRegs = p.getRegIDs(VecInReg)
   val vectorOutRegs = p.getRegIDs(VecOutReg)
 
-  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)))
+  // Scalar in Xbar
+  val numEffectiveScalarIns = p.getNumRegs(ScalarInReg)
+  val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, numEffectiveScalarIns, p.w)))
   scalarInXbar.io.config := io.config.scalarInXbar
-  scalarInXbar.io.ins := Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
-  val scalarIns = scalarInXbar.io.outs
+  scalarInXbar.io.ins := Vec(io.scalarIn.map { _.bits })
+
+
+  // Scalar input FIFOs
+  val scalarFIFOs = List.tabulate(numEffectiveScalarIns) { i =>
+    val fifo = Module(new FIFOCore(p.w, p.scalarFIFODepth, 1))
+    val config = Wire(FIFOConfig(p.scalarFIFODepth, p.v))
+    config.chainWrite := true.B
+    config.chainRead := true.B
+    fifo.io.config := config
+    fifo.io.enq(0) := scalarInXbar.io.outs(i)
+//    fifo.io.enqVld := io.scalarIn(i).valid
+    fifo
+  }
+
+//  val scalarIns = scalarInXbar.io.outs
+  val scalarIns = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, scalarInXbar.io.outs(i), fifo.io.deq(0)) }
 
   // Vector input FIFOs
   val vectorFIFOs = List.tabulate(p.numVectorIn) { i =>

@@ -129,7 +129,7 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val control = PCUControlBoxConfig(p)
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
   val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
-  val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
+  val fifoNbufConfig = Vec(p.getNumRegs(ScalarInReg), UInt(log2Up(p.scalarFIFODepth).W))
   val accumInit = UInt(p.w.W)
 
   override def cloneType(): this.type = {
@@ -155,7 +155,7 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val waddrSelect = SrcValueBundle(addrSources, log2Up(p.scratchpadSizeWords))
   val raddrSelect = SrcValueBundle(addrSources, log2Up(p.scratchpadSizeWords))
   val rdataEnable = Vec(p.numVectorOut, Bool())
-  val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
+  val fifoNbufConfig = Vec(p.getNumRegs(ScalarInReg), UInt(log2Up(p.scalarFIFODepth).W))
 
   override def cloneType(): this.type = {
     new PMUConfig(p).asInstanceOf[this.type]
