@@ -8,6 +8,9 @@ int main(int argc, char *argv[]) {
 
   c1->setArg(2, 10);
   c1->run();
+  uint32_t out = c1->getArg(0);
+
+  std::cout << "out = " << out << std::endl;
 //  time_t tend = time(0);
 //  double elapsed = difftime(tend, tstart);
 //  std::cout << "Kernel done, test run time = " << elapsed << " ms" << std::endl;
