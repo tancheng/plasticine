@@ -19,6 +19,7 @@ object GeneratedTopParams extends TopParams with GeneratedParams {
     override val controlSwitchParams = Array.fill(3)(Array.ofDim[ControlSwitchParams](3))
     override val switchCUParams = Array.fill(3)(Array.ofDim[SwitchCUParams](3))
     override val numArgOutSelections = List(6,6,6)
+    override val numDoneConnections = 6
   }
   genParams
 }
@@ -75,6 +76,7 @@ case class GeneratedPMUParams(override val numScalarIn:Int, override val numScal
 case class GeneratedSwitchCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends SwitchCUParams {
   override val w = 32
   override val numCounters = 8
+  override val numUDCs = 5
 }
 trait GeneratedParams extends GeneratedParams1 {
   self:TopParams =>
