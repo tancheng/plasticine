@@ -96,7 +96,7 @@ class PCU(val p: PCUParams) extends CU {
   cbox.io.controlIn := io.controlIn
   io.controlOut := cbox.io.controlOut
 
-  cbox.io.fifoNotFull := Vec(scalarFIFOs.map { ~_.io.full } ++ vectorFIFOs.map { ~_.io.full })
+  cbox.io.fifoNotFull := Vec(scalarFIFOs.map { ~_.io.full })
   cbox.io.fifoNotEmpty := Vec(scalarFIFOs.map { ~_.io.empty } ++ vectorFIFOs.map { ~_.io.empty })
 
   scalarFIFOs.zip(cbox.io.scalarFifoDeqVld) foreach { case (fifo, deqVld) => fifo.io.deqVld := deqVld }

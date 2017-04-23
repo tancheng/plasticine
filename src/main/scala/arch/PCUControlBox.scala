@@ -16,7 +16,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
     val controlOut = Output(Vec(p.numControlOut, Bool()))
 
     // Local FIFO Inputs
-    val fifoNotFull = Input(Vec(p.numScalarIn+p.numVectorIn, Bool()))
+    val fifoNotFull = Input(Vec(p.numScalarIn, Bool()))
     val fifoNotEmpty = Input(Vec(p.numScalarIn+p.numVectorIn, Bool()))
 
     // Local FIFO Outputs
@@ -53,6 +53,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
   // Up-down counters to handle tokens and credits
   val udCounters = List.tabulate(p.numUDCs) { i =>
     val udc = Module(new UpDownCtr(p.udCtrWidth))
+    udc.io.init := false.B
     udc.io.initval := 0.U
     udc.io.strideInc := 1.U
     udc.io.strideDec := 1.U
