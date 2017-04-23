@@ -130,6 +130,7 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
   val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
   val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
+  val accumInit = UInt(p.w.W)
 
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]

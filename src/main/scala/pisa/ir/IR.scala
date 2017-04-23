@@ -297,7 +297,8 @@ case class PCUBits(
   var control: PCUControlBoxBits,
   var scalarInXbar: CrossbarBits,
   var scalarOutXbar: CrossbarBits,
-  var fifoNbufConfig: List[Int]
+  var fifoNbufConfig: List[Int],
+  var accumInit: AnyVal
 ) extends CUBits
 object PCUBits {
   def zeroes(p: PCUParams) = {
@@ -309,7 +310,8 @@ object PCUBits {
       PCUControlBoxBits.zeroes(p),
       CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)),
       CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w)),
-      List.fill(p.numScalarIn) { 0 }
+      List.fill(p.numScalarIn) { 0 },
+      0
     )
   }
 }

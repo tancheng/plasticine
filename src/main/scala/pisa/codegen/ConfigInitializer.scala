@@ -58,6 +58,12 @@ class ConfigInitializer() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := (1+value).U }  // 0'th input is always 0
       case (n: PCUBits, cn: PCUConfig)                    =>
+        cn.accumInit := (n.accumInit match {
+          case i: Int => i.U
+          case f: Float => java.lang.Float.floatToRawIntBits(f).U
+          case b: Boolean => if (b) 1.U else 0.U
+          case _ => throw new Exception(s"[ERROR] Unsupported accumulator type ${n.accumInit}")
+        })
         cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         init(n.scalarOutXbar, cn.scalarOutXbar)
         init(n.scalarInXbar, cn.scalarInXbar)
