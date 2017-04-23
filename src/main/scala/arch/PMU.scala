@@ -205,8 +205,10 @@ class PMU(val p: PMUParams) extends CU {
   Predef.assert(raddrReg.size == 1, s"More than on register ${raddrReg} is a ReadAddrReg, currently unsupported!")
   Predef.assert(waddrReg.size == 1, s"More than on register ${waddrReg} is a WriteAddrReg, currently unsupported!")
 
-  val raddrs = pipeRegs.map { _(raddrReg(0)).io.out }.toList
-  val waddrs = pipeRegs.map { _(waddrReg(0)).io.out }.toList
+//  val raddrs = pipeRegs.map { _(raddrReg(0)).io.out }.toList
+//  val waddrs = pipeRegs.map { _(waddrReg(0)).io.out }.toList
+  val raddrs = pipeStages.map { _.io.out }.toList
+  val waddrs = pipeStages.map { _.io.out }.toList
 
   // Scratchpad
   val scratchpad = Module(new Scratchpad(p))
