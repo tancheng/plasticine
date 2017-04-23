@@ -15,16 +15,16 @@ trait SimpleSequentialTrait1 {
   self:SimpleSequentialTrait =>
   def config1:Unit = {
     vsbs(0)(1).outSelect(4) = 9
-    csbs(0)(1).outSelect(19) = 3
-    csbs(0)(2).outSelect(0) = 7
-    csbs(0)(2).outSelect(11) = 0
-    csbs(0)(2).outSelect(12) = 4
-    csbs(0)(2).outSelect(18) = 8
     ssbs(1)(0).outSelect(4) = 18
+    csbs(1)(1).outSelect(9) = 16
+    csbs(1)(1).outSelect(22) = 8
+    csbs(1)(1).outSelect(23) = 9
+    csbs(1)(1).outSelect(31) = 17
     vsbs(1)(2).outSelect(8) = 13
     ssbs(1)(2).outSelect(4) = 13
     ssbs(1)(2).outSelect(18) = 5
-    csbs(1)(2).outSelect(3) = 13
+    csbs(1)(2).outSelect(4) = 17
+    csbs(1)(2).outSelect(22) = 4
     // Configuring cus(0)(0).asPCUBits <- PipeCU62_x353
     // PipeCU62_x353.udcounters=[SeqCU7_x358 -> TokBuf320]
     // cus(0)(0).asPCUBits.udcs=[Some(TokBuf320),None,None,None,None]
@@ -34,7 +34,7 @@ trait SimpleSequentialTrait1 {
     // PipeCU62_x353 isPipelining=true isStreaming=false
     cus(0)(0).asPCUBits.control.streamingMuxSelect = 0
     // sm5602[0] -> ScalBuf64 swapWrite=NotConnected
-    cus(0)(0).asPCUBits.control.incrementXbar.outSelect(0) = 1
+    cus(0)(0).asPCUBits.control.incrementXbar.outSelect(0) = 3
     cus(0)(0).asPCUBits.control.doneXbar.outSelect(0) = 0
     cus(0)(0).asPCUBits.fifoNbufConfig=List(1,-1,-1,-1)
     // cus(0)(0).asPCUBits.scalarInXbar=[Some(iw3234[2]),None,None,None]
@@ -72,15 +72,15 @@ trait SimpleSequentialTrait1 {
     cus(0)(1).asPMUBits.stages(0).opA = SVT(ScalarFIFOSrc, 0)
     cus(0)(1).asPMUBits.stages(0).opB = SVT()
     cus(0)(1).asPMUBits.stages(0).opC = SVT()
-    cus(0)(1).asPMUBits.stages(0).opcode = Bypass
+    cus(0)(1).asPMUBits.stages(0).opcode = BypassA
     cus(0)(1).asPMUBits.stages(0).res = List(SVT(ReadAddrDst, -1))
-    cus(0)(1).asPMUBits.stages(0).enableSelect = ReadEn
+    cus(0)(1).asPMUBits.stages(0).enableSelect.src = ReadEnSrc
     // sram183[0] -> SRAM42
     cus(0)(1).asPMUBits.scratchpad.stride = 1
     cus(0)(1).asPMUBits.scratchpad.numBufs = 1
-    cus(0)(1).asPMUBits.scratchpad.wdataSelect = 3
-    cus(0)(1).asPMUBits.scratchpad.waddrSelect = SVT(CounterSrc, 0)
-    cus(0)(1).asPMUBits.scratchpad.raddrSelect = SVT(ALUSrc, 0)
+    cus(0)(1).asPMUBits.wdataSelect = 3
+    cus(0)(1).asPMUBits.waddrSelect = SVT(CounterSrc, 0)
+    cus(0)(1).asPMUBits.raddrSelect = SVT(ALUSrc, 0)
     // Configuring cus(1)(1).asPCUBits <- PipeCU96_x357
     // PipeCU96_x357.udcounters=[]
     // cus(1)(1).asPCUBits.udcs=[None,None,None,None,None]
@@ -89,7 +89,7 @@ trait SimpleSequentialTrait1 {
     cus(1)(1).asPCUBits.control.siblingAndTree = List(0, 0, 0, 0, 0)
     // PipeCU96_x357 isPipelining=true isStreaming=false
     cus(1)(1).asPCUBits.control.streamingMuxSelect = 0
-    cus(1)(1).asPCUBits.control.tokenOutXbar.outSelect(0) = 4
+    cus(1)(1).asPCUBits.control.tokenOutXbar.outSelect(3) = 4
     cus(1)(1).asPCUBits.control.doneXbar.outSelect(0) = 0
     cus(1)(1).asPCUBits.fifoNbufConfig=List(-1,-1,-1,-1)
     // cus(1)(1).asPCUBits.scalarInXbar=[None,None,None,None]
