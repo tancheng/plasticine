@@ -23,6 +23,8 @@ object DoneSrc extends SelectSource
 object CurrStageDst extends SelectDst
 object ScalarOutDst extends SelectDst
 object VectorOutDst extends SelectDst
+object ReadAddrDst extends SelectDst
+object WriteAddrDst extends SelectDst
 object XDst extends SelectDst with XType
 
 
