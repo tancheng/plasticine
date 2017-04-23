@@ -180,7 +180,7 @@ case class PipeStageBits(
   var enableSelect: SrcValueTuple
 )
 extends AbstractBits {
-  val result = res.map{
+  lazy val result = res.map{
     case SrcValueTuple(CurrStageDst, idx:Int) => idx
     case _ => 0
   }

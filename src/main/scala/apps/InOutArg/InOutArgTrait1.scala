@@ -41,7 +41,7 @@ trait InOutArgTrait1 {
     cus(0)(0).asPCUBits.stages(0).opB = SVT(ConstSrc, 4)
     cus(0)(0).asPCUBits.stages(0).opC = SVT()
     cus(0)(0).asPCUBits.stages(0).opcode = FixAdd
-    cus(0)(0).asPCUBits.stages(0).res = List(SVT(CurrStageDst, 8),SVT(CurrStageDst, 0))
+    cus(0)(0).asPCUBits.stages(0).res = List(SVT(CurrStageDst, 0),SVT(CurrStageDst, 8))
     cus(0)(0).asPCUBits.stages(0).fwd(0) = SVT(ALUSrc, 0)
     cus(0)(0).asPCUBits.stages(0).fwd(8) = SVT(ALUSrc, 0)
     cus(0)(0).asPCUBits.stages(1).fwd(8) = SVT(PrevStageSrc, 8)
@@ -54,12 +54,12 @@ trait InOutArgTrait1 {
     cus(0)(0).asPCUBits.stages(8).fwd(8) = SVT(PrevStageSrc, 8)
     // Configuring lcus(1)(0) <- SeqCU4_x193
     lcus(1)(0).counterChain.chain = List(0,0,0,0,0)
-    // SeqCU4_x193.udcounters=[Top1_Top -> TokBuf96,PipeCU20_x192 -> TokBuf108]
-    // lcus(1)(0).udcs=[Some(TokBuf96),Some(TokBuf108),None,None]
-    lcus(1)(0).control.childrenAndTree = List(0, 1, 0, 0)
-    lcus(1)(0).control.siblingAndTree = List(1, 0, 0, 0)
-    lcus(1)(0).control.incrementXbar.outSelect(0) = 6
-    lcus(1)(0).control.incrementXbar.outSelect(1) = 7
+    // SeqCU4_x193.udcounters=[PipeCU20_x192 -> TokBuf108,Top1_Top -> TokBuf96]
+    // lcus(1)(0).udcs=[Some(TokBuf108),Some(TokBuf96),None,None]
+    lcus(1)(0).control.childrenAndTree = List(1, 0, 0, 0)
+    lcus(1)(0).control.siblingAndTree = List(0, 1, 0, 0)
+    lcus(1)(0).control.incrementXbar.outSelect(0) = 7
+    lcus(1)(0).control.incrementXbar.outSelect(1) = 6
     lcus(1)(0).control.udcDecSelect=List(1,1,-1,-1)
     lcus(1)(0).control.doneXbar.outSelect(0) = 0
     lcus(1)(0).counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)

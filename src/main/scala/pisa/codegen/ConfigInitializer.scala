@@ -125,7 +125,7 @@ class ConfigInitializer() extends Traversal {
         init(n.swapWriteXbar, cn.swapWriteXbar)
         init(n.doneXbar, cn.doneXbar)
         init(n.incrementXbar, cn.incrementXbar)
-        cn.udcDecSelect.zip(n.udcDecSelect) foreach { case (wire, value) => wire := value.U }
+        cn.udcDecSelect.zip(n.udcDecSelect) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         cn.childrenAndTree.zip(n.childrenAndTree) foreach { case (wire, value) => wire := value.U }
         cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
 
