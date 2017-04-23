@@ -6,7 +6,7 @@ import scala.language.reflectiveCalls
 import scala.collection.mutable.ListBuffer
 
 trait PlasticineArch3 extends PlasticineArch2 {
-  def connect3(io:PlasticineIO, argOutMuxIns:Array[Array[DecoupledIO[UInt]]], doneOuts:Wire, cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[SwitchCU]]):Unit = {
+  def connect3(io:PlasticineIO, argOutMuxIns:Array[Array[DecoupledIO[UInt]]], doneOuts:Array[Bool], cus:Array[Array[CU]], vsbs:Array[Array[VectorSwitch]], ssbs:Array[Array[ScalarSwitch]], csbs:Array[Array[ControlSwitch]], lcus:Array[Array[SwitchCU]]):Unit = {
     lcus(2)(2).io.scalarOut(0) <> ssbs(2)(2).io.ins(7)
     lcus(2)(2).io.scalarOut(1) <> ssbs(2)(2).io.ins(8)
     ssbs(0)(0).io.outs(0) <> ssbs(0)(1).io.ins(12)
