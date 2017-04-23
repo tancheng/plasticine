@@ -134,6 +134,7 @@ class ConfigInitializer() extends Traversal {
 
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
+        cn.doneSelect := n.doneSelect.U
         cn.argOutMuxSelect.zip(n.argOutMuxSelect) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         for(i <- 0 until cn.switchCU.size) {
           for(j <- 0 until cn.switchCU(i).size) {

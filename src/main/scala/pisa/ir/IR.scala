@@ -484,7 +484,8 @@ case class PlasticineBits(
   scalarSwitch: Array[Array[CrossbarBits]],
   controlSwitch: Array[Array[CrossbarBits]],
   switchCU: Array[Array[SwitchCUBits]], //TODO
-  argOutMuxSelect: List[Int]
+  argOutMuxSelect: List[Int],
+  doneSelect: Int
 ) extends AbstractBits
 
 object PlasticineBits {
@@ -506,7 +507,8 @@ object PlasticineBits {
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(scalarParams(i)(j)) },
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(controlParams(i)(j)) },
       Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { SwitchCUBits.zeroes(switchCUParams(i)(j)) }}, //TODO
-      List.fill(f.numArgOuts) { 0 }
+      List.fill(f.numArgOuts) { 0 },
+      0
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
   )}
 }

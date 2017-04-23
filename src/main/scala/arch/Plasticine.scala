@@ -9,6 +9,7 @@ import plasticine.pisa.codegen.ConfigInitializer
 import plasticine.pisa.ir._
 import plasticine.spade._
 import plasticine.config._
+import plasticine.misc.Utils._
 import fringe._
 
 import scala.collection.mutable.HashMap
@@ -82,6 +83,9 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
     mux.io.sel := config.argOutMuxSelect(i)
     mux
   }
+
+  val doneOuts = Wire(Vec(p.numDoneConnections, Bool()))
+  io.done := getMux(doneOuts.getElements.toList, config.doneSelect)
 
   // PCUs, PMUs
   val cus = Array.tabulate(p.numCols) { i =>

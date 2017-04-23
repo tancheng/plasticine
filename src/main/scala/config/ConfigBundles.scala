@@ -323,6 +323,7 @@ case class PlasticineConfig(
   val switchCU = HVec.tabulate(switchCUParams.size) { i => HVec.tabulate(switchCUParams(i).size) { j => new SwitchCUConfig(switchCUParams(i)(j)) } }
 
   val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
+  val doneSelect = UInt(log2Up((p.numRows+1) * (p.numCols+1)).W)
   override def cloneType(): this.type = {
     new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f).asInstanceOf[this.type]
   }

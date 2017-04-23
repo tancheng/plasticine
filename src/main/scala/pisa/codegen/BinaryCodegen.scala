@@ -160,6 +160,7 @@ class BinaryCodegen() extends Traversal {
 
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
+        toBinary(n.doneSelect, cn.doneSelect.getWidth) ++
         toBinary(n.argOutMuxSelect, cn.argOutMuxSelect.getWidth) ++
         List.tabulate(cn.switchCU.size) { i =>
           List.tabulate(cn.switchCU(i).size) { j =>

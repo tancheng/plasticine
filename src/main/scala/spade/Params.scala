@@ -70,6 +70,7 @@ trait PlasticineParams extends Params {
   val scalarSwitchParams:Array[Array[ScalarSwitchParams]]
   val controlSwitchParams:Array[Array[ControlSwitchParams]]
   val numArgOutSelections: List[Int]   //  = List(6,6,6)
+  val numDoneConnections: Int = 6 // 2 * (1+numCols)
 }
 
 trait FringeParams extends Params {
