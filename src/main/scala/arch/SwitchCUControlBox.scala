@@ -50,6 +50,7 @@ class SwitchCUControlBox(val p: SwitchCUParams) extends Module {
   val udcDec = Wire(Vec(p.numUDCs, Bool()))
   val udCounters = List.tabulate(p.numUDCs) { i =>
     val udc = Module(new UpDownCtr(p.udCtrWidth))
+    udc.io.init := false.B
     udc.io.initval := 0.U
     udc.io.strideInc := 1.U
     udc.io.strideDec := 1.U
@@ -78,14 +79,15 @@ class SwitchCUControlBox(val p: SwitchCUParams) extends Module {
   pulser.io.in := siblingAndTree
   pulser.io.max := io.config.pulserMax
 
-  val tokenDownOut = Mux(childrenAndTree, childrenAndTree, pulser.io.out)
+  val tokenDownOut = Mux(childrenAndTree, childrenAndTree & ~doneXbar.io.outs(0), pulser.io.out)
 
   // Token out crossbar
-  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(3, p.numControlOut)))
+  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(4, p.numControlOut)))
   tokenOutXbar.io.config := io.config.tokenOutXbar
   tokenOutXbar.io.ins(0) := doneXbar.io.outs(0)
   tokenOutXbar.io.ins(1) := tokenDownOut
-  tokenOutXbar.io.ins(2) := siblingAndTree
+  tokenOutXbar.io.ins(2) := childrenAndTree
+  tokenOutXbar.io.ins(3) := siblingAndTree
 
   io.controlOut := tokenOutXbar.io.outs
 }

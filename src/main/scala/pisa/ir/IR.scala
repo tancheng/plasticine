@@ -180,7 +180,7 @@ case class PipeStageBits(
   var enableSelect: SrcValueTuple
 )
 extends AbstractBits {
-  val result = res.map{
+  lazy val result = res.map{
     case SrcValueTuple(CurrStageDst, idx:Int) => idx
     case _ => 0
   }
@@ -296,7 +296,9 @@ case class PCUBits(
   var vectorValidOut: Array[SrcValueTuple],
   var control: PCUControlBoxBits,
   var scalarInXbar: CrossbarBits,
-  var scalarOutXbar: CrossbarBits
+  var scalarOutXbar: CrossbarBits,
+  var fifoNbufConfig: List[Int],
+  var accumInit: AnyVal
 ) extends CUBits
 object PCUBits {
   def zeroes(p: PCUParams) = {
@@ -307,7 +309,9 @@ object PCUBits {
       Array.fill(p.numVectorOut) { SrcValueTuple.zeroes(p.w) },
       PCUControlBoxBits.zeroes(p),
       CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)),
-      CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
+      CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w)),
+      List.fill(p.numScalarIn) { 0 },
+      0
     )
   }
 }
@@ -320,9 +324,10 @@ case class PMUBits(
   var scalarOutXbar: CrossbarBits,
   var scratchpad: ScratchpadBits,
   var wdataSelect: Int,
-  var waddrSelect: Int,
-  var raddrSelect: Int,
-  var rdataEnable: List[Int]
+  var waddrSelect: SrcValueTuple,
+  var raddrSelect: SrcValueTuple,
+  var rdataEnable: List[Int],
+  var fifoNbufConfig: List[Int]
 
 ) extends CUBits
 object PMUBits {
@@ -335,16 +340,18 @@ object PMUBits {
       CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w)),
       ScratchpadBits.zeroes,
       0,
-      0,
-      0,
-      List.fill(p.numVectorOut) { 0 }
+      SrcValueTuple.zeroes(p.w),
+      SrcValueTuple.zeroes(p.w),
+      List.fill(p.numVectorOut) { 0 },
+      List.fill(p.numScalarIn) { 0 }
     )
   }
 }
 
 case class SwitchCUBits(
   var counterChain: CounterChainBits,
-  var control: SwitchCUControlBoxBits
+  var control: SwitchCUControlBoxBits,
+  var fifoNbufConfig: List[Int]
 ) extends CUBits {
   def stages = Array[PipeStageBits]()
 }
@@ -352,7 +359,8 @@ object SwitchCUBits {
   def zeroes(p: SwitchCUParams) = {
     new SwitchCUBits (
       CounterChainBits.zeroes(p.w, p.numCounters),
-      SwitchCUControlBoxBits.zeroes(p)
+      SwitchCUControlBoxBits.zeroes(p),
+      List.fill(p.numScalarIn) { 0 }
     )
   }
 }
@@ -424,7 +432,7 @@ object SwitchCUControlBoxBits {
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
-        CrossbarBits.zeroes(ControlSwitchParams(3, p.numControlOut)), // tokenOutXbar
+        CrossbarBits.zeroes(ControlSwitchParams(4, p.numControlOut)), // tokenOutXbar
         0
       )
   }
@@ -439,7 +447,7 @@ object SwitchCUControlBoxBits {
 case class CrossbarBits(outSelect: Array[Int]) extends AbstractBits
 object CrossbarBits {
   def zeroes(p: SwitchParams) = {
-    new CrossbarBits(Array.fill(1+p.numOuts) { 0 })
+    new CrossbarBits(Array.fill(p.numOuts) { -1 })
   }
 }
 
@@ -478,7 +486,8 @@ case class PlasticineBits(
   scalarSwitch: Array[Array[CrossbarBits]],
   controlSwitch: Array[Array[CrossbarBits]],
   switchCU: Array[Array[SwitchCUBits]], //TODO
-  argOutMuxSelect: List[Int]
+  argOutMuxSelect: List[Int],
+  doneSelect: Int
 ) extends AbstractBits
 
 object PlasticineBits {
@@ -500,7 +509,8 @@ object PlasticineBits {
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(scalarParams(i)(j)) },
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(controlParams(i)(j)) },
       Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { SwitchCUBits.zeroes(switchCUParams(i)(j)) }}, //TODO
-      List.fill(f.numArgOuts) { 0 }
+      List.fill(f.numArgOuts) { 0 },
+      0
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
   )}
 }

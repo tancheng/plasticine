@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 import plasticine.templates.Utils.log2Up
 import plasticine.templates.RegFile
-import plasticine.templates.Depulser
+import plasticine.templates.{Pulser, Depulser}
 import plasticine.templates.MAGCore
 import scala.language.reflectiveCalls
 
@@ -74,7 +74,10 @@ class Fringe(
 
   val command = regs.io.argIns(0)   // commandReg = first argIn
   val curStatus = regs.io.argIns(1) // current status
-  io.enable := command(0) & ~curStatus(0)          // enable = LSB of first argIn
+
+  val enablePulser = Module(new Pulser())
+  enablePulser.io.in := command(0) & ~curStatus(0)          // enable = LSB of first argIn
+  io.enable := enablePulser.io.out
   io.argIns := regs.io.argIns.drop(2) // Accel argIns: Everything except first argIn
 
   val depulser = Module(new Depulser())

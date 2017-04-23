@@ -38,7 +38,8 @@ trait PlasticineTestTrait {
       scalarSwitch=ssbs,
       controlSwitch=csbs,
       switchCU=lcus,
-      argOutMuxSelect=List(1,-1,-1)
+      argOutMuxSelect=List(1,-1,-1),
+      doneSelect = 0
     )
 
 //    cus(0)(0).counterChain.counters(0) = CounterRCBits(max=SrcValueTuple(ConstSrc, 10), stride=SrcValueTuple(ConstSrc, 0), min=SrcValueTuple(ConstSrc, 1), par=1)

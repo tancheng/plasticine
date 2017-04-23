@@ -43,7 +43,7 @@ trait InOutArgTrait1 {
     cus(0)(0).asPCUBits.stages(0).opB = SVT(ConstSrc, 4)
     cus(0)(0).asPCUBits.stages(0).opC = SVT()
     cus(0)(0).asPCUBits.stages(0).opcode = FixAdd
-    cus(0)(0).asPCUBits.stages(0).res = List(SVT(CurrStageDst, 8),SVT(CurrStageDst, 0))
+    cus(0)(0).asPCUBits.stages(0).res = List(SVT(CurrStageDst, 0),SVT(CurrStageDst, 8))
     cus(0)(0).asPCUBits.stages(0).fwd(0) = SVT(ALUSrc, 0)
     cus(0)(0).asPCUBits.stages(0).fwd(8) = SVT(ALUSrc, 0)
     cus(0)(0).asPCUBits.stages(1).fwd(8) = SVT(PrevStageSrc, 8)
@@ -58,8 +58,8 @@ trait InOutArgTrait1 {
     lcus(0)(1).counterChain.chain = List(0,0,0,0,0)
     // SeqCU4_x193.udcounters=[Top1_Top -> TokBuf96,PipeCU20_x192 -> TokBuf108]
     // lcus(0)(1).udcs=[Some(TokBuf96),Some(TokBuf108),None,None]
-    lcus(0)(1).control.childrenAndTree = List(0, 1, 0, 0)
-    lcus(0)(1).control.siblingAndTree = List(1, 0, 0, 0)
+    lcus(0)(1).control.childrenAndTree = List(0, 1, 0, 0, 0)
+    lcus(0)(1).control.siblingAndTree = List(1, 0, 0, 0, 0)
     lcus(0)(1).control.incrementXbar.outSelect(0) = 6
     lcus(0)(1).control.incrementXbar.outSelect(1) = 7
     lcus(0)(1).control.udcDecSelect=List(1,1,-1,-1)

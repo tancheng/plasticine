@@ -129,6 +129,9 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val control = PCUControlBoxConfig(p)
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
   val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
+  val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
+  val accumInit = UInt(p.w.W)
+
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]
   }
@@ -141,6 +144,7 @@ object PCUConfig {
 
 case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val enableSources = List[SelectSource](XSrc, PrevStageSrc, CounterSrc, ConstSrc)
+  val addrSources = List[SelectSource](XSrc, CounterSrc, ALUSrc, ScalarFIFOSrc, ConstSrc)
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w,p.numCounters, enableSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = PMUControlBoxConfig(p)
@@ -148,9 +152,10 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w))
   val scratchpad = ScratchpadConfig(p)
   val wdataSelect = UInt(log2Up(p.numVectorIn).W)
-  val waddrSelect = UInt(log2Up(p.d).W)
-  val raddrSelect = UInt(log2Up(p.d).W)
+  val waddrSelect = SrcValueBundle(addrSources, log2Up(p.scratchpadSizeWords))
+  val raddrSelect = SrcValueBundle(addrSources, log2Up(p.scratchpadSizeWords))
   val rdataEnable = Vec(p.numVectorOut, Bool())
+  val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
 
   override def cloneType(): this.type = {
     new PMUConfig(p).asInstanceOf[this.type]
@@ -160,6 +165,7 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
 case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = SwitchCUControlBoxConfig(p)
+  val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
 
   override def cloneType(): this.type = {
     new SwitchCUConfig(p).asInstanceOf[this.type]
@@ -170,7 +176,7 @@ case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
  * Crossbar config register format
  */
 case class CrossbarConfig(p: SwitchParams) extends AbstractConfig {
-  var outSelect = Vec(p.numOuts, UInt(log2Up(p.numIns).W))
+  var outSelect = Vec(p.numOuts, UInt(log2Up(1+p.numIns).W))
 
   override def cloneType(): this.type = {
     new CrossbarConfig(p).asInstanceOf[this.type]
@@ -286,7 +292,7 @@ case class SwitchCUControlBoxConfig(val p: SwitchCUParams) extends AbstractConfi
   val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
-  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(3, p.numControlOut))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(4, p.numControlOut))
   val pulserMax = UInt(p.udCtrWidth.W)
 
   override def cloneType(): this.type = {
@@ -319,6 +325,7 @@ case class PlasticineConfig(
   val switchCU = HVec.tabulate(switchCUParams.size) { i => HVec.tabulate(switchCUParams(i).size) { j => new SwitchCUConfig(switchCUParams(i)(j)) } }
 
   val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
+  val doneSelect = UInt(log2Up((p.numRows+1) * (p.numCols+1)).W)
   override def cloneType(): this.type = {
     new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f).asInstanceOf[this.type]
   }

@@ -33,7 +33,7 @@ class PMU(val p: PMUParams) extends CU {
 
   val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)))
   scalarInXbar.io.config := io.config.scalarInXbar
-  scalarInXbar.io.ins := Vec(scalarFIFOs.map { _.io.deq(0) })
+  scalarInXbar.io.ins := Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
   val scalarIns = scalarInXbar.io.outs
 //  val scalarIns = Vec(scalarFIFOs.map { _.io.deq(0)})
 
@@ -205,15 +205,43 @@ class PMU(val p: PMUParams) extends CU {
   Predef.assert(raddrReg.size == 1, s"More than on register ${raddrReg} is a ReadAddrReg, currently unsupported!")
   Predef.assert(waddrReg.size == 1, s"More than on register ${waddrReg} is a WriteAddrReg, currently unsupported!")
 
-  val raddrs = pipeRegs.map { _(raddrReg(0)).io.out }.toList
-  val waddrs = pipeRegs.map { _(waddrReg(0)).io.out }.toList
+//  val raddrs = pipeRegs.map { _(raddrReg(0)).io.out }.toList
+//  val waddrs = pipeRegs.map { _(waddrReg(0)).io.out }.toList
+  val raddrs = pipeStages.map { _.io.out }.toList
+  val waddrs = pipeStages.map { _.io.out }.toList
+
+  def getAddrSourcesMux(s: SelectSource) = {
+    val sources = s match {
+      case CounterSrc => counterChain.io.out
+      case ScalarFIFOSrc => scalarIns
+      case ALUSrc => Vec(pipeStages.map {_.io.out})
+      case _ => throw new Exception("Unsupported operand source!")
+    }
+    val mux = Module(new MuxN(sources(0).cloneType, sources.size))
+    mux.io.ins := sources
+    mux
+  }
+
+  def getAddr(addrConfig: SrcValueBundle) = {
+    val sources = addrConfig.nonXSources map { s => s match {
+      case ConstSrc => addrConfig.value
+      case _ =>
+        val m = getAddrSourcesMux(s)
+        m.io.sel := addrConfig.value
+        m.io.out
+    }}
+    val mux = Module(new MuxN(UInt(log2Up(p.scratchpadSizeWords)), sources.size))
+    mux.io.ins := Vec(sources)
+    mux.io.sel := addrConfig.src
+    mux.io.out
+  }
 
   // Scratchpad
   val scratchpad = Module(new Scratchpad(p))
   scratchpad.io.config := io.config.scratchpad
   scratchpad.io.wdata := getMux(vectorFIFOs.map {_.io.deq}, io.config.wdataSelect)
-  scratchpad.io.waddr := getMux(waddrs, io.config.waddrSelect)
-  scratchpad.io.raddr := getMux(raddrs, io.config.raddrSelect)
+  scratchpad.io.waddr := getAddr(io.config.waddrSelect)
+  scratchpad.io.raddr := getAddr(io.config.raddrSelect)
   scratchpad.io.wen := false.B  // TODO: Fix after threading enable signals through pipeline
 
   // Output assignment
@@ -260,7 +288,7 @@ class PMU(val p: PMUParams) extends CU {
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := scratchpad.io.rdata
-    out.valid := Reg(Bool(), stageEnables.last.io.out) & io.config.rdataEnable(i) // Output produced by read addr logic only, which is controlledby enable(0)
+    out.valid := RegNext(stageEnables.last.io.out & io.config.rdataEnable(i), 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
                                                               // TODO: Fix after threading enable signals
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }

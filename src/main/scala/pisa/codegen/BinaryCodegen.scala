@@ -77,6 +77,8 @@ class BinaryCodegen() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         toBinary(n.outSelect, cn.outSelect.getWidth)
       case (n: PCUBits, cn: PCUConfig)                    =>
+        val accumBits = toBinary(n.accumInit, cn.accumInit.getWidth)
+        val fifoNbufBits = toBinary(n.fifoNbufConfig, cn.fifoNbufConfig.getWidth)
         val scalarOutXbarBits = genBinary(n.scalarOutXbar, cn.scalarOutXbar)
         val scalarInXbarBits = genBinary(n.scalarInXbar, cn.scalarInXbar)
         val controlBits = genBinary(n.control, cn.control)
@@ -88,11 +90,12 @@ class BinaryCodegen() extends Traversal {
         }.flatten
 //        println(s"[PCUBits] counterBits = $counterBits")
 //        println(s"[PCUBits] stageBits = $stageBits")
-        scalarOutXbarBits ++ scalarInXbarBits ++ controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
+        accumBits ++ fifoNbufBits ++ scalarOutXbarBits ++ scalarInXbarBits ++ controlBits ++ vecValidBits ++ scalarValidBits ++ counterBits ++ stageBits
       case (n: PMUBits, cn: PMUConfig)                    =>
+        toBinary(n.fifoNbufConfig, cn.fifoNbufConfig.getWidth) ++
         toBinary(n.rdataEnable, cn.rdataEnable.getWidth) ++
-        toBinary(n.raddrSelect, cn.raddrSelect.getWidth) ++
-        toBinary(n.waddrSelect, cn.waddrSelect.getWidth) ++
+        genBinary(n.raddrSelect, cn.raddrSelect) ++
+        genBinary(n.waddrSelect, cn.waddrSelect) ++
         toBinary(n.wdataSelect, cn.wdataSelect.getWidth) ++
         genBinary(n.scratchpad, cn.scratchpad) ++
         genBinary(n.scalarOutXbar, cn.scalarOutXbar) ++
@@ -103,6 +106,7 @@ class BinaryCodegen() extends Traversal {
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
       case (n: SwitchCUBits, cn: SwitchCUConfig)                    =>
+        toBinary(n.fifoNbufConfig, cn.fifoNbufConfig.getWidth) ++
         genBinary(n.control, cn.control) ++
         genBinary(n.counterChain, cn.counterChain)
 
@@ -151,12 +155,13 @@ class BinaryCodegen() extends Traversal {
         genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
         genBinary(n.doneXbar, cn.doneXbar) ++
         genBinary(n.incrementXbar, cn.incrementXbar) ++
-        toBinary(n.udcDecSelect, cn.udcDecSelect.getWidth) ++
+        toBinary(if (n.udcDecSelect == -1) 0 else n.udcDecSelect, cn.udcDecSelect.getWidth) ++
         toBinary(n.childrenAndTree, cn.childrenAndTree.getWidth) ++
         toBinary(n.siblingAndTree, cn.siblingAndTree.getWidth)
 
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
+        toBinary(n.doneSelect, cn.doneSelect.getWidth) ++
         toBinary(n.argOutMuxSelect, cn.argOutMuxSelect.getWidth) ++
         List.tabulate(cn.switchCU.size) { i =>
           List.tabulate(cn.switchCU(i).size) { j =>

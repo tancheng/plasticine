@@ -56,8 +56,15 @@ class ConfigInitializer() extends Traversal {
         init(n.stride, cn.stride)
         init(n.max, cn.max)
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
-        cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := value.U }
+        cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := (1+value).U }  // 0'th input is always 0
       case (n: PCUBits, cn: PCUConfig)                    =>
+        cn.accumInit := (n.accumInit match {
+          case i: Int => i.U
+          case f: Float => java.lang.Float.floatToRawIntBits(f).U
+          case b: Boolean => if (b) 1.U else 0.U
+          case _ => throw new Exception(s"[ERROR] Unsupported accumulator type ${n.accumInit}")
+        })
+        cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         init(n.scalarOutXbar, cn.scalarOutXbar)
         init(n.scalarInXbar, cn.scalarInXbar)
         init(n.control, cn.control)
@@ -66,9 +73,10 @@ class ConfigInitializer() extends Traversal {
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PMUBits, cn: PMUConfig)                    =>
+        cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         cn.rdataEnable.zip(n.rdataEnable) foreach { case (wire, value) => wire := (value > 0).B }
-        cn.raddrSelect := n.raddrSelect.U
-        cn.waddrSelect := n.waddrSelect.U
+        init(n.raddrSelect, cn.raddrSelect)
+        init(n.waddrSelect, cn.waddrSelect)
         cn.wdataSelect := n.wdataSelect.U
         init(n.scratchpad, cn.scratchpad)
         init(n.scalarOutXbar, cn.scalarOutXbar)
@@ -77,6 +85,7 @@ class ConfigInitializer() extends Traversal {
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: SwitchCUBits, cn: SwitchCUConfig)                    =>
+        cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         init(n.control, cn.control)
         init(n.counterChain, cn.counterChain)
 
@@ -125,12 +134,13 @@ class ConfigInitializer() extends Traversal {
         init(n.swapWriteXbar, cn.swapWriteXbar)
         init(n.doneXbar, cn.doneXbar)
         init(n.incrementXbar, cn.incrementXbar)
-        cn.udcDecSelect.zip(n.udcDecSelect) foreach { case (wire, value) => wire := value.U }
+        cn.udcDecSelect.zip(n.udcDecSelect) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         cn.childrenAndTree.zip(n.childrenAndTree) foreach { case (wire, value) => wire := value.U }
         cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
 
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
+        cn.doneSelect := n.doneSelect.U
         cn.argOutMuxSelect.zip(n.argOutMuxSelect) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         for(i <- 0 until cn.switchCU.size) {
           for(j <- 0 until cn.switchCU(i).size) {

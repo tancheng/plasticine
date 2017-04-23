@@ -65,7 +65,7 @@ class ScalarSwitch(val p: ScalarSwitchParams) extends Module {
   }
 
   io.outs.zipWithIndex.foreach { case (o, idx) =>
-    o.bits := validCrossbar.io.outs(idx)(p.w-1, 1)
+    o.bits := validCrossbar.io.outs(idx)(p.w, 1)
     o.valid := validCrossbar.io.outs(0)
   }
 

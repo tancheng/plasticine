@@ -63,7 +63,7 @@ trait PlasticineArch5 extends PlasticineArch4 {
     csbs(0)(0).io.outs(15) <> lcus(0)(0).io.controlIn(5)
     csbs(0)(0).io.outs(16) <> lcus(0)(0).io.controlIn(6)
     csbs(0)(0).io.outs(17) <> lcus(0)(0).io.controlIn(7)
-    csbs(0)(0).io.outs(18) <> io.done
+//    csbs(0)(0).io.outs(18) <> io.done
     csbs(0)(1).io.outs(0) <> csbs(0)(2).io.ins(9)
     csbs(0)(1).io.outs(1) <> csbs(0)(2).io.ins(10)
     csbs(0)(1).io.outs(2) <> csbs(0)(2).io.ins(11)
