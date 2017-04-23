@@ -132,7 +132,7 @@ object CounterRCBits {
 /**
  * CounterChain config information
  */
-case class CounterChainBits(chain: List[Int], counters: Array[CounterRCBits]) extends AbstractBits
+case class CounterChainBits(var chain: List[Int], counters: Array[CounterRCBits]) extends AbstractBits
 object CounterChainBits {
   def zeroes(width: Int, numCounters: Int) = {
     new CounterChainBits(
@@ -171,13 +171,13 @@ object CounterChainBits {
 //}
 
 case class PipeStageBits(
-  opA: SrcValueTuple,
-  opB: SrcValueTuple,
-  opC: SrcValueTuple,
-  opcode: Opcode = XOp,
-  res: List[SrcValueTuple] = Nil,
+  var opA: SrcValueTuple,
+  var opB: SrcValueTuple,
+  var opC: SrcValueTuple,
+  var opcode: Opcode = XOp,
+  var res: List[SrcValueTuple] = Nil,
   fwd: Array[SrcValueTuple] = Array[SrcValueTuple](),
-  enableSelect: SrcValueTuple
+  var enableSelect: SrcValueTuple
 )
 extends AbstractBits {
   val result = res.map{
