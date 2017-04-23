@@ -22,8 +22,8 @@ object Opcodes {
   // a separate Decode table
   private var _opcodes = List[(Opcode, (UInt, UInt, UInt) => UInt)](
     (FixAdd , (a,b,c)    => a+b),
-    (FixSub , (a,b,c)    => a-b)
-//    (FixMul , (a,b,c)    => a*b),
+//    (FixSub , (a,b,c)    => a-b)
+    (FixMul , (a,b,c)    => a*b),
 //    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
 //    (FixAnd , (a,b,c)    => a&b),
 //    (FixOr , (a,b,c)    => a|b),
@@ -32,15 +32,15 @@ object Opcodes {
 //    (FixLt , (a,b,c)   => a<b),
 //    (FixSHL , (a,b,c)   => a<<b),
 //    (FixSHR , (a,b,c)   => a>>b),
-//    (FltLt , (a,b,c)   => UInt(0)),
-//    (FltEql , (a,b,c)  => UInt(0)),
-//    (FltGt , (a,b,c) => UInt(0)),
-//    (FltMul , (a,b,c) => UInt(0)),
-//    (FltAdd , (a,b,c) => UInt(0)),
+//    (FltLt , (a,b,c)   => 0.U),
+//    (FltEql , (a,b,c)  => 0.U),
+//    (FltGt , (a,b,c) => 0.U),
+//    (FltMul , (a,b,c) => 0.U),
+//    (FltAdd , (a,b,c) => 0.U),
 //    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
 //    (FixMin , (a,b,c) => Mux(a<b, a, b)),
 //    (FixMax , (a,b,c) => Mux(a>b, a, b)),
-//    (BypassA , (a,b,c) => a),
+    (BypassA , (a,b,c) => a)
 //    (BypassB , (a,b,c) => b),
 //    (BypassC , (a,b,c) => c)
   )
@@ -56,7 +56,7 @@ object Opcodes {
     }
   }
 
-  def getOp(i: Int, a: UInt, b: UInt, c: UInt = UInt(0)): UInt = {
+  def getOp(i: Int, a: UInt, b: UInt, c: UInt = 0.U): UInt = {
     opcodes(i)._2(a, b, c)
   }
 
@@ -74,7 +74,7 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
     val opcode = Input(UInt(log2Up(Opcodes.opcodes.size).W))
     val out = Output(UInt(w.W))
   })
-  io.out := UInt(0) // <-- Required because otherwise Chisel thinks no one writes to io.out
+  io.out := 0.U // <-- Required because otherwise Chisel thinks no one writes to io.out
 
   // Instantiate floating point units:
   // Comparator
@@ -100,8 +100,8 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
   // Populate opcode table
   Opcodes.opcodes = List[(Opcode, (UInt, UInt, UInt) => UInt)](
     (FixAdd , (a,b,c)    => a+b),
-    (FixSub , (a,b,c)    => a-b)
-//    (FixMul , (a,b,c)    => a*b),
+//    (FixSub , (a,b,c)    => a-b)
+    (FixMul , (a,b,c)    => a*b),
 //    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
 //    (FixAnd , (a,b,c)    => a&b),
 //    (FixOr , (a,b,c)    => a|b),
@@ -118,7 +118,7 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
 //    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
 //    (FixMin , (a,b,c) => Mux(a<b, a, b)),
 //    (FixMax , (a,b,c) => Mux(a>b, a, b)),
-//    (BypassA , (a,b,c) => a),
+    (BypassA , (a,b,c) => a)
 //    (BypassB , (a,b,c) => b),
 //    (BypassC , (a,b,c) => c)
   )
@@ -158,12 +158,12 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
 //
 //  // Register the inputs
 //  val aReg = Module(new FF(w))
-//  aReg.io.enable := Bool(true)
+//  aReg.io.enable := true.B
 //  aReg.io.in := io.a
 //  val a = aReg.io.out
 //
 //  val bReg = Module(new FF(w))
-//  bReg.io.enable := Bool(true)
+//  bReg.io.enable := true.B
 //  bReg.io.in := io.b
 //  val b = bReg.io.out
 //
@@ -173,7 +173,7 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
 //
 //  // Register the output
 //  val outReg = Module(new FF(w))
-//  outReg.io.enable := Bool(true)
+//  outReg.io.enable := true.B
 //  outReg.io.in := Cat(fpComparator.io.lt, fpComparator.io.eq, fpComparator.io.gt)
 //  io.out := outReg.io.out
 //}
@@ -188,12 +188,12 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
 //
 //  // Register the inputs
 //  val aReg = Module(new FF(w))
-//  aReg.io.enable := Bool(true)
+//  aReg.io.enable := true.B
 //  aReg.io.in := io.a
 //  val a = aReg.io.out
 //
 //  val bReg = Module(new FF(w))
-//  bReg.io.enable := Bool(true)
+//  bReg.io.enable := true.B
 //  bReg.io.in := io.b
 //  val b = bReg.io.out
 //
@@ -204,7 +204,7 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
 //
 //  // Register the output
 //  val outReg = Module(new FF(w))
-//  outReg.io.enable := Bool(true)
+//  outReg.io.enable := true.B
 //  outReg.io.in := fma.io.out
 //  io.out := outReg.io.out
 //}
@@ -220,22 +220,22 @@ class FUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
 
   // Register the inputs
   val aReg = Module(new FF(w))
-  aReg.io.enable := Bool(true)
+  aReg.io.enable := true.B
   aReg.io.in := io.a
   val a = aReg.io.out
 
   val bReg = Module(new FF(w))
-  bReg.io.enable := Bool(true)
+  bReg.io.enable := true.B
   bReg.io.in := io.b
   val b = bReg.io.out
 
   val cReg = Module(new FF(w))
-  cReg.io.enable := Bool(true)
+  cReg.io.enable := true.B
   cReg.io.in := io.c
   val c = bReg.io.out
 
   val opcodeReg = Module(new FF(log2Up(Opcodes.opcodes.size)))
-  opcodeReg.io.enable := Bool(true)
+  opcodeReg.io.enable := true.B
   opcodeReg.io.in := io.opcode
   val op = opcodeReg.io.out
 
@@ -248,7 +248,7 @@ class FUReg(val w: Int, useFMA: Boolean, useFPComp: Boolean) extends Module {
 
   // Register the output
   val outReg = Module(new FF(w))
-  outReg.io.enable := Bool(true)
+  outReg.io.enable := true.B
   outReg.io.in := fu.io.out
   io.out := outReg.io.out
 }

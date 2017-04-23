@@ -145,12 +145,12 @@ class Scratchpad(val p: PMUParams) extends Module {
   // when one side is a FIFO
   val sizeUDC = Module(new UpDownCtr(log2Up(scratchpadSizeWords)+1))
   val size = sizeUDC.io.out
-  val empty = size === UInt(0)
+  val empty = size === 0.U
   val full = sizeUDC.io.isMax
-  sizeUDC.io.initval := UInt(0)
+  sizeUDC.io.initval := 0.U
 //  sizeUDC.io.max := (if (inst.numBufs == 0) UInt(d) else UInt(d - v * (bankSize % inst.numBufs)))
   sizeUDC.io.max := io.config.fifoSize
-  sizeUDC.io.init := UInt(0)
+  sizeUDC.io.init := 0.U
 //  sizeUDC.io.strideInc := Mux(config.chainWrite, UInt(1), UInt(v))
   sizeUDC.io.strideInc := p.v.U
 //  sizeUDC.io.strideDec := Mux(config.chainRead, UInt(1), UInt(v))
