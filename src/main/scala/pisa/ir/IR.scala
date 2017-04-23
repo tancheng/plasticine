@@ -424,7 +424,7 @@ object SwitchCUControlBoxBits {
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
-        CrossbarBits.zeroes(ControlSwitchParams(3, p.numControlOut)), // tokenOutXbar
+        CrossbarBits.zeroes(ControlSwitchParams(4, p.numControlOut)), // tokenOutXbar
         0
       )
   }
