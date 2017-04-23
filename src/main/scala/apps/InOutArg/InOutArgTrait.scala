@@ -38,7 +38,7 @@ trait InOutArgTrait extends InOutArgTrait1 {
     controlSwitch=csbs,
     switchCU=lcus,
     argOutMuxSelect=List(1,-1,-1),
-    doneSelect=1
+    doneSelect=0
   )  
   def main(args: String*) = plasticineBits
   def config:Unit =  {
