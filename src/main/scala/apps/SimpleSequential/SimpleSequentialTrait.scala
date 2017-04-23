@@ -38,7 +38,7 @@ trait SimpleSequentialTrait extends SimpleSequentialTrait1 with SimpleSequential
     controlSwitch=csbs,
     switchCU=lcus,
     argOutMuxSelect=List(4,-1,-1),
-    doneSelect=5
+    doneSelect=4
   )  
   def main(args: String*) = plasticineBits
   def config:Unit =  {
