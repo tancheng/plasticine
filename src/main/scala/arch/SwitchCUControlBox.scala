@@ -50,6 +50,7 @@ class SwitchCUControlBox(val p: SwitchCUParams) extends Module {
   val udcDec = Wire(Vec(p.numUDCs, Bool()))
   val udCounters = List.tabulate(p.numUDCs) { i =>
     val udc = Module(new UpDownCtr(p.udCtrWidth))
+    udc.io.init := false.B
     udc.io.initval := 0.U
     udc.io.strideInc := 1.U
     udc.io.strideDec := 1.U
