@@ -41,7 +41,7 @@ trait PlasticineArch6 extends PlasticineArch5 {
     csbs(1)(0).io.outs(21) <> lcus(1)(0).io.controlIn(5)
     csbs(1)(0).io.outs(22) <> lcus(1)(0).io.controlIn(6)
     csbs(1)(0).io.outs(23) <> lcus(1)(0).io.controlIn(7)
-    csbs(1)(0).io.outs(24) <> io.done
+//    csbs(1)(0).io.outs(24) <> io.done
     csbs(1)(1).io.outs(0) <> csbs(0)(1).io.ins(5)
     csbs(1)(1).io.outs(1) <> csbs(0)(1).io.ins(6)
     csbs(1)(1).io.outs(2) <> csbs(0)(1).io.ins(7)
@@ -78,7 +78,7 @@ trait PlasticineArch6 extends PlasticineArch5 {
     csbs(1)(2).io.outs(1) <> csbs(0)(2).io.ins(2)
     csbs(1)(2).io.outs(2) <> csbs(0)(2).io.ins(3)
     csbs(1)(2).io.outs(3) <> csbs(0)(2).io.ins(4)
-    csbs(1)(2).io.outs(4) <> io.done
+//    csbs(1)(2).io.outs(4) <> io.done
     csbs(1)(2).io.outs(5) <> csbs(2)(2).io.ins(0)
     csbs(1)(2).io.outs(6) <> csbs(2)(2).io.ins(1)
     csbs(1)(2).io.outs(7) <> csbs(2)(2).io.ins(2)
