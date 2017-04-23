@@ -222,12 +222,12 @@ object PipeStageBits {
 }
 
 case class ScratchpadBits(
-  mode: Int = 0,
-  stride: Int = 0,
-  numBufs: Int = 0,
-  isReadFifo: Int = 0,
-  isWriteFifo: Int = 0,
-  fifoSize: Int = 0
+  var mode: Int = 0,
+  var stride: Int = 0,
+  var numBufs: Int = 0,
+  var isReadFifo: Int = 0,
+  var isWriteFifo: Int = 0,
+  var fifoSize: Int = 0
 ) extends AbstractBits
 object ScratchpadBits {
   def zeroes = {
@@ -391,13 +391,13 @@ object PCUControlBoxBits {
 }
 
 case class PMUControlBoxBits(
-  writeFifoAndTree: List[Int],
-  readFifoAndTree: List[Int],
-  scalarSwapReadSelect: List[Int],
-  writeDoneXbar: CrossbarBits,
-  readDoneXbar: CrossbarBits,
-  swapWriteXbar: CrossbarBits,
-  tokenOutXbar: CrossbarBits
+  var writeFifoAndTree: List[Int],
+  var readFifoAndTree: List[Int],
+  var scalarSwapReadSelect: List[Int],
+  var writeDoneXbar: CrossbarBits,
+  var readDoneXbar: CrossbarBits,
+  var swapWriteXbar: CrossbarBits,
+  var tokenOutXbar: CrossbarBits
 ) extends AbstractBits
 object PMUControlBoxBits {
   def zeroes(p: PMUParams) = {
