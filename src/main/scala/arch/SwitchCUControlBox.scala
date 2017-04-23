@@ -79,7 +79,7 @@ class SwitchCUControlBox(val p: SwitchCUParams) extends Module {
   pulser.io.in := siblingAndTree
   pulser.io.max := io.config.pulserMax
 
-  val tokenDownOut = Mux(childrenAndTree, childrenAndTree, pulser.io.out)
+  val tokenDownOut = Mux(childrenAndTree, childrenAndTree & ~doneXbar.io.outs(0), pulser.io.out)
 
   // Token out crossbar
   val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(3, p.numControlOut)))
