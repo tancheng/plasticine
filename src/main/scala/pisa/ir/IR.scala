@@ -296,7 +296,8 @@ case class PCUBits(
   var vectorValidOut: Array[SrcValueTuple],
   var control: PCUControlBoxBits,
   var scalarInXbar: CrossbarBits,
-  var scalarOutXbar: CrossbarBits
+  var scalarOutXbar: CrossbarBits,
+  var fifoNbufConfig: List[Int]
 ) extends CUBits
 object PCUBits {
   def zeroes(p: PCUParams) = {
@@ -307,7 +308,8 @@ object PCUBits {
       Array.fill(p.numVectorOut) { SrcValueTuple.zeroes(p.w) },
       PCUControlBoxBits.zeroes(p),
       CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)),
-      CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
+      CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w)),
+      List.fill(p.numScalarIn) { 0 }
     )
   }
 }
@@ -322,7 +324,8 @@ case class PMUBits(
   var wdataSelect: Int,
   var waddrSelect: Int,
   var raddrSelect: Int,
-  var rdataEnable: List[Int]
+  var rdataEnable: List[Int],
+  var fifoNbufConfig: List[Int]
 
 ) extends CUBits
 object PMUBits {
@@ -337,14 +340,16 @@ object PMUBits {
       0,
       0,
       0,
-      List.fill(p.numVectorOut) { 0 }
+      List.fill(p.numVectorOut) { 0 },
+      List.fill(p.numScalarIn) { 0 }
     )
   }
 }
 
 case class SwitchCUBits(
   var counterChain: CounterChainBits,
-  var control: SwitchCUControlBoxBits
+  var control: SwitchCUControlBoxBits,
+  var fifoNbufConfig: List[Int]
 ) extends CUBits {
   def stages = Array[PipeStageBits]()
 }
@@ -352,7 +357,8 @@ object SwitchCUBits {
   def zeroes(p: SwitchCUParams) = {
     new SwitchCUBits (
       CounterChainBits.zeroes(p.w, p.numCounters),
-      SwitchCUControlBoxBits.zeroes(p)
+      SwitchCUControlBoxBits.zeroes(p),
+      List.fill(p.numScalarIn) { 0 }
     )
   }
 }

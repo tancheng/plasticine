@@ -36,7 +36,7 @@ class SwitchCU(val p: SwitchCUParams) extends CU {
   counterChain.io.config := io.config.counterChain
 
   // Connect max and stride
-  val ctrMaxStrideSources = Vec(scalarFIFOs.map { _.io.deq(0) })
+  val ctrMaxStrideSources = Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
   for (i <- 0 until p.numCounters) {
     // max
     val maxMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))

@@ -55,7 +55,7 @@ class PCU(val p: PCUParams) extends CU {
 
   val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)))
   scalarInXbar.io.config := io.config.scalarInXbar
-  scalarInXbar.io.ins := Vec(scalarFIFOs.map { _.io.deq(0) })
+  scalarInXbar.io.ins := Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
   val scalarIns = scalarInXbar.io.outs
 
   // Vector input FIFOs

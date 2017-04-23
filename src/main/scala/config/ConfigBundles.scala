@@ -129,6 +129,8 @@ case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val control = PCUControlBoxConfig(p)
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
   val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
+  val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
+
   override def cloneType(): this.type = {
     new PCUConfig(p).asInstanceOf[this.type]
   }
@@ -151,6 +153,7 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val waddrSelect = UInt(log2Up(p.d).W)
   val raddrSelect = UInt(log2Up(p.d).W)
   val rdataEnable = Vec(p.numVectorOut, Bool())
+  val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
 
   override def cloneType(): this.type = {
     new PMUConfig(p).asInstanceOf[this.type]
@@ -160,6 +163,7 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
 case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = SwitchCUControlBoxConfig(p)
+  val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
 
   override def cloneType(): this.type = {
     new SwitchCUConfig(p).asInstanceOf[this.type]

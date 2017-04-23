@@ -58,6 +58,7 @@ class ConfigInitializer() extends Traversal {
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
         cn.outSelect.zip(n.outSelect) foreach { case (wire, value) => wire := (1+value).U }  // 0'th input is always 0
       case (n: PCUBits, cn: PCUConfig)                    =>
+        cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         init(n.scalarOutXbar, cn.scalarOutXbar)
         init(n.scalarInXbar, cn.scalarInXbar)
         init(n.control, cn.control)
@@ -66,6 +67,7 @@ class ConfigInitializer() extends Traversal {
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PMUBits, cn: PMUConfig)                    =>
+        cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         cn.rdataEnable.zip(n.rdataEnable) foreach { case (wire, value) => wire := (value > 0).B }
         cn.raddrSelect := n.raddrSelect.U
         cn.waddrSelect := n.waddrSelect.U
@@ -77,6 +79,7 @@ class ConfigInitializer() extends Traversal {
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: SwitchCUBits, cn: SwitchCUConfig)                    =>
+        cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         init(n.control, cn.control)
         init(n.counterChain, cn.counterChain)
 

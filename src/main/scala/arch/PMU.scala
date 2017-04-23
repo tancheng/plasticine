@@ -33,7 +33,7 @@ class PMU(val p: PMUParams) extends CU {
 
   val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)))
   scalarInXbar.io.config := io.config.scalarInXbar
-  scalarInXbar.io.ins := Vec(scalarFIFOs.map { _.io.deq(0) })
+  scalarInXbar.io.ins := Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
   val scalarIns = scalarInXbar.io.outs
 //  val scalarIns = Vec(scalarFIFOs.map { _.io.deq(0)})
 
@@ -260,7 +260,7 @@ class PMU(val p: PMUParams) extends CU {
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := scratchpad.io.rdata
-    out.valid := Reg(Bool(), stageEnables.last.io.out) & io.config.rdataEnable(i) // Output produced by read addr logic only, which is controlledby enable(0)
+    out.valid := RegNext(stageEnables.last.io.out & io.config.rdataEnable(i), 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
                                                               // TODO: Fix after threading enable signals
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }
