@@ -324,8 +324,8 @@ case class PMUBits(
   var scalarOutXbar: CrossbarBits,
   var scratchpad: ScratchpadBits,
   var wdataSelect: Int,
-  var waddrSelect: Int,
-  var raddrSelect: Int,
+  var waddrSelect: SrcValueTuple,
+  var raddrSelect: SrcValueTuple,
   var rdataEnable: List[Int],
   var fifoNbufConfig: List[Int]
 
@@ -340,8 +340,8 @@ object PMUBits {
       CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w)),
       ScratchpadBits.zeroes,
       0,
-      0,
-      0,
+      SrcValueTuple.zeroes(p.w),
+      SrcValueTuple.zeroes(p.w),
       List.fill(p.numVectorOut) { 0 },
       List.fill(p.numScalarIn) { 0 }
     )

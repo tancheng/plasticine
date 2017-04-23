@@ -75,8 +75,8 @@ class ConfigInitializer() extends Traversal {
       case (n: PMUBits, cn: PMUConfig)                    =>
         cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         cn.rdataEnable.zip(n.rdataEnable) foreach { case (wire, value) => wire := (value > 0).B }
-        cn.raddrSelect := n.raddrSelect.U
-        cn.waddrSelect := n.waddrSelect.U
+        init(n.raddrSelect, cn.raddrSelect)
+        init(n.waddrSelect, cn.waddrSelect)
         cn.wdataSelect := n.wdataSelect.U
         init(n.scratchpad, cn.scratchpad)
         init(n.scalarOutXbar, cn.scalarOutXbar)

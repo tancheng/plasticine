@@ -94,8 +94,8 @@ class BinaryCodegen() extends Traversal {
       case (n: PMUBits, cn: PMUConfig)                    =>
         toBinary(n.fifoNbufConfig, cn.fifoNbufConfig.getWidth) ++
         toBinary(n.rdataEnable, cn.rdataEnable.getWidth) ++
-        toBinary(n.raddrSelect, cn.raddrSelect.getWidth) ++
-        toBinary(n.waddrSelect, cn.waddrSelect.getWidth) ++
+        genBinary(n.raddrSelect, cn.raddrSelect) ++
+        genBinary(n.waddrSelect, cn.waddrSelect) ++
         toBinary(n.wdataSelect, cn.wdataSelect.getWidth) ++
         genBinary(n.scratchpad, cn.scratchpad) ++
         genBinary(n.scalarOutXbar, cn.scalarOutXbar) ++

@@ -144,6 +144,7 @@ object PCUConfig {
 
 case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val enableSources = List[SelectSource](XSrc, PrevStageSrc, CounterSrc, ConstSrc)
+  val addrSources = List[SelectSource](XSrc, CounterSrc, ALUSrc, ScalarFIFOSrc, ConstSrc)
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w,p.numCounters, enableSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = PMUControlBoxConfig(p)
@@ -151,8 +152,8 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w))
   val scratchpad = ScratchpadConfig(p)
   val wdataSelect = UInt(log2Up(p.numVectorIn).W)
-  val waddrSelect = UInt(log2Up(p.d).W)
-  val raddrSelect = UInt(log2Up(p.d).W)
+  val waddrSelect = SrcValueBundle(addrSources, log2Up(p.scratchpadSizeWords))
+  val raddrSelect = SrcValueBundle(addrSources, log2Up(p.scratchpadSizeWords))
   val rdataEnable = Vec(p.numVectorOut, Bool())
   val fifoNbufConfig = Vec(p.numScalarIn, UInt(log2Up(p.scalarFIFODepth).W))
 

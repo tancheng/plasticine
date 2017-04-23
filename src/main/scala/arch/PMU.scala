@@ -210,12 +210,38 @@ class PMU(val p: PMUParams) extends CU {
   val raddrs = pipeStages.map { _.io.out }.toList
   val waddrs = pipeStages.map { _.io.out }.toList
 
+  def getAddrSourcesMux(s: SelectSource) = {
+    val sources = s match {
+      case CounterSrc => counterChain.io.out
+      case ScalarFIFOSrc => scalarIns
+      case ALUSrc => Vec(pipeStages.map {_.io.out})
+      case _ => throw new Exception("Unsupported operand source!")
+    }
+    val mux = Module(new MuxN(sources(0).cloneType, sources.size))
+    mux.io.ins := sources
+    mux
+  }
+
+  def getAddr(addrConfig: SrcValueBundle) = {
+    val sources = addrConfig.nonXSources map { s => s match {
+      case ConstSrc => addrConfig.value
+      case _ =>
+        val m = getAddrSourcesMux(s)
+        m.io.sel := addrConfig.value
+        m.io.out
+    }}
+    val mux = Module(new MuxN(UInt(log2Up(p.scratchpadSizeWords)), sources.size))
+    mux.io.ins := Vec(sources)
+    mux.io.sel := addrConfig.src
+    mux.io.out
+  }
+
   // Scratchpad
   val scratchpad = Module(new Scratchpad(p))
   scratchpad.io.config := io.config.scratchpad
   scratchpad.io.wdata := getMux(vectorFIFOs.map {_.io.deq}, io.config.wdataSelect)
-  scratchpad.io.waddr := getMux(waddrs, io.config.waddrSelect)
-  scratchpad.io.raddr := getMux(raddrs, io.config.raddrSelect)
+  scratchpad.io.waddr := getAddr(io.config.waddrSelect)
+  scratchpad.io.raddr := getAddr(io.config.raddrSelect)
   scratchpad.io.wen := false.B  // TODO: Fix after threading enable signals through pipeline
 
   // Output assignment
