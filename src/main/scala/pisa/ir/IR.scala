@@ -310,7 +310,7 @@ object PCUBits {
       PCUControlBoxBits.zeroes(p),
       CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)),
       CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w)),
-      List.fill(p.numScalarIn) { 0 },
+      List.fill(p.getNumRegs(ScalarInReg)) { 0 },
       0
     )
   }
@@ -343,7 +343,7 @@ object PMUBits {
       SrcValueTuple.zeroes(p.w),
       SrcValueTuple.zeroes(p.w),
       List.fill(p.numVectorOut) { 0 },
-      List.fill(p.numScalarIn) { 0 }
+      List.fill(p.getNumRegs(ScalarInReg)) { 0 }
     )
   }
 }
