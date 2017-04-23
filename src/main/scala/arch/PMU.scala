@@ -5,6 +5,7 @@ import chisel3.util._
 import plasticine.templates._
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
+import scala.language.reflectiveCalls
 
 import plasticine.spade._
 import plasticine.config._

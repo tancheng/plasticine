@@ -21,19 +21,21 @@ trait InOutArgTrait1 {
     csbs(1)(0).outSelect(23) = 4
     csbs(1)(0).outSelect(24) = 15
     // Configuring cus(0)(0).asPCUBits <- PipeCU20_x192
-    cus(0)(0).asPCUBits.counterChain.chain = List(0,0,0,0,0,0,0)
+    // PipeCU20_x192.udcounters=[SeqCU4_x193 -> TokBuf102]
+    // cus(0)(0).asPCUBits.udcs=[Some(TokBuf102),None,None,None,None]
     cus(0)(0).asPCUBits.control.tokenInAndTree = List(0, 0, 0, 0, 0, 0, 0, 0)
     cus(0)(0).asPCUBits.control.fifoAndTree = List(0, 0, 0, 0, 0, 0, 0, 0)
     cus(0)(0).asPCUBits.control.siblingAndTree = List(1, 0, 0, 0, 0)
     // PipeCU20_x192 isPipelining=true isStreaming=false
     cus(0)(0).asPCUBits.control.streamingMuxSelect = 0
     cus(0)(0).asPCUBits.control.incrementXbar.outSelect(0) = 5
-    cus(0)(0).asPCUBits.control.tokenOutXbar.outSelect(2) = 0
+    cus(0)(0).asPCUBits.control.tokenOutXbar.outSelect(2) = 4
     cus(0)(0).asPCUBits.control.doneXbar.outSelect(0) = 0
     // cus(0)(0).asPCUBits.scalarInXbar=[Some(iw3234[2]),None,None,None]
     cus(0)(0).asPCUBits.scalarInXbar.outSelect(0) = 2
     // cus(0)(0).asPCUBits.scalarOutXbar=[None,None,Some(pr(st5512[8],reg13[8])),None]
     cus(0)(0).asPCUBits.scalarOutXbar.outSelect(2) = 0
+    cus(0)(0).asPCUBits.counterChain.chain = List(0,0,0,0,0,0,0)
     cus(0)(0).asPCUBits.counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
     cus(0)(0).asPCUBits.stages(0).opA = SVT(ScalarFIFOSrc, 0)
     cus(0)(0).asPCUBits.stages(0).opB = SVT(ConstSrc, 4)
@@ -52,8 +54,14 @@ trait InOutArgTrait1 {
     cus(0)(0).asPCUBits.stages(8).fwd(8) = SVT(PrevStageSrc, 8)
     // Configuring lcus(1)(0) <- SeqCU4_x193
     lcus(1)(0).counterChain.chain = List(0,0,0,0,0)
-    lcus(1)(0).control.childrenAndTree = List(0, 0, 0, 0)
-    lcus(1)(0).control.siblingAndTree = List(0, 0, 0, 0)
+    // SeqCU4_x193.udcounters=[Top1_Top -> TokBuf96,PipeCU20_x192 -> TokBuf108]
+    // lcus(1)(0).udcs=[Some(TokBuf96),Some(TokBuf108),None,None]
+    lcus(1)(0).control.childrenAndTree = List(0, 1, 0, 0)
+    lcus(1)(0).control.siblingAndTree = List(1, 0, 0, 0)
+    lcus(1)(0).control.incrementXbar.outSelect(0) = 6
+    lcus(1)(0).control.incrementXbar.outSelect(1) = 7
+    lcus(1)(0).control.udcDecSelect=List(1,1,-1,-1)
+    lcus(1)(0).control.doneXbar.outSelect(0) = 0
     lcus(1)(0).counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
   }
 }

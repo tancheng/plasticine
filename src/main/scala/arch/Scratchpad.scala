@@ -9,6 +9,8 @@ import plasticine.spade._
 import scala.collection.mutable.ListBuffer
 //import plasticine.config.ScratchpadConfig
 import plasticine.templates.Utils.log2Up
+import scala.language.reflectiveCalls
+import scala.language.implicitConversions
 
 ///**
 // * Scratchpad config register format

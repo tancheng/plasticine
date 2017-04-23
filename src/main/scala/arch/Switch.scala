@@ -9,6 +9,7 @@ import scala.collection.mutable.ListBuffer
 import plasticine.templates.CrossbarCore
 import plasticine.config.{CrossbarConfig}
 import plasticine.spade._
+import scala.language.reflectiveCalls
 
 class VectorSwitch(val p: VectorSwitchParams) extends Module {
   val io = IO(new Bundle {
