@@ -27,8 +27,8 @@ class FringeContextPlasticine : public FringeContextBase<void> {
   Channel *cmdChannel;
   Channel *respChannel;
   uint64_t numCycles = 0;
-  uint32_t numArgIns = 0;
-  uint32_t numArgOuts = 0;
+  uint32_t numArgIns = 3;
+  uint32_t numArgOuts = 3;
 
   const uint32_t burstSizeBytes = 64;
   const uint32_t commandReg = 0;
@@ -296,11 +296,9 @@ public:
 
   virtual void setArg(uint32_t arg, uint64_t data) {
     writeReg(arg+2, data);
-    numArgIns++;
   }
 
   virtual uint64_t getArg(uint32_t arg) {
-    numArgOuts++;
     return readReg(numArgIns+2+arg);
   }
 
