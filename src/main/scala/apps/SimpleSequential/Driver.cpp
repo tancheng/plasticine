@@ -7,8 +7,8 @@ int main(int argc, char *argv[]) {
 //  time_t tstart = time(0);
 
   c1->setArg(0, 2);
-  c1->setArg(1, 3);
-  c1->setArg(2, 48);
+  c1->setArg(1, 48);
+  c1->setArg(2, 5);
   c1->run();
   uint32_t out = c1->getArg(0);
 
