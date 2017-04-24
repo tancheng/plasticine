@@ -189,16 +189,21 @@ class PMU(val p: PMUParams) extends CU {
     pipeStages.append(fu)
     pipeRegs.append(regs)
 
+    val readEnable = cbox.io.enable(0)
+    val writeEnable = cbox.io.enable(1)
+
     // Assign stageEnable
     if (i == 0) {  // Pick from counter enables
-      stageEnableFF.io.in := getMux(cbox.io.enable.getElements.toList, stageConfig.enableSelect.value)
+      stageEnableFF.io.in := getMux(List(readEnable, writeEnable), stageConfig.enableSelect.src)
+//      stageEnableFF.io.in := getMux(cbox.io.enable.getElements.toList, stageConfig.enableSelect.value)
     } else {
-      val counterEnablesMux = getMux(cbox.io.enable.getElements.toList, stageConfig.enableSelect.value)
+//      val counterEnablesMux = getMux(cbox.io.enable.getElements.toList, stageConfig.enableSelect.value)
       val sources = stageConfig.enableSelect.nonXSources map { m => m match {
+        case ReadEnSrc => readEnable
+        case WriteEnSrc => writeEnable
+        case XSrc => 0.U
         case PrevStageSrc => stageEnables.last.io.out
-        case CounterSrc => counterEnablesMux
-        case ConstSrc => stageConfig.enableSelect.value
-        case _ => throw new Exception(s"Unsupported source type $m for stage enables")
+        case _ => throw new Exception(s"[PMU] Unsupported source type $m for stage enables")
       }}
       stageEnableFF.io.in := getMux(sources, stageConfig.enableSelect.src)
     }

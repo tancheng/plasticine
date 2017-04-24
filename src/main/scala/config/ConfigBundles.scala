@@ -102,7 +102,7 @@ case class CounterChainConfig(val w: Int, val numCounters: Int, val startDelayWi
 //  }
 //}
 
-class PipeStageConfig(r: Int, w: Int, numCounters: Int, val enableSources: List[SelectSource]) extends AbstractConfig {
+class PipeStageConfig(r: Int, w: Int, numCounters: Int, val enableSources: List[SelectSource], val enableValueWidth: Int = 1) extends AbstractConfig {
   val operandSources = List[SelectSource](XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc)
   val opA = SrcValueBundle(operandSources, w)
   val opB = SrcValueBundle(operandSources, w)
@@ -111,7 +111,7 @@ class PipeStageConfig(r: Int, w: Int, numCounters: Int, val enableSources: List[
   val opcode = UInt(log2Up(Opcodes.size).W)
   val result = UInt(r.W) // One-hot encoded
   var regEnables = UInt(r.W)    // One-hot encoded
-  val enableSelect = SrcValueBundle(enableSources, log2Up(numCounters))
+  val enableSelect = SrcValueBundle(enableSources, enableValueWidth)
 
   override def cloneType(): this.type = {
     new PipeStageConfig(r,w,numCounters, enableSources).asInstanceOf[this.type]
@@ -120,9 +120,9 @@ class PipeStageConfig(r: Int, w: Int, numCounters: Int, val enableSources: List[
 
 case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
-  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources))
-  val counterChain = CounterChainConfig(p.w, p.numCounters)
 
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources, 1))
+  val counterChain = CounterChainConfig(p.w, p.numCounters)
   val validOutSources = List[SelectSource](XSrc, EnableSrc, DoneSrc)
   val scalarValidOut = Vec(p.numScalarOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
   val vectorValidOut = Vec(p.numVectorOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
@@ -143,8 +143,9 @@ object PCUConfig {
 }
 
 case class PMUConfig(p: PMUParams) extends AbstractConfig {
-  val enableSources = List[SelectSource](XSrc, PrevStageSrc, CounterSrc, ConstSrc)
+  val enableSources = List[SelectSource](ReadEnSrc, WriteEnSrc, XSrc, PrevStageSrc)
   val addrSources = List[SelectSource](XSrc, CounterSrc, ALUSrc, ScalarFIFOSrc, ConstSrc)
+
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w,p.numCounters, enableSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = PMUControlBoxConfig(p)
@@ -254,7 +255,7 @@ case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
 
   val tokenInAndTree = Vec(p.numControlIn, Bool())
   val fifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
-  val siblingAndTree = Vec(p.numUDCs + 1, Bool())
+  val siblingAndTree = Vec(p.numUDCs, Bool())
   val streamingMuxSelect = Bool()
   val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))

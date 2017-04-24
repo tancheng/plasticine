@@ -36,7 +36,7 @@ class VectorSwitch(val p: VectorSwitchParams) extends Module {
 
   io.outs.zipWithIndex.foreach { case (o, idx) =>
     o.bits := uintToVec(validCrossbar.io.outs(idx)(p.w*p.v, 1))
-    o.valid := validCrossbar.io.outs(0)
+    o.valid := validCrossbar.io.outs(idx)(0)
   }
 
 //  io.ins.zipWithIndex.foreach { case (in, idx) =>

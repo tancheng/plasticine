@@ -38,7 +38,7 @@ trait SimpleSequentialTrait extends SimpleSequentialTrait1 with SimpleSequential
     controlSwitch=csbs,
     switchCU=lcus,
     argOutMuxSelect=List(4,-1,-1),
-    doneSelect=3
+    doneSelect=4
   )  
   // ow2768[1] -> ScalOut201(ArgIn6_x343)
   // ow2770[2] -> ScalOut197(ArgIn3_x342)

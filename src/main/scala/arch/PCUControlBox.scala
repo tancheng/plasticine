@@ -25,7 +25,9 @@ class PCUControlBox(val p: PCUParams) extends Module {
 
     // Counter IO
     val enable = Output(Bool())
-    val done = Input(Vec(p.numCounters, Bool()))
+    val delayedEnable = Input(Bool())
+    val done = Input(Bool())
+    val delayedDone = Input(Bool())
 
     // Config
     val config = Input(PCUControlBoxConfig(p))
@@ -37,11 +39,12 @@ class PCUControlBox(val p: PCUParams) extends Module {
   incrementXbar.io.ins := io.controlIn
 
   // Done crossbar
-  val doneXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numCounters, 1)))
-  doneXbar.io.config := io.config.doneXbar
-  doneXbar.io.ins := io.done
+//  val doneXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numCounters, 1)))
+//  doneXbar.io.config := io.config.doneXbar
+//  doneXbar.io.ins := io.done
 
-  io.scalarFifoDeqVld.foreach { deq => deq := doneXbar.io.outs(0) }
+//  io.scalarFifoDeqVld.foreach { deq => deq := doneXbar.io.outs(0) }
+  io.scalarFifoDeqVld.foreach { deq => deq := io.done }
 
   // Swap Write crossbar
   val swapWriteXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numControlIn, p.numScalarIn)))
@@ -58,7 +61,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
     udc.io.strideInc := 1.U
     udc.io.strideDec := 1.U
     udc.io.inc := incrementXbar.io.outs(i)
-    udc.io.dec := doneXbar.io.outs(0)
+    udc.io.dec := io.done
     udc
   }
 
@@ -77,9 +80,9 @@ class PCUControlBox(val p: PCUParams) extends Module {
   val fifoAndTree = createAndTree(io.fifoNotEmpty, io.config.fifoAndTree)
   val tokenInAndTree = createAndTree(io.controlIn, io.config.tokenInAndTree)
   val andTreeTop = tokenInAndTree & fifoAndTree
-  val siblingAndTree = createAndTree(udCounters.map { _.io.gtz} ++ List(fifoAndTree), io.config.siblingAndTree)
+  val siblingAndTree = createAndTree(udCounters.map { _.io.gtz}, io.config.siblingAndTree)
 
-  val localEnable = Mux(io.config.streamingMuxSelect, andTreeTop, siblingAndTree)
+  val localEnable = Mux(io.config.streamingMuxSelect, andTreeTop, siblingAndTree & fifoAndTree)
   io.enable := localEnable
 
   // Token out crossbar
@@ -88,8 +91,8 @@ class PCUControlBox(val p: PCUParams) extends Module {
   for (i <- 0 until io.fifoNotFull.size) {
     tokenOutXbar.io.ins(i) := io.fifoNotFull(i)
   }
-  tokenOutXbar.io.ins(io.fifoNotFull.size) := doneXbar.io.outs(0)
-  tokenOutXbar.io.ins(io.fifoNotFull.size + 1) := localEnable
+  tokenOutXbar.io.ins(io.fifoNotFull.size) := io.delayedDone
+  tokenOutXbar.io.ins(io.fifoNotFull.size + 1) := io.delayedEnable
 
   io.controlOut := tokenOutXbar.io.outs
 }

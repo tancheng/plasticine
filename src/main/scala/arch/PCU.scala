@@ -117,10 +117,17 @@ class PCU(val p: PCUParams) extends CU {
   vectorFIFOs.foreach { fifo => fifo.io.deqVld := cbox.io.enable & ~fifo.io.empty }
 
   // TODO: Testing this
+  val localEnable = Wire(Bool())
+  localEnable := cbox.io.enable
+
   val localDone = Wire(Bool())
-  val donePulser = Module(new Pulser())
-  donePulser.io.in := getMux(counterChain.io.done.getElements.toList, io.config.control.doneXbar.outSelect(0) - 1.U)
-  localDone := donePulser.io.out
+  localDone := getMux(counterChain.io.done.getElements.toList, io.config.control.doneXbar.outSelect(0) - 1.U)
+  cbox.io.done := localDone
+
+//  val donePulser = Module(new Pulser())
+//  donePulser.io.in := localCounterDone
+//  localDone := donePulser.io.out
+
 //  cbox.io.done := counterChain.io.done
 
   // Pipeline with FUs and registers
@@ -233,7 +240,7 @@ class PCU(val p: PCUParams) extends CU {
     // Assign stageEnable
     if (i == 0) {  // Pick from counter enables
 //      stageEnableFF.io.in := cbox.io.enable
-      stageEnableFF.io.in := Cat(localDone, 1.U) // TODO: Temporary, revert after InOutArg debugging
+      stageEnableFF.io.in := Cat(localDone, localEnable)
     } else {
       val sources = stageConfig.enableSelect.nonXSources map { m => m match {
         case PrevStageSrc => stageEnables.last.io.out(0)
@@ -247,7 +254,13 @@ class PCU(val p: PCUParams) extends CU {
 
   val delayedDone = Wire(Bool())
   delayedDone := stageEnables.last.io.out(1)
-  cbox.io.done.foreach { d => d := delayedDone }
+  val delayedEnable = Wire(Bool())
+  delayedEnable := stageEnables.last.io.out(0)
+
+  cbox.io.delayedDone := delayedDone
+  cbox.io.delayedEnable := delayedEnable
+
+//  cbox.io.done.foreach { d => d := delayedDone }
 
 //  def getStageOut(stage: List[FU]): Vec[UInt]  = Vec(stage.map { _.io.out })
 //  def getStageOut(i: Int) : Vec[UInt] = getStageOut(pipeStages(i))
@@ -288,13 +301,13 @@ class PCU(val p: PCUParams) extends CU {
 
   io.scalarOut.zip(scalarOutXbar.io.outs).foreach { case (out, xbarOut) =>
     out.bits := xbarOut
-    out.valid := stageEnables.last.io.out
+    out.valid := stageEnables.last.io.out(0)
 //    out.valid := getValids(io.config.scalarValidOut(i))
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := Vec(pipeRegs.last.map { _(vectorOutRegs(i)).io.out })
-    out.valid := stageEnables.last.io.out
+    out.valid := stageEnables.last.io.out(0)
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }
 }

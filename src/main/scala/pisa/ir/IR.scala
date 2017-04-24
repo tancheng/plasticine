@@ -45,7 +45,7 @@ abstract class AbstractBits {
  * to hold scratchpad config info.
  * TODO: Use this to hold operand info as well
  */
-case class SrcValueTuple(src: SelectType = XSrc, value: AnyVal = -1)
+case class SrcValueTuple(var src: SelectType = XSrc, var value: AnyVal = -1)
 extends AbstractBits {
 //  // Check if 'src' is in the list of valid sources
 //  Predef.assert(t.validSources.contains(src), s"ERROR: Invalid source $src in SrcValueTuple (allowed sources: ${t.validSources})")
@@ -380,7 +380,7 @@ object PCUControlBoxBits {
     new PCUControlBoxBits(
         List.fill(p.numControlIn) { 0 },   // tokenInAndTree
         List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // fifoAndTree
-        List.fill(p.numUDCs + 1) { 0 }, // siblingAndTree
+        List.fill(p.numUDCs) { 0 }, // siblingAndTree
         0,   // streamingMuxSelect
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
