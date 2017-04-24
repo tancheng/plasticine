@@ -278,7 +278,7 @@ case class PMUControlBoxConfig(val p: PMUParams) extends AbstractConfig {
   val scalarSwapReadSelect = Vec(p.numScalarIn, Bool())
   val writeDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
   val readDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
-  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
   val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut))
 
   override def cloneType(): this.type = {

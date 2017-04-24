@@ -80,8 +80,11 @@ class PMU(val p: PMUParams) extends CU {
   cbox.io.controlIn := io.controlIn
   io.controlOut := cbox.io.controlOut
 
-  cbox.io.fifoNotFull := Vec(scalarFIFOs.map { ~_.io.full })
-  cbox.io.fifoNotEmpty := Vec(scalarFIFOs.map { ~_.io.empty } ++ vectorFIFOs.map { ~_.io.empty })
+  val scalarFifoNotFull = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, false.B, ~fifo.io.full) }
+  val scalarFifoNotEmpty = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, true.B, ~fifo.io.full) }
+
+  cbox.io.fifoNotFull := Vec(scalarFifoNotFull)
+  cbox.io.fifoNotEmpty := Vec(scalarFifoNotEmpty ++ vectorFIFOs.map { ~_.io.empty })
 
   scalarFIFOs.zip(cbox.io.scalarFifoDeqVld) foreach { case (fifo, deqVld) => fifo.io.deqVld := deqVld }
   scalarFIFOs.zip(cbox.io.scalarFifoEnqVld) foreach { case (fifo, enqVld) => fifo.io.enqVld := enqVld }
@@ -249,7 +252,7 @@ class PMU(val p: PMUParams) extends CU {
   def getAddrEnableSourcesMux(s: SelectSource) = {
     val sources = s match {
       case CounterSrc => cbox.io.enable
-      case ScalarFIFOSrc => Vec(scalarFIFOs.map { ~_.io.empty })
+      case ScalarFIFOSrc => Vec(scalarFifoNotEmpty)
       case ALUSrc => Vec(stageEnables.map {_.io.out})
       case _ => throw new Exception("Unsupported operand source!")
     }
@@ -279,6 +282,8 @@ class PMU(val p: PMUParams) extends CU {
   scratchpad.io.waddr := getAddr(io.config.waddrSelect)
   scratchpad.io.raddr := getAddr(io.config.raddrSelect)
   scratchpad.io.wen := getAddrEnable(io.config.waddrSelect)
+  scratchpad.io.wdone := cbox.io.sramSwapWrite
+  scratchpad.io.rdone := cbox.io.sramSwapRead
 
   val readEn = getAddrEnable(io.config.raddrSelect)
 
