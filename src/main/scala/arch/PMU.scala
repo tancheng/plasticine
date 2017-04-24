@@ -332,7 +332,7 @@ class PMU(val p: PMUParams) extends CU {
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := scratchpad.io.rdata
 //    out.valid := RegNext(stageEnables.last.io.out & io.config.rdataEnable(i), 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
-    out.valid := RegNext(stageEnables.last.io.out & io.config.rdataEnable(i), 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
+    out.valid := RegNext(readEn, 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
                                                               // TODO: Fix after threading enable signals
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }
