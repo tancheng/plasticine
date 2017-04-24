@@ -7,6 +7,7 @@ import fringe._
 
 import plasticine.templates.Utils.log2Up
 import plasticine.templates.Utils.delay
+import plasticine.spade._
 
 class MAGCore(
   val w: Int,
@@ -146,14 +147,14 @@ class MAGCore(
   val elementID = burstTagCounter.io.out(log2Up(v)-1, 0)
 
   // Coalescing cache
-//  val ccache = Module(new CoalescingCache(w, d, v))
-//  ccache.io.raddr := Cat(io.dram.tagIn, UInt(0, width=log2Up(burstSizeBytes)))
-//  ccache.io.readEn := config.scatterGather & io.dram.vldIn
-//  ccache.io.waddr := addrFifo.io.deq(0)
-//  ccache.io.wen := config.scatterGather & ~addrFifo.io.empty
-//  ccache.io.position := elementID
-//  ccache.io.wdata := wdataFifo.io.deq(0)
-//  ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
+  val ccache = Module(new CoalescingCache(w, d, v))
+  ccache.io.raddr := Cat(io.dram.cmd.bits.tag, "b000000".U)
+  ccache.io.readEn := io.config.scatterGather & io.dram.resp.valid
+  ccache.io.waddr := addrFifo.io.deq(0)
+  ccache.io.wen := io.config.scatterGather & ~addrFifo.io.empty
+  ccache.io.position := elementID
+  ccache.io.wdata := wdataFifo.io.deq(0)
+  ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
 
   addrFifo.io.deqVld := burstCounter.io.done
   isWrFifo.io.deqVld := burstCounter.io.done
@@ -186,34 +187,37 @@ class MAGCore(
     (valid, crossbarConfig)
   }
 
-//  val (validMask, crossbarConfig) = parseMetadataLine(ccache.io.rmetaData)
+  val (validMask, crossbarSelect) = parseMetadataLine(ccache.io.rmetaData)
 
-//  val registeredData = Vec(io.dram.resp.bits.rdata.map { d => Reg(UInt(width=w), d) })
-//  val registeredVld = Reg(UInt(width=1), io.dram.resp.valid)
+  val registeredData = Vec(io.dram.resp.bits.rdata.map { d => Reg(UInt(w.W), d) })
+  val registeredVld = Reg(UInt(1.W), io.dram.resp.valid)
 
   // Gather crossbar
-//  val gatherCrossbar = Module(new CrossbarCore(w, v, v))
-//  gatherCrossbar.io.ins := registeredData
-//  gatherCrossbar.io.config := Vec(crossbarConfig)
+  val switchParams = VectorSwitchParams(v, v, w, v)
+  val crossbarConfig = Wire(CrossbarConfig(switchParams))
+  crossbarConfig.outSelect = Vec(crossbarSelect)
+  val gatherCrossbar = Module(new CrossbarCore(UInt(w.W), switchParams))
+  gatherCrossbar.io.ins := registeredData
+  gatherCrossbar.io.config := crossbarConfig
 
   // Gather buffer
-//  val gatherBuffer = List.tabulate(burstSizeWords) { i =>
-//    val ff = Module(new FF(w))
-//    ff.io.control.enable := registeredVld & validMask(i)
-//    ff.io.data.in := gatherCrossbar.io.outs(i)
-//    ff
-//  }
-//  val gatherData = Vec.tabulate(burstSizeWords) { gatherBuffer(_).io.data.out }
+  val gatherBuffer = List.tabulate(burstSizeWords) { i =>
+    val ff = Module(new FF(w))
+    ff.io.enable := registeredVld & validMask(i)
+    ff.io.in := gatherCrossbar.io.outs(i)
+    ff
+  }
+  val gatherData = Vec.tabulate(burstSizeWords) { gatherBuffer(_).io.out }
 
   // Completion mask
-//  val completed = UInt()
-//  val completionMask = List.tabulate(burstSizeWords) { i =>
-//    val ff = Module(new FF(1))
-//    ff.io.control.enable := completed | (validMask(i) & registeredVld)
-//    ff.io.data.in := validMask(i)
-//    ff
-//  }
-//  completed := completionMask.map { _.io.data.out }.reduce { _ & _ }
+  val completed = Wire(UInt())
+  val completionMask = List.tabulate(burstSizeWords) { i =>
+    val ff = Module(new FF(1))
+    ff.io.enable := completed | (validMask(i) & registeredVld)
+    ff.io.in := validMask(i)
+    ff
+  }
+  completed := completionMask.map { _.io.out }.reduce { _ & _ }
 
   class Tag extends Bundle {
     val streamTag = UInt(tagWidth.W)

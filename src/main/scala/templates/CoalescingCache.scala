@@ -56,11 +56,11 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
     addr(burstOffset-1, wordOffset)
   }
 
-  val writeIdx = UInt(width = log2Up(d))
-  val readHit = Vec.fill(d) { Bool() }
-  val writeHit = Vec.fill(d) { Bool() }
-  val full = Bool()
-  val miss = Bool()
+  val writeIdx = Wire(UInt(width = log2Up(d)))
+  val readHit = Wire(Vec(d, Bool()))
+  val writeHit = Wire(Vec(d, Bool()))
+  val full = Wire(Bool())
+  val miss = Wire(Bool())
 
   // Create valid array
   val valid = List.tabulate(d) { i =>
@@ -108,9 +108,10 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   //val md = Cat(UInt(1, width = (8 - log2Up(burstSizeWords))), woffset)
   val md = Cat("b0001".U, woffset)
   val temp = md << Cat(io.position, "b000".U)
-  val mdShifted = temp(burstSizeWords * 8 - 1, 0)
   //val mdShifted = UInt(md << Cat(io.position, UInt(0, width=3)), width=burstSizeWords*8)
-  metadata.io.wdata := mdShifted
+  //val mdShifted = temp(burstSizeWords * 8 - 1, 0)
+  //metadata.io.wdata := mdShifted
+  metadata.io.wdata := temp
 
   // Scatter data SRAM. Word size: 64 bytes
   val scatterData = Module(new SRAMByteEnable(burstSizeBytes*8, d))

@@ -109,8 +109,8 @@ object CoalescingCacheTest extends CommonMain {
 
   def dut = () => {
     val w = args(0).toInt
-    val d = args(0).toInt
-    val v = args(0).toInt
+    val d = args(1).toInt
+    val v = args(2).toInt
     new CoalescingCache(w, d, v)
   }
 

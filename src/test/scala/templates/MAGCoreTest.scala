@@ -355,7 +355,7 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
   //testGather
 }
 
-object MAGTest extends CommonMain {
+object MAGCoreTest extends CommonMain {
   type DUTType = MAGCore
 
   def dut = () => {

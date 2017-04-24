@@ -46,7 +46,6 @@ class SRAMByteEnable(val w: Int, val d: Int) extends Module {
   })
   val mem = SeqMem(d, Bits(w.W))
   io.rdata := Bits(0)
-  val raddr_reg = Bits(width = addrWidth)
   when (io.wen) {
     val tmp = mem(io.waddr)
     val tmpVec = Vec.tabulate(numBytes) { i => tmp(i*8+8-1, i*8) }
@@ -57,8 +56,7 @@ class SRAMByteEnable(val w: Int, val d: Int) extends Module {
     }.reverse.reduce { Cat(_,_) }
     mem(io.waddr) := wdata
   }
-  raddr_reg := io.raddr
 
-  io.rdata := mem.read(raddr_reg)
+  io.rdata := mem.read(io.raddr)
 }
 
