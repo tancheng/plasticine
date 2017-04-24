@@ -6,9 +6,9 @@ int main(int argc, char *argv[]) {
   c1->load();
 //  time_t tstart = time(0);
 
-  c1->setArg(0, 10);
-  c1->setArg(1, 20);
-  c1->setArg(2, 30);
+  c1->setArg(0, 2);
+  c1->setArg(1, 3);
+  c1->setArg(2, 48);
   c1->run();
   uint32_t out = c1->getArg(0);
 
