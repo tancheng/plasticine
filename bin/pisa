@@ -25,6 +25,7 @@ mv accel.bit.bin ${OUTDIR}
 
 # Copy 'src/main/scala/apps/$APP/Driver.cpp' to OUTDIR
 cp src/main/scala/apps/$APP/Driver.cpp ${OUTDIR}
+cp src/main/scala/apps/$APP/PrettyPrintMacros.h ${OUTDIR}
 
 # Copy Makefile
 cp static/fringeVCS/sw/Makefile ${OUTDIR}
