@@ -82,6 +82,8 @@ class PCU(val p: PCUParams) extends CU {
 
   // Connect max and stride
   val ctrMaxStrideSources = scalarIns
+  val ctrStrides = Wire(Vec(p.numCounters, UInt(p.w.W)))
+
   for (i <- 0 until p.numCounters) {
     // max
     val maxMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
@@ -94,6 +96,7 @@ class PCU(val p: PCUParams) extends CU {
     strideMux.io.ins := ctrMaxStrideSources
     strideMux.io.sel := io.config.counterChain.counters(i).stride.value
     counterChain.io.stride(i) := strideMux.io.out
+    ctrStrides(i) := Mux(io.config.counterChain.counters(i).stride.is(ConstSrc), io.config.counterChain.counters(i).stride.value,  strideMux.io.out)
   }
 
   // Control Block
@@ -144,6 +147,10 @@ class PCU(val p: PCUParams) extends CU {
   // Reduction stages
   val reduceStages = (0 until p.d).dropRight(1).takeRight(numReduceStages)  // Leave 1 stage to do in-place accumulation
 
+  val unrolledCounters = List.tabulate(p.v) { lane =>
+    Vec(List.tabulate(p.numCounters) { ctr => counterChain.io.out(ctr) + lane.U * ctrStrides(ctr) })
+  }
+
   for (i <- 0 until p.d) {
 //    val fus = List.fill(p.v) { Module(new FU(p.w, fmaStages.contains(i), true)) }
     val fus = List.fill(p.v) { Module(new FU(p.w, false, false)) } // TODO :Change after Float support
@@ -171,7 +178,7 @@ class PCU(val p: PCUParams) extends CU {
 
       def getSourcesMux(s: SelectSource) = {
         val sources = s match {
-          case CounterSrc => counterChain.io.out
+          case CounterSrc => unrolledCounters(lane)
           case ScalarFIFOSrc => scalarIns
           case VectorFIFOSrc => Vec(vectorFIFOs.map { _.io.deq(lane) })
           case PrevStageSrc => if (i == 0) Vec(List.fill(2) {0.U}) else Vec(pipeRegs.last(lane).map {_.io.out})
@@ -231,7 +238,7 @@ class PCU(val p: PCUParams) extends CU {
           }
           reg.io.in := Mux(stageConfig.result(idx), fu.io.out, fwd)
         }
-        reg.io.enable := stageEnableFF.io.out(0) & stageConfig.regEnables(idx)
+        reg.io.enable := (if (i == 0) localEnable else stageEnables.last.io.out(0)) & stageConfig.regEnables(idx)
       }
     }
     pipeStages.append(fus)
