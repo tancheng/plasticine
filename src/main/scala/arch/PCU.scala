@@ -27,7 +27,8 @@ class PCU(val p: PCUParams) extends CU {
   // after 'rwStages' and before 'reduction' stages because of the way
   // the dataSrc muxes are created.
   // i.e., d >= rwStages + 1 + numReduceStages + numStagesAfterReduction
-  Predef.assert(p.d >= (1 + numReduceStages), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages)!""")
+  val numStagesAfterReduction = 1
+  Predef.assert(p.d >= (1 + numReduceStages + numStagesAfterReduction), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages + $numStagesAfterReduction)!""")
 
   def getMux[T<:Data](ins: List[T], sel: UInt): T = {
     val srcMux = Module(new MuxN(ins(0).cloneType, ins.size))
@@ -145,7 +146,7 @@ class PCU(val p: PCUParams) extends CU {
   val stageEnables = ListBuffer[FF]()
 
   // Reduction stages
-  val reduceStages = (0 until p.d).dropRight(1).takeRight(numReduceStages)  // Leave 1 stage to do in-place accumulation
+  val reduceStages = (0 until p.d).dropRight(2).takeRight(numReduceStages)  // Leave 1 stage to do in-place accumulation, 1 stage to move data to correct register
 
   val unrolledCounters = List.tabulate(p.v) { lane =>
     Vec(List.tabulate(p.numCounters) { ctr => counterChain.io.out(ctr) + lane.U * ctrStrides(ctr) })
@@ -171,7 +172,7 @@ class PCU(val p: PCUParams) extends CU {
     reduceLanes.foreach { r =>
       fwdLaneMap(r) = r + (1 << reduceStageNum)
     }
-//    println(s"stage $i: fwdLaneMap $fwdLaneMap")
+//    println(s"stage $i: [reduce: $isReduceStage] fwdLaneMap $fwdLaneMap")
     (0 until p.v) foreach { lane =>
       val fu = fus(lane)
       val regs = stageRegs(lane)
