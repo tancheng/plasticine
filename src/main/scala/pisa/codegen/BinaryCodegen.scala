@@ -72,6 +72,7 @@ class BinaryCodegen() extends Traversal {
         }.flatten ++
         toBinary(n.chain, cn.chain.getWidth)
       case (n: CounterRCBits, cn: CounterConfig)          =>
+        toBinary(n.par, cn.par.getWidth) ++
         genBinary(n.stride, cn.stride) ++
         genBinary(n.max, cn.max)
       case (n: CrossbarBits, cn: CrossbarConfig)          =>

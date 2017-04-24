@@ -60,6 +60,7 @@ case class CounterConfig(val w: Int, val startDelayWidth: Int, val endDelayWidth
   private val validSources = List[SelectSource](XSrc, ConstSrc, ScalarFIFOSrc)
   val max = SrcValueBundle(validSources, w)
   val stride = SrcValueBundle(validSources, w)
+  val par = UInt(5.W) // TODO: 5? must be log2Up(#lanes) + 1
 
 //  val maxConst = Bool()
 //  val strideConst = Bool()

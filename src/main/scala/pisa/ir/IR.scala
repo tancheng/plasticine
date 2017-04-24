@@ -101,14 +101,9 @@ object SrcValueTuple {
  */
 case class CounterRCBits(
   max: SrcValueTuple,
-  stride: SrcValueTuple
+  stride: SrcValueTuple,
 //  min: SrcValueTuple,
-//  par:Int = 1
-  //maxConst: Int = 0,
-  //strideConst: Int = 0,
-  //startDelay: Int = 0,
-  //endDelay: Int = 0,
-  //onlyDelay: Int = 0
+  par:Int = 1
 ) extends AbstractBits {
 }
 object CounterRCBits {
@@ -125,7 +120,7 @@ object CounterRCBits {
     min: SrcValueTuple,
     par:Int = 1
   ):CounterRCBits = {
-    CounterRCBits(max, stride) //TODO: add min, par back
+    CounterRCBits(max, stride, par) //TODO: add min, par back
   }
 }
 

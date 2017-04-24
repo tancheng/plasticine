@@ -53,6 +53,7 @@ class ConfigInitializer() extends Traversal {
         for(i <- 0 until cn.counters.size) { init(n.counters(i), cn.counters(i)) }
         cn.chain.zip(n.chain) foreach { case (wire, value) => wire := value.U }
       case (n: CounterRCBits, cn: CounterConfig)          =>
+        cn.par := n.par.U
         init(n.stride, cn.stride)
         init(n.max, cn.max)
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
