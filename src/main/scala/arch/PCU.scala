@@ -192,21 +192,35 @@ class PCU(val p: PCUParams) extends CU {
         mux
       }
 
-      def getOperand(opConfig: SrcValueBundle) = {
-        val sources = opConfig.nonXSources map { s => s match {
-          case ConstSrc => opConfig.value
+      def getOperand(opConfig: SrcValueBundle, allowReduce: Boolean = false) = {
+        val sources = opConfig.nonXSources.map { s => s match {
+          case ConstSrc => List(opConfig.value)
+          case ReduceTreeSrc =>
+            if (allowReduce) {
+              Predef.assert(isReduceStage, s"Stage $i is not a reduce stage!")
+              if (fwdLaneMap.contains(lane)) {
+                val prevRegBlock = pipeRegs.last(fwdLaneMap(lane))
+                val reduceReg = p.getRegIDs(ReduceReg)
+                Predef.assert(reduceReg.size == 1, s"ERROR: Only single reduceReg supported! reduceRegs: $reduceReg")
+                List(prevRegBlock(reduceReg(0)).io.out)
+              } else {
+                List()
+              }
+            } else {
+              List()
+            }
           case _ =>
             val m = getSourcesMux(s)
             m.io.sel := opConfig.value
-            m.io.out
-        }}
+            List(m.io.out)
+        }}.flatten
         val mux = Module(new MuxN(UInt(p.w.W), sources.size))
         mux.io.ins := Vec(sources)
         mux.io.sel := opConfig.src
         mux.io.out
       }
 
-      fu.io.a := getOperand(stageConfig.opA)
+      fu.io.a := getOperand(stageConfig.opA, allowReduce = isReduceStage) // reduction op is only opA
       fu.io.b := getOperand(stageConfig.opB)
       fu.io.c := getOperand(stageConfig.opC)
       fu.io.opcode := stageConfig.opcode

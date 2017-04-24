@@ -134,10 +134,9 @@ class PMU(val p: PMUParams) extends CU {
       val sources = s match {
         case CounterSrc => counterChain.io.out
         case ScalarFIFOSrc => scalarIns
-        case VectorFIFOSrc => Vec(vectorFIFOs.map { _.io.deq(0) })
         case PrevStageSrc => if (i == 0) Vec(List.fill(2) {0.U}) else Vec(pipeRegs.last.map {_.io.out})
         case CurrStageSrc => Vec(regs.map {_.io.out})
-        case _ => throw new Exception("Unsupported operand source!")
+        case _ => throw new Exception(s"Unsupported operand source $s!")
       }
       val mux = Module(new MuxN(sources(0).cloneType, sources.size))
       mux.io.ins := sources
