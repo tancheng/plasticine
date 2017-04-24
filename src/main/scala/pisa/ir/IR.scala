@@ -110,7 +110,8 @@ object CounterRCBits {
   def zeroes(width: Int) = {
     new CounterRCBits(
       SrcValueTuple.zeroes(width),
-      SrcValueTuple.zeroes(width)
+      SrcValueTuple.zeroes(width),
+      1
 //      SrcValueTuple.zeroes(width)
       )
   }
@@ -118,7 +119,7 @@ object CounterRCBits {
     max: SrcValueTuple,
     stride: SrcValueTuple,
     min: SrcValueTuple,
-    par:Int = 1
+    par:Int
   ):CounterRCBits = {
     CounterRCBits(max, stride, par) //TODO: add min, par back
   }
