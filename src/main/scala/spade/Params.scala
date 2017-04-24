@@ -43,6 +43,12 @@ trait CUParams extends Params {
 }
 
 trait PCUParams extends CUParams
+trait SCUParams extends CUParams {
+  override val v = 1
+  override val numVectorIn = 0
+  override val numVectorOut = 0
+  override val vectorFIFODepth = 0
+}
 
 trait PMUParams extends CUParams {
   val wd = 5

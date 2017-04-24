@@ -182,6 +182,26 @@ case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
   }
 }
 
+case class SCUConfig(p: SCUParams) extends AbstractConfig {
+  val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
+  val operandSources = List(XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, PrevStageSrc, CurrStageSrc)
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources, 1, operandSources))
+  val counterChain = CounterChainConfig(p.w, p.numCounters)
+  val control = SCUControlBoxConfig(p)
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
+  val fifoNbufConfig = Vec(p.getNumRegs(ScalarInReg), UInt(log2Up(p.scalarFIFODepth).W))
+
+  override def cloneType(): this.type = {
+    new SCUConfig(p).asInstanceOf[this.type]
+  }
+}
+object SCUConfig {
+  def apply(p:CUParams):SCUConfig = {
+    SCUConfig(p.asInstanceOf[SCUParams])
+  }
+}
+
 /**
  * Crossbar config register format
  */
@@ -263,13 +283,13 @@ case class ScratchpadConfig(val p: PMUParams) extends AbstractConfig {
 case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
 
   val tokenInAndTree = Vec(p.numControlIn, Bool())
-  val fifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
+  val fifoAndTree = Vec(p.getNumRegs(ScalarInReg)+p.numVectorIn, Bool())
   val siblingAndTree = Vec(p.numUDCs, Bool())
   val streamingMuxSelect = Bool()
   val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
-  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
-  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.getNumRegs(ScalarInReg) + 2, p.numControlOut))
 
   override def cloneType(): this.type = {
     new PCUControlBoxConfig(p).asInstanceOf[this.type]
@@ -281,9 +301,9 @@ case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
  */
 case class PMUControlBoxConfig(val p: PMUParams) extends AbstractConfig {
 
-  val writeFifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
-  val readFifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
-  val scalarSwapReadSelect = Vec(p.numScalarIn, Bool())
+  val writeFifoAndTree = Vec(p.getNumRegs(ScalarInReg)+p.numVectorIn, Bool())
+  val readFifoAndTree = Vec(p.getNumRegs(ScalarInReg)+p.numVectorIn, Bool())
+  val scalarSwapReadSelect = Vec(p.getNumRegs(ScalarInReg), Bool())
   val writeDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
   val readDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
@@ -310,6 +330,21 @@ case class SwitchCUControlBoxConfig(val p: SwitchCUParams) extends AbstractConfi
   }
 }
 
+case class SCUControlBoxConfig(val p: SCUParams) extends AbstractConfig {
+
+  val tokenInAndTree = Vec(p.numControlIn, Bool())
+  val fifoAndTree = Vec(p.getNumRegs(ScalarInReg), Bool())
+  val siblingAndTree = Vec(p.numUDCs, Bool())
+  val streamingMuxSelect = Bool()
+  val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
+  val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.getNumRegs(ScalarInReg) + 2, p.numControlOut))
+
+  override def cloneType(): this.type = {
+    new SCUControlBoxConfig(p).asInstanceOf[this.type]
+  }
+}
 
 case class PlasticineConfig(
   cuParams:    Array[Array[CUParams]],
