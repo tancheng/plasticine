@@ -182,23 +182,23 @@ case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
   }
 }
 
-case class SCUConfig(p: SCUParams) extends AbstractConfig {
+case class ScalarCUConfig(p: ScalarCUParams) extends AbstractConfig {
   val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
   val operandSources = List(XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, PrevStageSrc, CurrStageSrc)
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources, 1, operandSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
-  val control = SCUControlBoxConfig(p)
+  val control = ScalarCUControlBoxConfig(p)
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
   val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
   val fifoNbufConfig = Vec(p.getNumRegs(ScalarInReg), UInt(log2Up(p.scalarFIFODepth).W))
 
   override def cloneType(): this.type = {
-    new SCUConfig(p).asInstanceOf[this.type]
+    new ScalarCUConfig(p).asInstanceOf[this.type]
   }
 }
-object SCUConfig {
-  def apply(p:CUParams):SCUConfig = {
-    SCUConfig(p.asInstanceOf[SCUParams])
+object ScalarCUConfig {
+  def apply(p:CUParams):ScalarCUConfig = {
+    ScalarCUConfig(p.asInstanceOf[ScalarCUParams])
   }
 }
 
@@ -330,7 +330,7 @@ case class SwitchCUControlBoxConfig(val p: SwitchCUParams) extends AbstractConfi
   }
 }
 
-case class SCUControlBoxConfig(val p: SCUParams) extends AbstractConfig {
+case class ScalarCUControlBoxConfig(val p: ScalarCUParams) extends AbstractConfig {
 
   val tokenInAndTree = Vec(p.numControlIn, Bool())
   val fifoAndTree = Vec(p.getNumRegs(ScalarInReg), Bool())
@@ -342,7 +342,7 @@ case class SCUControlBoxConfig(val p: SCUParams) extends AbstractConfig {
   val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.getNumRegs(ScalarInReg) + 2, p.numControlOut))
 
   override def cloneType(): this.type = {
-    new SCUControlBoxConfig(p).asInstanceOf[this.type]
+    new ScalarCUControlBoxConfig(p).asInstanceOf[this.type]
   }
 }
 
@@ -352,6 +352,7 @@ case class PlasticineConfig(
   scalarParams: Array[Array[ScalarSwitchParams]],
   controlParams: Array[Array[ControlSwitchParams]],
   switchCUParams: Array[Array[SwitchCUParams]],
+  scalarCUParams: Array[Array[ScalarCUParams]],
   p: PlasticineParams,
   f: FringeParams) extends AbstractConfig {
 
@@ -369,10 +370,12 @@ case class PlasticineConfig(
 
   val switchCU = HVec.tabulate(switchCUParams.size) { i => HVec.tabulate(switchCUParams(i).size) { j => new SwitchCUConfig(switchCUParams(i)(j)) } }
 
+  val scalarCU = HVec.tabulate(scalarCUParams.size) { i => HVec.tabulate(scalarCUParams(i).size) { j => new ScalarCUConfig(scalarCUParams(i)(j)) } }
+
   val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
   val doneSelect = UInt(log2Up((p.numRows+1) * (p.numCols+1)).W)
   override def cloneType(): this.type = {
-    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f).asInstanceOf[this.type]
+    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, p, f).asInstanceOf[this.type]
   }
 }
 

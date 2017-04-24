@@ -18,6 +18,7 @@ object GeneratedTopParams extends TopParams with GeneratedParams {
     override val scalarSwitchParams = Array.fill(3)(Array.ofDim[ScalarSwitchParams](3))
     override val controlSwitchParams = Array.fill(3)(Array.ofDim[ControlSwitchParams](3))
     override val switchCUParams = Array.fill(3)(Array.ofDim[SwitchCUParams](3))
+    override val scalarCUParams = Array.fill(3)(Array.ofDim[ScalarCUParams](3))
     override val numArgOutSelections = List(6,6,6)
     override val numDoneConnections = 6
   }

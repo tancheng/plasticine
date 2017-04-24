@@ -15,8 +15,8 @@ import plasticine.pisa.enums._
 import plasticine.templates.Utils.log2Up
 import plasticine.misc.Utils._
 
-class SCU(val p: SCUParams) extends CU {
-  val io = IO(CUIO(p, SCUConfig(p)))
+class ScalarCU(val p: ScalarCUParams) extends CU {
+  val io = IO(CUIO(p, ScalarCUConfig(p)))
 
   // Sanity check parameters for validity
 
@@ -69,7 +69,7 @@ class SCU(val p: SCUParams) extends CU {
   }
 
   // Control Block
-  val cbox = Module(new SCUControlBox(p))
+  val cbox = Module(new ScalarCUControlBox(p))
   cbox.io.config := io.config.control
   cbox.io.controlIn := io.controlIn
   io.controlOut := cbox.io.controlOut
@@ -182,7 +182,7 @@ class SCU(val p: SCUParams) extends CU {
       val sources = stageConfig.enableSelect.nonXSources map { m => m match {
         case PrevStageSrc => stageEnables.last.io.out(0)
         case ConstSrc => stageConfig.enableSelect.value
-        case _ => throw new Exception(s"[SCU] Unsupported source type $m for stage enables")
+        case _ => throw new Exception(s"[ScalarCU] Unsupported source type $m for stage enables")
       }}
       stageEnableFF.io.in := Cat(stageEnables.last.io.out(1), getMux(sources, stageConfig.enableSelect.src))
     }

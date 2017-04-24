@@ -9,7 +9,7 @@ import scala.language.reflectiveCalls
  * Compute Unit Control Module. Handles incoming tokens, done signals,
  * and outgoing tokens.
  */
-class SCUControlBox(val p: SCUParams) extends Module {
+class ScalarCUControlBox(val p: ScalarCUParams) extends Module {
   val numScalarFIFOs = p.getNumRegs(ScalarInReg)
   val io = IO(new Bundle {
     // Control IO
@@ -31,7 +31,7 @@ class SCUControlBox(val p: SCUParams) extends Module {
     val delayedDone = Input(Bool())
 
     // Config
-    val config = Input(SCUControlBoxConfig(p))
+    val config = Input(ScalarCUControlBoxConfig(p))
   })
 
   // Increment crossbar

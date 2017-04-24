@@ -43,7 +43,7 @@ trait CUParams extends Params {
 }
 
 trait PCUParams extends CUParams
-trait SCUParams extends CUParams {
+trait ScalarCUParams extends CUParams {
   override val v = 1
   override val numVectorIn = 0
   override val numVectorOut = 0
@@ -71,7 +71,8 @@ trait PlasticineParams extends Params {
   val numRows: Int = 2
   val numCols: Int = 2
   val cuParams: Array[Array[CUParams]]
-  val switchCUParams: Array[Array[SwitchCUParams]] //TODO
+  val switchCUParams: Array[Array[SwitchCUParams]]
+  val scalarCUParams: Array[Array[ScalarCUParams]]
   val vectorSwitchParams:Array[Array[VectorSwitchParams]]
   val scalarSwitchParams:Array[Array[ScalarSwitchParams]]
   val controlSwitchParams:Array[Array[ControlSwitchParams]]
