@@ -380,7 +380,7 @@ object PCUControlBoxBits {
     new PCUControlBoxBits(
         List.fill(p.numControlIn) { 0 },   // tokenInAndTree
         List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // fifoAndTree
-        List.fill(p.numUDCs + 1) { 0 }, // siblingAndTree
+        List.fill(p.numUDCs) { 0 }, // siblingAndTree
         0,   // streamingMuxSelect
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar

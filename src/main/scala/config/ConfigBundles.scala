@@ -255,7 +255,7 @@ case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
 
   val tokenInAndTree = Vec(p.numControlIn, Bool())
   val fifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
-  val siblingAndTree = Vec(p.numUDCs + 1, Bool())
+  val siblingAndTree = Vec(p.numUDCs, Bool())
   val streamingMuxSelect = Bool()
   val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
