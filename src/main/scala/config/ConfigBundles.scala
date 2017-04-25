@@ -204,6 +204,8 @@ object ScalarCUConfig {
 
 case class MemoryChannelConfig(p: MemoryChannelParams) extends AbstractConfig {
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, 4, p.w))
+  val tokenInXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, 4))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(4+2, p.numControlOut))
 
   override def cloneType(): this.type = {
     new MemoryChannelConfig(p).asInstanceOf[this.type]

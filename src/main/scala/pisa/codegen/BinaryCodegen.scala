@@ -28,6 +28,7 @@ class BinaryCodegen() extends Traversal {
       case n: ScalarCUControlBoxBits => Predef.assert(cnode.isInstanceOf[ScalarCUControlBoxConfig])
       case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
       case n: ScalarCUBits => Predef.assert(cnode.isInstanceOf[ScalarCUConfig])
+      case n: MemoryChannelBits => Predef.assert(cnode.isInstanceOf[MemoryChannelConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
       case _ => throw new Exception(s"Unknown node $node")
     }
@@ -182,10 +183,20 @@ class BinaryCodegen() extends Traversal {
         toBinary(n.fifoAndTree, cn.fifoAndTree.getWidth) ++
         toBinary(n.tokenInAndTree, cn.tokenInAndTree.getWidth)
 
+      case (n: MemoryChannelBits, cn: MemoryChannelConfig)      =>
+        genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
+        genBinary(n.tokenInXbar, cn.tokenInXbar) ++
+        genBinary(n.scalarInXbar, cn.scalarInXbar)
+
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         toBinary(n.doneSelect, cn.doneSelect.getWidth) ++
         toBinary(n.argOutMuxSelect, cn.argOutMuxSelect.getWidth) ++
+        List.tabulate(cn.memoryChannel.size) { i =>
+          List.tabulate(cn.memoryChannel(i).size) { j =>
+            genBinary(n.memoryChannel(i)(j), cn.memoryChannel(i)(j))
+          }.flatten
+        }.flatten ++
         List.tabulate(cn.scalarCU.size) { i =>
           List.tabulate(cn.scalarCU(i).size) { j =>
             genBinary(n.scalarCU(i)(j), cn.scalarCU(i)(j))

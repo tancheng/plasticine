@@ -1,7 +1,7 @@
 package plasticine.arch
 
 import chisel3._
-import chisel3.util._
+import chisel3.util.Decoupled
 import plasticine.templates.Opcodes
 import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
@@ -24,7 +24,6 @@ case class PlasticineMemoryInterface(p: MemoryChannelParams) extends Bundle {
   val controlIn = Input(Vec(p.numControlIn, Bool()))
   val controlOut = Output(Vec(p.numControlOut, Bool()))
 
-  // Write data
   val vecIn = Flipped(Decoupled(Vec(p.v, UInt(p.w.W))))
   val vecOut = Decoupled(Vec(p.v, UInt(p.w.W)))
 }
@@ -33,7 +32,7 @@ case class PlasticineMemoryInterface(p: MemoryChannelParams) extends Bundle {
 case class MemoryChannelIO(p: MemoryChannelParams) extends Bundle {
   // Plasticine
   val plasticine = PlasticineMemoryInterface(p)
-  val dram = new AppStreams(List(StreamParInfo(p.w, p.v)), List(StreamParInfo(p.w, p.v)))
+  val dram = Flipped(new AppStreams(List(StreamParInfo(p.w, p.v)), List(StreamParInfo(p.w, p.v))))
   val config = Input(MemoryChannelConfig(p))
 }
 
@@ -43,10 +42,14 @@ class MemoryChannel(val p: MemoryChannelParams) extends Module {
   // Scalar in Xbar
   val numEffectiveScalarIns = 4
 
+  // Control inputs
+  val tokenInXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numControlIn, numEffectiveScalarIns)))
+  tokenInXbar.io.config := io.config.tokenInXbar
+  tokenInXbar.io.ins := io.plasticine.controlIn
+
   val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, numEffectiveScalarIns, p.w)))
   scalarInXbar.io.config := io.config.scalarInXbar
   scalarInXbar.io.ins := Vec(io.plasticine.scalarIn.map { _.bits })
-
 
   // Scalar input FIFOs
   val scalarFIFOs = List.tabulate(numEffectiveScalarIns) { i =>
@@ -56,17 +59,60 @@ class MemoryChannel(val p: MemoryChannelParams) extends Module {
     config.chainRead := true.B
     fifo.io.config := config
     fifo.io.enq(0) := scalarInXbar.io.outs(i)
-//    fifo.io.enqVld := io.scalarIn(i).valid
+    fifo.io.enqVld := tokenInXbar.io.outs(i)
     fifo
   }
 
   val scalarIns = scalarFIFOs.map { _.io.deq(0) }
 
-  val raddr = scalarIns(0)
-  val waddr = scalarIns(1)
-  val rsize = scalarIns(2)
-  val wsize = scalarIns(3)
+  val READ = 0
+  val WRITE = 1
+  val RSIZE = 2
+  val WSIZE = 3
 
-//  val readCtr = Module(new Counter(p.w.W))
-//  readCtr.io.reset := false.B
+  val raddr = scalarIns(READ)
+  val waddr = scalarIns(WRITE)
+  val rsize = scalarIns(RSIZE)
+  val wsize = scalarIns(WSIZE)
+
+  // Command is valid only when both addrFifo and sizeFifo are not empty
+  val readCmdValid = ~scalarFIFOs(READ).io.empty & ~scalarFIFOs(READ+1).io.empty
+  val writeCmdValid = ~scalarFIFOs(WRITE).io.empty & ~scalarFIFOs(WRITE+1).io.empty
+  scalarFIFOs(READ).io.deqVld := readCmdValid
+  scalarFIFOs(WRITE).io.deqVld := writeCmdValid
+
+  io.dram.loads(0).cmd.bits.addr := raddr
+  io.dram.loads(0).cmd.bits.size := rsize
+  io.dram.loads(0).cmd.bits.isWr := 0.U
+  io.dram.loads(0).cmd.valid := readCmdValid
+
+  io.dram.stores(0).cmd.bits.addr := waddr
+  io.dram.stores(0).cmd.bits.size := wsize
+  io.dram.stores(0).cmd.bits.isWr := 1.U
+  io.dram.stores(0).cmd.valid := writeCmdValid
+
+
+  val readCtr = Module(new Counter(p.w))
+  readCtr.io.enable := io.dram.loads(0).rdata.valid
+  readCtr.io.reset := false.B
+  readCtr.io.max := rsize
+  readCtr.io.stride := 1.U
+  readCtr.io.saturate := 0.U
+  scalarFIFOs(RSIZE).io.deqVld := readCtr.io.done
+
+  val writeCtr = Module(new Counter(p.w))
+  writeCtr.io.enable := io.dram.stores(0).wresp.bits
+  writeCtr.io.reset := false.B
+  writeCtr.io.max := wsize
+  writeCtr.io.stride := 1.U
+  writeCtr.io.saturate := 0.U
+  scalarFIFOs(WSIZE).io.deqVld := writeCtr.io.done
+
+  val tokenOutXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(numEffectiveScalarIns+2, p.numControlOut)))
+  tokenOutXbar.io.config := io.config.tokenOutXbar
+  tokenOutXbar.io.ins := Vec(scalarFIFOs.map { ~_.io.full } ++ List(readCtr.io.done, writeCtr.io.done))
+  io.plasticine.controlOut := tokenOutXbar.io.outs
+
+  io.dram.loads(0).rdata <> io.plasticine.vecOut
+  io.plasticine.vecIn <> io.dram.stores(0).wdata
 }

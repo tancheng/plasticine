@@ -527,7 +527,7 @@ case class MemoryChannelBits(
 object MemoryChannelBits {
   def zeroes(p: MemoryChannelParams) = {
     new MemoryChannelBits(
-        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn, 4)),  // scalarInXbar
+        CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, 4, p.w)),  // scalarInXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, 4)),  // tokenInXbar
         CrossbarBits.zeroes(ControlSwitchParams(4 + 2, p.numControlOut)) // tokenOutXbar
       )
