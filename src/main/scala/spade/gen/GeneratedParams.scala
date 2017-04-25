@@ -83,7 +83,7 @@ case class GeneratedScalarCUParams(override val numScalarIn:Int, override val nu
   override val w = 32
   override val numCounters = 6
   override val numUDCs = 4
-  regColors += List(CounterReg,ReduceReg)
+  regColors += List(CounterReg)
   regColors += List(CounterReg)
   regColors += List(CounterReg)
   regColors += List(CounterReg)
@@ -99,7 +99,7 @@ case class GeneratedScalarCUParams(override val numScalarIn:Int, override val nu
   regColors += List()
   regColors += List()
   regColors += List()
-  override val d = 5
+  override val d = 6
   override val r = regColors.size
 }
 trait GeneratedParams extends GeneratedParams1 {

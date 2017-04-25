@@ -31,11 +31,9 @@ trait InOutArgTrait extends InOutArgTrait1 {
   val lcus = Array.tabulate(3, 3) {    case (i,j) =>
     SwitchCUBits.zeroes(switchCUParams(i)(j))
   }
-
-  val scalarCUs = Array.tabulate(3, 3) { case (i, j) =>
+  val scalarCUs = Array.tabulate(2, 3) {    case (i,j) =>
     ScalarCUBits.zeroes(scalarCUParams(i)(j))
   }
-
   val plasticineBits = PlasticineBits (
     cu=cus,
     vectorSwitch=vsbs,
@@ -44,8 +42,9 @@ trait InOutArgTrait extends InOutArgTrait1 {
     switchCU=lcus,
     scalarCU=scalarCUs,
     argOutMuxSelect=List(1,-1,-1),
-    doneSelect=4
+    doneSelect=1
   )  
+  // ow2680[2] -> ScalOut62(ArgIn3_x186)
   def main(args: String*) = plasticineBits
   def config:Unit =  {
     config1
