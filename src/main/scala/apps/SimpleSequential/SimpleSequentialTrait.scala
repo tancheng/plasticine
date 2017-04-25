@@ -42,10 +42,10 @@ trait SimpleSequentialTrait extends SimpleSequentialTrait1 with SimpleSequential
     switchCU=lcus,
     scalarCU=scalarCUs,
     argOutMuxSelect=List(4,-1,-1),
-    doneSelect=4
+    doneSelect=2
   )  
-  // ow2678[1] -> ScalOut201(ArgIn6_x343)
-  // ow2680[2] -> ScalOut197(ArgIn3_x342)
+  // ow2678[1] -> ScalOut197(ArgIn3_x342)
+  // ow2680[2] -> ScalOut201(ArgIn6_x343)
   def main(args: String*) = plasticineBits
   def config:Unit =  {
     config1
