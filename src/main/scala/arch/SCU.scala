@@ -155,10 +155,9 @@ class ScalarCU(val p: ScalarCUParams) extends CU {
         reg.io.in := Mux(stageConfig.result(idx), fu.io.out, prevRegs(idx).io.out)
       } else {
         // Use regcolor to pick the right thing to forward
-        val validFwds = Set[RegColor](CounterReg, ScalarInReg, VecInReg)
+        val validFwds = Set[RegColor](CounterReg, ScalarInReg)
         val colors = p.regColors(idx).filter { validFwds.contains(_) }
-        Predef.assert(colors.size == 1, s"ERROR: Invalid number of valid regcolors (should be 1): $colors")
-        val fwd = colors(0) match {
+        val fwd = if (colors.size == 0) 0.U else colors(0) match {
           case CounterReg =>
             counterPtr += 1
             counterChain.io.out(counterPtr)
