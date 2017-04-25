@@ -519,6 +519,21 @@ object CrossbarBits {
 //  }
 //}
 
+case class MemoryChannelBits(
+  var scalarInXbar: CrossbarBits,
+  var tokenInXbar: CrossbarBits,
+  var tokenOutXbar: CrossbarBits
+) extends AbstractBits
+object MemoryChannelBits {
+  def zeroes(p: MemoryChannelParams) = {
+    new MemoryChannelBits(
+        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn, 4)),  // scalarInXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, 4)),  // tokenInXbar
+        CrossbarBits.zeroes(ControlSwitchParams(4 + 2, p.numControlOut)) // tokenOutXbar
+      )
+  }
+}
+
 /**
  * Plasticine config information
  */
@@ -529,6 +544,7 @@ case class PlasticineBits(
   controlSwitch: Array[Array[CrossbarBits]],
   switchCU: Array[Array[SwitchCUBits]],
   scalarCU: Array[Array[ScalarCUBits]],
+  memoryChannel: Array[Array[MemoryChannelBits]],
   argOutMuxSelect: List[Int],
   doneSelect: Int
 ) extends AbstractBits
@@ -541,6 +557,7 @@ object PlasticineBits {
       controlParams: Array[Array[ControlSwitchParams]],
       switchCUParams:    Array[Array[SwitchCUParams]],
       scalarCUParams:    Array[Array[ScalarCUParams]],
+      memoryChannelParams:    Array[Array[MemoryChannelParams]],
       p: PlasticineParams,
       f: FringeParams
   ) = {
@@ -552,8 +569,9 @@ object PlasticineBits {
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(vectorParams(i)(j)) },
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(scalarParams(i)(j)) },
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(controlParams(i)(j)) },
-      Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { SwitchCUBits.zeroes(switchCUParams(i)(j)) }}, //TODO
-      Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { ScalarCUBits.zeroes(scalarCUParams(i)(j)) }}, //TODO
+      Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { SwitchCUBits.zeroes(switchCUParams(i)(j)) }},
+      Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { ScalarCUBits.zeroes(scalarCUParams(i)(j)) }},
+      Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { MemoryChannelBits.zeroes(memoryChannelParams(i)(j)) }},
       List.fill(f.numArgOuts) { 0 },
       0
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },
