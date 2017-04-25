@@ -48,7 +48,7 @@ trait InOutArgTrait extends InOutArgTrait1 {
     argOutMuxSelect=List(1,-1,-1),
     doneSelect=1
   )  
-  // ow2680[2] -> ScalOut57(ArgIn3_x222)
+  // ow2686[2] -> ScalOut57(ArgIn3_x222)
   def main(args: String*) = plasticineBits
   def config:Unit =  {
     config1
