@@ -79,6 +79,25 @@ case class GeneratedSwitchCUParams(override val numScalarIn:Int, override val nu
   override val numCounters = 6
   override val numUDCs = 4
 }
+
+case class GeneratedScalarCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends ScalarCUParams {
+  override val w = 32
+  override val numCounters = 6
+  override val numUDCs = 4
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List(ScalarInReg)
+  regColors += List(ScalarInReg)
+  regColors += List(ScalarInReg)
+  regColors += List(ScalarInReg)
+  override val d = 6
+  override val r = regColors.size
+}
+
 trait GeneratedParams extends GeneratedParams1 {
   self:TopParams =>
   import plasticineParams._

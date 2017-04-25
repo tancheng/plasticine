@@ -31,12 +31,17 @@ trait SimpleSequentialTrait extends SimpleSequentialTrait1 with SimpleSequential
   val lcus = Array.tabulate(3, 3) {    case (i,j) =>
     SwitchCUBits.zeroes(switchCUParams(i)(j))
   }
+  val scalarCUs = Array.tabulate(3, 3) { case (i, j) =>
+    ScalarCUBits.zeroes(scalarCUParams(i)(j))
+  }
+
   val plasticineBits = PlasticineBits (
     cu=cus,
     vectorSwitch=vsbs,
     scalarSwitch=ssbs,
     controlSwitch=csbs,
     switchCU=lcus,
+    scalarCU=scalarCUs,
     argOutMuxSelect=List(4,-1,-1),
     doneSelect=5
   )  
