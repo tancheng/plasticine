@@ -79,7 +79,7 @@ trait PlasticineArch8 extends PlasticineArch7 {
     csbs(2)(0).io.outs(19) <> scus(1)(0).io.controlIn(1)
     csbs(2)(0).io.outs(20) <> scus(1)(0).io.controlIn(2)
     csbs(2)(0).io.outs(21) <> scus(1)(0).io.controlIn(3)
-    csbs(2)(0).io.outs(22) <> mcs(1)(0).io.plasticine.controlIn
+    csbs(2)(0).io.outs(22) <> mcs(1)(0).io.plasticine.controlIn(0)
     csbs(2)(0).io.outs(23) <> doneOuts(2)
     csbs(2)(1).io.outs(0) <> csbs(1)(1).io.ins(10)
     csbs(2)(1).io.outs(1) <> csbs(1)(1).io.ins(11)
