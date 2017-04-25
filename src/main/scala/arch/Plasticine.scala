@@ -18,13 +18,16 @@ import scala.collection.mutable.ListBuffer
 import java.io.PrintWriter
 import scala.language.reflectiveCalls
 
-case class PlasticineIO(f: FringeParams) extends Bundle {
+case class PlasticineIO(f: FringeParams, mc: Array[Array[MemoryChannelParams]]) extends Bundle {
   // Scalar IO
   val argIns = Vec(f.numArgIns, Flipped(Decoupled(UInt(f.dataWidth.W))))
   val argOuts = Vec(f.numArgOuts, Decoupled(UInt(f.dataWidth.W)))
 
   // Memory IO
-  val memStreams = Flipped(new AppStreams(f.loadStreamInfo, f.storeStreamInfo))
+  private val numMemoryChannels = mc.flatten.size
+  private val streamPar = StreamParInfo(32, 16)
+  private val streamParams = List.fill(numMemoryChannels) { streamPar }
+  val memStreams = Flipped(new AppStreams(streamParams, streamParams))
 
   // Control IO
   val enable = Input(Bool())
@@ -36,8 +39,6 @@ case class PlasticineIO(f: FringeParams) extends Bundle {
 }
 
 class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Option[PlasticineBits] = None) extends Module with PlasticineArch {
-  val io = IO(PlasticineIO(f))
-
   val cuParams = p.cuParams
   val vectorParams = p.vectorSwitchParams
   val scalarParams = p.scalarSwitchParams
@@ -45,6 +46,8 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
   val switchCUParams = p.switchCUParams
   val scalarCUParams = p.scalarCUParams
   val memoryChannelParams = p.memoryChannelParams
+
+  val io = IO(PlasticineIO(f, memoryChannelParams))
 
   // Wire up the reconfiguration network: ASIC or CGRA?
   val configType = PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, memoryChannelParams, p, f)
@@ -150,15 +153,16 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
     }
   }
 
-  // Memory channels
+  // Memory channels, connect dram portion
   val memoryChannels = Array.tabulate(memoryChannelParams.size) { i =>
     Array.tabulate(memoryChannelParams(i).size) { j =>
       val mc = Module(new MemoryChannel(memoryChannelParams(i)(j)))
       mc.io.config := config.memoryChannel(i)(j)
+      io.memStreams.loads(i*memoryChannelParams(i).size + j) <> mc.io.dramLoad
+      io.memStreams.stores(i*memoryChannelParams(i).size + j) <> mc.io.dramStore
       mc
     }
   }
-
 
   connect(io, argOutMuxInData, Array.tabulate(doneOuts.size) { doneOuts(_) }, cus, scalarCUs, memoryChannels, vsbs, ssbs, csbs, switchCUs)
 }

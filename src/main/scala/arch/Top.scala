@@ -43,6 +43,11 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
 //  val plasticine = Module(new CounterChainWrapper(p.plasticineParams.w, 8))
 //  val plasticine = Module(new PCUWrapper(p.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]))
 
+  // Memory IO
+  private val numMemoryChannels = p.plasticineParams.memoryChannelParams.flatten.size
+  private val streamPar = StreamParInfo(32, 16)
+  private val streamParams = List.fill(numMemoryChannels) { streamPar }
+
   p.target match {
     case "verilator" | "vcs" =>
       // Simulation Fringe
@@ -51,8 +56,8 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
         p.fringeParams.dataWidth,
         p.fringeParams.numArgIns,
         p.fringeParams.numArgOuts,
-        p.fringeParams.loadStreamInfo,
-        p.fringeParams.storeStreamInfo,
+        streamParams,
+        streamParams,
         List[StreamParInfo](),  // streamIns
         List[StreamParInfo](),  // streamOuts
         blockingDRAMIssue))

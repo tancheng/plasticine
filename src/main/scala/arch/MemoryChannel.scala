@@ -32,7 +32,8 @@ case class PlasticineMemoryInterface(p: MemoryChannelParams) extends Bundle {
 case class MemoryChannelIO(p: MemoryChannelParams) extends Bundle {
   // Plasticine
   val plasticine = PlasticineMemoryInterface(p)
-  val dram = Flipped(new AppStreams(List(StreamParInfo(p.w, p.v)), List(StreamParInfo(p.w, p.v))))
+  val dramLoad = Flipped(new LoadStream(StreamParInfo(p.w, p.v)))
+  val dramStore    = Flipped(new StoreStream(StreamParInfo(p.w, p.v)))
   val config = Input(MemoryChannelConfig(p))
 }
 
@@ -81,19 +82,19 @@ class MemoryChannel(val p: MemoryChannelParams) extends Module {
   scalarFIFOs(READ).io.deqVld := readCmdValid
   scalarFIFOs(WRITE).io.deqVld := writeCmdValid
 
-  io.dram.loads(0).cmd.bits.addr := raddr
-  io.dram.loads(0).cmd.bits.size := rsize
-  io.dram.loads(0).cmd.bits.isWr := 0.U
-  io.dram.loads(0).cmd.valid := readCmdValid
+  io.dramLoad.cmd.bits.addr := raddr
+  io.dramLoad.cmd.bits.size := rsize
+  io.dramLoad.cmd.bits.isWr := 0.U
+  io.dramLoad.cmd.valid := readCmdValid
 
-  io.dram.stores(0).cmd.bits.addr := waddr
-  io.dram.stores(0).cmd.bits.size := wsize
-  io.dram.stores(0).cmd.bits.isWr := 1.U
-  io.dram.stores(0).cmd.valid := writeCmdValid
+  io.dramStore.cmd.bits.addr := waddr
+  io.dramStore.cmd.bits.size := wsize
+  io.dramStore.cmd.bits.isWr := 1.U
+  io.dramStore.cmd.valid := writeCmdValid
 
 
   val readCtr = Module(new Counter(p.w))
-  readCtr.io.enable := io.dram.loads(0).rdata.valid
+  readCtr.io.enable := io.dramLoad.rdata.valid
   readCtr.io.reset := false.B
   readCtr.io.max := rsize
   readCtr.io.stride := 1.U
@@ -101,7 +102,7 @@ class MemoryChannel(val p: MemoryChannelParams) extends Module {
   scalarFIFOs(RSIZE).io.deqVld := readCtr.io.done
 
   val writeCtr = Module(new Counter(p.w))
-  writeCtr.io.enable := io.dram.stores(0).wresp.bits
+  writeCtr.io.enable := io.dramStore.wresp.bits
   writeCtr.io.reset := false.B
   writeCtr.io.max := wsize
   writeCtr.io.stride := 1.U
@@ -113,6 +114,6 @@ class MemoryChannel(val p: MemoryChannelParams) extends Module {
   tokenOutXbar.io.ins := Vec(scalarFIFOs.map { ~_.io.full } ++ List(readCtr.io.done, writeCtr.io.done))
   io.plasticine.controlOut := tokenOutXbar.io.outs
 
-  io.dram.loads(0).rdata <> io.plasticine.vecOut
-  io.plasticine.vecIn <> io.dram.stores(0).wdata
+  io.dramLoad.rdata <> io.plasticine.vecOut
+  io.plasticine.vecIn <> io.dramStore.wdata
 }
