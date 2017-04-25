@@ -80,18 +80,24 @@ class PMU(val p: PMUParams) extends CU {
   cbox.io.controlIn := io.controlIn
   io.controlOut := cbox.io.controlOut
 
-  cbox.io.fifoNotFull := Vec(scalarFIFOs.map { ~_.io.full })
-  cbox.io.fifoNotEmpty := Vec(scalarFIFOs.map { ~_.io.empty } ++ vectorFIFOs.map { ~_.io.empty })
+  val scalarFifoNotFull = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, false.B, ~fifo.io.full) }
+  val scalarFifoNotEmpty = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, true.B, ~fifo.io.full) }
+
+  cbox.io.fifoNotFull := Vec(scalarFifoNotFull)
+  cbox.io.fifoNotEmpty := Vec(scalarFifoNotEmpty ++ vectorFIFOs.map { ~_.io.empty })
 
   scalarFIFOs.zip(cbox.io.scalarFifoDeqVld) foreach { case (fifo, deqVld) => fifo.io.deqVld := deqVld }
   scalarFIFOs.zip(cbox.io.scalarFifoEnqVld) foreach { case (fifo, enqVld) => fifo.io.enqVld := enqVld }
 
   counterChain.io.enable := cbox.io.enable
+  val readEnable = cbox.io.enable(0)
+  val writeEnable = cbox.io.enable(1)
 
   // Connect enable to deqVld of all vector FIFOs.
   // Deq only if there is a valid element in the FIFO
+  // TODO: Currently assume that FIFO is dequeued only by write enable, which may not be true
   // TODO: Add deqVld muxes to select the stage that drives the deqVld signal
-//  vectorFIFOs.foreach { fifo => fifo.io.deqVld := cbox.io.enable & ~fifo.io.empty }
+  vectorFIFOs.foreach { fifo => fifo.io.deqVld := writeEnable }
 
   cbox.io.done := counterChain.io.done
 
@@ -128,10 +134,9 @@ class PMU(val p: PMUParams) extends CU {
       val sources = s match {
         case CounterSrc => counterChain.io.out
         case ScalarFIFOSrc => scalarIns
-        case VectorFIFOSrc => Vec(vectorFIFOs.map { _.io.deq(0) })
         case PrevStageSrc => if (i == 0) Vec(List.fill(2) {0.U}) else Vec(pipeRegs.last.map {_.io.out})
         case CurrStageSrc => Vec(regs.map {_.io.out})
-        case _ => throw new Exception("Unsupported operand source!")
+        case _ => throw new Exception(s"Unsupported operand source $s!")
       }
       val mux = Module(new MuxN(sources(0).cloneType, sources.size))
       mux.io.ins := sources
@@ -189,9 +194,6 @@ class PMU(val p: PMUParams) extends CU {
     pipeStages.append(fu)
     pipeRegs.append(regs)
 
-    val readEnable = cbox.io.enable(0)
-    val writeEnable = cbox.io.enable(1)
-
     // Assign stageEnable
     if (i == 0) {  // Pick from counter enables
       stageEnableFF.io.in := getMux(List(readEnable, writeEnable), stageConfig.enableSelect.src)
@@ -246,13 +248,43 @@ class PMU(val p: PMUParams) extends CU {
     mux.io.out
   }
 
+  def getAddrEnableSourcesMux(s: SelectSource) = {
+    val sources = s match {
+      case CounterSrc => cbox.io.enable
+      case ScalarFIFOSrc => Vec(scalarFifoNotEmpty)
+      case ALUSrc => Vec(stageEnables.map {_.io.out})
+      case _ => throw new Exception("Unsupported operand source!")
+    }
+    val mux = Module(new MuxN(sources(0).cloneType, sources.size))
+    mux.io.ins := sources
+    mux
+  }
+
+  def getAddrEnable(config: SrcValueBundle) = {
+    val sources = config.nonXSources map { s => s match {
+      case ConstSrc => config.value
+      case _ =>
+        val m = getAddrEnableSourcesMux(s)
+        m.io.sel := config.value
+        m.io.out
+    }}
+    val mux = Module(new MuxN(sources(0).cloneType, sources.size))
+    mux.io.ins := Vec(sources)
+    mux.io.sel := config.src
+    mux.io.out
+  }
+
   // Scratchpad
   val scratchpad = Module(new Scratchpad(p))
   scratchpad.io.config := io.config.scratchpad
   scratchpad.io.wdata := getMux(vectorFIFOs.map {_.io.deq}, io.config.wdataSelect)
   scratchpad.io.waddr := getAddr(io.config.waddrSelect)
   scratchpad.io.raddr := getAddr(io.config.raddrSelect)
-  scratchpad.io.wen := false.B  // TODO: Fix after threading enable signals through pipeline
+  scratchpad.io.wen := getAddrEnable(io.config.waddrSelect)
+  scratchpad.io.wdone := cbox.io.sramSwapWrite
+  scratchpad.io.rdone := cbox.io.sramSwapRead
+
+  val readEn = getAddrEnable(io.config.raddrSelect)
 
   // Output assignment
   def getSourcesMux(s: SelectSource) = {
@@ -298,7 +330,8 @@ class PMU(val p: PMUParams) extends CU {
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := scratchpad.io.rdata
-    out.valid := RegNext(stageEnables.last.io.out & io.config.rdataEnable(i), 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
+//    out.valid := RegNext(stageEnables.last.io.out & io.config.rdataEnable(i), 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
+    out.valid := RegNext(readEn, 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
                                                               // TODO: Fix after threading enable signals
 //    out.valid := getValids(io.config.vectorValidOut(i))
   }

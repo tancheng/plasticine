@@ -27,7 +27,8 @@ class PCU(val p: PCUParams) extends CU {
   // after 'rwStages' and before 'reduction' stages because of the way
   // the dataSrc muxes are created.
   // i.e., d >= rwStages + 1 + numReduceStages + numStagesAfterReduction
-  Predef.assert(p.d >= (1 + numReduceStages), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages)!""")
+  val numStagesAfterReduction = 1
+  Predef.assert(p.d >= (1 + numReduceStages + numStagesAfterReduction), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages + $numStagesAfterReduction)!""")
 
   def getMux[T<:Data](ins: List[T], sel: UInt): T = {
     val srcMux = Module(new MuxN(ins(0).cloneType, ins.size))
@@ -82,6 +83,8 @@ class PCU(val p: PCUParams) extends CU {
 
   // Connect max and stride
   val ctrMaxStrideSources = scalarIns
+  val ctrStrides = Wire(Vec(p.numCounters, UInt(p.w.W)))
+
   for (i <- 0 until p.numCounters) {
     // max
     val maxMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
@@ -94,6 +97,7 @@ class PCU(val p: PCUParams) extends CU {
     strideMux.io.ins := ctrMaxStrideSources
     strideMux.io.sel := io.config.counterChain.counters(i).stride.value
     counterChain.io.stride(i) := strideMux.io.out
+    ctrStrides(i) := Mux(io.config.counterChain.counters(i).stride.is(ConstSrc), io.config.counterChain.counters(i).stride.value,  strideMux.io.out)
   }
 
   // Control Block
@@ -142,7 +146,11 @@ class PCU(val p: PCUParams) extends CU {
   val stageEnables = ListBuffer[FF]()
 
   // Reduction stages
-  val reduceStages = (0 until p.d).dropRight(1).takeRight(numReduceStages)  // Leave 1 stage to do in-place accumulation
+  val reduceStages = (0 until p.d).dropRight(2).takeRight(numReduceStages)  // Leave 1 stage to do in-place accumulation, 1 stage to move data to correct register
+
+  val unrolledCounters = List.tabulate(p.v) { lane =>
+    Vec(List.tabulate(p.numCounters) { ctr => counterChain.io.out(ctr) + lane.U * ctrStrides(ctr) })
+  }
 
   for (i <- 0 until p.d) {
 //    val fus = List.fill(p.v) { Module(new FU(p.w, fmaStages.contains(i), true)) }
@@ -164,14 +172,14 @@ class PCU(val p: PCUParams) extends CU {
     reduceLanes.foreach { r =>
       fwdLaneMap(r) = r + (1 << reduceStageNum)
     }
-//    println(s"stage $i: fwdLaneMap $fwdLaneMap")
+//    println(s"stage $i: [reduce: $isReduceStage] fwdLaneMap $fwdLaneMap")
     (0 until p.v) foreach { lane =>
       val fu = fus(lane)
       val regs = stageRegs(lane)
 
       def getSourcesMux(s: SelectSource) = {
         val sources = s match {
-          case CounterSrc => counterChain.io.out
+          case CounterSrc => unrolledCounters(lane)
           case ScalarFIFOSrc => scalarIns
           case VectorFIFOSrc => Vec(vectorFIFOs.map { _.io.deq(lane) })
           case PrevStageSrc => if (i == 0) Vec(List.fill(2) {0.U}) else Vec(pipeRegs.last(lane).map {_.io.out})
@@ -185,21 +193,35 @@ class PCU(val p: PCUParams) extends CU {
         mux
       }
 
-      def getOperand(opConfig: SrcValueBundle) = {
-        val sources = opConfig.nonXSources map { s => s match {
-          case ConstSrc => opConfig.value
+      def getOperand(opConfig: SrcValueBundle, allowReduce: Boolean = false) = {
+        val sources = opConfig.nonXSources.map { s => s match {
+          case ConstSrc => List(opConfig.value)
+          case ReduceTreeSrc =>
+            if (allowReduce) {
+              Predef.assert(isReduceStage, s"Stage $i is not a reduce stage!")
+              if (fwdLaneMap.contains(lane)) {
+                val prevRegBlock = pipeRegs.last(fwdLaneMap(lane))
+                val reduceReg = p.getRegIDs(ReduceReg)
+                Predef.assert(reduceReg.size == 1, s"ERROR: Only single reduceReg supported! reduceRegs: $reduceReg")
+                List(prevRegBlock(reduceReg(0)).io.out)
+              } else {
+                List()
+              }
+            } else {
+              List()
+            }
           case _ =>
             val m = getSourcesMux(s)
             m.io.sel := opConfig.value
-            m.io.out
-        }}
+            List(m.io.out)
+        }}.flatten
         val mux = Module(new MuxN(UInt(p.w.W), sources.size))
         mux.io.ins := Vec(sources)
         mux.io.sel := opConfig.src
         mux.io.out
       }
 
-      fu.io.a := getOperand(stageConfig.opA)
+      fu.io.a := getOperand(stageConfig.opA, allowReduce = isReduceStage) // reduction op is only opA
       fu.io.b := getOperand(stageConfig.opB)
       fu.io.c := getOperand(stageConfig.opC)
       fu.io.opcode := stageConfig.opcode
@@ -231,7 +253,7 @@ class PCU(val p: PCUParams) extends CU {
           }
           reg.io.in := Mux(stageConfig.result(idx), fu.io.out, fwd)
         }
-        reg.io.enable := stageEnableFF.io.out(0) & stageConfig.regEnables(idx)
+        reg.io.enable := (if (i == 0) localEnable else stageEnables.last.io.out(0)) & stageConfig.regEnables(idx)
       }
     }
     pipeStages.append(fus)

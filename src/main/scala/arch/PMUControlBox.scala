@@ -15,12 +15,12 @@ class PMUControlBox(val p: PMUParams) extends Module {
     val controlOut = Output(Vec(p.numControlOut, Bool()))
 
     // Local FIFO Inputs
-    val fifoNotFull = Input(Vec(p.numScalarIn, Bool()))
-    val fifoNotEmpty = Input(Vec(p.numScalarIn+p.numVectorIn, Bool()))
+    val fifoNotFull = Input(Vec(p.getNumRegs(ScalarInReg), Bool()))
+    val fifoNotEmpty = Input(Vec(p.getNumRegs(ScalarInReg)+p.numVectorIn, Bool()))
 
     // Local FIFO Outputs
-    val scalarFifoDeqVld = Output(Vec(p.numScalarIn, Bool()))
-    val scalarFifoEnqVld = Output(Vec(p.numScalarIn, Bool()))
+    val scalarFifoDeqVld = Output(Vec(p.getNumRegs(ScalarInReg), Bool()))
+    val scalarFifoEnqVld = Output(Vec(p.getNumRegs(ScalarInReg), Bool()))
 
     // Counter IO
     val enable = Output(Vec(p.numCounters, Bool()))
@@ -52,7 +52,7 @@ class PMUControlBox(val p: PMUParams) extends Module {
   }
 
   // Swap Write crossbar
-  val swapWriteXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numControlIn, p.numScalarIn)))
+  val swapWriteXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg))))
   swapWriteXbar.io.config := io.config.swapWriteXbar
   swapWriteXbar.io.ins := io.controlIn
 
@@ -73,7 +73,15 @@ class PMUControlBox(val p: PMUParams) extends Module {
   val writeEn = createAndTree(io.fifoNotEmpty, io.config.writeFifoAndTree)
   val readEn = createAndTree(io.fifoNotEmpty, io.config.readFifoAndTree)
 
-  val localReadEnable = readEn & RegNext(writeDone, 0.U)
+  val readWriteUDC = Module(new UpDownCtr(p.udCtrWidth))
+  readWriteUDC.io.init := false.B
+  readWriteUDC.io.initval := 0.U
+  readWriteUDC.io.strideInc := 1.U
+  readWriteUDC.io.strideDec := 1.U
+  readWriteUDC.io.inc := writeDone
+  readWriteUDC.io.dec := readDone
+
+  val localReadEnable = readEn & readWriteUDC.io.gtz
   io.enable.zipWithIndex.foreach { case (en, i) =>
     if (i == 0) en := localReadEnable else en := writeEn
   }

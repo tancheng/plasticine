@@ -60,6 +60,7 @@ case class CounterConfig(val w: Int, val startDelayWidth: Int, val endDelayWidth
   private val validSources = List[SelectSource](XSrc, ConstSrc, ScalarFIFOSrc)
   val max = SrcValueBundle(validSources, w)
   val stride = SrcValueBundle(validSources, w)
+  val par = UInt(5.W) // TODO: 5? must be log2Up(#lanes) + 1
 
 //  val maxConst = Bool()
 //  val strideConst = Bool()
@@ -102,8 +103,14 @@ case class CounterChainConfig(val w: Int, val numCounters: Int, val startDelayWi
 //  }
 //}
 
-class PipeStageConfig(r: Int, w: Int, numCounters: Int, val enableSources: List[SelectSource], val enableValueWidth: Int = 1) extends AbstractConfig {
-  val operandSources = List[SelectSource](XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc)
+class PipeStageConfig(
+  r: Int,
+  w: Int,
+  numCounters: Int,
+  val enableSources: List[SelectSource],
+  val enableValueWidth: Int = 1,
+  val operandSources: List[SelectSource]
+) extends AbstractConfig {
   val opA = SrcValueBundle(operandSources, w)
   val opB = SrcValueBundle(operandSources, w)
   val opC = SrcValueBundle(operandSources, w)
@@ -114,14 +121,15 @@ class PipeStageConfig(r: Int, w: Int, numCounters: Int, val enableSources: List[
   val enableSelect = SrcValueBundle(enableSources, enableValueWidth)
 
   override def cloneType(): this.type = {
-    new PipeStageConfig(r,w,numCounters, enableSources).asInstanceOf[this.type]
+    new PipeStageConfig(r,w,numCounters, enableSources, enableValueWidth, operandSources).asInstanceOf[this.type]
   }
 }
 
 case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
+  val operandSources = List(XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc, ReduceTreeSrc)
 
-  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources, 1))
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources, 1, operandSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val validOutSources = List[SelectSource](XSrc, EnableSrc, DoneSrc)
   val scalarValidOut = Vec(p.numScalarOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
@@ -145,8 +153,9 @@ object PCUConfig {
 case class PMUConfig(p: PMUParams) extends AbstractConfig {
   val enableSources = List[SelectSource](ReadEnSrc, WriteEnSrc, XSrc, PrevStageSrc)
   val addrSources = List[SelectSource](XSrc, CounterSrc, ALUSrc, ScalarFIFOSrc, ConstSrc)
+  val operandSources = List[SelectSource](XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, PrevStageSrc)
 
-  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w,p.numCounters, enableSources))
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w,p.numCounters, enableSources, 1, operandSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = PMUControlBoxConfig(p)
   val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
@@ -170,6 +179,26 @@ case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
 
   override def cloneType(): this.type = {
     new SwitchCUConfig(p).asInstanceOf[this.type]
+  }
+}
+
+case class ScalarCUConfig(p: ScalarCUParams) extends AbstractConfig {
+  val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
+  val operandSources = List(XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, PrevStageSrc, CurrStageSrc)
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources, 1, operandSources))
+  val counterChain = CounterChainConfig(p.w, p.numCounters)
+  val control = ScalarCUControlBoxConfig(p)
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
+  val fifoNbufConfig = Vec(p.getNumRegs(ScalarInReg), UInt(log2Up(p.scalarFIFODepth).W))
+
+  override def cloneType(): this.type = {
+    new ScalarCUConfig(p).asInstanceOf[this.type]
+  }
+}
+object ScalarCUConfig {
+  def apply(p:CUParams):ScalarCUConfig = {
+    ScalarCUConfig(p.asInstanceOf[ScalarCUParams])
   }
 }
 
@@ -254,13 +283,13 @@ case class ScratchpadConfig(val p: PMUParams) extends AbstractConfig {
 case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
 
   val tokenInAndTree = Vec(p.numControlIn, Bool())
-  val fifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
+  val fifoAndTree = Vec(p.getNumRegs(ScalarInReg)+p.numVectorIn, Bool())
   val siblingAndTree = Vec(p.numUDCs, Bool())
   val streamingMuxSelect = Bool()
   val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
-  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
-  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.getNumRegs(ScalarInReg) + 2, p.numControlOut))
 
   override def cloneType(): this.type = {
     new PCUControlBoxConfig(p).asInstanceOf[this.type]
@@ -272,12 +301,12 @@ case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
  */
 case class PMUControlBoxConfig(val p: PMUParams) extends AbstractConfig {
 
-  val writeFifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
-  val readFifoAndTree = Vec(p.numScalarIn+p.numVectorIn, Bool())
-  val scalarSwapReadSelect = Vec(p.numScalarIn, Bool())
+  val writeFifoAndTree = Vec(p.getNumRegs(ScalarInReg)+p.numVectorIn, Bool())
+  val readFifoAndTree = Vec(p.getNumRegs(ScalarInReg)+p.numVectorIn, Bool())
+  val scalarSwapReadSelect = Vec(p.getNumRegs(ScalarInReg), Bool())
   val writeDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
   val readDoneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters + p.numControlIn, 1))
-  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
   val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut))
 
   override def cloneType(): this.type = {
@@ -301,6 +330,21 @@ case class SwitchCUControlBoxConfig(val p: SwitchCUParams) extends AbstractConfi
   }
 }
 
+case class ScalarCUControlBoxConfig(val p: ScalarCUParams) extends AbstractConfig {
+
+  val tokenInAndTree = Vec(p.numControlIn, Bool())
+  val fifoAndTree = Vec(p.getNumRegs(ScalarInReg), Bool())
+  val siblingAndTree = Vec(p.numUDCs, Bool())
+  val streamingMuxSelect = Bool()
+  val incrementXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numUDCs))
+  val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
+  val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
+  val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.getNumRegs(ScalarInReg) + 2, p.numControlOut))
+
+  override def cloneType(): this.type = {
+    new ScalarCUControlBoxConfig(p).asInstanceOf[this.type]
+  }
+}
 
 case class PlasticineConfig(
   cuParams:    Array[Array[CUParams]],
@@ -308,6 +352,7 @@ case class PlasticineConfig(
   scalarParams: Array[Array[ScalarSwitchParams]],
   controlParams: Array[Array[ControlSwitchParams]],
   switchCUParams: Array[Array[SwitchCUParams]],
+  scalarCUParams: Array[Array[ScalarCUParams]],
   p: PlasticineParams,
   f: FringeParams) extends AbstractConfig {
 
@@ -325,10 +370,12 @@ case class PlasticineConfig(
 
   val switchCU = HVec.tabulate(switchCUParams.size) { i => HVec.tabulate(switchCUParams(i).size) { j => new SwitchCUConfig(switchCUParams(i)(j)) } }
 
+  val scalarCU = HVec.tabulate(scalarCUParams.size) { i => HVec.tabulate(scalarCUParams(i).size) { j => new ScalarCUConfig(scalarCUParams(i)(j)) } }
+
   val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
   val doneSelect = UInt(log2Up((p.numRows+1) * (p.numCols+1)).W)
   override def cloneType(): this.type = {
-    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, p, f).asInstanceOf[this.type]
+    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, p, f).asInstanceOf[this.type]
   }
 }
 

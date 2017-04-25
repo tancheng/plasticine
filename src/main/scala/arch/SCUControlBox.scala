@@ -9,7 +9,7 @@ import scala.language.reflectiveCalls
  * Compute Unit Control Module. Handles incoming tokens, done signals,
  * and outgoing tokens.
  */
-class PCUControlBox(val p: PCUParams) extends Module {
+class ScalarCUControlBox(val p: ScalarCUParams) extends Module {
   val numScalarFIFOs = p.getNumRegs(ScalarInReg)
   val io = IO(new Bundle {
     // Control IO
@@ -18,7 +18,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
 
     // Local FIFO Inputs
     val fifoNotFull = Input(Vec(numScalarFIFOs, Bool()))
-    val fifoNotEmpty = Input(Vec(numScalarFIFOs+p.numVectorIn, Bool()))
+    val fifoNotEmpty = Input(Vec(numScalarFIFOs, Bool()))
 
     // Local FIFO Outputs
     val scalarFifoDeqVld = Output(Vec(numScalarFIFOs, Bool()))
@@ -31,7 +31,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
     val delayedDone = Input(Bool())
 
     // Config
-    val config = Input(PCUControlBoxConfig(p))
+    val config = Input(ScalarCUControlBoxConfig(p))
   })
 
   // Increment crossbar
@@ -39,12 +39,6 @@ class PCUControlBox(val p: PCUParams) extends Module {
   incrementXbar.io.config := io.config.incrementXbar
   incrementXbar.io.ins := io.controlIn
 
-  // Done crossbar
-//  val doneXbar = Module(new CrossbarCore(Bool(), ControlSwitchParams(p.numCounters, 1)))
-//  doneXbar.io.config := io.config.doneXbar
-//  doneXbar.io.ins := io.done
-
-//  io.scalarFifoDeqVld.foreach { deq => deq := doneXbar.io.outs(0) }
   io.scalarFifoDeqVld.foreach { deq => deq := io.done }
 
   // Swap Write crossbar

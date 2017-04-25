@@ -27,7 +27,9 @@ class ConfigInitializer() extends Traversal {
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
       case n: PMUControlBoxBits => Predef.assert(cnode.isInstanceOf[PMUControlBoxConfig])
       case n: SwitchCUControlBoxBits => Predef.assert(cnode.isInstanceOf[SwitchCUControlBoxConfig])
+      case n: ScalarCUControlBoxBits => Predef.assert(cnode.isInstanceOf[ScalarCUControlBoxConfig])
       case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
+      case n: ScalarCUBits => Predef.assert(cnode.isInstanceOf[ScalarCUConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
       case _ => throw new Exception(s"Unknown node $node")
     }
@@ -53,6 +55,7 @@ class ConfigInitializer() extends Traversal {
         for(i <- 0 until cn.counters.size) { init(n.counters(i), cn.counters(i)) }
         cn.chain.zip(n.chain) foreach { case (wire, value) => wire := value.U }
       case (n: CounterRCBits, cn: CounterConfig)          =>
+        cn.par := n.par.U
         init(n.stride, cn.stride)
         init(n.max, cn.max)
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
@@ -88,6 +91,14 @@ class ConfigInitializer() extends Traversal {
         cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         init(n.control, cn.control)
         init(n.counterChain, cn.counterChain)
+
+      case (n: ScalarCUBits, cn: ScalarCUConfig)                    =>
+        cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
+        init(n.scalarOutXbar, cn.scalarOutXbar)
+        init(n.scalarInXbar, cn.scalarInXbar)
+        init(n.control, cn.control)
+        init(n.counterChain, cn.counterChain)
+        for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
 
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
         init(n.enableSelect, cn.enableSelect)
@@ -138,10 +149,25 @@ class ConfigInitializer() extends Traversal {
         cn.childrenAndTree.zip(n.childrenAndTree) foreach { case (wire, value) => wire := value.U }
         cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
 
+      case (n: ScalarCUControlBoxBits, cn: ScalarCUControlBoxConfig)      =>
+        init(n.tokenOutXbar, cn.tokenOutXbar)
+        init(n.swapWriteXbar, cn.swapWriteXbar)
+        init(n.doneXbar, cn.doneXbar)
+        init(n.incrementXbar, cn.incrementXbar)
+        cn.streamingMuxSelect := n.streamingMuxSelect.U
+        cn.siblingAndTree.zip(n.siblingAndTree) foreach { case (wire, value) => wire := value.U }
+        cn.fifoAndTree.zip(n.fifoAndTree) foreach { case (wire, value) => wire := value.U }
+        cn.tokenInAndTree.zip(n.tokenInAndTree) foreach { case (wire, value) => wire := value.U }
+
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         cn.doneSelect := n.doneSelect.U
         cn.argOutMuxSelect.zip(n.argOutMuxSelect) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
+        for(i <- 0 until cn.scalarCU.size) {
+          for(j <- 0 until cn.scalarCU(i).size) {
+            init(n.scalarCU(i)(j), cn.scalarCU(i)(j))
+          }
+        }
         for(i <- 0 until cn.switchCU.size) {
           for(j <- 0 until cn.switchCU(i).size) {
             init(n.switchCU(i)(j), cn.switchCU(i)(j))

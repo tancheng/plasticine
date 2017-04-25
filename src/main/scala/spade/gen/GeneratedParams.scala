@@ -18,6 +18,7 @@ object GeneratedTopParams extends TopParams with GeneratedParams {
     override val scalarSwitchParams = Array.fill(3)(Array.ofDim[ScalarSwitchParams](3))
     override val controlSwitchParams = Array.fill(3)(Array.ofDim[ControlSwitchParams](3))
     override val switchCUParams = Array.fill(3)(Array.ofDim[SwitchCUParams](3))
+    override val scalarCUParams = Array.fill(2)(Array.ofDim[ScalarCUParams](3))
     override val numArgOutSelections = List(6,6,6)
     override val numDoneConnections = 6
   }
@@ -77,6 +78,29 @@ case class GeneratedSwitchCUParams(override val numScalarIn:Int, override val nu
   override val w = 32
   override val numCounters = 6
   override val numUDCs = 4
+}
+case class GeneratedScalarCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends ScalarCUParams {
+  override val w = 32
+  override val numCounters = 6
+  override val numUDCs = 4
+  regColors += List(CounterReg,ReduceReg)
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List(CounterReg)
+  regColors += List()
+  regColors += List(ScalarInReg)
+  regColors += List(ScalarInReg,ScalarOutReg)
+  regColors += List(ScalarInReg,ScalarOutReg)
+  regColors += List(ScalarInReg,ScalarOutReg)
+  regColors += List(ScalarOutReg)
+  regColors += List()
+  regColors += List()
+  regColors += List()
+  regColors += List()
+  override val d = 5
+  override val r = regColors.size
 }
 trait GeneratedParams extends GeneratedParams1 {
   self:TopParams =>

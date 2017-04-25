@@ -32,12 +32,17 @@ trait PlasticineTestTrait {
     val lcus = Array.tabulate(3, 3) {    case (i,j) =>
       SwitchCUBits.zeroes(switchCUParams(i)(j))
     }
+    val scalarCUs = Array.tabulate(3, 3) { case (i, j) =>
+      ScalarCUBits.zeroes(scalarCUParams(i)(j))
+    }
+
     val plasticineBits = PlasticineBits (
       cu=cus,
       vectorSwitch=vsbs,
       scalarSwitch=ssbs,
       controlSwitch=csbs,
       switchCU=lcus,
+      scalarCU=scalarCUs,
       argOutMuxSelect=List(1,-1,-1),
       doneSelect = 0
     )

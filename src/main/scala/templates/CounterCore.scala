@@ -36,7 +36,7 @@ class CounterCore(val w: Int, val startDelayWidth: Int = 0, val endDelayWidth: I
   // Actual counter
   val counter = Module(new Counter(w))
   counter.io.max := Mux(io.config.max.is(ConstSrc), io.config.max.value, io.max)
-  counter.io.stride := Mux(io.config.stride.is(ConstSrc), io.config.stride.value, io.stride)
+  counter.io.stride := io.config.par * Mux(io.config.stride.is(ConstSrc), io.config.stride.value, io.stride)
   io.out := counter.io.out
   io.next := counter.io.next
   io.configuredMax := io.config.max.value

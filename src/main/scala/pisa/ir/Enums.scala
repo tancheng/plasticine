@@ -16,6 +16,7 @@ object ConstSrc extends SelectSource
 object PrevStageSrc extends SelectSource
 object CurrStageSrc extends SelectSource
 object ALUSrc extends SelectSource
+object ReduceTreeSrc extends SelectSource
 object XSrc extends SelectSource with XType
 object EnableSrc extends SelectSource
 object DoneSrc extends SelectSource

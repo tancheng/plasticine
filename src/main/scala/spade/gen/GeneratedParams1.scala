@@ -47,5 +47,11 @@ trait GeneratedParams1 {
     switchCUParams(2)(0) = GeneratedSwitchCUParams(4, 2, 8, 4)
     switchCUParams(2)(1) = GeneratedSwitchCUParams(4, 2, 8, 4)
     switchCUParams(2)(2) = GeneratedSwitchCUParams(4, 2, 8, 4)
+    scalarCUParams(0)(0) = GeneratedScalarCUParams(4, 2, 8, 4)
+    scalarCUParams(0)(1) = GeneratedScalarCUParams(4, 2, 8, 4)
+    scalarCUParams(0)(2) = GeneratedScalarCUParams(4, 2, 8, 4)
+    scalarCUParams(1)(0) = GeneratedScalarCUParams(4, 2, 8, 4)
+    scalarCUParams(1)(1) = GeneratedScalarCUParams(4, 2, 8, 4)
+    scalarCUParams(1)(2) = GeneratedScalarCUParams(4, 2, 8, 4)
   }
 }
