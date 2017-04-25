@@ -15,18 +15,16 @@ trait SimpleSequentialTrait1 {
   self:SimpleSequentialTrait =>
   def config1:Unit = {
     vsbs(0)(1).outSelect(4) = 9
-    ssbs(1)(0).outSelect(4) = 17
-    csbs(1)(1).outSelect(31) = 13
+    ssbs(1)(0).outSelect(4) = 18
+    csbs(1)(1).outSelect(31) = 8
     vsbs(1)(2).outSelect(8) = 13
     ssbs(1)(2).outSelect(4) = 13
-    ssbs(1)(2).outSelect(18) = 6
+    ssbs(1)(2).outSelect(18) = 5
+    csbs(1)(2).outSelect(4) = 11
+    csbs(1)(2).outSelect(15) = 4
+    csbs(1)(2).outSelect(16) = 13
+    csbs(1)(2).outSelect(22) = 12
     csbs(1)(2).outSelect(24) = 13
-    csbs(2)(1).outSelect(3) = 12
-    csbs(2)(1).outSelect(9) = 11
-    csbs(2)(1).outSelect(16) = 8
-    csbs(2)(1).outSelect(17) = 4
-    csbs(2)(2).outSelect(4) = 12
-    csbs(2)(2).outSelect(16) = 4
     // Configuring cus(0)(0).asPCUBits <- PipeCU62_x353
     // PipeCU62_x353.udcounters=[SeqCU7_x358 -> TokBuf320]
     // cus(0)(0).asPCUBits.udcs=[Some(TokBuf320),None,None,None,None]
@@ -94,8 +92,10 @@ trait SimpleSequentialTrait1 {
     // PipeCU96_x357 isPipelining=true isStreaming=false
     cus(1)(1).asPCUBits.control.streamingMuxSelect = 0
     cus(1)(1).asPCUBits.control.tokenOutXbar.outSelect(0) = 4
-    cus(1)(1).asPCUBits.control.tokenOutXbar.outSelect(2) = 4
     cus(1)(1).asPCUBits.control.doneXbar.outSelect(0) = 0
     cus(1)(1).asPCUBits.fifoNbufConfig=List(-1,-1,-1,-1)
+    // cus(1)(1).asPCUBits.scalarInXbar=[None,None,None,None]
+    // cus(1)(1).asPCUBits.scalarOutXbar=[Some(pr(st6320[8],reg513[8])),None,None,None]
+    cus(1)(1).asPCUBits.scalarOutXbar.outSelect(0) = 0
   }
 }
