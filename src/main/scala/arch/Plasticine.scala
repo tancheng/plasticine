@@ -44,9 +44,10 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
   val controlParams = p.controlSwitchParams
   val switchCUParams = p.switchCUParams
   val scalarCUParams = p.scalarCUParams
+  val memoryChannelParams = p.memoryChannelParams
 
   // Wire up the reconfiguration network: ASIC or CGRA?
-  val configType = PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, p, f)
+  val configType = PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, memoryChannelParams, p, f)
   val config = Wire(configType)
 
   if (initBits.isDefined) {
@@ -140,12 +141,21 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
     }
   }
 
-   //Switch CUs
+   // Scalar CUs
   val scalarCUs = Array.tabulate(scalarCUParams.size) { i =>
     Array.tabulate(scalarCUParams(i).size) { j =>
       val cu = Module(new ScalarCU(scalarCUParams(i)(j)))
       cu.io.config := config.scalarCU(i)(j)
       cu
+    }
+  }
+
+  // Memory channels
+  val memoryChannels = Array.tabulate(memoryChannelParams.size) { i =>
+    Array.tabulate(memoryChannelParams(i).size) { j =>
+      val mc = Module(new MemoryChannel(memoryChannelParams(i)(j)))
+      mc.io.config := config.memoryChannel(i)(j)
+      mc
     }
   }
 

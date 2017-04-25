@@ -202,6 +202,14 @@ object ScalarCUConfig {
   }
 }
 
+case class MemoryChannelConfig(p: MemoryChannelParams) extends AbstractConfig {
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, 4, p.w))
+
+  override def cloneType(): this.type = {
+    new MemoryChannelConfig(p).asInstanceOf[this.type]
+  }
+}
+
 /**
  * Crossbar config register format
  */
@@ -353,6 +361,7 @@ case class PlasticineConfig(
   controlParams: Array[Array[ControlSwitchParams]],
   switchCUParams: Array[Array[SwitchCUParams]],
   scalarCUParams: Array[Array[ScalarCUParams]],
+  memoryChannelParams: Array[Array[MemoryChannelParams]],
   p: PlasticineParams,
   f: FringeParams) extends AbstractConfig {
 
@@ -372,10 +381,12 @@ case class PlasticineConfig(
 
   val scalarCU = HVec.tabulate(scalarCUParams.size) { i => HVec.tabulate(scalarCUParams(i).size) { j => new ScalarCUConfig(scalarCUParams(i)(j)) } }
 
+  val memoryChannel = HVec.tabulate(memoryChannelParams.size) { i => HVec.tabulate(memoryChannelParams(i).size) { j => new MemoryChannelConfig(memoryChannelParams(i)(j)) } }
+
   val argOutMuxSelect = HVec.tabulate(f.numArgOuts) { i => UInt(log2Up(p.numArgOutSelections(i)).W) }
   val doneSelect = UInt(log2Up((p.numRows+1) * (p.numCols+1)).W)
   override def cloneType(): this.type = {
-    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, p, f).asInstanceOf[this.type]
+    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, memoryChannelParams, p, f).asInstanceOf[this.type]
   }
 }
 

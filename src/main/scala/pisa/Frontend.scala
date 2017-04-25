@@ -76,8 +76,9 @@ trait PISADesign extends ConfigFileInterface {
     val controlParams = p.controlSwitchParams
     val switchCUParams = p.switchCUParams
     val scalarCUParams = p.scalarCUParams
+    val memoryChannelParams = p.memoryChannelParams
 
-    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, p, f)
+    new PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, memoryChannelParams, p, f)
   }
 
   def getConfigTop(node: AbstractBits): AbstractConfig = node match {
