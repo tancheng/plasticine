@@ -361,6 +361,27 @@ object SwitchCUBits {
   }
 }
 
+case class ScalarCUBits(
+  var stages: Array[PipeStageBits],
+  var counterChain: CounterChainBits,
+  var control: ScalarCUControlBoxBits,
+  var scalarInXbar: CrossbarBits,
+  var scalarOutXbar: CrossbarBits,
+  var fifoNbufConfig: List[Int]
+) extends AbstractBits
+object ScalarCUBits {
+  def zeroes(p: ScalarCUParams) = {
+    new ScalarCUBits(
+      Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
+      CounterChainBits.zeroes(p.w, p.numCounters),
+      ScalarCUControlBoxBits.zeroes(p),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w)),
+      List.fill(p.getNumRegs(ScalarInReg)) { 0 }
+      )
+  }
+}
+
 case class PCUControlBoxBits(
   var tokenInAndTree: List[Int],
   var fifoAndTree: List[Int],
@@ -434,6 +455,31 @@ object SwitchCUControlBoxBits {
   }
 }
 
+case class ScalarCUControlBoxBits(
+  var tokenInAndTree: List[Int],
+  var fifoAndTree: List[Int],
+  var siblingAndTree: List[Int],
+  var streamingMuxSelect: Int,
+  var incrementXbar: CrossbarBits,
+  var doneXbar: CrossbarBits,
+  var swapWriteXbar: CrossbarBits,
+  var tokenOutXbar: CrossbarBits
+) extends AbstractBits
+object ScalarCUControlBoxBits {
+  def zeroes(p: ScalarCUParams) = {
+    new ScalarCUControlBoxBits(
+        List.fill(p.numControlIn) { 0 },   // tokenInAndTree
+        List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // fifoAndTree
+        List.fill(p.numUDCs) { 0 }, // siblingAndTree
+        0,   // streamingMuxSelect
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut)) // tokenOutXbar
+      )
+  }
+}
+
 /**
  * Crossbar config information
  * @param incByOne: Set to true if crossbar's '0' corresponds to the value 0.
@@ -481,7 +527,8 @@ case class PlasticineBits(
   vectorSwitch: Array[Array[CrossbarBits]],
   scalarSwitch: Array[Array[CrossbarBits]],
   controlSwitch: Array[Array[CrossbarBits]],
-  switchCU: Array[Array[SwitchCUBits]], //TODO
+  switchCU: Array[Array[SwitchCUBits]],
+  scalarCU: Array[Array[ScalarCUBits]],
   argOutMuxSelect: List[Int],
   doneSelect: Int
 ) extends AbstractBits
@@ -493,6 +540,7 @@ object PlasticineBits {
       scalarParams: Array[Array[ScalarSwitchParams]],
       controlParams: Array[Array[ControlSwitchParams]],
       switchCUParams:    Array[Array[SwitchCUParams]],
+      scalarCUParams:    Array[Array[ScalarCUParams]],
       p: PlasticineParams,
       f: FringeParams
   ) = {
@@ -505,6 +553,7 @@ object PlasticineBits {
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(scalarParams(i)(j)) },
       Array.tabulate((p.numRows+1), (p.numCols+1)) { case (i, j) => CrossbarBits.zeroes(controlParams(i)(j)) },
       Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { SwitchCUBits.zeroes(switchCUParams(i)(j)) }}, //TODO
+      Array.tabulate(p.numRows+1, p.numCols+1) { case (i, j) => { ScalarCUBits.zeroes(scalarCUParams(i)(j)) }}, //TODO
       List.fill(f.numArgOuts) { 0 },
       0
 //      List.tabulate(numMemoryUnits) { i => MemoryUnitBits.zeroes },

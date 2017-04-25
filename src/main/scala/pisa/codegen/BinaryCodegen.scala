@@ -25,7 +25,9 @@ class BinaryCodegen() extends Traversal {
       case n: PCUControlBoxBits => Predef.assert(cnode.isInstanceOf[PCUControlBoxConfig])
       case n: PMUControlBoxBits => Predef.assert(cnode.isInstanceOf[PMUControlBoxConfig])
       case n: SwitchCUControlBoxBits => Predef.assert(cnode.isInstanceOf[SwitchCUControlBoxConfig])
+      case n: ScalarCUControlBoxBits => Predef.assert(cnode.isInstanceOf[ScalarCUControlBoxConfig])
       case n: SwitchCUBits => Predef.assert(cnode.isInstanceOf[SwitchCUConfig])
+      case n: ScalarCUBits => Predef.assert(cnode.isInstanceOf[ScalarCUConfig])
       case n: SrcValueTuple   => Predef.assert(cnode.isInstanceOf[SrcValueBundle])
       case _ => throw new Exception(s"Unknown node $node")
     }
@@ -111,6 +113,16 @@ class BinaryCodegen() extends Traversal {
         genBinary(n.control, cn.control) ++
         genBinary(n.counterChain, cn.counterChain)
 
+      case (n: ScalarCUBits, cn: ScalarCUConfig)                    =>
+        toBinary(n.fifoNbufConfig, cn.fifoNbufConfig.getWidth) ++
+        genBinary(n.scalarOutXbar, cn.scalarOutXbar) ++
+        genBinary(n.scalarInXbar, cn.scalarInXbar) ++
+        genBinary(n.control, cn.control) ++
+        genBinary(n.counterChain, cn.counterChain) ++
+        List.tabulate(cn.stages.size) { i =>
+          genBinary(n.stages(i), cn.stages(i))
+        }.flatten
+
       case (n: PipeStageBits, cn: PipeStageConfig)        =>
 //        toBinary(encodeOneHot(n.result), cn.result.getWidth) ++
 //        toBinary(5, cn.opcode.getWidth)
@@ -160,10 +172,25 @@ class BinaryCodegen() extends Traversal {
         toBinary(n.childrenAndTree, cn.childrenAndTree.getWidth) ++
         toBinary(n.siblingAndTree, cn.siblingAndTree.getWidth)
 
+      case (n: ScalarCUControlBoxBits, cn: ScalarCUControlBoxConfig)      =>
+        genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
+        genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
+        genBinary(n.doneXbar, cn.doneXbar) ++
+        genBinary(n.incrementXbar, cn.incrementXbar) ++
+        toBinary(n.streamingMuxSelect, cn.streamingMuxSelect.getWidth) ++
+        toBinary(n.siblingAndTree, cn.siblingAndTree.getWidth) ++
+        toBinary(n.fifoAndTree, cn.fifoAndTree.getWidth) ++
+        toBinary(n.tokenInAndTree, cn.tokenInAndTree.getWidth)
+
       case (n: PlasticineBits, cn: PlasticineConfig)      =>
         // argOutMuxSelect
         toBinary(n.doneSelect, cn.doneSelect.getWidth) ++
         toBinary(n.argOutMuxSelect, cn.argOutMuxSelect.getWidth) ++
+        List.tabulate(cn.scalarCU.size) { i =>
+          List.tabulate(cn.scalarCU(i).size) { j =>
+            genBinary(n.scalarCU(i)(j), cn.scalarCU(i)(j))
+          }.flatten
+        }.flatten ++
         List.tabulate(cn.switchCU.size) { i =>
           List.tabulate(cn.switchCU(i).size) { j =>
             genBinary(n.switchCU(i)(j), cn.switchCU(i)(j))
