@@ -14,68 +14,41 @@ import plasticine.pisa.enums._
 trait SimpleSequentialTrait2 extends SimpleSequentialTrait1 {
   self:SimpleSequentialTrait =>
   def config2:Unit = {
-    // cus(1)(1).asPCUBits.scalarOutXbar=[Some(pr(st6320[8],reg513[8])),None,None,None]
+    cus(1)(1).asPCUBits.control.doneXbar.outSelect(0) = 0
+    cus(1)(1).asPCUBits.fifoNbufConfig=List(1,-1,-1,-1)
+    // cus(1)(1).asPCUBits.scalarInXbar=[Some(iw3232[1]),None,None,None]
+    cus(1)(1).asPCUBits.scalarInXbar.outSelect(0) = 1
+    // cus(1)(1).asPCUBits.scalarOutXbar=[Some(pr(st6896[8],reg513[8])),None,None,None]
     cus(1)(1).asPCUBits.scalarOutXbar.outSelect(0) = 0
     cus(1)(1).asPCUBits.counterChain.chain = List(0,0,0,0,0,0,0)
-    cus(1)(1).asPCUBits.counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 64), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=16)
+    cus(1)(1).asPCUBits.counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
     cus(1)(1).asPCUBits.stages(0).opA = SVT(VectorFIFOSrc, 0)
     cus(1)(1).asPCUBits.stages(0).opB = SVT()
     cus(1)(1).asPCUBits.stages(0).opC = SVT()
     cus(1)(1).asPCUBits.stages(0).opcode = BypassA
-    cus(1)(1).asPCUBits.stages(0).res = List(SVT(CurrStageDst, 0))
-    cus(1)(1).asPCUBits.stages(0).fwd(0) = SVT(ALUSrc, 0)
-    cus(1)(1).asPCUBits.stages(1).fwd(0) = SVT(PrevStageSrc, 0)
-    cus(1)(1).asPCUBits.stages(2).fwd(0) = SVT(PrevStageSrc, 0)
-    cus(1)(1).asPCUBits.stages(3).opA = SVT(ReduceTreeSrc, 0)
-    cus(1)(1).asPCUBits.stages(3).opB = SVT(ReduceTreeSrc, 0)
-    cus(1)(1).asPCUBits.stages(3).opC = SVT()
-    cus(1)(1).asPCUBits.stages(3).opcode = FixAdd
-    cus(1)(1).asPCUBits.stages(3).res = List(SVT(CurrStageDst, 0))
-    cus(1)(1).asPCUBits.stages(3).fwd(0) = SVT(ALUSrc, 3)
-    cus(1)(1).asPCUBits.stages(4).opA = SVT(ReduceTreeSrc, 0)
-    cus(1)(1).asPCUBits.stages(4).opB = SVT(ReduceTreeSrc, 0)
-    cus(1)(1).asPCUBits.stages(4).opC = SVT()
-    cus(1)(1).asPCUBits.stages(4).opcode = FixAdd
-    cus(1)(1).asPCUBits.stages(4).res = List(SVT(CurrStageDst, 0))
-    cus(1)(1).asPCUBits.stages(4).fwd(0) = SVT(ALUSrc, 4)
-    cus(1)(1).asPCUBits.stages(5).opA = SVT(ReduceTreeSrc, 0)
-    cus(1)(1).asPCUBits.stages(5).opB = SVT(ReduceTreeSrc, 0)
-    cus(1)(1).asPCUBits.stages(5).opC = SVT()
-    cus(1)(1).asPCUBits.stages(5).opcode = FixAdd
-    cus(1)(1).asPCUBits.stages(5).res = List(SVT(CurrStageDst, 0))
-    cus(1)(1).asPCUBits.stages(5).fwd(0) = SVT(ALUSrc, 5)
-    cus(1)(1).asPCUBits.stages(6).opA = SVT(ReduceTreeSrc, 0)
-    cus(1)(1).asPCUBits.stages(6).opB = SVT(ReduceTreeSrc, 0)
-    cus(1)(1).asPCUBits.stages(6).opC = SVT()
-    cus(1)(1).asPCUBits.stages(6).opcode = FixAdd
-    cus(1)(1).asPCUBits.stages(6).res = List(SVT(CurrStageDst, 0))
-    cus(1)(1).asPCUBits.stages(6).fwd(0) = SVT(ALUSrc, 6)
-    cus(1)(1).asPCUBits.stages(7).opA = SVT(PrevStageSrc, 0)
-    cus(1)(1).asPCUBits.stages(7).opB = SVT(CurrStageSrc, 1)
-    cus(1)(1).asPCUBits.stages(7).opC = SVT()
-    cus(1)(1).asPCUBits.stages(7).opcode = FixAdd
-    cus(1)(1).asPCUBits.stages(7).res = List(SVT(CurrStageDst, 1))
-    cus(1)(1).asPCUBits.accumInit = 3
-    cus(1)(1).asPCUBits.stages(7).fwd(1) = SVT(ALUSrc, 7)
-    cus(1)(1).asPCUBits.stages(8).opA = SVT(PrevStageSrc, 1)
-    cus(1)(1).asPCUBits.stages(8).opB = SVT()
-    cus(1)(1).asPCUBits.stages(8).opC = SVT()
-    cus(1)(1).asPCUBits.stages(8).opcode = BypassA
-    cus(1)(1).asPCUBits.stages(8).res = List(SVT(CurrStageDst, 8))
-    cus(1)(1).asPCUBits.stages(8).fwd(8) = SVT(ALUSrc, 8)
-    // Configuring lcus(2)(0) <- SeqCU7_x358
-    lcus(2)(0).counterChain.chain = List(0,0,0,0,0)
-    // SeqCU7_x358.udcounters=[Top1_Top -> TokBuf312,PipeCU96_x357 -> TokBuf326]
-    // lcus(2)(0).udcs=[Some(TokBuf312),Some(TokBuf326),None,None]
-    lcus(2)(0).control.childrenAndTree = List(0, 1, 0, 0)
-    lcus(2)(0).control.siblingAndTree = List(1, 0, 0, 0)
-    lcus(2)(0).control.incrementXbar.outSelect(0) = 6
-    lcus(2)(0).control.incrementXbar.outSelect(1) = 7
-    lcus(2)(0).control.udcDecSelect=List(1,1,-1,-1)
-    lcus(2)(0).control.tokenOutXbar.outSelect(2) = 0
-    lcus(2)(0).control.tokenOutXbar.outSelect(3) = 1
-    lcus(2)(0).control.doneXbar.outSelect(0) = 0
-    lcus(2)(0).control.pulserMax=1
-    lcus(2)(0).counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
+    cus(1)(1).asPCUBits.stages(0).res = List(SVT(CurrStageDst, 8))
+    cus(1)(1).asPCUBits.stages(0).fwd(8) = SVT(ALUSrc, 0)
+    cus(1)(1).asPCUBits.stages(1).fwd(8) = SVT(PrevStageSrc, 8)
+    cus(1)(1).asPCUBits.stages(2).fwd(8) = SVT(PrevStageSrc, 8)
+    cus(1)(1).asPCUBits.stages(3).fwd(8) = SVT(PrevStageSrc, 8)
+    cus(1)(1).asPCUBits.stages(4).fwd(8) = SVT(PrevStageSrc, 8)
+    cus(1)(1).asPCUBits.stages(5).fwd(8) = SVT(PrevStageSrc, 8)
+    cus(1)(1).asPCUBits.stages(6).fwd(8) = SVT(PrevStageSrc, 8)
+    cus(1)(1).asPCUBits.stages(7).fwd(8) = SVT(PrevStageSrc, 8)
+    cus(1)(1).asPCUBits.stages(8).fwd(8) = SVT(PrevStageSrc, 8)
+    // Configuring lcus(2)(1) <- SeqCU7_x358
+    lcus(2)(1).counterChain.chain = List(0,0,0,0,0)
+    // SeqCU7_x358.udcounters=[Top1_Top -> TokBuf230,PipeCU96_x357 -> TokBuf244]
+    // lcus(2)(1).udcs=[Some(TokBuf230),Some(TokBuf244),None,None]
+    lcus(2)(1).control.childrenAndTree = List(0, 1, 0, 0)
+    lcus(2)(1).control.siblingAndTree = List(1, 0, 0, 0)
+    lcus(2)(1).control.incrementXbar.outSelect(0) = 6
+    lcus(2)(1).control.incrementXbar.outSelect(1) = 7
+    lcus(2)(1).control.udcDecSelect=List(1,1,-1,-1)
+    lcus(2)(1).control.tokenOutXbar.outSelect(2) = 0
+    lcus(2)(1).control.tokenOutXbar.outSelect(3) = 1
+    lcus(2)(1).control.doneXbar.outSelect(0) = 0
+    lcus(2)(1).control.pulserMax=1
+    lcus(2)(1).counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
   }
 }

@@ -160,7 +160,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
   }
 
 
-  connect(io, argOutMuxInData, Array.tabulate(doneOuts.size) { doneOuts(_) }, cus, scalarCUs, vsbs, ssbs, csbs, switchCUs)
+  connect(io, argOutMuxInData, Array.tabulate(doneOuts.size) { doneOuts(_) }, cus, scalarCUs, memoryChannels, vsbs, ssbs, csbs, switchCUs)
 }
 
 //trait DirectionOps {

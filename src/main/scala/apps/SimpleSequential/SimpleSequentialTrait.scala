@@ -31,8 +31,11 @@ trait SimpleSequentialTrait extends SimpleSequentialTrait1 with SimpleSequential
   val lcus = Array.tabulate(3, 3) {    case (i,j) =>
     SwitchCUBits.zeroes(switchCUParams(i)(j))
   }
-  val scalarCUs = Array.tabulate(2, 3) {    case (i,j) =>
+  val scus = Array.tabulate(2, 3) {    case (i,j) =>
     ScalarCUBits.zeroes(scalarCUParams(i)(j))
+  }
+  val mcs = Array.tabulate(2, 3) {    case (i,j) =>
+    MemoryChannelBits.zeroes(memoryChannelParams(i)(j))
   }
   val plasticineBits = PlasticineBits (
     cu=cus,
@@ -40,12 +43,13 @@ trait SimpleSequentialTrait extends SimpleSequentialTrait1 with SimpleSequential
     scalarSwitch=ssbs,
     controlSwitch=csbs,
     switchCU=lcus,
-    scalarCU=scalarCUs,
+    scalarCU=scus,
+    memoryChannel=mcs,
     argOutMuxSelect=List(4,-1,-1),
-    doneSelect=2
+    doneSelect=5
   )  
-  // ow2678[1] -> ScalOut197(ArgIn3_x342)
-  // ow2680[2] -> ScalOut201(ArgIn6_x343)
+  // ow2678[1] -> ScalOut142(ArgIn6_x343)
+  // ow2680[2] -> ScalOut138(ArgIn3_x342)
   def main(args: String*) = plasticineBits
   def config:Unit =  {
     config1

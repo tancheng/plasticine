@@ -75,10 +75,11 @@ case class GeneratedPMUParams(override val numScalarIn:Int, override val numScal
   override val wd = 3
   override val r = regColors.size
 }
-case class GeneratedSwitchCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends SwitchCUParams {
+case class GeneratedSwitchCUParams(override val numScalarIn:Int, override val numControlIn:Int, override val numControlOut:Int) extends SwitchCUParams {
   override val w = 32
   override val numCounters = 6
   override val numUDCs = 4
+  override val numScalarOut = 0
 }
 case class GeneratedScalarCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends ScalarCUParams {
   override val w = 32
@@ -102,6 +103,10 @@ case class GeneratedScalarCUParams(override val numScalarIn:Int, override val nu
   regColors += List()
   override val d = 6
   override val r = regColors.size
+}
+case class GeneratedMemoryChannelParams(override val numScalarIn:Int, override val numControlIn:Int, override val numControlOut:Int) extends MemoryChannelParams {
+  override val w = 32
+  override val v = 16
 }
 trait GeneratedParams extends GeneratedParams1 {
   self:TopParams =>

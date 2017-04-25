@@ -35,6 +35,9 @@ trait PlasticineTestTrait {
     val scalarCUs = Array.tabulate(3, 3) { case (i, j) =>
       ScalarCUBits.zeroes(scalarCUParams(i)(j))
     }
+    val mcs = Array.tabulate(2, 3) {    case (i,j) =>
+      MemoryChannelBits.zeroes(memoryChannelParams(i)(j))
+    }
 
     val plasticineBits = PlasticineBits (
       cu=cus,
@@ -43,6 +46,7 @@ trait PlasticineTestTrait {
       controlSwitch=csbs,
       switchCU=lcus,
       scalarCU=scalarCUs,
+      memoryChannel=mcs,
       argOutMuxSelect=List(1,-1,-1),
       doneSelect = 0
     )
