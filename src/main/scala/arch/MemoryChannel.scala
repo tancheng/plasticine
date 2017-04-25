@@ -77,8 +77,8 @@ class MemoryChannel(val p: MemoryChannelParams) extends Module {
   val wsize = scalarIns(WSIZE)
 
   // Command is valid only when both addrFifo and sizeFifo are not empty
-  val readCmdValid = ~scalarFIFOs(READ).io.empty & ~scalarFIFOs(READ+1).io.empty
-  val writeCmdValid = ~scalarFIFOs(WRITE).io.empty & ~scalarFIFOs(WRITE+1).io.empty
+  val readCmdValid = ~scalarFIFOs(READ).io.empty & ~scalarFIFOs(RSIZE).io.empty
+  val writeCmdValid = ~scalarFIFOs(WRITE).io.empty & ~scalarFIFOs(WSIZE).io.empty
   scalarFIFOs(READ).io.deqVld := readCmdValid
   scalarFIFOs(WRITE).io.deqVld := writeCmdValid
 
