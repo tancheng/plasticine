@@ -66,6 +66,15 @@ trait SwitchCUParams extends CUParams {
   override val vectorFIFODepth = 0
 }
 
+trait MemoryChannelParams extends Params {
+  val w: Int = 32
+  val v: Int = 16
+  val numScalarIn = 4
+  val numControlIn = 4
+  val numControlOut = 2
+  val scalarFIFODepth: Int = 32 // Depth of each scalar FIFO
+}
+
 trait PlasticineParams extends Params {
   val w: Int = 32
   val numRows: Int = 2
@@ -78,6 +87,7 @@ trait PlasticineParams extends Params {
   val controlSwitchParams:Array[Array[ControlSwitchParams]]
   val numArgOutSelections: List[Int]   //  = List(6,6,6)
   val numDoneConnections: Int = 6 // 2 * (1+numCols)
+  val memoryChannelParams: Array[Array[MemoryChannelParams]]
 }
 
 trait FringeParams extends Params {
