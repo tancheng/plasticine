@@ -14,6 +14,7 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.templates.Utils.log2Up
 import plasticine.misc.Utils._
+import fringe._
 
 case class PlasticineMemoryInterface(p: MemoryChannelParams) extends Bundle {
   // Scalar IO
@@ -24,14 +25,15 @@ case class PlasticineMemoryInterface(p: MemoryChannelParams) extends Bundle {
   val controlOut = Output(Vec(p.numControlOut, Bool()))
 
   // Write data
-  val wdata = Flipped(Decoupled(Vec(p.v, UInt(p.w.W))))
-  val rdata = Decoupled(Vec(p.v, UInt(p.w.W)))
+  val vecIn = Flipped(Decoupled(Vec(p.v, UInt(p.w.W))))
+  val vecOut = Decoupled(Vec(p.v, UInt(p.w.W)))
 }
 
 
 case class MemoryChannelIO(p: MemoryChannelParams) extends Bundle {
   // Plasticine
   val plasticine = PlasticineMemoryInterface(p)
+  val dram = new AppStreams(List(StreamParInfo(p.w, p.v)), List(StreamParInfo(p.w, p.v)))
   val config = Input(MemoryChannelConfig(p))
 }
 
@@ -59,4 +61,12 @@ class MemoryChannel(val p: MemoryChannelParams) extends Module {
   }
 
   val scalarIns = scalarFIFOs.map { _.io.deq(0) }
+
+  val raddr = scalarIns(0)
+  val waddr = scalarIns(1)
+  val rsize = scalarIns(2)
+  val wsize = scalarIns(3)
+
+//  val readCtr = Module(new Counter(p.w.W))
+//  readCtr.io.reset := false.B
 }
