@@ -14,6 +14,8 @@
 #include <sys/prctl.h>
 
 #include "commonDefs.h"
+#include "vc_hdrs.h"
+#include "svdpi_src.h"
 
 using namespace std;
 
@@ -22,7 +24,7 @@ public:
 
   const uint32_t pageSize = 4096;  // Bytes
   map<uint32_t, uint64_t> addrMap;
-  uint32_t nextAvailAddr = 0; // Next available address
+  uint32_t nextAvailAddr = 4096; // Next available address
 
   AddrRemapper() {
   }
@@ -72,7 +74,10 @@ public:
     uint32_t pageOffset = getPageOffset((uint32_t)smallAddr);
 
     map<uint32_t, uint64_t>::iterator it = addrMap.find(pageBase);
-    ASSERT(it != addrMap.end(), "[AddrRemapper getBig] Address %x does not exist in addrMap!\n", (uint32_t)smallAddr);
+    if(it == addrMap.end()) {
+      EPRINTF("[AddrRemapper getBig] Address %x does not exist in addrMap!\n", (uint32_t)smallAddr);
+      terminateSim();
+    }
     return it->second + pageOffset;
   }
 

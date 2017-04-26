@@ -14,6 +14,7 @@ module test;
   export "DPI" function pokeDRAMResponse;
   export "DPI" function getDRAMRespReady;
   export "DPI" function writeConfig;
+  export "DPI" function terminateSim;
 
   reg clock = 1;
   reg reset = 1;
@@ -155,6 +156,11 @@ module test;
     rdatalo = io_rdata[31:0];
   endfunction
 
+  function void terminateSim();
+    $vcdplusflush;
+    $finish;
+  endfunction
+
   function void writeReg(input int r, longint wdata);
     io_waddr = r;
     io_wdata = wdata;
@@ -246,7 +252,7 @@ module test;
       );
     end
 
-    if (io_configDone & ~reset) begin
+    if (io_config_valid & io_configDone & ~reset) begin
       outConfigValid();
     end
 
