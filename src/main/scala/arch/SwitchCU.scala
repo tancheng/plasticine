@@ -15,7 +15,8 @@ import plasticine.templates._
 /**
  * Switch Compute Unit
  */
-class SwitchCU(val p: SwitchCUParams) extends CU {
+class SwitchCU(val p: SwitchCUParams)(row: Int, col: Int) extends CU {
+  override def desiredName = this.getClass.getName.split('.').last + s"_${row}_${col}"
   val io = IO(CUIO(p, SwitchCUConfig(p)))
 
   // Switch CU only has scalarIn, controlIn, controlOut

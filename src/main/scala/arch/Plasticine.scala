@@ -138,7 +138,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
    //Switch CUs
   val switchCUs = Array.tabulate(switchCUParams.size) { i =>
     Array.tabulate(switchCUParams(i).size) { j =>
-      val cu = Module(new SwitchCU(switchCUParams(i)(j)))
+      val cu = Module(new SwitchCU(switchCUParams(i)(j))(i,j))
       cu.io.config := config.switchCU(i)(j)
       cu
     }
