@@ -245,7 +245,7 @@ class PCU(val p: PCUParams) extends CU {
               counterChain.io.out(counterPtr)
             case ScalarInReg =>
               scalarInPtr += 1
-              scalarFIFOs(scalarInPtr).io.deq(0)
+              scalarIns(scalarInPtr)
             case VecInReg =>
               vectorInPtr += 1
               vectorFIFOs(vectorInPtr).io.deq(lane)

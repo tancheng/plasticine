@@ -111,10 +111,13 @@ class ScalarCU(val p: ScalarCUParams) extends CU {
     stageEnableFF.io.init := 0.U
     stageEnableFF.io.enable := 1.U
 
+    val scalarInsWire = Wire(Vec(scalarIns.size, scalarIns.head.cloneType))
+    scalarInsWire := scalarIns
+
     def getSourcesMux(s: SelectSource) = {
       val sources = s match {
         case CounterSrc => counterChain.io.out
-        case ScalarFIFOSrc => scalarIns
+        case ScalarFIFOSrc => Vec(scalarIns)
         case PrevStageSrc => if (i == 0) Vec(List.fill(2) {0.U}) else Vec(pipeRegs.last.map {_.io.out})
         case CurrStageSrc => Vec(stageRegs.map {_.io.out})
         case EnableSrc => counterChain.io.enable
@@ -163,7 +166,7 @@ class ScalarCU(val p: ScalarCUParams) extends CU {
             counterChain.io.out(counterPtr)
           case ScalarInReg =>
             scalarInPtr += 1
-            scalarFIFOs(scalarInPtr).io.deq(0)
+            scalarIns(scalarInPtr)
           case _ => throw new Exception("Unsupported fwd color for first stage!")
         }
         reg.io.in := Mux(stageConfig.result(idx), fu.io.out, fwd)
