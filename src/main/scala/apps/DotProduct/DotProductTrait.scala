@@ -46,10 +46,10 @@ trait DotProductTrait extends DotProductTrait1 with DotProductTrait2 with DotPro
     scalarCU=scus,
     memoryChannel=mcs,
     argOutMuxSelect=List(1,-1,-1),
-    doneSelect=3
+    doneSelect=4
   )  
-  // ow2682[0] -> ScalOut549(ArgIn12_x1056)
-  // ow2684[1] -> ScalOut551(ArgIn13_x1037)
+  // ow2682[0] -> ScalOut551(ArgIn13_x1037)
+  // ow2684[1] -> ScalOut549(ArgIn12_x1056)
   // ow2686[2] -> ScalOut547(ArgIn6_x1019)
   def main(args: String*) = plasticineBits
   def config:Unit =  {
