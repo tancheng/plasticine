@@ -57,8 +57,9 @@ class PCUControlBox(val p: PCUParams) extends Module {
   // Up-down counters to handle tokens and credits
   val udCounters = List.tabulate(p.numUDCs) { i =>
     val udc = Module(new UpDownCtr(p.udCtrWidth))
+    udc.io.initAtConfig := true.B
     udc.io.init := false.B
-    udc.io.initval := 0.U
+    udc.io.initval := io.config.udcInit(i)
     udc.io.strideInc := 1.U
     udc.io.strideDec := 1.U
     udc.io.inc := incrementXbar.io.outs(i)

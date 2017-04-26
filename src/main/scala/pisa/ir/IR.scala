@@ -399,7 +399,8 @@ case class PCUControlBoxBits(
   var incrementXbar: CrossbarBits,
   var doneXbar: CrossbarBits,
   var swapWriteXbar: CrossbarBits,
-  var tokenOutXbar: CrossbarBits
+  var tokenOutXbar: CrossbarBits,
+  var udcInit: List[Int]
 ) extends AbstractBits
 object PCUControlBoxBits {
   def zeroes(p: PCUParams) = {
@@ -411,7 +412,8 @@ object PCUControlBoxBits {
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
-        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut)) // tokenOutXbar
+        CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut)), // tokenOutXbar
+        List.fill(p.numUDCs) { 0 } // udcInit
       )
   }
 }
@@ -447,7 +449,8 @@ case class SwitchCUControlBoxBits(
   var doneXbar: CrossbarBits,
   var swapWriteXbar: CrossbarBits,
   var tokenOutXbar: CrossbarBits,
-  var pulserMax: Int
+  var pulserMax: Int,
+  var udcInit: List[Int]
 ) extends AbstractBits
 object SwitchCUControlBoxBits {
   def zeroes(p: SwitchCUParams) = {
@@ -459,7 +462,8 @@ object SwitchCUControlBoxBits {
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
         CrossbarBits.zeroes(ControlSwitchParams(4, p.numControlOut)), // tokenOutXbar
-        0
+        0,
+        List.fill(p.numUDCs) { 0 } // udcInit
       )
   }
 }

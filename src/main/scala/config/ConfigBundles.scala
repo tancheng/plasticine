@@ -300,6 +300,7 @@ case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
   val doneXbar = CrossbarConfig(ControlSwitchParams(p.numCounters, 1))
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
   val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.getNumRegs(ScalarInReg) + 2, p.numControlOut))
+  val udcInit = Vec(p.numUDCs, UInt(p.udCtrWidth.W))
 
   override def cloneType(): this.type = {
     new PCUControlBoxConfig(p).asInstanceOf[this.type]
@@ -334,6 +335,7 @@ case class SwitchCUControlBoxConfig(val p: SwitchCUParams) extends AbstractConfi
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.numScalarIn))
   val tokenOutXbar = CrossbarConfig(ControlSwitchParams(4, p.numControlOut))
   val pulserMax = UInt(p.udCtrWidth.W)
+  val udcInit = Vec(p.numUDCs, UInt(p.udCtrWidth.W))
 
   override def cloneType(): this.type = {
     new SwitchCUControlBoxConfig(p).asInstanceOf[this.type]

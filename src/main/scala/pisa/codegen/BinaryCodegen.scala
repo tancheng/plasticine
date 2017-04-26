@@ -145,6 +145,7 @@ class BinaryCodegen() extends Traversal {
         toBinary(n.mode, cn.mode.getWidth)
 
       case (n: PCUControlBoxBits, cn: PCUControlBoxConfig)      =>
+        toBinary(n.udcInit, cn.udcInit.getWidth) ++
         genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
         genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
         genBinary(n.doneXbar, cn.doneXbar) ++
@@ -164,6 +165,7 @@ class BinaryCodegen() extends Traversal {
         toBinary(n.writeFifoAndTree, cn.writeFifoAndTree.getWidth)
 
       case (n: SwitchCUControlBoxBits, cn: SwitchCUControlBoxConfig)      =>
+        toBinary(n.udcInit, cn.udcInit.getWidth) ++
         toBinary(n.pulserMax, cn.pulserMax.getWidth) ++
         genBinary(n.tokenOutXbar, cn.tokenOutXbar) ++
         genBinary(n.swapWriteXbar, cn.swapWriteXbar) ++
