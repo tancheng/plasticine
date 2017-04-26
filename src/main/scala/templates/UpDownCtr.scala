@@ -1,6 +1,7 @@
 package plasticine.templates
 
 import chisel3._
+import chisel3.util.Cat
 import scala.language.reflectiveCalls
 
 /**
@@ -38,7 +39,8 @@ class UpDownCtr(val w: Int) extends Module {
   val decval = Mux(io.dec, io.strideDec, 0.U)
   val incr = incval - decval
 
-  val newval = reg.io.out + incr
+  val newval = Wire(UInt((w+1).W))
+  newval := Cat(0.U, reg.io.out) + Cat(0.U, incr)
   io.isMax := newval > io.max
   reg.io.in := Mux (io.init, io.initval, newval)
   io.gtz := (reg.io.out > 0.U)

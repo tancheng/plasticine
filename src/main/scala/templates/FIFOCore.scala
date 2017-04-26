@@ -79,12 +79,14 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
         cfg.max.value := bankSize.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
+        cfg.par := 1.U
       case 0 => // Bankaddr: max = v, stride = 1
         val cfg = wptrConfig.counters(i)
         cfg.max.value := v.U
         cfg.max.src := cfg.max.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.par := 1.U
   }}
   val wptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
   wptr.io.enable(0) := writeEn & io.config.chainWrite
@@ -104,12 +106,14 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
         cfg.max.value := bankSize.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
+        cfg.par := 1.U
       case 0 => // Bankaddr: max = v, stride = 1
         val cfg = rptrConfig.counters(i)
         cfg.max.src := cfg.max.srcIdx(ConstSrc).U
         cfg.max.value := v.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
+        cfg.par := 1.U
     }}
   val rptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
   rptr.io.enable(0) := readEn & io.config.chainRead

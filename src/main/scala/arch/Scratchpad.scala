@@ -170,12 +170,14 @@ class Scratchpad(val p: PMUParams) extends Module {
         cfg.max.value := io.config.localWaddrMax // localWaddrMax = if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
+        cfg.par := 1.U
       case 0 => // Bankaddr: max = v, stride = 1
         val cfg = wptrConfig.counters(i)
         cfg.max.value := p.v.U
         cfg.max.src := cfg.max.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.par := 1.U
   }}
   val wptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
   wptr.io.config := wptrConfig
@@ -194,12 +196,14 @@ class Scratchpad(val p: PMUParams) extends Module {
         cfg.max.value := io.config.localRaddrMax  // if (inst.numBufs == 0) 0 else bankSize - (bankSize % inst.numBufs)
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
+        cfg.par := 1.U
       case 0 => // Bankaddr: max = v, stride = 1
         val cfg = rptrConfig.counters(i)
         cfg.max.src := cfg.max.srcIdx(ConstSrc).U
         cfg.max.value := p.v.U
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.stride.value := 1.U
+        cfg.par := 1.U
     }}
 
   // Create rptr (head) counter chain
