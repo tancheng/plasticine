@@ -63,6 +63,12 @@ class PCUControlBox(val p: PCUParams) extends Module {
     udc.io.strideDec := 1.U
     udc.io.inc := incrementXbar.io.outs(i)
     udc.io.dec := io.done
+    val max = ((1 << p.udCtrWidth) - 1).U
+    udc.io.max := max
+
+    // asserts
+    assert(~udc.io.inc | (udc.io.inc & (udc.io.out < max)) | (udc.io.inc & udc.io.dec), "UDC overflow!")
+    assert(~udc.io.dec | (udc.io.dec & (udc.io.out > 0.U)) | (udc.io.inc & udc.io.dec), "UDC underflow")
     udc
   }
 
