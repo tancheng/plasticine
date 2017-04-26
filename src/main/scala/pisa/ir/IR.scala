@@ -13,6 +13,8 @@ import plasticine.arch._
 import plasticine.templates._
 import plasticine.spade._
 import plasticine.pisa.enums._
+import plasticine.pisa.enums._
+
 //import Chisel._
 
 /**
@@ -181,10 +183,17 @@ extends AbstractBits {
     case _ => 0
   }
 
-  lazy val regEnables = result ++ fwd.map { t =>
-    val n = t.value.asInstanceOf[Int]
-    if (n == -1) 0 else n
-  }
+//  lazy val regEnables = result ++ fwd.map { t =>
+//    val n = t.value.asInstanceOf[Int]
+//    if (n == -1) 0 else n
+//  }
+  lazy val regEnables = result ++ fwd.zipWithIndex.filter { t => t._1.src match {
+    case XSrc => false
+    case _ => true
+  }}.map { _._2 }
+//    val n = t.value.asInstanceOf[Int]
+//    if (n == -1) 0 else n
+//  }
 
   // Get names of case class fields
 //  def classAccessors[T: TypeTag]: List[String] = typeOf[T].members.collect {
