@@ -17,11 +17,13 @@ using namespace std;
 #include "vc_hdrs.h"
 #include "svdpi_src.h"
 
+#include <AddrRemapper.h>
 #include <DRAMSim.h>
 
 // DRAMSim3
 DRAMSim::MultiChannelMemorySystem *mem = NULL;
 bool useIdealDRAM = false;
+AddrRemapper *remapper = NULL;
 
 extern uint64_t numCycles;
 class DRAMRequest {
@@ -36,7 +38,7 @@ public:
   bool completed;
 
   DRAMRequest(uint64_t a, uint64_t t, bool wr, uint32_t *wd, uint64_t issueCycle) {
-    addr = a;
+    addr = remapper->getBig(a);
     tag = t;
     isWr = wr;
     if (isWr) {
@@ -109,6 +111,7 @@ void checkAndSendDRAMResponse() {
 
         uint32_t rdata[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+        // Data handling
         if (req->isWr) {
           // Write request: Update 1 burst-length bytes at *addr
           uint32_t *waddr = (uint32_t*) req->addr;
@@ -256,5 +259,6 @@ void initDRAM() {
     DRAMSim::TransactionCompleteCB *rwCb = new DRAMSim::Callback<DRAMCallbackMethods, void, unsigned, uint64_t, uint64_t, uint64_t>(&callbackMethods, &DRAMCallbackMethods::txComplete);
     mem->RegisterCallbacks(rwCb, rwCb, NULL);
   }
-}
 
+  remapper = new AddrRemapper();
+}

@@ -150,12 +150,14 @@ extern "C" {
             void *ptr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
             close(fd);
 
+            uint32_t smallPtr = remapper->remap((uint64_t)ptr, size);
+
             simCmd resp;
             resp.id = cmd->id;
             resp.cmd = cmd->cmd;
-            *(uint64_t*)resp.data = (uint64_t)ptr;
+            *(uint64_t*)resp.data = (uint64_t)smallPtr;
             resp.size = sizeof(size_t);
-            EPRINTF("[SIM] MALLOC(%lu), returning %p\n", size, (void*)ptr);
+            EPRINTF("[SIM] MALLOC(%lu), returning %u (%p)\n", size, smallPtr, ptr);
             respChannel->send(&resp);
             break;
           }
@@ -188,10 +190,12 @@ extern "C" {
             void *dst = (void*)data[0];
             size_t size = data[1];
 
-            EPRINTF("[SIM] Received memcpy request to %p, size %lu\n", (void*)dst, size);
+            uint64_t bigptr = remapper->getBig((uint64_t)dst);
+
+            EPRINTF("[SIM] Received memcpy request to %p (%p), size %lu\n", dst, (uint64_t*)bigptr, size);
 
             // Now to receive 'size' bytes from the cmd stream
-            cmdChannel->recvFixedBytes(dst, size);
+            cmdChannel->recvFixedBytes((uint64_t*)bigptr, size);
 
             // Send ack back indicating end of memcpy
             simCmd resp;
@@ -207,8 +211,10 @@ extern "C" {
             void *src = (void*)data[0];
             size_t size = data[1];
 
+            uint64_t bigptr = remapper->getBig((uint64_t)src);
+
             // Now to receive 'size' bytes from the cmd stream
-            respChannel->sendFixedBytes(src, size);
+            respChannel->sendFixedBytes((uint64_t*)bigptr, size);
             break;
           }
           case RESET:
