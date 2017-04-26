@@ -48,9 +48,9 @@ trait DotProductTrait extends DotProductTrait1 with DotProductTrait2 with DotPro
     argOutMuxSelect=List(1,-1,-1),
     doneSelect=4
   )  
-  // ow2682[0] -> ScalOut551(ArgIn13_x1037)
-  // ow2684[1] -> ScalOut549(ArgIn12_x1056)
-  // ow2686[2] -> ScalOut547(ArgIn6_x1019)
+  // ow2183[0] -> ScalOut549(ArgIn12_x1056)
+  // ow2185[1] -> ScalOut551(ArgIn13_x1037)
+  // ow2187[2] -> ScalOut547(ArgIn6_x1019)
   def main(args: String*) = plasticineBits
   def config:Unit =  {
     config1
