@@ -50,7 +50,7 @@ object PCUGen extends CommonDriver {
   type DUTType = PCU
   override val moduleName = "PCU"
   val params = new PCUParams { }
-  def dut = () => new PCU(params)
+  def dut = () => new PCU(params)(0,0)
 }
 
 object PMUGen extends CommonDriver {
