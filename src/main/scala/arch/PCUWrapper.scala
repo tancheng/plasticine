@@ -45,7 +45,7 @@ class PCUWrapper(val p: PCUParams) extends Module {
 
   val config = configSR.io.config
 
-  val pcu = Module(new PCU(p))
+  val pcu = Module(new PCU(p)(0,0))
   pcu.io.vecIn      <> io.vecIn
   pcu.io.vecOut     <> io.vecOut
   pcu.io.scalarIn   <> io.scalarIn

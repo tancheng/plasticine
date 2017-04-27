@@ -68,8 +68,8 @@ class PCUControlBox(val p: PCUParams) extends Module {
     udc.io.max := max
 
     // asserts
-    assert(~udc.io.inc | (udc.io.inc & (udc.io.out < max)) | (udc.io.inc & udc.io.dec), "UDC overflow!")
-    assert(~udc.io.dec | (udc.io.dec & (udc.io.out > 0.U)) | (udc.io.inc & udc.io.dec), "UDC underflow")
+    assert(~udc.io.inc | (udc.io.inc & (udc.io.out < max)) | (udc.io.inc & udc.io.dec), s"UDC $i overflow!")
+    assert(~udc.io.dec | (udc.io.dec & (udc.io.out > 0.U)) | (udc.io.inc & udc.io.dec), s"UDC $i underflow!")
     udc
   }
 

@@ -97,7 +97,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
       Array.tabulate(p.numRows) { j =>
         cuParams(i)(j) match {
           case p: PCUParams =>
-            val cu = Module(new PCU(p))
+            val cu = Module(new PCU(p)(i,j))
             cu.io.config := config.cu(i)(j).asInstanceOf[PCUConfig]
             cu
           case p: PMUParams =>

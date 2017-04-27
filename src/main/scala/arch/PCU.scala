@@ -14,7 +14,9 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.templates.Utils.log2Up
 
-class PCU(val p: PCUParams) extends CU {
+class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
+  override def desiredName = this.getClass.getName.split('.').last + s"_${row}_${col}"
+
   val io = IO(CUIO(p, PCUConfig(p)))
 
   val numReduceStages = log2Up(p.v)
