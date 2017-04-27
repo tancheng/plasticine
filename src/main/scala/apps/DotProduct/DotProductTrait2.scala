@@ -38,12 +38,12 @@ trait DotProductTrait2 extends DotProductTrait1 {
     // Configuring cus(0)(1).asPMUBits <- MemPipe87_x1034_dsp0
     // MemPipe87_x1034_dsp0.udcounters=[]
     // cus(0)(1).asPMUBits.udcs=[]
-    cus(0)(1).asPMUBits.control.writeFifoAndTree = List(0, 0, 0, 0, 0, 1, 0, 0)
+    cus(0)(1).asPMUBits.control.writeFifoAndTree = List(0, 0, 0, 0, 0, 0, 0, 1)
     cus(0)(1).asPMUBits.control.readFifoAndTree = List(0, 0, 0, 0, 0, 0, 0, 0)
     cus(0)(1).asPMUBits.control.readDoneXbar.outSelect(0) = 0
-    cus(0)(1).asPMUBits.control.writeDoneXbar.outSelect(0) = 11
-    // ob3645[1] -> CtrlBox620.readDone.out
-    cus(0)(1).asPMUBits.control.tokenOutXbar.outSelect(1) = 5
+    cus(0)(1).asPMUBits.control.writeDoneXbar.outSelect(0) = 15
+    // ob3649[3] -> CtrlBox620.readDone.out
+    cus(0)(1).asPMUBits.control.tokenOutXbar.outSelect(3) = 5
     cus(0)(1).asPMUBits.control.scalarSwapReadSelect = List(-1,-1,-1,-1)
     cus(0)(1).asPMUBits.fifoNbufConfig=List(-1,-1,-1,-1)
     // cus(0)(1).asPMUBits.scalarInXbar=[None,None,None,None]
@@ -54,7 +54,7 @@ trait DotProductTrait2 extends DotProductTrait1 {
     // sram134[0] -> SRAM99
     cus(0)(1).asPMUBits.scratchpad.stride = 1
     cus(0)(1).asPMUBits.scratchpad.numBufs = 2
-    cus(0)(1).asPMUBits.wdataSelect = 1
+    cus(0)(1).asPMUBits.wdataSelect = 3
     cus(0)(1).asPMUBits.waddrSelect = SVT(CounterSrc, 1)
     cus(0)(1).asPMUBits.raddrSelect = SVT(CounterSrc, 0)
     // Configuring cus(1)(0).asPMUBits <- MemPipe52_x1033_dsp0
@@ -82,6 +82,7 @@ trait DotProductTrait2 extends DotProductTrait1 {
     // Configuring cus(1)(1).asPCUBits <- PipeCU366_x1087
     // PipeCU366_x1087.udcounters=[ScalBuf464 -> CredBuf859]
     // cus(1)(1).asPCUBits.udcs=[Some(CredBuf859),None,None,None,None]
+    cus(1)(1).asPCUBits.control.udcInit=List(2,-1,-1,-1,-1)
     cus(1)(1).asPCUBits.control.tokenInAndTree = List(0, 0, 0, 0, 0, 0, 0, 0)
     cus(1)(1).asPCUBits.control.fifoAndTree = List(0, 0, 0, 0, 1, 0, 0, 1)
     cus(1)(1).asPCUBits.control.siblingAndTree = List(1, 0, 0, 0, 0)
@@ -96,6 +97,5 @@ trait DotProductTrait2 extends DotProductTrait1 {
     // cus(1)(1).asPCUBits.scalarOutXbar=[None,None,None,Some(pr(st6331[8],reg366[8]))]
     cus(1)(1).asPCUBits.scalarOutXbar.outSelect(3) = 0
     cus(1)(1).asPCUBits.counterChain.chain = List(0,0,0,0,0,0,0)
-    cus(1)(1).asPCUBits.counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 320), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 0), par=1)
   }
 }

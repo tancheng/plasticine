@@ -14,34 +14,53 @@ import plasticine.pisa.enums._
 trait DotProductTrait5 extends DotProductTrait4 {
   self:DotProductTrait =>
   def config5:Unit = {
-    scus(1)(2).counterChain.counters(1) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
-    scus(1)(2).counterChain.counters(2) = CounterRCBits(max=SVT(ScalarFIFOSrc, 1), stride=SVT(ConstSrc, 320), min=SVT(ConstSrc, 0), par=1)
-    scus(1)(2).stages(0).opA = SVT(CounterSrc, 2)
-    scus(1)(2).stages(0).opB = SVT(ConstSrc, 4)
-    scus(1)(2).stages(0).opC = SVT()
-    scus(1)(2).stages(0).opcode = FixMul
-    scus(1)(2).stages(0).res = List(SVT(CurrStageDst, 0))
-    scus(1)(2).stages(0).fwd(0) = SVT(ALUSrc, 0)
-    scus(1)(2).stages(0).fwd(7) = SVT(ScalarFIFOSrc, 0)
-    scus(1)(2).stages(1).opA = SVT(PrevStageSrc, 0)
-    scus(1)(2).stages(1).opB = SVT(PrevStageSrc, 7)
-    scus(1)(2).stages(1).opC = SVT()
-    scus(1)(2).stages(1).opcode = FixAdd
-    scus(1)(2).stages(1).res = List(SVT(CurrStageDst, 9))
-    scus(1)(2).stages(1).fwd(9) = SVT(ALUSrc, 1)
-    scus(1)(2).stages(2).opA = SVT(ConstSrc, 1280)
-    scus(1)(2).stages(2).opB = SVT()
-    scus(1)(2).stages(2).opC = SVT()
-    scus(1)(2).stages(2).opcode = BypassA
-    scus(1)(2).stages(2).res = List(SVT(CurrStageDst, 8))
-    scus(1)(2).stages(2).fwd(8) = SVT(ALUSrc, 2)
-    scus(1)(2).stages(2).fwd(9) = SVT(PrevStageSrc, 9)
-    scus(1)(2).stages(3).fwd(8) = SVT(PrevStageSrc, 8)
-    scus(1)(2).stages(3).fwd(9) = SVT(PrevStageSrc, 9)
-    scus(1)(2).stages(4).fwd(8) = SVT(PrevStageSrc, 8)
-    scus(1)(2).stages(4).fwd(9) = SVT(PrevStageSrc, 9)
-    scus(1)(2).stages(5).fwd(8) = SVT(PrevStageSrc, 8)
-    scus(1)(2).stages(5).fwd(9) = SVT(PrevStageSrc, 9)
+    scus(1)(1).scalarOutXbar.outSelect(4) = 1
+    scus(1)(1).scalarOutXbar.outSelect(5) = 0
+    scus(1)(1).counterChain.chain = List(1,1,0,0,0)
+    scus(1)(1).counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
+    scus(1)(1).counterChain.counters(1) = CounterRCBits(max=SVT(ConstSrc, 1), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 1), par=1)
+    scus(1)(1).counterChain.counters(2) = CounterRCBits(max=SVT(ScalarFIFOSrc, 1), stride=SVT(ConstSrc, 320), min=SVT(ConstSrc, 0), par=1)
+    scus(1)(1).stages(0).opA = SVT(CounterSrc, 2)
+    scus(1)(1).stages(0).opB = SVT(ConstSrc, 4)
+    scus(1)(1).stages(0).opC = SVT()
+    scus(1)(1).stages(0).opcode = FixMul
+    scus(1)(1).stages(0).res = List(SVT(CurrStageDst, 0))
+    scus(1)(1).stages(0).fwd(0) = SVT(ALUSrc, 0)
+    scus(1)(1).stages(0).fwd(7) = SVT(ScalarFIFOSrc, 0)
+    scus(1)(1).stages(1).opA = SVT(PrevStageSrc, 0)
+    scus(1)(1).stages(1).opB = SVT(PrevStageSrc, 7)
+    scus(1)(1).stages(1).opC = SVT()
+    scus(1)(1).stages(1).opcode = FixAdd
+    scus(1)(1).stages(1).res = List(SVT(CurrStageDst, 9))
+    scus(1)(1).stages(1).fwd(9) = SVT(ALUSrc, 1)
+    scus(1)(1).stages(2).opA = SVT(ConstSrc, 1280)
+    scus(1)(1).stages(2).opB = SVT()
+    scus(1)(1).stages(2).opC = SVT()
+    scus(1)(1).stages(2).opcode = BypassA
+    scus(1)(1).stages(2).res = List(SVT(CurrStageDst, 8))
+    scus(1)(1).stages(2).fwd(8) = SVT(ALUSrc, 2)
+    scus(1)(1).stages(2).fwd(9) = SVT(PrevStageSrc, 9)
+    scus(1)(1).stages(3).fwd(8) = SVT(PrevStageSrc, 8)
+    scus(1)(1).stages(3).fwd(9) = SVT(PrevStageSrc, 9)
+    scus(1)(1).stages(4).fwd(8) = SVT(PrevStageSrc, 8)
+    scus(1)(1).stages(4).fwd(9) = SVT(PrevStageSrc, 9)
+    scus(1)(1).stages(5).fwd(8) = SVT(PrevStageSrc, 8)
+    scus(1)(1).stages(5).fwd(9) = SVT(PrevStageSrc, 9)
+    // Configuring mcs(0)(1) <- MemoryController328_x1064
+    // mctpe=TileLoad
+    // mcs(0)(1).scalarInXbar=[Some(iw3097[0]),None,Some(iw3099[1]),None]
+    mcs(0)(1).scalarInXbar.outSelect(0) = 0
+    mcs(0)(1).scalarInXbar.outSelect(2) = 1
+    // sm12164[0] -> ScalarFIFO338_offset 
+    // sm12178[2] -> ScalarFIFO329_size 
+    mcs(0)(1).tokenInXbar.outSelect(0) = 0
+    mcs(0)(1).tokenInXbar.outSelect(2) = 0
+    // ob4417[0] -> ScalarFIFO329_size.notFull
+    // ob4419[1] -> ScalarFIFO338_offset.notFull
+    // ob4377[2] -> CtrlBox695.done
+    mcs(0)(1).tokenOutXbar.outSelect(0) = 2
+    mcs(0)(1).tokenOutXbar.outSelect(1) = 0
+    mcs(0)(1).tokenOutXbar.outSelect(2) = 4
     // Configuring mcs(1)(1) <- MemoryController206_x1045
     // mctpe=TileLoad
     // mcs(1)(1).scalarInXbar=[Some(iw3121[0]),None,Some(iw3123[1]),None]
@@ -57,20 +76,5 @@ trait DotProductTrait5 extends DotProductTrait4 {
     mcs(1)(1).tokenOutXbar.outSelect(0) = 4
     mcs(1)(1).tokenOutXbar.outSelect(1) = 2
     mcs(1)(1).tokenOutXbar.outSelect(2) = 0
-    // Configuring mcs(1)(2) <- MemoryController328_x1064
-    // mctpe=TileLoad
-    // mcs(1)(2).scalarInXbar=[Some(iw3129[0]),None,Some(iw3131[1]),None]
-    mcs(1)(2).scalarInXbar.outSelect(0) = 0
-    mcs(1)(2).scalarInXbar.outSelect(2) = 1
-    // sm12304[0] -> ScalarFIFO338_offset 
-    // sm12318[2] -> ScalarFIFO329_size 
-    mcs(1)(2).tokenInXbar.outSelect(0) = 0
-    mcs(1)(2).tokenInXbar.outSelect(2) = 0
-    // ob4401[0] -> CtrlBox695.done
-    // ob4449[1] -> ScalarFIFO338_offset.notFull
-    // ob4451[2] -> ScalarFIFO329_size.notFull
-    mcs(1)(2).tokenOutXbar.outSelect(0) = 4
-    mcs(1)(2).tokenOutXbar.outSelect(1) = 0
-    mcs(1)(2).tokenOutXbar.outSelect(2) = 2
   }
 }
