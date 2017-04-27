@@ -12,5 +12,6 @@ object Utils {
     srcMux.io.out
   }
 
+  def getFloatBits(num: Float) = java.lang.Float.floatToRawIntBits(num)
   def red(x: String): String = Console.BLACK + Console.RED_B + x + Console.RESET
 }

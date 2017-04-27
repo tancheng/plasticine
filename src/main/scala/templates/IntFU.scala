@@ -2,13 +2,14 @@ package plasticine.templates
 
 import chisel3._
 import chisel3.util._
-//import plasticine.templates.hardfloat._
 
 import plasticine.templates.Utils.log2Up
 
 import scala.collection.immutable.Map
 import plasticine.pisa.enums._
 import scala.language.reflectiveCalls
+import plasticine.misc.Utils._
+import hardfloat._
 
 /**
  * Integer Functional Unit module. Represents the basic workhorse
@@ -124,12 +125,12 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
   )
 
 //  if (useFMA) {
-//    val fmulCode = UInt(Opcodes.getCode("f*"))
-//    val faddCode = UInt(Opcodes.getCode("f+"))
+//    val fmulCode = Opcodes.getCode(FltMul).U
+//    val faddCode = Opcodes.getCode(FltAdd).U
 //    val fma = Module(new MulAddRecFN(8, 24))
 //    fma.io.a := recFNFromFN(8, 24, io.a)
-//    fma.io.b := recFNFromFN(8, 24, Mux(fmulCode === io.opcode, io.b, Flo(1.0f)))
-//    fma.io.c := recFNFromFN(8, 24, Mux(faddCode === io.opcode, io.b, Flo(1.0f)))
+//    fma.io.b := recFNFromFN(8, 24, Mux(fmulCode === io.opcode, io.b, getFloatBits(1.0f).S))
+//    fma.io.c := recFNFromFN(8, 24, Mux(faddCode === io.opcode, io.b, getFloatBits(1.0f).S))
 //    fmaOut := fNFromRecFN(8, 24, fma.io.out)
 //  } else {
     fmaOut := 0.U

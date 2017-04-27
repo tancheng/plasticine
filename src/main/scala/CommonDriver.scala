@@ -6,6 +6,7 @@ import chisel3.core.Module
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import plasticine.arch._
 import plasticine.spade._
+import plasticine.templates._
 import fringe._
 
 trait CommonDriver {
@@ -102,3 +103,9 @@ object TopGen extends CommonDriver {
   def dut = () => new Top(GeneratedTopParams)
 }
 
+
+object FUGen extends CommonDriver {
+  type DUTType = FU
+  override val moduleName = "FU"
+  def dut = () => new FU(32)
+}
