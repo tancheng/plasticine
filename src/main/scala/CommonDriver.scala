@@ -54,6 +54,27 @@ object PCUGen extends CommonDriver {
   def dut = () => new PCU(params)(0,0)
 }
 
+object PCUWrapperGen extends CommonDriver {
+  type DUTType = PCUWrapper
+  override val moduleName = "PCUWrapper"
+  val params = new PCUParams { }
+  def dut = () => new PCUWrapper(params)
+}
+
+object PMUWrapperGen extends CommonDriver {
+  type DUTType = PMUWrapper
+  override val moduleName = "PMUWrapper"
+  val params = GeneratedPMUParams(4, 4, 4, 4, 8, 4)
+  def dut = () => new PMUWrapper(params)
+}
+
+object PMUControlBoxGen extends CommonDriver {
+  type DUTType = PMUControlBoxWrapper
+  override val moduleName = "PMUControlBoxWrapper"
+  val params = GeneratedPMUParams(4, 4, 4, 4, 8, 4)
+  def dut = () => new PMUControlBoxWrapper(params)
+}
+
 object PMUGen extends CommonDriver {
   type DUTType = PMU
   override val moduleName = "PMU"
@@ -107,5 +128,5 @@ object TopGen extends CommonDriver {
 object FUGen extends CommonDriver {
   type DUTType = FU
   override val moduleName = "FU"
-  def dut = () => new FU(32)
+  def dut = () => new FU(32, false, false)
 }
