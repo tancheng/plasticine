@@ -23,24 +23,24 @@ object Opcodes {
   // a separate Decode table
   private var _opcodes = List[(Opcode, (UInt, UInt, UInt) => UInt)](
     (FixAdd , (a,b,c)    => a+b),
-//    (FixSub , (a,b,c)    => a-b)
+    (FixSub , (a,b,c)    => a-b),
     (FixMul , (a,b,c)    => a*b),
-//    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
-//    (FixAnd , (a,b,c)    => a&b),
-//    (FixOr , (a,b,c)    => a|b),
-//    (FixEql , (a,b,c)   => a===b),
-//    (FixGt , (a,b,c)   => a>b),
-//    (FixLt , (a,b,c)   => a<b),
-//    (FixSHL , (a,b,c)   => a<<b),
-//    (FixSHR , (a,b,c)   => a>>b),
-//    (FltLt , (a,b,c)   => 0.U),
-//    (FltEql , (a,b,c)  => 0.U),
-//    (FltGt , (a,b,c) => 0.U),
+    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
+    (FixAnd , (a,b,c)    => a&b),
+    (FixOr , (a,b,c)    => a|b),
+    (FixEql , (a,b,c)   => a===b),
+    (FixGt , (a,b,c)   => a>b),
+    (FixLt , (a,b,c)   => a<b),
+////    (FixSHL , (a,b,c)   => a<<b),
+////    (FixSHR , (a,b,c)   => a>>b),
+    (FltLt , (a,b,c)   => 0.U),
+    (FltEql , (a,b,c)  => 0.U),
+    (FltGt , (a,b,c) => 0.U),
     (FltMul , (a,b,c) => 0.U),
     (FltAdd , (a,b,c) => 0.U),
-//    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
-//    (FixMin , (a,b,c) => Mux(a<b, a, b)),
-//    (FixMax , (a,b,c) => Mux(a>b, a, b)),
+    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
+    (FixMin , (a,b,c) => Mux(a<b, a, b)),
+    (FixMax , (a,b,c) => Mux(a>b, a, b)),
     (BypassA , (a,b,c) => a)
 //    (BypassB , (a,b,c) => b),
 //    (BypassC , (a,b,c) => c)
@@ -82,18 +82,18 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
   val fpGt = Wire(UInt(1.W))
   val fpEq = Wire(UInt(1.W))
   val fpLt = Wire(UInt(1.W))
-//  if (useFPComp) {
-//    val fpComparator = Module(new CompareRecFN(8, 24))
-//    fpComparator.io.a := io.a
-//    fpComparator.io.b := io.b
-//    fpGt := fpComparator.io.gt
-//    fpEq := fpComparator.io.eq
-//    fpLt := fpComparator.io.lt
-//  } else {
+  if (useFPComp) {
+    val fpComparator = Module(new CompareRecFN(8, 24))
+    fpComparator.io.a := io.a
+    fpComparator.io.b := io.b
+    fpGt := fpComparator.io.gt
+    fpEq := fpComparator.io.eq
+    fpLt := fpComparator.io.lt
+  } else {
     fpGt :=0.U
     fpEq :=0.U
     fpLt :=0.U
-//  }
+  }
 
   // FMA
   val fmaOut = Wire(UInt(w.W))
@@ -101,24 +101,24 @@ class FU(val w: Int, useFMA: Boolean = true, useFPComp: Boolean = true) extends 
   // Populate opcode table
   Opcodes.opcodes = List[(Opcode, (UInt, UInt, UInt) => UInt)](
     (FixAdd , (a,b,c)    => a+b),
-//    (FixSub , (a,b,c)    => a-b)
+    (FixSub , (a,b,c)    => a-b),
     (FixMul , (a,b,c)    => a*b),
-//    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
-//    (FixAnd , (a,b,c)    => a&b),
-//    (FixOr , (a,b,c)    => a|b),
-//    (FixEql , (a,b,c)   => a===b),
-//    (FixGt , (a,b,c)   => a>b),
-//    (FixLt , (a,b,c)   => a<b),
+    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
+    (FixAnd , (a,b,c)    => a&b),
+    (FixOr , (a,b,c)    => a|b),
+    (FixEql , (a,b,c)   => a===b),
+    (FixGt , (a,b,c)   => a>b),
+    (FixLt , (a,b,c)   => a<b),
 //    (FixSHL , (a,b,c)   => a<<b),
 //    (FixSHR , (a,b,c)   => a>>b),
-//    (FltLt , (a,b,c)   => fpLt),
-//    (FltEql , (a,b,c)  => fpEq),
-//    (FltGt , (a,b,c) => fpGt),
+    (FltLt , (a,b,c)   => fpLt),
+    (FltEql , (a,b,c)  => fpEq),
+    (FltGt , (a,b,c) => fpGt),
     (FltMul , (a,b,c) => fmaOut),
     (FltAdd , (a,b,c) => fmaOut),
-//    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
-//    (FixMin , (a,b,c) => Mux(a<b, a, b)),
-//    (FixMax , (a,b,c) => Mux(a>b, a, b)),
+    (MuxOp , (a,b,c) => Mux(c(0), a, b)),
+    (FixMin , (a,b,c) => Mux(a<b, a, b)),
+    (FixMax , (a,b,c) => Mux(a>b, a, b)),
     (BypassA , (a,b,c) => a)
 //    (BypassB , (a,b,c) => b),
 //    (BypassC , (a,b,c) => c)
