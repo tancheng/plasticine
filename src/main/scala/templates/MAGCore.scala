@@ -148,7 +148,7 @@ class MAGCore(
 
   // Coalescing cache
   val ccache = Module(new CoalescingCache(w, d, v))
-  ccache.io.raddr := Cat(io.dram.cmd.bits.tag, "b000000".U)
+  ccache.io.raddr := Cat(io.dram.cmd.bits.tag, UInt(0, log2Up(burstSizeBytes).W))
   ccache.io.readEn := io.config.scatterGather & io.dram.resp.valid
   ccache.io.waddr := addrFifo.io.deq(0)
   ccache.io.wen := io.config.scatterGather & ~addrFifo.io.empty

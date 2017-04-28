@@ -96,9 +96,9 @@ class CoalescingCacheTester(c: CoalescingCache)(implicit args: Array[String]) ex
   {
     val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1000 * 10 * i }
     gatherVector.zipWithIndex.foreach { case (g, i) => writeGatherAddr(g, i) }
-    expect2(peek(c.io.full).toInt, 1)
+    expect2(peek(c.io.full).toInt, 1, "Expected full cache")
     issuedLoads.foreach { addr => readMetadata(addr) }
-    expect2(peek(c.io.full).toInt, 0)
+    expect2(peek(c.io.full).toInt, 0, "Expected non-full cache")
     issuedLoads.clear
   }
 }
