@@ -36,7 +36,7 @@ class CoalescingCacheTester(c: CoalescingCache)(implicit args: Array[String]) ex
     val miss = peek(c.io.miss).toInt
     step(1)
     poke(c.io.wen, 0)
-    expect2(expectedMiss, miss, s"[writeGatherAddr] addr=$addr, pos=$pos, expectedMiss = $expectedMiss, miss = $miss")
+    expect2(expectedMiss, miss, f"[writeGatherAddr] addr=0x$addr%x, pos=$pos, expectedMiss = $expectedMiss, miss = $miss")
     if (expectedMiss > 0) issuedLoads += addr
     miss
   }
@@ -48,28 +48,27 @@ class CoalescingCacheTester(c: CoalescingCache)(implicit args: Array[String]) ex
     poke(c.io.readEn, 0)
     val expected = expectedCache(getBurstAddr(addr))
     val observed = parseMetadataLine(peek(c.io.rmetaData))
-    println(s"[readMetadata] addr=$addr, expected: $expected, observed: $observed")
+    val test = peek(c.io.rmetaData)
+    println(f"[readMetadata] addr=0x$addr%x, expected: $expected, observed: $observed")
     expected.zip(observed) foreach { case (e, o) =>
-      expect2(BigInt(e._1), o._1, s"[readMetadata] addr=$addr, expected $e, observed $o")
-      expect2(BigInt(e._2), o._2, s"[readMetadata] addr=$addr, expected $e, observed $o")
+      expect2(BigInt(e._1), o._1, f"[readMetadata] addr=0x$addr%x, expected $e, observed $o")
+      expect2(BigInt(e._2), o._2, f"[readMetadata] addr=0x$addr%x, expected $e, observed $o")
     }
     expectedCache -= getBurstAddr(addr)
   }
 
-  def parseMetadataLine(m: BigInt) = {
+  def parseMetadataLine(m: Seq[BigInt]) = {
     // One Metadata line contains one byte per burst word
     // => burstSizeWords bytes
-    val metadataList = List.tabulate(c.burstSizeWords) { i => ((m >> (i*8)) & 0xFF).toInt }
+    val metadataList = List.tabulate(c.burstSizeWords) { i => m(i).toInt }
     metadataList.map { parseMetadata(_) }
   }
 
   def parseMetadata(m: Int) = {
     // Metadata is an 8-bit word
     // Last 'wordOffset' bits contain the word offset
-    val wordOffsetMask = (1 << log2Up(c.burstSizeWords)) - 1
-    val lsb = m & 0xFF
-    val wordOffset = lsb & wordOffsetMask
-    val valid = lsb >> log2Up(c.burstSizeWords)
+    val valid = (m >> log2Up(c.burstSizeWords)) & 1
+    val wordOffset = m & ((1 << log2Up(c.burstSizeWords)) - 1)
 //    println(s"[parseMetadata] m = $m, lsb = $lsb, wordOffsetMask = $wordOffsetMask, wordOffset = $wordOffset, valid = $valid")
     (valid, wordOffset)
   }
@@ -80,12 +79,12 @@ class CoalescingCacheTester(c: CoalescingCache)(implicit args: Array[String]) ex
   issuedLoads.clear
 
   // Multiple same addresses - should all hit in the cache line
-  {
+/*  {
     val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1030 }
     gatherVector.zipWithIndex.foreach { case (g, i) => writeGatherAddr(g, i) }
     issuedLoads.foreach { addr => readMetadata(addr) }
     issuedLoads.clear
-  }
+  }*/
   // Multiple random addresses
   {
     val gatherVector = List.tabulate(c.burstSizeWords) { i => 0x1000 + math.abs(rnd.nextInt % 0x1000) }

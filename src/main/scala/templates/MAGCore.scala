@@ -165,12 +165,12 @@ class MAGCore(
 
 
   // Parse Metadata line
-  def parseMetadataLine(m: UInt) = {
+  def parseMetadataLine(m: Vec[UInt]) = {
     // m is burstSizeWords * 8 wide. Each byte 'i' has the following format:
     // | 7 6 5 4     | 3    2   1    0     |
     // | x x x <vld> | <crossbar_config_i> |
     val validAndConfig = List.tabulate(burstSizeWords) { i =>
-      parseMetadata(m(i*8+8-1, i*8))
+      parseMetadata(m(i))
     }
 
     val valid = validAndConfig.map { _._1 }

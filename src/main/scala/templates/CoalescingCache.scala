@@ -19,12 +19,13 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   val burstSizeBytes = 64
   val burstSizeWords = burstSizeBytes / wordSizeBytes
   val taglen = w - log2Up(burstSizeBytes)
+  val metadataWidth = 8
 
   val io = IO(new Bundle {
     val raddr = Input(UInt(w.W))
     val readEn = Input(Bool())
-    val rdata = Output(Bits((burstSizeBytes * 8).W))
-    val rmetaData = Output(Bits((burstSizeWords * 8).W))
+    val rdata = Output(Vec(burstSizeWords, UInt(w.W)))
+    val rmetaData = Output(Vec(burstSizeWords, UInt(metadataWidth.W)))
     val waddr = Input(UInt(w.W))
     val wen = Input(Bool())
     val wdata = Input(Bits(w.W))
@@ -96,30 +97,30 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
 
   // Metadata SRAM
   // Word size: 16 bytes (1 byte per burst)
-  val metadata = Module(new SRAMByteEnable(burstSizeWords*8, d))
+  val metadata = Module(new SRAMByteEnable(metadataWidth, burstSizeWords, d))
   metadata.io.raddr := readIdx
   io.rmetaData := metadata.io.rdata
   metadata.io.waddr := writeIdx
   metadata.io.wen := io.wen & ~full
   // If this is a write miss, wipe out entire line to avoid stale entries
   metadata.io.mask := Vec.tabulate(burstSizeWords) { i => miss | UIntToOH(io.position)(i) }
-  val woffset = Cat("b00".U, extractWordOffset(io.waddr).asUInt)
-  //val woffset = extractWordOffset(io.waddr).asUInt(log2Up(burstSizeWords).W)
-  //val md = Cat(UInt(1, width = (8 - log2Up(burstSizeWords))), woffset)
-  val md = Cat("b0001".U, woffset)
-  val temp = md << Cat(io.position, "b000".U)
-  //val mdShifted = UInt(md << Cat(io.position, UInt(0, width=3)), width=burstSizeWords*8)
-  //val mdShifted = temp(burstSizeWords * 8 - 1, 0)
-  //metadata.io.wdata := mdShifted
-  metadata.io.wdata := temp
+  val woffset = Wire(UInt(log2Up(burstSizeWords).W))
+  woffset := extractWordOffset(io.waddr)
+  val wvalid = 1.U
+  val md = Vec.fill(burstSizeWords){ UInt(0, metadataWidth.W) }
+  val windex = io.position
+  md(windex) := Cat(wvalid, woffset)
+  metadata.io.wdata := md
 
   // Scatter data SRAM. Word size: 64 bytes
-  val scatterData = Module(new SRAMByteEnable(burstSizeBytes*8, d))
+  val scatterData = Module(new SRAMByteEnable(w, burstSizeWords, d))
   scatterData.io.raddr := readIdx
   io.rdata := scatterData.io.rdata
   scatterData.io.waddr := writeIdx
   scatterData.io.wen := io.wen & ~full & io.isScatter
-  scatterData.io.mask := Vec.tabulate(burstSizeBytes) { i => UIntToOH(io.position)(i/wordSizeBytes) }
-  scatterData.io.wdata := io.wdata << Cat(io.position, UInt(0, width=3))
+  scatterData.io.mask := Vec.tabulate(burstSizeWords) { i => UIntToOH(io.position)(i) }
+  val sd = Vec.fill(burstSizeWords){ UInt(0, w.W) }
+  sd(windex) := io.wdata
+  scatterData.io.wdata := sd
 }
 
