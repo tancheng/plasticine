@@ -27,19 +27,26 @@ define_design_lib WORK -path ./work
 read_verilog -rtl $VERILOG_LIST
 analyze -format verilog $VERILOG_LIST
 
-# remove SRAM as we don't need to elaborate the interface
-## [raghu] # remove_design [list SRAM]
-#set_dont_touch SRAM
-
 ## SRAMs are in the Scratchpad module, set_dont_touch them
-current_design ComputeUnit
-current_design Scratchpad
+current_design PCUWrapper
+current_design PCU_0_0
+current_design FIFOCore
 set srams [get_instances SRAM]
 foreach sram $srams {
   set_dont_touch $sram
 }
-
 list_designs
+
+current_design FIFOCore_4
+set srams [get_instances SRAM_4]
+foreach sram $srams {
+  set_dont_touch $sram
+}
+current_design Scratchpad
+set srams [get_instances SRAM_68]
+foreach sram $srams {
+  set_dont_touch $sram
+}
 
 # set top level design
 current_design $PROJECT_NAME
@@ -73,7 +80,7 @@ set_dont_use tcbn45gsbwpml/*D0BWP
 
 # define clock
 # create_clock clk -name ideal_clock1 -period 1
-create_clock clk -name clk -period $CLK_PERIOD
+create_clock clock -name clk -period $CLK_PERIOD
 # compile_ultra -gate_clock
 # disable OPT-1206
 # set compile_seqmap_propagate_constants false
