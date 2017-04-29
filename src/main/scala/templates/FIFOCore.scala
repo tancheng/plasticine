@@ -68,6 +68,82 @@ class FIFOCounter(override val d: Int, override val v: Int) extends FIFOBase(1, 
   io.deq.foreach { d => d := ~empty }
 }
 
+class FIFOFake(override val w: Int, override val d: Int, override val v: Int) extends FIFOBase(w, d, v) {
+  // Create wptr (tail) counter chain
+  val wptrConfig = Wire(new CounterChainConfig(log2Up(bankSize+1), 2, 0, 0))
+  wptrConfig.chain(0) := io.config.chainWrite
+  (0 until 2) foreach { i => i match {
+      case 1 => // Localaddr: max = bankSize, stride = 1
+        val cfg = wptrConfig.counters(i)
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := bankSize.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+        cfg.par := 1.U
+      case 0 => // Bankaddr: max = v, stride = 1
+        val cfg = wptrConfig.counters(i)
+        cfg.max.value := v.U
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.par := 1.U
+  }}
+  val wptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
+  wptr.io.enable(0) := writeEn & io.config.chainWrite
+  wptr.io.enable(1) := writeEn
+  wptr.io.config := wptrConfig
+  val tailLocalAddr = wptr.io.out(1)
+  val tailBankAddr = wptr.io.out(0)
+
+
+  // Create rptr (head) counter chain
+  val rptrConfig = Wire(new CounterChainConfig(log2Up(bankSize+1), 2, 0, 0))
+  rptrConfig.chain(0) := io.config.chainRead
+  (0 until 2) foreach { i => i match {
+      case 1 => // Localaddr: max = bankSize, stride = 1
+        val cfg = rptrConfig.counters(i)
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := bankSize.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+        cfg.par := 1.U
+      case 0 => // Bankaddr: max = v, stride = 1
+        val cfg = rptrConfig.counters(i)
+        cfg.max.src := cfg.max.srcIdx(ConstSrc).U
+        cfg.max.value := v.U
+        cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
+        cfg.stride.value := 1.U
+        cfg.par := 1.U
+    }}
+  val rptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
+  rptr.io.enable(0) := readEn & io.config.chainRead
+  rptr.io.enable(1) := readEn
+  rptr.io.config := rptrConfig
+  val headLocalAddr = rptr.io.out(1)
+  val nextHeadLocalAddr = Mux(io.config.chainRead, Mux(rptr.io.done(0), rptr.io.next(1), rptr.io.out(1)), rptr.io.next(1))
+  val headBankAddr = rptr.io.out(0)
+  val nextHeadBankAddr = rptr.io.next(0)
+
+  // Backing SRAM
+  val mems = List.fill(v) { Module(new FF(w)) }
+  mems.zipWithIndex.foreach { case (m, i) =>
+    val wdata = i match {
+      case 0 => io.enq(i)
+      case _ => Mux(io.config.chainWrite, io.enq(0), io.enq(i))
+    }
+    m.io.in := wdata
+
+    // Write enable
+    val wen = Mux(io.config.chainWrite,
+                    io.enqVld & tailBankAddr === i.U,
+                    io.enqVld)
+    m.io.enable := wen
+
+    // Read data output
+    io.deq(i) := m.io.out
+  }
+}
+
 class FIFOCore(override val w: Int, override val d: Int, override val v: Int) extends FIFOBase(w, d, v) {
   // Create wptr (tail) counter chain
   val wptrConfig = Wire(new CounterChainConfig(log2Up(bankSize+1), 2, 0, 0))
