@@ -82,6 +82,21 @@ object PMUGen extends CommonDriver {
   def dut = () => new PMU(params)
 }
 
+object ScalarCUGen extends CommonDriver {
+  type DUTType = ScalarCUWrapper
+  override val moduleName = "ScalarCUWrapper"
+  val params = GeneratedTopParams.plasticineParams.scalarCUParams(0)(0)
+  def dut = () => new ScalarCUWrapper(params)
+}
+
+object SwitchCUGen extends CommonDriver {
+  type DUTType = SwitchCUWrapper
+  override val moduleName = "SwitchCUWrapper"
+  val params = GeneratedTopParams.plasticineParams.switchCUParams(0)(0)
+  def dut = () => new SwitchCUWrapper(params)
+}
+
+
 object VectorSwitchGen extends CommonDriver {
   type DUTType = VectorSwitch
   override val moduleName = "VectorSwitch"
