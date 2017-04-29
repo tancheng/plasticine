@@ -39,7 +39,7 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
       case _ => false
     }
 
-    override def toString = s"Cmd($addr, $tag, $wr, ${if (wr > 0) data else List()})"
+    override def toString = f"Cmd(addr: 0x$addr%x, tag: 0x$tag%x, write: $wr, ${if (wr > 0) data else List()})"
   }
 
   var expectedTag = 0
@@ -159,21 +159,34 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
   }
 
   def enqueueCmd(addr: List[Int], data: List[Int])(streamID: Int) {
-    Predef.assert(false, "Group enqueueCmd not supported currently")
-//    val isWr = writeMode
-//    poke(c.io.app(streamID).cmd.valid, 1)
-//    c.io.app(streamID).cmd.bits.addr.zip(addr) foreach { case (in, i) => poke(in, i) }
-//
-//    // If it is a write, enqueue first burst
-//    if (isWr > 0) {
-//      poke(c.io.app(streamID).wdata.bits, data)
-//      poke(c.io.app(streamID).wdata.valid, 1)
-//    }
-//    observeFor(1)
-//    poke(c.io.app(streamID).cmd.valid, 0)
-//    poke(c.io.app(streamID).wdata.valid, 0)
-//    observeFor(1)  // Extra level of pipelining requires another cycle
-//    updateExpected(addr, data)
+    val isWr = writeMode
+
+    val dataInBursts = getDataInBursts(data)
+    addr.zipAll(dataInBursts.toList, 0, List[Int](0)).foreach{ case (a, d) =>
+      if (isWr > 0) {
+        poke(c.io.app.stores(streamID).cmd.valid, 1)
+        poke(c.io.app.stores(streamID).cmd.bits.addr, a)
+        poke(c.io.app.stores(streamID).cmd.bits.size, burstSizeBytes)
+        poke(c.io.app.stores(streamID).cmd.bits.isWr, isWr)
+
+        poke(c.io.app.stores(streamID).wdata.bits, d)
+        poke(c.io.app.stores(streamID).wdata.valid, 1)
+      } else {
+        poke(c.io.app.loads(streamID).cmd.valid, 1)
+        poke(c.io.app.loads(streamID).cmd.bits.addr, a)
+        poke(c.io.app.loads(streamID).cmd.bits.size, burstSizeBytes)
+        poke(c.io.app.loads(streamID).cmd.bits.isWr, isWr)
+      }
+      observeFor(1)
+    }
+    if (isWr > 0) {
+      poke(c.io.app.stores(streamID).cmd.valid, 0)
+    } else {
+      poke(c.io.app.loads(streamID).cmd.valid, 0)
+    }
+    poke(c.io.app.stores(streamID).wdata.valid, 0)
+    observeFor(1)
+    updateExpected(addr, data, streamID)
   }
 
 
@@ -186,7 +199,7 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
   }
 
   def enqueueGather(addr: List[Int])(streamID: Int) {
-    enqueueCmd(addr, List())(streamID)
+    enqueueCmd(addr, List[Int]())(streamID)
   }
 
   def enqueueScatter(addr: List[Int], data: List[Int])(streamID: Int) {
@@ -278,7 +291,6 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
   def testGather {
     resetAll
     poke(c.io.config.scatterGather, 1)
-//    poke(c.io.config.isWr, 0)
     writeMode = 0
 
     def getTagFor(addr: Int) = {
@@ -294,7 +306,11 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
     check("Single gather with same address")
 
     // 2. Single gather, multiple addresses
-    val addrs = List.tabulate(c.v) { i => if (i == 0) 0x1000 else (0x1000 + (rnd.nextInt) % 0x1000) & ((Integer.MAX_VALUE >> log2Up(c.wordSizeBytes)) << log2Up(c.wordSizeBytes)) }
+    val addrs = List.tabulate(c.v) { i =>
+      if (i == 0) 0x1000 else {
+        (0x1000 + (rnd.nextInt) % 0x1000) & ((Integer.MAX_VALUE >> log2Up(c.wordSizeBytes)) << log2Up(c.wordSizeBytes))
+      }
+    }
     val burstData = HashMap[Int, List[Int]]()
     addrs.foreach { a =>
       val baseAddr = a - (a % burstSizeBytes)
@@ -327,19 +343,19 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
       val burstOffset = a % burstSizeBytes
       val wordOffset = burstOffset / c.wordSizeBytes
       val data = burstData(baseAddr)
-      println(s"addr:$a, base:$baseAddr, wordOffset:$wordOffset, data:$data")
+      println(f"addr:0x$a%x, base: 0x$baseAddr%x, wordOffset: 0x$wordOffset%x, data: $data")
     }
   }
 
   // Setup: Set dram ready to always be high
   poke(c.io.dram.cmd.ready, 1)
 
-  testBurstRead
-  testBurstWrite
-//  testGather
+  //testBurstRead
+  //testBurstWrite
+  testGather
 }
 
-object MAGTest extends CommonMain {
+object MAGCoreTest extends CommonMain {
   type DUTType = MAGCore
 
   def dut = () => {
