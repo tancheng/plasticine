@@ -31,7 +31,8 @@ trait CommonMain {
     case _ => false
   }
 
-  def target = if (args.size > 0) args(0) else "verilator"
+  //def target = if (args.size > 0) args(0) else "verilator"
+  def target = "verilator"
 
   def separateChiselArgs(args: Array[String]) = {
     val argSeparator = "--testArgs"

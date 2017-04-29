@@ -7,8 +7,9 @@ import fringe._
 
 import plasticine.templates.Utils.log2Up
 import plasticine.templates.Utils.delay
-import plasticine.config.{FIFOConfig, CounterChainConfig}
+import plasticine.config.{FIFOConfig, CounterChainConfig, CrossbarConfig}
 import scala.language.reflectiveCalls
+import plasticine.spade._
 
 class MAGCore(
   val w: Int,
@@ -62,7 +63,7 @@ class MAGCore(
   val addrFifo = Module(new FIFOArbiter(addrWidth, d, v, numStreams))
   val addrFifoConfig = Wire(new FIFOConfig(d, v))
   addrFifoConfig.chainRead := 1.U
-  addrFifoConfig.chainWrite := ~io.config.scatterGather
+  addrFifoConfig.chainWrite := 1.U
   addrFifo.io.config := addrFifoConfig
 
   addrFifo.io.forceTag.valid := 0.U
@@ -148,30 +149,29 @@ class MAGCore(
   val elementID = burstTagCounter.io.out(log2Up(v)-1, 0)
 
   // Coalescing cache
-//  val ccache = Module(new CoalescingCache(w, d, v))
-//  ccache.io.raddr := Cat(io.dram.tagIn, UInt(0, width=log2Up(burstSizeBytes)))
-//  ccache.io.readEn := config.scatterGather & io.dram.vldIn
-//  ccache.io.waddr := addrFifo.io.deq(0)
-//  ccache.io.wen := config.scatterGather & ~addrFifo.io.empty
-//  ccache.io.position := elementID
-//  ccache.io.wdata := wdataFifo.io.deq(0)
-//  ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
+  val ccache = Module(new CoalescingCache(w, d, v))
+  ccache.io.raddr := Cat(io.dram.cmd.bits.tag, UInt(0, log2Up(burstSizeBytes).W))
+  ccache.io.readEn := io.config.scatterGather & io.dram.resp.valid
+  ccache.io.waddr := addrFifo.io.deq(0)
+  ccache.io.wen := io.config.scatterGather & ~addrFifo.io.empty
+  ccache.io.position := elementID
+  ccache.io.wdata := wdataFifo.io.deq(0)
+  ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
 
-  addrFifo.io.deqVld := burstCounter.io.done
   isWrFifo.io.deqVld := burstCounter.io.done
   sizeFifo.io.deqVld := burstCounter.io.done
-  wdataFifo.io.deqVld := burstVld & isWrFifo.io.deq(0) & dramReady & ~issued // io.config.isWr & burstVld
-//  addrFifo.io.deqVld := burstCounter.io.done & ~ccache.io.full
-//  wdataFifo.io.deqVld := Mux(io.config.scatterGather, burstCounter.io.done & ~ccache.io.full, io.config.isWr & burstVld)
+  addrFifo.io.deqVld := burstCounter.io.done & ~ccache.io.full
+  wdataFifo.io.deqVld := Mux(io.config.scatterGather, burstCounter.io.done & ~ccache.io.full,
+                             burstVld & isWrFifo.io.deq(0) & dramReady & ~issued)
 
 
   // Parse Metadata line
-  def parseMetadataLine(m: UInt) = {
+  def parseMetadataLine(m: Vec[UInt]) = {
     // m is burstSizeWords * 8 wide. Each byte 'i' has the following format:
     // | 7 6 5 4     | 3    2   1    0     |
     // | x x x <vld> | <crossbar_config_i> |
     val validAndConfig = List.tabulate(burstSizeWords) { i =>
-      parseMetadata(m(i*8+8-1, i*8))
+      parseMetadata(m(i))
     }
 
     val valid = validAndConfig.map { _._1 }
@@ -188,34 +188,37 @@ class MAGCore(
     (valid, crossbarConfig)
   }
 
-//  val (validMask, crossbarConfig) = parseMetadataLine(ccache.io.rmetaData)
+  val (validMask, crossbarSelect) = parseMetadataLine(ccache.io.rmetaData)
 
-//  val registeredData = Vec(io.dram.resp.bits.rdata.map { d => Reg(UInt(width=w), d) })
-//  val registeredVld = Reg(UInt(width=1), io.dram.resp.valid)
+  val registeredData = Vec(io.dram.resp.bits.rdata.map { d => Reg(UInt(w.W), d) })
+  val registeredVld = Reg(UInt(1.W), io.dram.resp.valid)
 
   // Gather crossbar
-//  val gatherCrossbar = Module(new CrossbarCore(w, v, v))
-//  gatherCrossbar.io.ins := registeredData
-//  gatherCrossbar.io.config := Vec(crossbarConfig)
+  val switchParams = VectorSwitchParams(v, v, w, v)
+  val crossbarConfig = Wire(CrossbarConfig(switchParams))
+  crossbarConfig.outSelect = Vec(crossbarSelect)
+  val gatherCrossbar = Module(new CrossbarCore(UInt(w.W), switchParams))
+  gatherCrossbar.io.ins := registeredData
+  gatherCrossbar.io.config := crossbarConfig
 
   // Gather buffer
-//  val gatherBuffer = List.tabulate(burstSizeWords) { i =>
-//    val ff = Module(new FF(w))
-//    ff.io.control.enable := registeredVld & validMask(i)
-//    ff.io.data.in := gatherCrossbar.io.outs(i)
-//    ff
-//  }
-//  val gatherData = Vec.tabulate(burstSizeWords) { gatherBuffer(_).io.data.out }
+  val gatherBuffer = List.tabulate(burstSizeWords) { i =>
+    val ff = Module(new FF(w))
+    ff.io.enable := registeredVld & validMask(i)
+    ff.io.in := gatherCrossbar.io.outs(i)
+    ff
+  }
+  val gatherData = Vec.tabulate(burstSizeWords) { gatherBuffer(_).io.out }
 
   // Completion mask
-//  val completed = UInt()
-//  val completionMask = List.tabulate(burstSizeWords) { i =>
-//    val ff = Module(new FF(1))
-//    ff.io.control.enable := completed | (validMask(i) & registeredVld)
-//    ff.io.data.in := validMask(i)
-//    ff
-//  }
-//  completed := completionMask.map { _.io.data.out }.reduce { _ & _ }
+  val completed = Wire(UInt())
+  val completionMask = List.tabulate(burstSizeWords) { i =>
+    val ff = Module(new FF(1))
+    ff.io.enable := completed | (validMask(i) & registeredVld)
+    ff.io.in := validMask(i)
+    ff
+  }
+  completed := completionMask.map { _.io.out }.reduce { _ & _ }
 
   class Tag extends Bundle {
     val streamTag = UInt(tagWidth.W)
@@ -232,11 +235,10 @@ class MAGCore(
   io.dram.cmd.bits.tag := Cat(tagOut.streamTag, tagOut.burstTag)
   io.dram.cmd.bits.streamId := tagOut.streamTag
   io.dram.cmd.bits.wdata := wdataFifo.io.deq
-//  io.dram.cmd.valid := Mux(config.scatterGather, ccache.io.miss, burstVld)
   io.dram.cmd.bits.isWr := isWrFifo.io.deq(0)
   wrPhase.io.input.set := (~isWrFifo.io.empty & isWrFifo.io.deq(0))
   wrPhase.io.input.reset := delay(burstVld,1)
-  io.dram.cmd.valid := burstVld & ~issued
+  io.dram.cmd.valid := Mux(io.config.scatterGather, ccache.io.miss, burstVld & ~issued)
 
   val issuedTag = Wire(UInt(w.W))
   if (blockingDRAMIssue) {
