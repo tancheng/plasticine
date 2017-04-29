@@ -61,7 +61,7 @@ class MAGCore(
   val addrFifo = Module(new FIFOArbiter(addrWidth, d, v, numStreams))
   val addrFifoConfig = Wire(new FIFOOpcode(d, v))
   addrFifoConfig.chainRead := 1.U
-  addrFifoConfig.chainWrite := ~io.config.scatterGather
+  addrFifoConfig.chainWrite := 1.U
   addrFifo.io.config := addrFifoConfig
 
   addrFifo.io.forceTag.valid := 0.U
@@ -156,12 +156,11 @@ class MAGCore(
   ccache.io.wdata := wdataFifo.io.deq(0)
   ccache.io.isScatter := Bool(false) // TODO: Remove this restriction once ready
 
-  addrFifo.io.deqVld := burstCounter.io.done
   isWrFifo.io.deqVld := burstCounter.io.done
   sizeFifo.io.deqVld := burstCounter.io.done
-  wdataFifo.io.deqVld := burstVld & isWrFifo.io.deq(0) & dramReady & ~issued // io.config.isWr & burstVld
-//  addrFifo.io.deqVld := burstCounter.io.done & ~ccache.io.full
-//  wdataFifo.io.deqVld := Mux(io.config.scatterGather, burstCounter.io.done & ~ccache.io.full, io.config.isWr & burstVld)
+  addrFifo.io.deqVld := burstCounter.io.done & ~ccache.io.full
+  wdataFifo.io.deqVld := Mux(io.config.scatterGather, burstCounter.io.done & ~ccache.io.full,
+                             burstVld & isWrFifo.io.deq(0) & dramReady & ~issued)
 
 
   // Parse Metadata line
@@ -237,8 +236,7 @@ class MAGCore(
   io.dram.cmd.bits.isWr := isWrFifo.io.deq(0)
   wrPhase.io.input.set := (~isWrFifo.io.empty & isWrFifo.io.deq(0))
   wrPhase.io.input.reset := delay(burstVld,1)
-  // io.dram.cmd.valid := burstVld & ~issued
-  io.dram.cmd.valid := Mux(io.config.scatterGather, ~issued, burstVld & ~issued)
+  io.dram.cmd.valid := Mux(io.config.scatterGather, ccache.io.miss, burstVld & ~issued)
 
   val issuedTag = Wire(UInt(w.W))
   if (blockingDRAMIssue) {

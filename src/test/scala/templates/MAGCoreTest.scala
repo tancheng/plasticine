@@ -38,7 +38,7 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
       case _ => false
     }
 
-    override def toString = s"Cmd($addr, $tag, $wr, ${if (wr > 0) data else List()})"
+    override def toString = f"Cmd(addr: 0x$addr%x, tag: 0x$tag%x, write: $wr, ${if (wr > 0) data else List()})"
   }
 
   var expectedTag = 0
@@ -301,7 +301,6 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
     val expectedData = 0x2000
     enqueueGather(g)(0)
     observeFor(c.v * 2)
-    println(s"TEST: $observedOrder")
     pokeDramResponse(getTagFor(0x1000), List.fill(c.v) { 0x2000 })
     check("Single gather with same address")
 
@@ -343,16 +342,16 @@ class MAGCoreTester(c: MAGCore)(implicit args: Array[String]) extends ArgsTester
       val burstOffset = a % burstSizeBytes
       val wordOffset = burstOffset / c.wordSizeBytes
       val data = burstData(baseAddr)
-      println(s"addr:$a, base:$baseAddr, wordOffset:$wordOffset, data:$data")
+      println(f"addr:0x$a%x, base: 0x$baseAddr%x, wordOffset: 0x$wordOffset%x, data: $data")
     }
   }
 
   // Setup: Set dram ready to always be high
   poke(c.io.dram.cmd.ready, 1)
 
-  testBurstRead
-  testBurstWrite
-  //testGather
+  //testBurstRead
+  //testBurstWrite
+  testGather
 }
 
 object MAGCoreTest extends CommonMain {
