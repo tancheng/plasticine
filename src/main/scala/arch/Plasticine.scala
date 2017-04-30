@@ -18,14 +18,14 @@ import scala.collection.mutable.ListBuffer
 import java.io.PrintWriter
 import scala.language.reflectiveCalls
 
-case class PlasticineIO(f: FringeParams, mc: Array[Array[MemoryChannelParams]]) extends Bundle {
+case class PlasticineIO(p: PlasticineParams, f: FringeParams, mc: Array[Array[MemoryChannelParams]]) extends Bundle {
   // Scalar IO
   val argIns = Vec(f.numArgIns, Flipped(Decoupled(UInt(f.dataWidth.W))))
   val argOuts = Vec(f.numArgOuts, Decoupled(UInt(f.dataWidth.W)))
 
   // Memory IO
   private val numMemoryChannels = mc.flatten.size
-  private val streamPar = StreamParInfo(32, 16)
+  private val streamPar = StreamParInfo(32, p.cuParams(0)(0).v)
   private val streamParams = List.fill(numMemoryChannels) { streamPar }
   val memStreams = Flipped(new AppStreams(streamParams, streamParams))
 
@@ -47,7 +47,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
   val scalarCUParams = p.scalarCUParams
   val memoryChannelParams = p.memoryChannelParams
 
-  val io = IO(PlasticineIO(f, memoryChannelParams))
+  val io = IO(PlasticineIO(p, f, memoryChannelParams))
 
   // Wire up the reconfiguration network: ASIC or CGRA?
   val configType = PlasticineConfig(cuParams, vectorParams, scalarParams, controlParams, switchCUParams, scalarCUParams, memoryChannelParams, p, f)
@@ -108,39 +108,14 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
       }
     }
 
-  // Vector switches
-  val vsbs = Array.tabulate(vectorParams.size) { i =>
-    Array.tabulate(vectorParams(i).size) { j =>
-      val switch = Module(new VectorSwitch(vectorParams(i)(j)))
-      switch.io.config := config.vectorSwitch(i)(j)
-      switch
-    }
-  }
-
-  // Scalar network
-  val ssbs = Array.tabulate(scalarParams.size) { i =>
-    Array.tabulate(scalarParams(i).size) { j =>
-      val switch = Module(new ScalarSwitch(scalarParams(i)(j)))
-      switch.io.config := config.scalarSwitch(i)(j)
-      switch
-    }
-  }
-
-  // Control network
-  val csbs = Array.tabulate(controlParams.size) { i =>
-    Array.tabulate(controlParams(i).size) { j =>
-      val switch = Module(new ControlSwitch(controlParams(i)(j)))
-      switch.io.config := config.controlSwitch(i)(j)
-      switch
-    }
-  }
-
-   //Switch CUs
-  val switchCUs = Array.tabulate(switchCUParams.size) { i =>
-    Array.tabulate(switchCUParams(i).size) { j =>
-      val cu = Module(new SwitchCU(switchCUParams(i)(j))(i,j))
-      cu.io.config := config.switchCU(i)(j)
-      cu
+  // Memory channels, connect dram portion
+  val memoryChannels = Array.tabulate(memoryChannelParams.size) { i =>
+    Array.tabulate(memoryChannelParams(i).size) { j =>
+      val mc = Module(new MemoryChannel(memoryChannelParams(i)(j)))
+      mc.io.config := config.memoryChannel(i)(j)
+      io.memStreams.loads(i*memoryChannelParams(i).size + j) <> mc.io.dramLoad
+      io.memStreams.stores(i*memoryChannelParams(i).size + j) <> mc.io.dramStore
+      mc
     }
   }
 
@@ -153,18 +128,141 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
     }
   }
 
-  // Memory channels, connect dram portion
-  val memoryChannels = Array.tabulate(memoryChannelParams.size) { i =>
-    Array.tabulate(memoryChannelParams(i).size) { j =>
-      val mc = Module(new MemoryChannel(memoryChannelParams(i)(j)))
-      mc.io.config := config.memoryChannel(i)(j)
-      io.memStreams.loads(i*memoryChannelParams(i).size + j) <> mc.io.dramLoad
-      io.memStreams.stores(i*memoryChannelParams(i).size + j) <> mc.io.dramStore
-      mc
-    }
-  }
+  val useInterconnect = false
 
-  connect(io, argOutMuxInData, Array.tabulate(doneOuts.size) { doneOuts(_) }, cus, scalarCUs, memoryChannels, vsbs, ssbs, csbs, switchCUs)
+  if (useInterconnect) {
+    // Vector switches
+    val vsbs = Array.tabulate(vectorParams.size) { i =>
+      Array.tabulate(vectorParams(i).size) { j =>
+        val switch = Module(new VectorSwitch(vectorParams(i)(j)))
+        switch.io.config := config.vectorSwitch(i)(j)
+        switch
+      }
+    }
+
+    // Scalar network
+    val ssbs = Array.tabulate(scalarParams.size) { i =>
+      Array.tabulate(scalarParams(i).size) { j =>
+        val switch = Module(new ScalarSwitch(scalarParams(i)(j)))
+        switch.io.config := config.scalarSwitch(i)(j)
+        switch
+      }
+    }
+
+    // Control network
+    val csbs = Array.tabulate(controlParams.size) { i =>
+      Array.tabulate(controlParams(i).size) { j =>
+        val switch = Module(new ControlSwitch(controlParams(i)(j)))
+        switch.io.config := config.controlSwitch(i)(j)
+        switch
+      }
+    }
+
+     //Switch CUs
+    val switchCUs = Array.tabulate(switchCUParams.size) { i =>
+      Array.tabulate(switchCUParams(i).size) { j =>
+        val cu = Module(new SwitchCU(switchCUParams(i)(j))(i,j))
+        cu.io.config := config.switchCU(i)(j)
+        cu
+      }
+    }
+
+    connect(io, argOutMuxInData, Array.tabulate(doneOuts.size) { doneOuts(_) }, cus, scalarCUs, memoryChannels, vsbs, ssbs, csbs, switchCUs)
+  } else {
+    // Flatten memoryChannels and chain them
+
+    val flattenedCUs = cus.flatten
+    val flattenedMemoryChannels = memoryChannels.flatten
+
+    for (i <- 0 until flattenedMemoryChannels.size) {
+      if (i == 0) {
+        flattenedMemoryChannels(i).io.plasticine.vecIn <> flattenedCUs.last.io.vecOut(flattenedCUs.last.io.vecOut.size-1)
+      } else {
+        flattenedMemoryChannels(i).io.plasticine.vecIn <> flattenedMemoryChannels(i-1).io.plasticine.vecOut
+      }
+//      flattenedSCUs(i).io.scalarIn <> flattenedMemoryChannels(i).io.plasticine.scalarIn
+    }
+
+    for (i <- 0 until flattenedCUs.size) {
+      val inOutRatio = if (i == 0) (flattenedCUs(i).io.vecIn.size / flattenedCUs.last.io.vecOut.size) else (flattenedCUs(i).io.vecIn.size / flattenedCUs(i-1).io.vecOut.size)
+      val prevOuts = if (i == 0) {
+        flattenedCUs.last.io.vecOut.getElements.dropRight(1)
+      } else {
+        flattenedCUs(i-1).io.vecOut.getElements
+      }
+      for (j <- 0 until flattenedCUs(i).io.vecIn.size) {
+        val outIdx = j / inOutRatio
+        if (outIdx >= prevOuts.size) {
+          flattenedCUs(i).io.vecIn(j) <> flattenedMemoryChannels.last.io.plasticine.vecOut
+        } else {
+          flattenedCUs(i).io.vecIn(j) <> prevOuts(j / inOutRatio)
+        }
+      }
+    }
+
+    // Flatten the scalar network
+    val flattenedArgOuts = argOutMuxInData.flatten
+    val flattenedSCUs = scalarCUs.flatten
+    for (i <- 0 until flattenedCUs.size) {
+      val inOutRatio = if (i == 0) math.ceil(flattenedCUs(i).io.scalarIn.size.toFloat / io.argIns.size).toInt else (flattenedCUs(i).io.scalarIn.size / flattenedCUs(i-1).io.scalarOut.size)
+      val prevOuts = if (i == 0) {
+        io.argIns
+      } else {
+        flattenedCUs(i-1).io.scalarOut
+      }
+      for (j <- 0 until flattenedCUs(i).io.scalarIn.size) {
+        val outIdx = j / inOutRatio
+        flattenedCUs(i).io.scalarIn(j) <> prevOuts(j / inOutRatio)
+      }
+    }
+    flattenedArgOuts.take(flattenedCUs.last.io.scalarOut.size).zipWithIndex.foreach { case (argOut, i) =>
+      flattenedArgOuts(i) := flattenedCUs.last.io.scalarOut(i)
+    }
+
+    for (i <- 0 until flattenedSCUs.size) {
+      val inOutRatio = math.max(if (i == 0) math.ceil(flattenedSCUs(i).io.scalarIn.size.toFloat / io.argIns.size).toInt else (flattenedSCUs(i).io.scalarIn.size / flattenedSCUs(i-1).io.scalarOut.size), 1)
+      val prevOuts = if (i == 0) {
+        io.argIns
+      } else {
+        flattenedSCUs(i-1).io.scalarOut
+      }
+
+      for (j <- 0 until flattenedSCUs(i).io.scalarIn.size) {
+        val outIdx = j / inOutRatio
+        flattenedSCUs(i).io.scalarIn(j) <> prevOuts(math.min(j / inOutRatio, prevOuts.size-1))
+      }
+    }
+    flattenedArgOuts.takeRight(flattenedSCUs.last.io.scalarOut.size).zipWithIndex.foreach { case (argOut, i) =>
+      flattenedArgOuts(i) := flattenedSCUs.last.io.scalarOut(i)
+    }
+
+    // Flatten the control network
+    for (i <- 0 until flattenedCUs.size) {
+      val inOutRatio = if (i == 0) (flattenedCUs(i).io.controlIn.size) else (flattenedCUs(i).io.controlIn.size / flattenedCUs(i-1).io.controlOut.size)
+      for (j <- 0 until flattenedCUs(i).io.controlIn.size) {
+        if (i == 0) {
+          flattenedCUs(i).io.controlIn(j) := io.enable
+        } else {
+          val outIdx = j / inOutRatio
+          flattenedCUs(i).io.controlIn(j) := flattenedCUs(i-1).io.controlOut(j / inOutRatio)
+        }
+      }
+    }
+    doneOuts(0) := flattenedCUs.last.io.controlOut(0)
+
+    for (i <- 0 until flattenedSCUs.size) {
+      val inOutRatio = if (i == 0) math.ceil(flattenedSCUs(i).io.controlIn.size.toFloat / io.argIns.size).toInt else math.ceil(flattenedSCUs(i).io.controlIn.size.toFloat / flattenedSCUs(i-1).io.controlOut.size).toInt
+      for (j <- 0 until flattenedSCUs(i).io.controlIn.size) {
+        if (i == 0) {
+          flattenedSCUs(i).io.controlIn(j) <> io.enable
+        } else {
+          val outIdx = j / inOutRatio
+          flattenedSCUs(i).io.controlIn(j) <> flattenedSCUs(i-1).io.controlOut(j / inOutRatio)
+        }
+      }
+    }
+    doneOuts(1) := flattenedSCUs.last.io.controlOut(0)
+  }
 }
 
 //trait DirectionOps {
