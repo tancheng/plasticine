@@ -184,7 +184,7 @@ case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
 
 case class ScalarCUConfig(p: ScalarCUParams) extends AbstractConfig {
   val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
-  val operandSources = List(XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, PrevStageSrc, CurrStageSrc)
+  val operandSources = List(XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, PrevStageSrc)
   val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources, 1, operandSources))
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = ScalarCUControlBoxConfig(p)
