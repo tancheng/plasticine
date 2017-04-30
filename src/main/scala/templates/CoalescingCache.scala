@@ -3,6 +3,7 @@ package plasticine.templates
 import chisel3._
 import chisel3.util._
 
+import plasticine.templates.Utils.log2Up
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 
@@ -57,7 +58,7 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
     addr(burstOffset-1, wordOffset)
   }
 
-  val writeIdx = Wire(UInt(width = log2Up(d)))
+  val writeIdx = Wire(UInt(log2Up(d).W))
   val readHit = Wire(Vec(d, Bool()))
   val writeHit = Wire(Vec(d, Bool()))
   val full = Wire(Bool())
@@ -66,19 +67,20 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   // Create valid array
   val valid = List.tabulate(d) { i =>
     val vld = Module(new FF(1))
-    vld.io.init := UInt(0) // Initialize to invalid (0) state
-    vld.io.in := Mux(readHit(i), UInt(0), UInt(1)) // Read + evict
-    vld.io.enable := (io.wen & ~full & writeIdx === UInt(i)) | readHit(i) // Read + evict
+    vld.io.init := 0.U // Initialize to invalid (0) state
+    vld.io.in := Mux(readHit(i), 0.U, 1.U // Read + evict
+    vld.io.enable := (io.wen & ~full & writeIdx === i.U) | readHit(i) // Read + evict
     vld
   }
 
   val wburstAddr = extractBurstAddr(io.waddr)
   val rburstAddr = extractBurstAddr(io.raddr)
+
   // Create tag array, populate readHit table
   val tags = List.tabulate(d) { i =>
     val ff = Module(new FF(taglen))
     ff.io.in := wburstAddr
-    ff.io.enable := (io.wen & writeIdx === UInt(i))
+    ff.io.enable := (io.wen & writeIdx === i.U)
     readHit(i) := io.readEn & valid(i).io.out & (rburstAddr === ff.io.out)
     writeHit(i) := io.wen & valid(i).io.out & (wburstAddr === ff.io.out)
     ff
@@ -119,7 +121,7 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   scatterData.io.waddr := writeIdx
   scatterData.io.wen := io.wen & ~full & io.isScatter
   scatterData.io.mask := Vec.tabulate(burstSizeWords) { i => UIntToOH(io.position)(i) }
-  val sd = Vec.fill(burstSizeWords){ UInt(0, w.W) }
+  val sd = Vec.fill(burstSizeWords){ 0.U }
   sd(windex) := io.wdata
   scatterData.io.wdata := sd
 }
