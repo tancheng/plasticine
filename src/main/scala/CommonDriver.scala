@@ -2,7 +2,7 @@
 
 package plasticine
 
-import chisel3.core.Module
+import chisel3.core._
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import plasticine.arch._
 import plasticine.spade._
@@ -82,7 +82,7 @@ object PMUGen extends CommonDriver {
   def dut = () => new PMU(params)
 }
 
-object ScalarCUGen extends CommonDriver {
+object ScalarCUWrapperGen extends CommonDriver {
   type DUTType = ScalarCUWrapper
   override val moduleName = "ScalarCUWrapper"
   val params = GeneratedTopParams.plasticineParams.scalarCUParams(0)(0)
@@ -144,4 +144,22 @@ object FUGen extends CommonDriver {
   type DUTType = FU
   override val moduleName = "FU"
   def dut = () => new FU(32, false, false)
+}
+
+object MuxNGen extends CommonDriver {
+  type DUTType = MuxN[UInt]
+  override val moduleName = "MuxN"
+  def dut = () => new MuxN(UInt(32.W), 8)
+}
+
+object FFGen extends CommonDriver {
+  type DUTType = FF
+  override val moduleName = "FF"
+  def dut = () => new FF(32)
+}
+
+object FFNoInitGen extends CommonDriver {
+  type DUTType = FFNoInit
+  override val moduleName = "FFNoInit"
+  def dut = () => new FFNoInit(32)
 }
