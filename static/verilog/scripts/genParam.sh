@@ -5,7 +5,7 @@ if [ $# -ne 2 ]; then
   exit -1
 fi
 
-PROJ_PATH=`readlink -f $1`
+PROJ_PATH=.
 PROJ_NAME=$2
 PROJ_SRC_PATH=$PROJ_PATH
 PROJ_SOURCES=`ls $PROJ_SRC_PATH/*.v`
