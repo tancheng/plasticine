@@ -1,18 +1,18 @@
-//package plasticine.templates
-//
-//import Chisel._
-//
-//class IntPrimitiveModule(val w: Int, op: (UInt, UInt, UInt) => UInt) extends Module {
-//  val io = new Bundle {
-//    val a = UInt(INPUT, w)
-//    val b = UInt(INPUT, w)
-//    val c = UInt(INPUT, w)
-//    val out = UInt(OUTPUT, w)
-//  }
-//
-//  io.out := op(io.a, io.b, io.c)
-//}
-//
+package plasticine.templates
+
+import chisel3._
+
+class IntPrimitiveModule(val w: Int, op: (UInt, UInt, UInt) => UInt) extends Module {
+  val io = IO(new Bundle {
+    val a = Input(UInt(w.W))
+    val b = Input(UInt(w.W))
+    val c = Input(UInt(w.W))
+    val out = Output(UInt(w.W))
+  })
+
+  io.out := op(io.a, io.b, io.c)
+}
+
 //class IntPrimitiveReg(val w: Int, op: (UInt, UInt, UInt) => UInt) extends Module {
 //  val io = new Bundle {
 //    val a = UInt(INPUT, w)

@@ -149,7 +149,7 @@ object FUGen extends CommonDriver {
 object MuxNGen extends CommonDriver {
   type DUTType = MuxN[UInt]
   override val moduleName = "MuxN"
-  def dut = () => new MuxN(UInt(32.W), 8)
+  def dut = () => new MuxN(UInt(32.W), 2)
 }
 
 object FFGen extends CommonDriver {
@@ -162,4 +162,40 @@ object FFNoInitGen extends CommonDriver {
   type DUTType = FFNoInit
   override val moduleName = "FFNoInit"
   def dut = () => new FFNoInit(32)
+}
+
+object RegFileGen extends CommonDriver {
+  type DUTType = RegFile
+  override val moduleName = "RegFile"
+  def dut = () => new RegFile(32, 16, 10, 10)
+}
+
+object FPMultGen extends CommonDriver {
+  type DUTType = FPMult
+  override val moduleName = "FPMult"
+  def dut = () => new FPMult()
+}
+
+object FPCompGen extends CommonDriver {
+  type DUTType = FPComp
+  override val moduleName = "FPComp"
+  def dut = () => new FPComp()
+}
+
+object PrimitiveGen extends CommonDriver {
+  type DUTType = IntPrimitiveModule
+  override val moduleName = "IntPrimitiveModule"
+  def getLambda(x: String): (UInt, UInt, UInt) => UInt = x match {
+    case "%" => (a,b, c) => a % b
+    case "===" => (a,b, c) => a === b
+    case "!==" => (a,b, c) => a != b
+    case "min" => (a,b,c) => Mux(a<b, a, b)
+    case "max" => (a,b,c) => Mux(a>b, a, b)
+    case "neg" => (a,b,c) => ~a
+    case "bit_and" => (a,b,c) => a & b
+    case "bit_or" => (a,b,c) => a | b
+    case _ => throw new Exception(s"Unknown operator $x")
+  }
+
+  def dut = () => new IntPrimitiveModule(32, getLambda(args(0)))
 }
