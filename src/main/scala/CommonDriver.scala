@@ -176,6 +176,12 @@ object FPMultGen extends CommonDriver {
   def dut = () => new FPMult()
 }
 
+object FPAddGen extends CommonDriver {
+  type DUTType = FPAdd
+  override val moduleName = "FPAdd"
+  def dut = () => new FPAdd()
+}
+
 object FPCompGen extends CommonDriver {
   type DUTType = FPComp
   override val moduleName = "FPComp"
@@ -186,6 +192,12 @@ object PrimitiveGen extends CommonDriver {
   type DUTType = IntPrimitiveModule
   override val moduleName = "IntPrimitiveModule"
   def getLambda(x: String): (UInt, UInt, UInt) => UInt = x match {
+    case "+" => (a,b, c) => a + b
+    case "-" => (a,b, c) => a - b
+    case "mul" => (a,b, c) => a * b
+    case "div" => (a,b, c) => a / b
+    case "lt" => (a,b, c) => a < b
+    case "le" => (a,b, c) => a <= b
     case "%" => (a,b, c) => a % b
     case "===" => (a,b, c) => a === b
     case "!==" => (a,b, c) => a != b
