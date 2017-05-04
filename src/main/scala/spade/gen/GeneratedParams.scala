@@ -5,8 +5,8 @@ import scala.collection.mutable.ListBuffer
 
 object GeneratedTopParams extends TopParams with GeneratedParams {
   override lazy val fringeParams = new FringeParams {
-    override val numArgIns = 3
-    override val numArgOuts = 3
+    override val numArgIns = 4
+    override val numArgOuts = 4
     override val dataWidth = 32
   }
   override lazy val plasticineParams = new PlasticineParams {
@@ -46,7 +46,7 @@ case class GeneratedPCUParams(override val numScalarIn:Int, override val numScal
   regColors += List(VecInReg,VecOutReg)
   regColors += List(VecInReg,VecOutReg)
   regColors += List(VecInReg,VecOutReg)
-  override val d = 9
+  override val d = 5
   override val r = regColors.size
 }
 

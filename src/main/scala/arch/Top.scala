@@ -38,29 +38,22 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
   }
 
   // Accel
-  val plasticine = Module(new Plasticine(p.plasticineParams, p.fringeParams, initBits.asInstanceOf[Option[PlasticineBits]]))
+//  val plasticine = Module(new Plasticine(p.plasticineParams, p.fringeParams, initBits.asInstanceOf[Option[PlasticineBits]]))
 //  val plasticine = Module(new CounterWrapper(p.plasticineParams.w, 0, 0))
 //  val plasticine = Module(new CounterChainWrapper(p.plasticineParams.w, 8))
-//  val plasticine = Module(new PCUWrapper(p.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]))
-
-  // Memory IO
-  private val numMemoryChannels = p.plasticineParams.memoryChannelParams.flatten.size
-  private val streamPar = StreamParInfo(32, 16)
-  private val streamParams = List.fill(numMemoryChannels) { streamPar }
+  val pcu = Module(new PCUWrapper(
+    p.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams],
+    initBits.asInstanceOf[Option[PCUBits]]
+  ))
 
   p.target match {
     case "verilator" | "vcs" =>
       // Simulation Fringe
       val blockingDRAMIssue = false
-      val fringe = Module(new Fringe(
+      val fringe = Module(new FringeLite(
         p.fringeParams.dataWidth,
         p.fringeParams.numArgIns,
-        p.fringeParams.numArgOuts,
-        streamParams,
-        streamParams,
-        List[StreamParInfo](),  // streamIns
-        List[StreamParInfo](),  // streamOuts
-        blockingDRAMIssue))
+        p.fringeParams.numArgOuts))
 
       val topIO = io.asInstanceOf[VerilatorInterface]
 
@@ -71,20 +64,16 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
       fringe.io.wdata := topIO.wdata
       topIO.rdata := fringe.io.rdata
 
-      // Fringe <-> DRAM connections
-      topIO.dram <> fringe.io.dram
-
-      plasticine.io.argIns.zip(fringe.io.argIns) foreach { case (pArgIn, fArgIn) => pArgIn.bits := fArgIn }
-      fringe.io.argOuts.zip(plasticine.io.argOuts) foreach { case (fringeArgOut, accelArgOut) =>
+      pcu.io.scalarIn.zip(fringe.io.argIns) foreach { case (pArgIn, fArgIn) => pArgIn.bits := fArgIn }
+      fringe.io.argOuts.zip(pcu.io.scalarOut) foreach { case (fringeArgOut, accelArgOut) =>
           fringeArgOut.bits := accelArgOut.bits
           fringeArgOut.valid := 1.U
       }
-      fringe.io.memStreams <> plasticine.io.memStreams
-      plasticine.io.enable := fringe.io.enable
-      fringe.io.done := plasticine.io.done
 
-      plasticine.io.config <> topIO.config
-      topIO.configDone := plasticine.io.configDone
+      pcu.io.controlIn(0) := fringe.io.enable
+      fringe.io.done := pcu.io.controlOut(0)
+
+      pcu.io.config <> topIO.config
     case _ =>
       throw new Exception(s"Unknown target '${io.target}'")
   }

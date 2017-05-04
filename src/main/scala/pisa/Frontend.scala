@@ -93,18 +93,8 @@ trait PISADesign extends ConfigFileInterface {
 		val top = main(args:_*)
 		val configTop = getConfigTop(top)
 
-    // Debugging only
-    val plTop = top.asInstanceOf[PlasticineBits]
-    plTop.cu(0)(0).stages.zipWithIndex.foreach {case (stage, idx) =>
-      println(s"[PISA] Stage $idx : ")
-      println(s" fwd: ${stage.fwd.toList}")
-      println(s" res: ${stage.res}")
-      println(s" result: ${stage.result}")
-      println(s" regEnables: ${stage.regEnables}")
-   }
-
     // Generate arch with given top params as initBits
-    chisel3.Driver.execute(Array[String]("--target-dir", "psim"), () => new Top(GeneratedTopParams, Some(top)))
+    chisel3.Driver.execute(Array[String]("--target-dir", "pcu_sim"), () => new Top(GeneratedTopParams, Some(top)))
 
 		// Generate binary
     val binaryGen = new BinaryCodegen()

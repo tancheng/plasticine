@@ -29,7 +29,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   // after 'rwStages' and before 'reduction' stages because of the way
   // the dataSrc muxes are created.
   // i.e., d >= rwStages + 1 + numReduceStages + numStagesAfterReduction
-  val numStagesAfterReduction = 1
+  val numStagesAfterReduction = 0
   Predef.assert(p.d >= (1 + numReduceStages + numStagesAfterReduction), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages + $numStagesAfterReduction)!""")
 
   def getMux[T<:Data](ins: List[T], sel: UInt): T = {
@@ -202,10 +202,9 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
             if (allowReduce) {
               Predef.assert(isReduceStage, s"Stage $i is not a reduce stage!")
               if (fwdLaneMap.contains(lane)) {
-                val prevRegBlock = pipeRegs.last(fwdLaneMap(lane))
                 val reduceReg = p.getRegIDs(ReduceReg)
                 Predef.assert(reduceReg.size == 1, s"ERROR: Only single reduceReg supported! reduceRegs: $reduceReg")
-                List(prevRegBlock(reduceReg(0)).io.out)
+                List(if (i == 0) io.config.accumInit else pipeRegs.last(fwdLaneMap(lane))(reduceReg(0)).io.out)
               } else {
                 List()
               }

@@ -16,8 +16,9 @@ import scala.collection.mutable.Set
 import scala.collection.mutable.ListBuffer
 import scala.language.reflectiveCalls
 import java.io.PrintWriter
+import plasticine.pisa.codegen.ConfigInitializer
 
-class PCUWrapper(val p: PCUParams) extends Module {
+class PCUWrapper(val p: PCUParams, val initBits: Option[PCUBits] = None) extends Module {
   val io = IO(new Bundle {
     // Vector IO
     val vecIn = Vec(p.numVectorIn, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
@@ -38,12 +39,25 @@ class PCUWrapper(val p: PCUParams) extends Module {
 
 
   // Wire up the reconfiguration network: ASIC or CGRA?
-  val configSR = Module(new ShiftRegister(new PCUConfig(p)))
-  configSR.io.in.bits := io.config.bits
-  configSR.io.in.valid := io.config.valid
-  io.configDone := configSR.io.out.valid
+  val configType = PCUConfig(p)
+  val config = Wire(configType)
 
-  val config = configSR.io.config
+  if (initBits.isDefined) {
+    // ASIC flow
+    println(s"initBits defined, ASIC flow")
+    val configWire = Wire(configType)
+    val configInitializer = new ConfigInitializer()
+    configInitializer.init(initBits.get, configWire)
+    config := configWire
+  } else {
+    // CGRA flow
+    println(s"initBits undefined, CGRA flow")
+    val configSR = Module(new ShiftRegister(configType))
+    configSR.io.in.bits := io.config.bits
+    configSR.io.in.valid := io.config.valid
+    io.configDone := configSR.io.out.valid
+    config := configSR.io.config
+  }
 
   val pcu = Module(new PCU(p)(0,0))
   pcu.io.vecIn      <> io.vecIn
