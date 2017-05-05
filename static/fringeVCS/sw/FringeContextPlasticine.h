@@ -23,7 +23,7 @@ class FringeContextPlasticine : public FringeContextBase<void> {
 
   pid_t sim_pid;
   std::string configPath;
-  std::string simPath = std::string(getenv("PLASTICINE_HOME")) + "/psim/psim.bin";
+  std::string simPath = std::string(getenv("PLASTICINE_HOME")) + "/pcu_sim/psim.bin";
   Channel *cmdChannel;
   Channel *respChannel;
   uint64_t numCycles = 0;
@@ -33,7 +33,7 @@ class FringeContextPlasticine : public FringeContextBase<void> {
   const uint32_t burstSizeBytes = 64;
   const uint32_t commandReg = 0;
   const uint32_t statusReg = 1;
-  const uint64_t maxCycles = 5000;
+  const uint64_t maxCycles = 500000;
 
   posix_spawn_file_actions_t action;
   int globalID = 1;

@@ -8,14 +8,21 @@ class ShiftRegister[T<:Data](val t: T) extends Module {
   val io = IO(new Bundle {
     val in = Flipped(Decoupled(Bool()))
     val out = Decoupled(Bool())
+    val init = Input(t.cloneType)
     val config = Output(t.cloneType)
   })
 
   val w = t.getWidth
   val sr = List.fill(w) { Module(new FF(2)) }
 
+//  val configInit = sr.map { ff => ff.io.init(1).asUInt }.reduce {Cat(_,_)}
+//  val configValidInit = sr.map { ff => ff.io.init(0).asUInt }.reduce {Cat(_,_)}
+//
+//  configValidInit := 0.U
+//  configInit := io.init.asUInt
+
   for (i <- 0 until w) {
-    sr(i).io.init := 0.U
+    sr(i).io.init := Cat(io.init.asUInt()(w-1-i), 0.U)
     if (i == 0) {
       sr(i).io.in := Cat(io.in.bits, io.in.valid)
     } else {

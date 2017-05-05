@@ -42,22 +42,37 @@ class PCUWrapper(val p: PCUParams, val initBits: Option[PCUBits] = None) extends
   val configType = PCUConfig(p)
   val config = Wire(configType)
 
+  val configSR = Module(new ShiftRegister(configType))
+  configSR.io.in.bits := io.config.bits
+  configSR.io.in.valid := io.config.valid
+  io.configDone := configSR.io.out.valid
+  config := configSR.io.config
+
   if (initBits.isDefined) {
-    // ASIC flow
-    println(s"initBits defined, ASIC flow")
     val configWire = Wire(configType)
     val configInitializer = new ConfigInitializer()
     configInitializer.init(initBits.get, configWire)
-    config := configWire
+    configSR.io.init := configWire
   } else {
-    // CGRA flow
-    println(s"initBits undefined, CGRA flow")
-    val configSR = Module(new ShiftRegister(configType))
-    configSR.io.in.bits := io.config.bits
-    configSR.io.in.valid := io.config.valid
-    io.configDone := configSR.io.out.valid
-    config := configSR.io.config
+    configSR.io.init := 0.U
   }
+
+//  if (initBits.isDefined) {
+//    // ASIC flow
+//    println(s"initBits defined, ASIC flow")
+//    val configWire = Wire(configType)
+//    val configInitializer = new ConfigInitializer()
+//    configInitializer.init(initBits.get, configWire)
+//    config := configWire
+//  } else {
+//    // CGRA flow
+//    println(s"initBits undefined, CGRA flow")
+//    val configSR = Module(new ShiftRegister(configType))
+//    configSR.io.in.bits := io.config.bits
+//    configSR.io.in.valid := io.config.valid
+//    io.configDone := configSR.io.out.valid
+//    config := configSR.io.config
+//  }
 
   val pcu = Module(new PCU(p)(0,0))
   pcu.io.vecIn      <> io.vecIn

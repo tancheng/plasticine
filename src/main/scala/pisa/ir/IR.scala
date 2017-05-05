@@ -174,7 +174,7 @@ case class PipeStageBits(
   var opC: SrcValueTuple,
   var opcode: Opcode = XOp,
   var res: List[SrcValueTuple] = Nil,
-  fwd: Array[SrcValueTuple] = Array[SrcValueTuple](),
+  var fwd: Array[SrcValueTuple] = Array[SrcValueTuple](),
   var enableSelect: SrcValueTuple
 )
 extends AbstractBits {

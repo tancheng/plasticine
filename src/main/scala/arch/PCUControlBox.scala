@@ -63,7 +63,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
     udc.io.strideInc := 1.U
     udc.io.strideDec := 1.U
     udc.io.inc := incrementXbar.io.outs(i)
-    udc.io.dec := io.done
+    udc.io.dec := io.done & io.config.siblingAndTree(i)  // To prevent underflow
     val max = ((1 << p.udCtrWidth) - 1).U
     udc.io.max := max
 

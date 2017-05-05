@@ -156,7 +156,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
 
   for (i <- 0 until p.d) {
 //    val fus = List.fill(p.v) { Module(new FU(p.w, fmaStages.contains(i), true)) }
-    val fus = List.fill(p.v) { Module(new FU(p.w, false, false)) } // TODO :Change after Float support
+    val fus = List.fill(p.v) { Module(new FU(p.w, true, true)) } // TODO :Change after Float support
     val stageRegs = List.fill(p.v) { getPipeRegs }
     val stageConfig = io.config.stages(i)
     val stageEnableFF = Module(new FF(2)) // MSB: 'Done/Last iter', LSB: 'Enable'
