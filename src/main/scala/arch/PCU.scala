@@ -240,19 +240,20 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
           // Use regcolor to pick the right thing to forward
           val validFwds = Set[RegColor](CounterReg, ScalarInReg, VecInReg)
           val colors = p.regColors(idx).filter { validFwds.contains(_) }
-          Predef.assert(colors.size == 1, s"ERROR: Invalid number of valid regcolors (should be 1): $colors")
-          val fwd = colors(0) match {
-            case CounterReg =>
-              counterPtr += 1
-              counterChain.io.out(counterPtr)
-            case ScalarInReg =>
-              scalarInPtr += 1
-              scalarIns(scalarInPtr)
-            case VecInReg =>
-              vectorInPtr += 1
-              vectorFIFOs(vectorInPtr).io.deq(lane)
-            case _ => throw new Exception("Unsupported fwd color for first stage!")
-          }
+          val fwd = if (colors.size > 0) { // Issue #23
+            colors(0) match {
+              case CounterReg =>
+                counterPtr += 1
+                counterChain.io.out(counterPtr)
+              case ScalarInReg =>
+                scalarInPtr += 1
+                scalarIns(scalarInPtr)
+              case VecInReg =>
+                vectorInPtr += 1
+                vectorFIFOs(vectorInPtr).io.deq(lane)
+              case _ => throw new Exception("Unsupported fwd color for first stage!")
+            }
+          } else 0.U
           reg.io.in := Mux(stageConfig.result(idx), fu.io.out, fwd)
         }
         reg.io.enable := (if (i == 0) localEnable else stageEnables.last.io.out(0)) & stageConfig.regEnables(idx)
