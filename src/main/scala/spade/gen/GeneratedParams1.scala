@@ -1,0 +1,63 @@
+package plasticine.spade
+import chisel3._
+import chisel3.util._
+import scala.collection.mutable.ListBuffer
+
+trait GeneratedParams1 {
+  self:TopParams =>
+  import plasticineParams._
+  def genParams1:Unit = {
+    cuParams(0)(0) = GeneratedPCUParams(numScalarIn=4, numScalarOut=4, numVectorIn=4, numVectorOut=4, numControlIn=16, numControlOut=8)
+    cuParams(0)(1) = GeneratedPMUParams(numScalarIn=4, numScalarOut=4, numVectorIn=4, numVectorOut=4, numControlIn=16, numControlOut=8)
+    cuParams(1)(0) = GeneratedPMUParams(numScalarIn=4, numScalarOut=4, numVectorIn=4, numVectorOut=4, numControlIn=16, numControlOut=8)
+    cuParams(1)(1) = GeneratedPCUParams(numScalarIn=4, numScalarOut=4, numVectorIn=4, numVectorOut=4, numControlIn=16, numControlOut=8)
+    switchCUParams(0)(0) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    switchCUParams(0)(1) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    switchCUParams(0)(2) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    switchCUParams(1)(0) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    switchCUParams(1)(1) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    switchCUParams(1)(2) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    switchCUParams(2)(0) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    switchCUParams(2)(1) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    switchCUParams(2)(2) = GeneratedSwitchCUParams(numScalarIn=4, numControlIn=6, numControlOut=4)
+    scalarCUParams(0)(0) = GeneratedScalarCUParams(numScalarIn=6, numScalarOut=6, numControlIn=6, numControlOut=4)
+    scalarCUParams(0)(1) = GeneratedScalarCUParams(numScalarIn=6, numScalarOut=6, numControlIn=6, numControlOut=4)
+    scalarCUParams(0)(2) = GeneratedScalarCUParams(numScalarIn=6, numScalarOut=6, numControlIn=6, numControlOut=4)
+    scalarCUParams(1)(0) = GeneratedScalarCUParams(numScalarIn=6, numScalarOut=6, numControlIn=6, numControlOut=4)
+    scalarCUParams(1)(1) = GeneratedScalarCUParams(numScalarIn=6, numScalarOut=6, numControlIn=6, numControlOut=4)
+    scalarCUParams(1)(2) = GeneratedScalarCUParams(numScalarIn=6, numScalarOut=6, numControlIn=6, numControlOut=4)
+    memoryChannelParams(0)(0) = GeneratedMemoryChannelParams(numScalarIn=3, numControlIn=1, numControlOut=3)
+    memoryChannelParams(0)(1) = GeneratedMemoryChannelParams(numScalarIn=3, numControlIn=1, numControlOut=3)
+    memoryChannelParams(0)(2) = GeneratedMemoryChannelParams(numScalarIn=3, numControlIn=1, numControlOut=3)
+    memoryChannelParams(1)(0) = GeneratedMemoryChannelParams(numScalarIn=3, numControlIn=1, numControlOut=3)
+    memoryChannelParams(1)(1) = GeneratedMemoryChannelParams(numScalarIn=3, numControlIn=1, numControlOut=3)
+    memoryChannelParams(1)(2) = GeneratedMemoryChannelParams(numScalarIn=3, numControlIn=1, numControlOut=3)
+    vectorSwitchParams(0)(0) = VectorSwitchParams(numIns=20, numOuts=20, v=16, w=32)
+    scalarSwitchParams(0)(0) = ScalarSwitchParams(numIns=28, numOuts=33, w=32)
+    controlSwitchParams(0)(0) = ControlSwitchParams(numIns=48, numOuts=52)
+    vectorSwitchParams(0)(1) = VectorSwitchParams(numIns=33, numOuts=33, v=16, w=32)
+    scalarSwitchParams(0)(1) = ScalarSwitchParams(numIns=42, numOuts=49, w=32)
+    controlSwitchParams(0)(1) = ControlSwitchParams(numIns=73, numOuts=79)
+    vectorSwitchParams(0)(2) = VectorSwitchParams(numIns=20, numOuts=20, v=16, w=32)
+    scalarSwitchParams(0)(2) = ScalarSwitchParams(numIns=28, numOuts=33, w=32)
+    controlSwitchParams(0)(2) = ControlSwitchParams(numIns=48, numOuts=52)
+    vectorSwitchParams(1)(0) = VectorSwitchParams(numIns=20, numOuts=20, v=16, w=32)
+    scalarSwitchParams(1)(0) = ScalarSwitchParams(numIns=21, numOuts=23, w=32)
+    controlSwitchParams(1)(0) = ControlSwitchParams(numIns=45, numOuts=51)
+    vectorSwitchParams(1)(1) = VectorSwitchParams(numIns=28, numOuts=28, v=16, w=32)
+    scalarSwitchParams(1)(1) = ScalarSwitchParams(numIns=28, numOuts=32, w=32)
+    controlSwitchParams(1)(1) = ControlSwitchParams(numIns=60, numOuts=70)
+    vectorSwitchParams(1)(2) = VectorSwitchParams(numIns=20, numOuts=20, v=16, w=32)
+    scalarSwitchParams(1)(2) = ScalarSwitchParams(numIns=21, numOuts=23, w=32)
+    controlSwitchParams(1)(2) = ControlSwitchParams(numIns=45, numOuts=51)
+    vectorSwitchParams(2)(0) = VectorSwitchParams(numIns=20, numOuts=20, v=16, w=32)
+    scalarSwitchParams(2)(0) = ScalarSwitchParams(numIns=28, numOuts=33, w=32)
+    controlSwitchParams(2)(0) = ControlSwitchParams(numIns=48, numOuts=52)
+    vectorSwitchParams(2)(1) = VectorSwitchParams(numIns=33, numOuts=33, v=16, w=32)
+    scalarSwitchParams(2)(1) = ScalarSwitchParams(numIns=42, numOuts=49, w=32)
+    controlSwitchParams(2)(1) = ControlSwitchParams(numIns=73, numOuts=79)
+    vectorSwitchParams(2)(2) = VectorSwitchParams(numIns=20, numOuts=20, v=16, w=32)
+    scalarSwitchParams(2)(2) = ScalarSwitchParams(numIns=28, numOuts=33, w=32)
+    controlSwitchParams(2)(2) = ControlSwitchParams(numIns=48, numOuts=52)
+  }
+}
