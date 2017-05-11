@@ -1,0 +1,24 @@
+#!/bin/bash
+
+OUT_DIR=hw_out
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 <Module>"
+  exit -1
+fi
+
+MODULE=$1
+#argsArray=( "$@" )
+
+#sbtArgs=${argsArray[@]:0:$#}
+
+# Create new output directory (and nuke the old one)
+OUTDIR=${OUT_DIR}/${MODULE}
+rm -rf ${OUTDIR}
+mkdir -p ${OUTDIR}
+
+# Generate binary
+echo "Generating $MODULE.."
+sbt "; run-main plasticine.${MODULE}Gen --outdir $OUTDIR"
+
+# Copy 'src/main/scala/apps/$MODULE/Driver.cpp' to OUTDIR
+cp -r static/verilog/* $OUTDIR
