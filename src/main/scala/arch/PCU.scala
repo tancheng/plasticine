@@ -30,7 +30,9 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   // the dataSrc muxes are created.
   // i.e., d >= rwStages + 1 + numReduceStages + numStagesAfterReduction
   val numStagesAfterReduction = 0
-  Predef.assert(p.d >= (1 + numReduceStages + numStagesAfterReduction), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages + $numStagesAfterReduction)!""")
+//  Predef.assert(p.d >= (1 + numReduceStages + numStagesAfterReduction), s"""#stages ${p.d} < min. legal stages (1 + $numReduceStages + $numStagesAfterReduction)!""")
+
+  val doReduce = if (p.d < numReduceStages) false else true
 
   def getMux[T<:Data](ins: List[T], sel: UInt): T = {
     val srcMux = Module(new MuxN(ins(0).cloneType, ins.size))
@@ -148,7 +150,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   val stageEnables = ListBuffer[FF]()
 
   // Reduction stages
-  val reduceStages = (0 until p.d).dropRight(2).takeRight(numReduceStages)  // Leave 1 stage to do in-place accumulation, 1 stage to move data to correct register
+  val reduceStages = if (doReduce) (0 until p.d).dropRight(2).takeRight(numReduceStages)  else List() // Leave 1 stage to do in-place accumulation, 1 stage to move data to correct register
 
   val unrolledCounters = List.tabulate(p.v) { lane =>
     Vec(List.tabulate(p.numCounters) { ctr => counterChain.io.out(ctr) + lane.U * ctrStrides(ctr) })
@@ -156,7 +158,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
 
   for (i <- 0 until p.d) {
 //    val fus = List.fill(p.v) { Module(new FU(p.w, fmaStages.contains(i), true)) }
-    val fus = List.fill(p.v) { Module(new FU(p.w, true, true)) } // TODO :Change after Float support
+    val fus = List.fill(p.v) { Module(new FU(p.w, false, false)) } // TODO :Change after Float support
     val stageRegs = List.fill(p.v) { getPipeRegs }
     val stageConfig = io.config.stages(i)
     val stageEnableFF = Module(new FF(2)) // MSB: 'Done/Last iter', LSB: 'Enable'

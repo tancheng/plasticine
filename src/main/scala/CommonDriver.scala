@@ -50,8 +50,7 @@ object PlasticineGen extends CommonDriver {
 object PCUGen extends CommonDriver {
   type DUTType = PCU
   override val moduleName = "PCU"
-  val params = new PCUParams { }
-  def dut = () => new PCU(params)(0,0)
+  def dut = () => new PCU(GeneratedTopParams.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams])(0,0)
 }
 
 object PMUGen extends CommonDriver {
@@ -61,26 +60,33 @@ object PMUGen extends CommonDriver {
   def dut = () => new PMU(params)
 }
 
-object VectorSwitchGen extends CommonDriver {
-  type DUTType = VectorSwitch
-  override val moduleName = "VectorSwitch"
-  val params = VectorSwitchParams(8, 8, 32, 16)
-  def dut = () => new VectorSwitch(params)
+object PCUControlBoxGen extends CommonDriver {
+  type DUTType = PCUControlBoxWrapper
+  override val moduleName = "PCUControlBoxWrapper"
+  def dut = () => new PCUControlBoxWrapper(GeneratedTopParams.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams])
 }
 
-object ScalarSwitchGen extends CommonDriver {
-  type DUTType = ScalarSwitch
-  override val moduleName = "ScalarSwitch"
-  val params = ScalarSwitchParams(8, 8, 32)
-  def dut = () => new ScalarSwitch(params)
-}
 
-object ControlSwitchGen extends CommonDriver {
-  type DUTType = ControlSwitch
-  override val moduleName = "ControlSwitch"
-  val params = ControlSwitchParams(8, 8)
-  def dut = () => new ControlSwitch(params)
-}
+//object VectorSwitchGen extends CommonDriver {
+//  type DUTType = VectorSwitch
+//  override val moduleName = "VectorSwitch"
+//  val params = VectorSwitchParams(8, 8, 32, 16)
+//  def dut = () => new VectorSwitch(params)
+//}
+
+//object ScalarSwitchGen extends CommonDriver {
+//  type DUTType = ScalarSwitch
+//  override val moduleName = "ScalarSwitch"
+//  val params = ScalarSwitchParams(8, 8, 32)
+//  def dut = () => new ScalarSwitch(params)
+//}
+
+//object ControlSwitchGen extends CommonDriver {
+//  type DUTType = ControlSwitch
+//  override val moduleName = "ControlSwitch"
+//  val params = ControlSwitchParams(8, 8)
+//  def dut = () => new ControlSwitch(params)
+//}
 
 object FringeGen extends CommonDriver {
   type DUTType = Fringe
@@ -108,4 +114,25 @@ object FUGen extends CommonDriver {
   type DUTType = FU
   override val moduleName = "FU"
   def dut = () => new FU(32)
+}
+
+object VectorSwitchGen extends CommonDriver {
+  type DUTType = VectorSwitch
+  val p = VectorSwitchParams(16, 16, 32, 16)
+  override val moduleName = "VectorSwitch"
+  def dut = () => new VectorSwitch(p)
+}
+
+object ScalarSwitchGen extends CommonDriver {
+  type DUTType = ScalarSwitch
+  val p = ScalarSwitchParams(36, 36, 32)
+  override val moduleName = "ScalarSwitch"
+  def dut = () => new ScalarSwitch(p)
+}
+
+object ControlSwitchGen extends CommonDriver {
+  type DUTType = ControlSwitch
+  val p = ControlSwitchParams(54, 54)
+  override val moduleName = "ControlSwitch"
+  def dut = () => new ControlSwitch(p)
 }

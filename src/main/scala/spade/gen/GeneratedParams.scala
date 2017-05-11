@@ -46,7 +46,7 @@ case class GeneratedPCUParams(override val numScalarIn:Int, override val numScal
   regColors += List(VecInReg,VecOutReg)
   regColors += List(VecInReg,VecOutReg)
   regColors += List(VecInReg,VecOutReg)
-  override val d = 5
+  override val d = 2
   override val r = regColors.size
 }
 
