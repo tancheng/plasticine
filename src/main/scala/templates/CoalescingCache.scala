@@ -68,7 +68,7 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   val valid = List.tabulate(d) { i =>
     val vld = Module(new FF(1))
     vld.io.init := 0.U // Initialize to invalid (0) state
-    vld.io.in := Mux(readHit(i), 0.U, 1.U // Read + evict
+    vld.io.in := Mux(readHit(i), 0.U, 1.U) // Read + evict
     vld.io.enable := (io.wen & ~full & writeIdx === i.U) | readHit(i) // Read + evict
     vld
   }

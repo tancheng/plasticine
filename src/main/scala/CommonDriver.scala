@@ -2,7 +2,7 @@
 
 package plasticine
 
-import chisel3.core.Module
+import chisel3.Module
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import plasticine.arch._
 import plasticine.spade._
