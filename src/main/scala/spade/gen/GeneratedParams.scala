@@ -28,16 +28,13 @@ object GeneratedTopParams extends TopParams with GeneratedParams {
 case class GeneratedPCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numVectorIn:Int, override val numVectorOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends PCUParams {
   override val w = 32
   override val v = 16
-  override val numCounters = 8
+  override val numCounters = 5
   override val numUDCs = 5
   regColors += List(CounterReg,ReduceReg)
   regColors += List(CounterReg,AccumReg)
   regColors += List(CounterReg)
   regColors += List(CounterReg)
   regColors += List(CounterReg)
-  regColors += List(CounterReg)
-  regColors += List(CounterReg)
-  regColors += List(CounterReg)
   regColors += List(ScalarInReg,ScalarOutReg)
   regColors += List(ScalarInReg,ScalarOutReg)
   regColors += List(ScalarInReg,ScalarOutReg)
@@ -46,7 +43,10 @@ case class GeneratedPCUParams(override val numScalarIn:Int, override val numScal
   regColors += List(VecInReg,VecOutReg)
   regColors += List(VecInReg,VecOutReg)
   regColors += List(VecInReg,VecOutReg)
-  override val d = 9
+  regColors += List()
+  regColors += List()
+  regColors += List()
+  override val d = 7
   override val r = regColors.size
 }
 
@@ -78,7 +78,7 @@ case class GeneratedPMUParams(override val numScalarIn:Int, override val numScal
 case class GeneratedSwitchCUParams(override val numScalarIn:Int, override val numControlIn:Int, override val numControlOut:Int) extends SwitchCUParams {
   override val w = 32
   override val numCounters = 6
-  override val numUDCs = 4
+  override val numUDCs = 15
   override val numScalarOut = 0
 }
 case class GeneratedScalarCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends ScalarCUParams {
@@ -96,9 +96,9 @@ case class GeneratedScalarCUParams(override val numScalarIn:Int, override val nu
   regColors += List(ScalarInReg,ScalarOutReg)
   regColors += List(ScalarInReg,ScalarOutReg)
   regColors += List(ScalarInReg,ScalarOutReg)
+  regColors += List(ScalarInReg,ScalarOutReg)
+  regColors += List(ScalarInReg,ScalarOutReg)
   regColors += List(ScalarOutReg)
-  regColors += List()
-  regColors += List()
   regColors += List()
   regColors += List()
   override val d = 6
