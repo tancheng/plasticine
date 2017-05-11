@@ -16,6 +16,7 @@ target/
 genVerilog/
 test_run_dir/
 psim/
+pcu_sim/
 app_out/
 hw_out/
 *.bin
