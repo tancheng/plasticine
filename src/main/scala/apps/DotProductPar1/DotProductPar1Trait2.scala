@@ -39,7 +39,7 @@ trait DotProductPar1Trait2 extends DotProductPar1Trait1 {
     // Configuring cus(0)(1).asPMUBits <- MemPipe38_x1033_dsp0
     // MemPipe38_x1033_dsp0.udcounters=[]
     // cus(0)(1).asPMUBits.udcs=[]
-    cus(0)(1).asPMUBits.control.writeFifoAndTree = List(0, 0, 0, 0, 1, 0, 0, 0)
+    cus(0)(1).asPMUBits.control.writeFifoAndTree = List(0, 0, 0, 0, 0, 0, 0, 1)
     cus(0)(1).asPMUBits.control.readFifoAndTree = List(0, 0, 0, 0, 0, 0, 0, 0)
     // ib6237[15] -> CtrlBox518.writeDone.in(from:CtrlBox689.done.out at StreamCtrler108_x1053)
     cus(0)(1).asPMUBits.control.readDoneXbar.outSelect(0) = 0
@@ -54,7 +54,7 @@ trait DotProductPar1Trait2 extends DotProductPar1Trait1 {
     // sram113[0] -> SRAM50
     cus(0)(1).asPMUBits.scratchpad.stride = 1
     cus(0)(1).asPMUBits.scratchpad.numBufs = 2
-    cus(0)(1).asPMUBits.wdataSelect = 0
+    cus(0)(1).asPMUBits.wdataSelect = 3
     cus(0)(1).asPMUBits.waddrSelect = SVT(CounterSrc, 1)
     cus(0)(1).asPMUBits.raddrSelect = SVT(CounterSrc, 0)
     // Configuring cus(1)(0).asPMUBits <- MemPipe73_x1034_dsp0

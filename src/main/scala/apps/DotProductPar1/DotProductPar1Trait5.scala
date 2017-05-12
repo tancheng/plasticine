@@ -55,22 +55,22 @@ trait DotProductPar1Trait5 extends DotProductPar1Trait4 {
     scus(1)(0).stages(4).fwd(9) = SVT(PrevStageSrc, 9)
     scus(1)(0).stages(5).fwd(8) = SVT(PrevStageSrc, 8)
     scus(1)(0).stages(5).fwd(9) = SVT(PrevStageSrc, 9)
-    // Configuring mcs(0)(2) <- MemoryController164_x1045
+    // Configuring mcs(0)(0) <- MemoryController164_x1045
     // mctpe=TileLoad
-    // mcs(0)(2).scalarInXbar=[Some(iw4375[0]),None,Some(iw4377[1]),None]
-    mcs(0)(2).scalarInXbar.outSelect(0) = 0
-    mcs(0)(2).scalarInXbar.outSelect(2) = 1
-    // sm15285[0] -> ScalarFIFO174_offset 
-    // sm15299[2] -> ScalarFIFO165_size 
-    // ib6941[0] -> ScalarFIFO165_size.enqueueEnable(from:CtrlBox554.en.out at PipeCU109_x1044_0),ScalarFIFO174_offset.enqueueEnable(from:CtrlBox554.en.out at PipeCU109_x1044_0)
-    mcs(0)(2).tokenInXbar.outSelect(0) = 0
-    mcs(0)(2).tokenInXbar.outSelect(2) = 0
-    // ob6967[0] -> ScalarFIFO165_size.notFull(to:AndTree565_TokenInAndTree.in at PipeCU109_x1044_0)
-    // ob6969[1] -> ScalarFIFO174_offset.notFull(to:AndTree565_TokenInAndTree.in at PipeCU109_x1044_0)
-    // ob6935[2] -> CtrlBox572.done(to:TokBuf849.inc at StreamCtrler108_x1053)
-    mcs(0)(2).tokenOutXbar.outSelect(0) = 2
-    mcs(0)(2).tokenOutXbar.outSelect(1) = 0
-    mcs(0)(2).tokenOutXbar.outSelect(2) = 4
+    // mcs(0)(0).scalarInXbar=[Some(iw4359[0]),None,Some(iw4361[1]),None]
+    mcs(0)(0).scalarInXbar.outSelect(0) = 0
+    mcs(0)(0).scalarInXbar.outSelect(2) = 1
+    // sm15215[0] -> ScalarFIFO174_offset 
+    // sm15229[2] -> ScalarFIFO165_size 
+    // ib6909[0] -> ScalarFIFO165_size.enqueueEnable(from:CtrlBox554.en.out at PipeCU109_x1044_0),ScalarFIFO174_offset.enqueueEnable(from:CtrlBox554.en.out at PipeCU109_x1044_0)
+    mcs(0)(0).tokenInXbar.outSelect(0) = 0
+    mcs(0)(0).tokenInXbar.outSelect(2) = 0
+    // ob6951[0] -> ScalarFIFO174_offset.notFull(to:AndTree565_TokenInAndTree.in at PipeCU109_x1044_0)
+    // ob6953[1] -> ScalarFIFO165_size.notFull(to:AndTree565_TokenInAndTree.in at PipeCU109_x1044_0)
+    // ob6903[2] -> CtrlBox572.done(to:TokBuf849.inc at StreamCtrler108_x1053)
+    mcs(0)(0).tokenOutXbar.outSelect(0) = 0
+    mcs(0)(0).tokenOutXbar.outSelect(1) = 2
+    mcs(0)(0).tokenOutXbar.outSelect(2) = 4
     // Configuring mcs(1)(0) <- MemoryController258_x1064
     // mctpe=TileLoad
     // mcs(1)(0).scalarInXbar=[Some(iw4383[1]),None,Some(iw4385[2]),None]

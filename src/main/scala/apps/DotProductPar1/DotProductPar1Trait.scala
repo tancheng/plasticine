@@ -46,7 +46,7 @@ trait DotProductPar1Trait extends DotProductPar1Trait1 with DotProductPar1Trait2
     scalarCU=scus,
     memoryChannel=mcs,
     argOutMuxSelect=List(1,-1,-1),
-    doneSelect=4
+    doneSelect=0
   )  
   // ow2933[0] -> ScalOut465(ArgIn12_x1056)
   // ow2935[1] -> ScalOut467(ArgIn13_x1037)
