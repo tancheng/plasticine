@@ -1,0 +1,14 @@
+
+1. Update README with instructions to build hardware, build app, run app
+2. Fix shift network
+3. Regression tests: single PCU
+   - Configuration
+   - Smoke test: Simple pipelines
+   - Reduction network
+   - Shift network
+4. Helpful stuff to write Plasma by hand?
+   - Try writing a few single PCU programs by hand
+   - Possible to have some pre-generated objects in PISADesign based on
+     parameters?
+   - Simplify datapath spec?
+   - Simplify control spec?
