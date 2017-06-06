@@ -11,7 +11,7 @@ argsArray=( "$@" )
 
 sbtArgs=${argsArray[@]:0:$#}
 
-# Generate binary
+# Generate binary (currently also regenerates hardware with initial values for config registers)
 echo "Running $sbtArgs.."
 sbt "; run-main plasticine.apps.$sbtArgs"
 
