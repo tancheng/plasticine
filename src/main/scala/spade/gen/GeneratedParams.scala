@@ -46,7 +46,7 @@ case class GeneratedPCUParams(override val numScalarIn:Int, override val numScal
   regColors += List()
   regColors += List()
   regColors += List()
-  override val d = 7
+  override val d = 8
   override val r = regColors.size
 }
 
@@ -111,7 +111,7 @@ case class GeneratedMemoryChannelParams(override val numScalarIn:Int, override v
 trait GeneratedParams extends GeneratedParams1 {
   self:TopParams =>
   import plasticineParams._
-  def genParams:Unit = {
+  def genParams:Unit =  {
     genParams1
   }
 }
