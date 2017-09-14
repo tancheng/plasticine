@@ -13,7 +13,7 @@ import plasticine.pisa.enums._
 import plasticine.templates.Utils.log2Up
 
 class PMU(val p: PMUParams) extends CU {
-  val io = IO(CUIO(p, PMUConfig(p)))
+  val io = IO(CUIO(p, () => PMUConfig(p)))
 
   val scalarInRegs = p.getRegIDs(ScalarInReg)
   val scalarOutRegs = p.getRegIDs(ScalarOutReg)

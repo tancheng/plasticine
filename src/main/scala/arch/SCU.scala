@@ -16,7 +16,7 @@ import plasticine.templates.Utils.log2Up
 import plasticine.misc.Utils._
 
 class ScalarCU(val p: ScalarCUParams) extends CU {
-  val io = IO(CUIO(p, ScalarCUConfig(p)))
+  val io = IO(CUIO(p, () => ScalarCUConfig(p)))
 
   // Sanity check parameters for validity
 

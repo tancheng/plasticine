@@ -8,7 +8,7 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 import plasticine.spade._
 
-case class CUIO[+T<:Bundle](p:CUParams, cuConfig: T) extends Bundle {
+case class CUIO[+T<:Bundle](p:CUParams, cuConfig: () => T) extends Bundle {
     // Vector IO
   val vecIn = Vec(p.numVectorIn, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
   val vecOut = Vec(p.numVectorOut, Decoupled(Vec(p.v, UInt(p.w.W))))
@@ -21,7 +21,7 @@ case class CUIO[+T<:Bundle](p:CUParams, cuConfig: T) extends Bundle {
   val controlIn = Input(Vec(p.numControlIn, Bool()))
   val controlOut = Output(Vec(p.numControlOut, Bool()))
 
-  val config = Input(cuConfig)
+  val config = Input(cuConfig())
 }
 
 trait CU extends Module {

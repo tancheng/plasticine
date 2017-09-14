@@ -14,10 +14,34 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.templates.Utils.log2Up
 
+case class DummyCUIO[+T<:Bundle](p:CUParams, cuConfig: () => T) extends Bundle {
+    // Vector IO
+  val vecIn = Vec(p.numVectorIn, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
+  val vecOut = Vec(p.numVectorOut, Decoupled(Vec(p.v, UInt(p.w.W))))
+
+  // Scalar IO
+  val scalarIn = Vec(p.numScalarIn, Flipped(Decoupled(UInt(p.w.W))))
+  val scalarOut = Vec(p.numScalarOut, Decoupled(UInt(p.w.W)))
+
+  // Control IO
+  val controlIn = Input(Vec(p.numControlIn, Bool()))
+  val controlOut = Output(Vec(p.numControlOut, Bool()))
+
+  val config = Input(cuConfig())
+}
+
+class DummyPCU(val p: PCUParams)(row: Int, col: Int) extends Module {
+  val io = IO(DummyCUIO(p, () => DummyPCUConfig(p)))
+//  val io = IO(new Bundle{
+//    val config = Input(DummyPCUConfig(p))
+//  })
+}
+
 class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
+  println(s"PCUParams: $p")
   override def desiredName = this.getClass.getName.split('.').last + s"_${row}_${col}"
 
-  val io = IO(CUIO(p, PCUConfig(p)))
+  val io = IO(CUIO(p, () => PCUConfig(p)))
 
   val numReduceStages = log2Up(p.v)
 
@@ -50,6 +74,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   scalarInXbar.io.config := io.config.scalarInXbar
   scalarInXbar.io.ins := Vec(io.scalarIn.map { _.bits })
 
+  Predef.assert(numEffectiveScalarIns > 0, s"numEffectiveScalarIns == $numEffectiveScalarIns (must be >0)!")
 
   // Scalar input FIFOs
   val scalarFIFOs = List.tabulate(numEffectiveScalarIns) { i =>
