@@ -94,17 +94,16 @@ trait PISADesign extends ConfigFileInterface {
 		val configTop = getConfigTop(top)
 
     // Debugging only
-    val plTop = top.asInstanceOf[PlasticineBits]
-    plTop.cu(0)(0).stages.zipWithIndex.foreach {case (stage, idx) =>
-      println(s"[PISA] Stage $idx : ")
-      println(s" fwd: ${stage.fwd.toList}")
-      println(s" res: ${stage.res}")
-      println(s" result: ${stage.result}")
-      println(s" regEnables: ${stage.regEnables}")
-   }
-
+//    val plTop = top.asInstanceOf[PlasticineBits]
+//    plTop.cu(0)(0).stages.zipWithIndex.foreach {case (stage, idx) =>
+//      println(s"[PISA] Stage $idx : ")
+//      println(s" fwd: ${stage.fwd.toList}")
+//      println(s" res: ${stage.res}")
+//      println(s" result: ${stage.result}")
+//      println(s" regEnables: ${stage.regEnables}")
+//   }
     // Generate arch with given top params as initBits
-    chisel3.Driver.execute(Array[String]("--target-dir", "psim"), () => new Top(GeneratedTopParams, Some(top)))
+//    chisel3.Driver.execute(Array[String]("--target-dir", "psim"), () => new Top(GeneratedTopParams, Some(top)))
 
 		// Generate binary
     val binaryGen = new BinaryCodegen()
@@ -116,17 +115,17 @@ trait PISADesign extends ConfigFileInterface {
     toFile(fileName, binData)
 
     // Read from file
-//    val readBinData = unpack(fromFile(fileName))
+    val readBinData = unpack(fromFile(fileName))
 //
 //
-//    println(s"binData[size = ${binData.size}] = $binData")
-//    println(s"readBinData[size = ${readBinData.size}] = $readBinData")
+    println(s"binData[size = ${binData.size}] = $binData")
+    println(s"readBinData[size = ${readBinData.size}] = $readBinData")
 //
 //    // Check: Print both
-//    binData.zipWithIndex.foreach { case (bit, i) =>
-//      if (bit != readBinData(i)) {
-//        println(s"ERROR at pos $i: Expected $bit, found ${readBinData(i)}")
-//      }
-//    }
+    binData.zipWithIndex.foreach { case (bit, i) =>
+      if (bit != readBinData(i)) {
+        println(s"ERROR at pos $i: Expected $bit, found ${readBinData(i)}")
+      }
+    }
 	}
 }
