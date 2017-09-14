@@ -43,6 +43,11 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
 
   val io = IO(CUIO(p, () => PCUConfig(p)))
 
+  val configSR = Module(new ShiftRegister(PCUConfig(p)))
+  configSR.io.in <> io.configIn
+  io.configOut <> configSR.io.out
+  val localConfig = configSR.io.config
+
   val numReduceStages = log2Up(p.v)
 
   // Which stages contain the fused multiply-add (FMA) unit?
@@ -71,7 +76,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   // Scalar in Xbar
   val numEffectiveScalarIns = p.getNumRegs(ScalarInReg)
   val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, numEffectiveScalarIns, p.w)))
-  scalarInXbar.io.config := io.config.scalarInXbar
+  scalarInXbar.io.config := localConfig.scalarInXbar
   scalarInXbar.io.ins := Vec(io.scalarIn.map { _.bits })
 
   Predef.assert(numEffectiveScalarIns > 0, s"numEffectiveScalarIns == $numEffectiveScalarIns (must be >0)!")
@@ -89,7 +94,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   }
 
 //  val scalarIns = scalarInXbar.io.outs
-  val scalarIns = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, scalarInXbar.io.outs(i), fifo.io.deq(0)) }
+  val scalarIns = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(localConfig.fifoNbufConfig(i) === 1.U, scalarInXbar.io.outs(i), fifo.io.deq(0)) }
 
   // Vector input FIFOs
   val vectorFIFOs = List.tabulate(p.numVectorIn) { i =>
@@ -106,7 +111,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
 
   // Counter chain
   val counterChain = Module(new CounterChainCore(p.w, p.numCounters))
-  counterChain.io.config := io.config.counterChain
+  counterChain.io.config := localConfig.counterChain
 
   // Connect max and stride
   val ctrMaxStrideSources = scalarIns
@@ -116,20 +121,20 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
     // max
     val maxMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
     maxMux.io.ins := ctrMaxStrideSources
-    maxMux.io.sel := io.config.counterChain.counters(i).max.value
+    maxMux.io.sel := localConfig.counterChain.counters(i).max.value
     counterChain.io.max(i) := maxMux.io.out
 
     // stride
     val strideMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
     strideMux.io.ins := ctrMaxStrideSources
-    strideMux.io.sel := io.config.counterChain.counters(i).stride.value
+    strideMux.io.sel := localConfig.counterChain.counters(i).stride.value
     counterChain.io.stride(i) := strideMux.io.out
-    ctrStrides(i) := Mux(io.config.counterChain.counters(i).stride.is(ConstSrc), io.config.counterChain.counters(i).stride.value,  strideMux.io.out)
+    ctrStrides(i) := Mux(localConfig.counterChain.counters(i).stride.is(ConstSrc), localConfig.counterChain.counters(i).stride.value,  strideMux.io.out)
   }
 
   // Control Block
   val cbox = Module(new PCUControlBox(p))
-  cbox.io.config := io.config.control
+  cbox.io.config := localConfig.control
   cbox.io.controlIn := io.controlIn
   io.controlOut := cbox.io.controlOut
 
@@ -152,7 +157,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   localEnable := cbox.io.enable
 
   val localDone = Wire(Bool())
-  localDone := getMux(counterChain.io.done.getElements.toList, io.config.control.doneXbar.outSelect(0) - 1.U)
+  localDone := getMux(counterChain.io.done.getElements.toList, localConfig.control.doneXbar.outSelect(0) - 1.U)
   cbox.io.done := localDone
 
 //  val donePulser = Module(new Pulser())
@@ -183,7 +188,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
 //    val fus = List.fill(p.v) { Module(new FU(p.w, fmaStages.contains(i), true)) }
     val fus = List.fill(p.v) { Module(new FU(p.w, false, false)) } // TODO :Change after Float support
     val stageRegs = List.fill(p.v) { getPipeRegs }
-    val stageConfig = io.config.stages(i)
+    val stageConfig = localConfig.stages(i)
     val stageEnableFF = Module(new FF(2)) // MSB: 'Done/Last iter', LSB: 'Enable'
     stageEnableFF.io.init := 0.U
     stageEnableFF.io.enable := 1.U
@@ -342,7 +347,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   }
 
   val scalarOutXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w)))
-  scalarOutXbar.io.config := io.config.scalarOutXbar
+  scalarOutXbar.io.config := localConfig.scalarOutXbar
   val scalarOutIns = scalarOutRegs.map { r => pipeRegs.last(0)(r).io.out }
   scalarOutXbar.io.ins := scalarOutIns
 //  scalarOutXbar.io.ins.zipWithIndex.foreach { case (in, i) =>
@@ -352,13 +357,13 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
   io.scalarOut.zip(scalarOutXbar.io.outs).foreach { case (out, xbarOut) =>
     out.bits := xbarOut
     out.valid := stageEnables.last.io.out(0)
-//    out.valid := getValids(io.config.scalarValidOut(i))
+//    out.valid := getValids(localConfig.scalarValidOut(i))
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := Vec(pipeRegs.last.map { _(vectorOutRegs(i)).io.out })
     out.valid := stageEnables.last.io.out(0)
-//    out.valid := getValids(io.config.vectorValidOut(i))
+//    out.valid := getValids(localConfig.vectorValidOut(i))
   }
 }
 

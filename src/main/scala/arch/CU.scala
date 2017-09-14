@@ -22,6 +22,8 @@ case class CUIO[+T<:Bundle](p:CUParams, cuConfig: () => T) extends Bundle {
   val controlOut = Output(Vec(p.numControlOut, Bool()))
 
   val config = Input(cuConfig())
+  val configIn = Flipped(Decoupled(UInt(1.W)))
+  val configOut = Decoupled(UInt(1.W))
 }
 
 trait CU extends Module {
