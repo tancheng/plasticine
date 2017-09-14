@@ -1,5 +1,28 @@
-# plasticine
-Implementation of the Plasticine architecture
+# Plasticine Architecture and the Plasma assembler
+
+# Getting Started
+
+### Build
+Entry points (that invoke Chisel) for various modules in the design are all in src/main/scala/CommonDriver.scala. The specific entry point for the entire Plasticine architecture is called 'TopGen'. The Makefile uses this starting point to generate the RTL for the entire Plasticine architecture and Fringe, also compiles the generated RTL and testbench using VCS. The RTL and other compiled files are generated into a folder called 'psim'.
+
+``sh
+$ make # Builds entire architecture
+```
+
+Generating other components individually is often quite valuable for testing, characterization etc. A helper script at 'bin/gen' can be used to generate individual modules. Output products are generated into a hw_out/<dir> directory. VCS is not invoked on this, as there is no testbench for each individual module separately. Example:
+``sh
+$ bin/gen PCU  # Generates RTL for PCU
+```
+
+### Run (Plasma)
+The 'bin/pisa' script (TODO: Change to Plasma) executes the entry point for Plasma. Plasma is roughly organized like old DHDL. Applications exist in src/main/scala/apps/<dir> in several traits. The 'head' trait extends a common trait (PISADesign in src/main/scala/pisa/Frontend.scala) that defines the main method. Currently, PISADesign also regenerates the Top module (using the TopGen entry point, by assigning initial values to the configuration registers). This will be removed to use the shift register in the near future. Host driver code for app (Driver.cpp) is expected to be in the <app> folder, and will be copied over to the 'app_out/<gen>' folder. VCS is not invoked, but Makefile is provided (should be invoked manually in the folder)
+``sh
+$ bin/pisa <app>  # Generates Plasticine RTL with init values for registers defined according to <app>.
+cd app_out/<app>
+make              # Invokes VCS
+```
+
+Simulation is carried out in a manner similar to VCS simulation of Spatial-generated apps; the host process (Driver.cpp) communicates with the hardware (accel.bit.bin, in psim folder) using the FringeContext API. The Fringe API uses UNIX pipes under the hood to communicate between processes.
 
 # PDB: Plasticine Debugger
 
