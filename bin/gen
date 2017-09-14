@@ -18,7 +18,7 @@ mkdir -p ${OUTDIR}
 
 # Generate binary
 echo "Generating $MODULE.."
-sbt "; run-main plasticine.${MODULE}Gen --outdir $OUTDIR"
+sbt "; run-main plasticine.${MODULE}Gen --testArgs --outdir $OUTDIR"
 
 # Copy 'src/main/scala/apps/$MODULE/Driver.cpp' to OUTDIR
 cp -r static/verilog/* $OUTDIR

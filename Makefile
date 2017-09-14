@@ -11,6 +11,6 @@ build:
 vcs-clean:
 	make -C ${OUT_DIR} clean
 
-distclean: clean
-	sbt clean
+distclean: vcs-clean
+	rm -rf target
 	rm -rf ${OUT_DIR}

@@ -47,10 +47,17 @@ object PlasticineGen extends CommonDriver {
   def dut = () => new Plasticine(GeneratedTopParams.plasticineParams, GeneratedTopParams.fringeParams)
 }
 
+object DummyPCUGen extends CommonDriver {
+  type DUTType = DummyPCU
+  override val moduleName = "DummyPCU"
+  val params = new PCUParams { }
+  def dut = () => new DummyPCU(params)(0,0)
+}
+
 object PCUGen extends CommonDriver {
   type DUTType = PCU
   override val moduleName = "PCU"
-  val params = new PCUParams { }
+  val params = GeneratedTopParams.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]
   def dut = () => new PCU(params)(0,0)
 }
 

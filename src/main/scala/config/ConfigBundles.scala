@@ -125,6 +125,26 @@ class PipeStageConfig(
   }
 }
 
+case class DummyPCUConfig(p: PCUParams) extends AbstractConfig {
+  val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
+  val operandSources = List(XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc, ReduceTreeSrc)
+
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w, p.numCounters, enableSources, 1, operandSources))
+  val counterChain = CounterChainConfig(p.w, p.numCounters)
+  val validOutSources = List[SelectSource](XSrc, EnableSrc, DoneSrc)
+  val scalarValidOut = Vec(p.numScalarOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
+  val vectorValidOut = Vec(p.numVectorOut, SrcValueBundle(validOutSources, log2Up(p.numCounters)))
+  val control = PCUControlBoxConfig(p)
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg), p.numScalarOut, p.w))
+  val fifoNbufConfig = Vec(p.getNumRegs(ScalarInReg), UInt(log2Up(p.scalarFIFODepth).W))
+  val accumInit = UInt(p.w.W)
+
+  override def cloneType(): this.type = {
+    new DummyPCUConfig(p).asInstanceOf[this.type]
+  }
+}
+
 case class PCUConfig(p: PCUParams) extends AbstractConfig {
   val enableSources = List[SelectSource](XSrc, PrevStageSrc, ConstSrc)
   val operandSources = List(XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, VectorFIFOSrc, PrevStageSrc, CurrStageSrc, ReduceTreeSrc)
