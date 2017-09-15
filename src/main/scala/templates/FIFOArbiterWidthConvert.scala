@@ -1,9 +1,9 @@
-package plasticine.templates
+package templates
 
 import util.HVec
 import chisel3._
 import chisel3.util._
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 import scala.language.reflectiveCalls
 
 class FIFOArbiterWidthConvert(
@@ -14,8 +14,8 @@ class FIFOArbiterWidthConvert(
   val d: Int
 ) extends Module {
 
-  val tagWidth = log2Up(numStreams)
   val numStreams = win.size
+  val tagWidth = log2Up(numStreams)
 
   val io = IO(new Bundle {
     val enq = Input(HVec.tabulate(numStreams) { i =>  Vec(vin(i), Bits(win(i).W))})
@@ -26,6 +26,7 @@ class FIFOArbiterWidthConvert(
     val empty = Output(Bool())
     val forceTag = Flipped(Decoupled(UInt(tagWidth.W)))
     val tag = Output(UInt(tagWidth.W))
+    val fifoSize = Output(UInt(32.W))
   })
 
   val tagFF = Module(new FF(tagWidth))
@@ -62,8 +63,13 @@ class FIFOArbiterWidthConvert(
     outMux.io.ins := Vec(fifos.map {e => e.io.deq})
     outMux.io.sel := tag
 
+    val sizeMux = Module(new MuxN(UInt(32.W), numStreams))
+    sizeMux.io.ins := Vec(fifos.map {e => e.io.fifoSize})
+    sizeMux.io.sel := tag
+
     io.tag := tag
     io.deq := outMux.io.out
+    io.fifoSize := sizeMux.io.out
     val empties = Array.tabulate(numStreams) { i => (i.U -> fifos(i).io.empty) }
     io.empty := MuxLookup(tag, false.B, empties)
     //fifos.map {e => e.io.empty}.reduce{_&_}  // emptyMux.io.out

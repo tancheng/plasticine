@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 
 import plasticine.ArchConfig
-import plasticine.templates._
+import templates._
 import plasticine.pisa.codegen.ConfigInitializer
 import plasticine.pisa.ir._
 import plasticine.spade._

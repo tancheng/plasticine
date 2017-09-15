@@ -4,7 +4,7 @@ import java.io.File
 
 import scala.collection.immutable.Map
 import plasticine.pisa.parser._
-import plasticine.templates.Opcodes
+import templates.Opcodes
 import scala.collection.mutable.HashMap
 import scala.util.Random
 
@@ -95,8 +95,13 @@ trait FringeParams extends Params {
   val dataWidth: Int = 32
   val numArgIns: Int = 16
   val numArgOuts: Int = 8
+  val numArgIOs: Int  = 0
+  val numChannels: Int = 1
+  val numArgInstrs: Int = 0
   val loadStreamInfo = List[StreamParInfo]()
   val storeStreamInfo = List[StreamParInfo]()
+  val streamInsInfo = List[StreamParInfo]()
+  val streamOutsInfo = List[StreamParInfo]()
 }
 
 trait TopParams {

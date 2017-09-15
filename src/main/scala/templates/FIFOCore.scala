@@ -1,8 +1,9 @@
-package plasticine.templates
+package templates
 
+import scala.language.reflectiveCalls
 import chisel3._
 import chisel3.util.{log2Ceil, isPow2}
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 
 import plasticine.pisa.enums._
 import plasticine.config.{FIFOConfig, CounterChainConfig}
@@ -19,6 +20,7 @@ abstract class FIFOBase(val w: Int, val d: Int, val v: Int) extends Module {
     val almostFull = Output(Bool())
     val almostEmpty = Output(Bool())
     val config = Input(new FIFOConfig(d, v))
+    val fifoSize = Output(UInt(32.W))
   })
 
   val addrWidth = log2Up(d/v)
@@ -32,6 +34,7 @@ abstract class FIFOBase(val w: Int, val d: Int, val v: Int) extends Module {
   // Create size register
   val sizeUDC = Module(new UpDownCtr(log2Up(d+1)))
   val size = sizeUDC.io.out
+  io.fifoSize := size
   val remainingSlots = d.U - size
   val nextRemainingSlots = d.U - sizeUDC.io.nextInc
 
@@ -70,7 +73,7 @@ class FIFOCounter(override val d: Int, override val v: Int) extends FIFOBase(1, 
 
 class FIFOCore(override val w: Int, override val d: Int, override val v: Int) extends FIFOBase(w, d, v) {
   // Create wptr (tail) counter chain
-  val wptrConfig = Wire(new CounterChainConfig(log2Up(bankSize+1), 2, 0, 0))
+  val wptrConfig = Wire(new CounterChainConfig(log2Up(scala.math.max(bankSize,v)+1), 2, 0, 0))
   wptrConfig.chain(0) := io.config.chainWrite
   (0 until 2) foreach { i => i match {
       case 1 => // Localaddr: max = bankSize, stride = 1
@@ -88,7 +91,7 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
         cfg.stride.src := cfg.stride.srcIdx(ConstSrc).U
         cfg.par := 1.U
   }}
-  val wptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
+  val wptr = Module(new CounterChainCore(log2Up(scala.math.max(bankSize,v)+1), 2, 0, 0))
   wptr.io.enable(0) := writeEn & io.config.chainWrite
   wptr.io.enable(1) := writeEn
   wptr.io.config := wptrConfig
@@ -97,7 +100,7 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
 
 
   // Create rptr (head) counter chain
-  val rptrConfig = Wire(new CounterChainConfig(log2Up(bankSize+1), 2, 0, 0))
+  val rptrConfig = Wire(new CounterChainConfig(log2Up(scala.math.max(bankSize,v)+1), 2, 0, 0))
   rptrConfig.chain(0) := io.config.chainRead
   (0 until 2) foreach { i => i match {
       case 1 => // Localaddr: max = bankSize, stride = 1
@@ -115,7 +118,7 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
         cfg.stride.value := 1.U
         cfg.par := 1.U
     }}
-  val rptr = Module(new CounterChainCore(log2Up(bankSize+1), 2, 0, 0))
+  val rptr = Module(new CounterChainCore(log2Up(scala.math.max(bankSize,v)+1), 2, 0, 0))
   rptr.io.enable(0) := readEn & io.config.chainRead
   rptr.io.enable(1) := readEn
   rptr.io.config := rptrConfig
@@ -125,7 +128,7 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
   val nextHeadBankAddr = rptr.io.next(0)
 
   // Backing SRAM
-  val mems = List.fill(v) { Module(new SRAM(w, bankSize)) }
+  val mems = if (w == 1) List.fill(v) { Module(new FFRAM(1, bankSize)) } else List.fill(v) { Module(new SRAM(w, bankSize)) }
   mems.zipWithIndex.foreach { case (m, i) =>
     // Read address
     m.io.raddr := Mux(readEn, nextHeadLocalAddr, headLocalAddr)
@@ -150,7 +153,7 @@ class FIFOCore(override val w: Int, override val d: Int, override val v: Int) ex
     val rdata = i match {
       case 0 =>
         val rdata0Mux = Module(new MuxN(UInt(w.W), v))
-        val addrFF = Module(new FF(log2Up(v)))
+        val addrFF = Module(new FF(log2Ceil(v)))
         addrFF.io.in := Mux(readEn, nextHeadBankAddr, headBankAddr)
         addrFF.io.enable := true.B
 

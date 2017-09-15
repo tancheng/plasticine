@@ -4,8 +4,8 @@ import plasticine.pisa.ir._
 import plasticine.config._
 import plasticine.pisa.enums._
 import plasticine.pisa.Traversal
-import plasticine.templates.Opcodes
-import plasticine.templates.Utils.log2Up
+import templates.Opcodes
+import templates.Utils.log2Up
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable.Set

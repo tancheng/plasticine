@@ -39,6 +39,7 @@ package hardfloat
 
 import Chisel._
 import consts._
+import scala.language.reflectiveCalls
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
@@ -98,7 +99,7 @@ class MulAddRecFNToRaw_preMul(expWidth: Int, sigWidth: Int) extends Module
     val signProd = rawA.sign ^ rawB.sign ^ io.op(1)
 //*** REVIEW THE BIAS FOR 'sExpAlignedProd':
     val sExpAlignedProd =
-        rawA.sExp +& rawB.sExp + SInt(-(1<<expWidth) + sigWidth + 3)
+        rawA.sExp +& rawB.sExp + SInt(-(BigInt(1)<<expWidth) + sigWidth + 3)
 
     val doSubMags = signProd ^ rawC.sign ^ io.op(0)
 

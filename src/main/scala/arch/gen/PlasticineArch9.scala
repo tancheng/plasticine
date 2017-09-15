@@ -1,7 +1,7 @@
 package plasticine.arch
 import chisel3._
 import chisel3.util._
-import plasticine.templates.MuxN
+import templates.MuxN
 import scala.language.reflectiveCalls
 import scala.collection.mutable.ListBuffer
 

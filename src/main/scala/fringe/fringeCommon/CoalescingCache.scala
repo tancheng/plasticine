@@ -1,11 +1,10 @@
-package plasticine.templates
+package fringe
 
 import chisel3._
 import chisel3.util._
-
-import plasticine.templates.Utils.log2Up
-import plasticine.pisa.parser.Parser
-import plasticine.pisa.ir._
+import scala.language.reflectiveCalls
+import templates._
+import templates.Utils.log2Up
 
 /**
  * CoalescingCache memory that supports various banking modes
@@ -79,6 +78,7 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   // Create tag array, populate readHit table
   val tags = List.tabulate(d) { i =>
     val ff = Module(new FF(taglen))
+    ff.io.init := 0.U
     ff.io.in := wburstAddr
     ff.io.enable := (io.wen & writeIdx === i.U)
     readHit(i) := io.readEn & valid(i).io.out & (rburstAddr === ff.io.out)
@@ -97,7 +97,8 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   io.miss := miss
   io.full := full
 
-  // Metadata SRAM
+  // Metadata SRAM: Stores an index corresponding to each word in the incoming burst
+  // This index is used to reorder the required words as required by the address pattern
   // Word size: 16 bytes (1 byte per burst)
   val metadata = Module(new SRAMByteEnable(metadataWidth, burstSizeWords, d))
   metadata.io.raddr := readIdx
@@ -105,11 +106,11 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   metadata.io.waddr := writeIdx
   metadata.io.wen := io.wen & ~full
   // If this is a write miss, wipe out entire line to avoid stale entries
-  metadata.io.mask := Vec.tabulate(burstSizeWords) { i => miss | UIntToOH(io.position)(i) }
+  metadata.io.mask := Vec(List.tabulate(burstSizeWords) { i => miss | UIntToOH(io.position)(i) })
   val woffset = Wire(UInt(log2Up(burstSizeWords).W))
   woffset := extractWordOffset(io.waddr)
   val wvalid = 1.U
-  val md = Vec.fill(burstSizeWords){ UInt(0, metadataWidth.W) }
+  val md = Vec.fill(burstSizeWords){ 0.U(metadataWidth.W) }
   val windex = io.position
   md(windex) := Cat(wvalid, woffset)
   metadata.io.wdata := md
@@ -120,8 +121,8 @@ class CoalescingCache(val w: Int, val d: Int, val v: Int) extends Module {
   io.rdata := scatterData.io.rdata
   scatterData.io.waddr := writeIdx
   scatterData.io.wen := io.wen & ~full & io.isScatter
-  scatterData.io.mask := Vec.tabulate(burstSizeWords) { i => UIntToOH(io.position)(i) }
-  val sd = Vec.fill(burstSizeWords){ 0.U }
+  scatterData.io.mask := Vec(List.tabulate(burstSizeWords) { i => UIntToOH(io.position)(i) })
+  val sd = Vec(List.fill(burstSizeWords){ 0.U })
   sd(windex) := io.wdata
   scatterData.io.wdata := sd
 }

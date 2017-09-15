@@ -6,8 +6,8 @@ import chisel3.util._
 
 import plasticine.spade._
 import plasticine.pisa.enums._
-import plasticine.templates.Opcodes
-import plasticine.templates.Utils.log2Up
+import templates.Opcodes
+import templates.Utils.log2Up
 
 abstract class AbstractConfig extends Bundle
 
@@ -414,4 +414,11 @@ case class PlasticineConfig(
   }
 }
 
+// TODO: Get rid of this
+case class MAGConfig() extends AbstractConfig {
+  val scatterGather = Bool()
 
+  override def cloneType(): this.type = {
+    new MAGConfig().asInstanceOf[this.type]
+  }
+}

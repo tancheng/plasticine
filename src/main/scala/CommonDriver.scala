@@ -6,7 +6,7 @@ import chisel3.Module
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import plasticine.arch._
 import plasticine.spade._
-import plasticine.templates._
+import templates._
 import fringe._
 
 trait CommonDriver {
@@ -89,20 +89,20 @@ object ControlSwitchGen extends CommonDriver {
   def dut = () => new ControlSwitch(params)
 }
 
-object FringeGen extends CommonDriver {
-  type DUTType = Fringe
-  override val moduleName = "Fringe"
-  val params = new FringeParams { }
-  def dut = () => new Fringe(
-    params.dataWidth,
-    params.numArgIns,
-    params.numArgOuts,
-    params.loadStreamInfo,
-    params.storeStreamInfo,
-    List[StreamParInfo](),
-    List[StreamParInfo](),
-    false)
-}
+//object FringeGen extends CommonDriver {
+//  type DUTType = Fringe
+//  override val moduleName = "Fringe"
+//  val params = new FringeParams { }
+//  def dut = () => new Fringe(
+//    params.dataWidth,
+//    params.numArgIns,
+//    params.numArgOuts,
+//    params.loadStreamInfo,
+//    params.storeStreamInfo,
+//    List[StreamParInfo](),
+//    List[StreamParInfo](),
+//    false)
+//}
 
 object TopGen extends CommonDriver {
   type DUTType = Top

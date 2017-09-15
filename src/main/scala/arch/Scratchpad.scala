@@ -1,4 +1,4 @@
-package plasticine.templates
+package templates
 
 import chisel3._
 import chisel3.util._
@@ -8,7 +8,7 @@ import plasticine.config._
 import plasticine.spade._
 import scala.collection.mutable.ListBuffer
 //import plasticine.config.ScratchpadConfig
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 import scala.language.reflectiveCalls
 import scala.language.implicitConversions
 

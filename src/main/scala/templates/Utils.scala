@@ -1,5 +1,5 @@
 // See LICENSE.txt for license details.
-package plasticine.templates
+package templates
 
 import chisel3._
 import chisel3.util.{log2Ceil, isPow2}
@@ -12,6 +12,8 @@ object Utils {
       case n: scala.math.BigInt => 1 max log2Ceil(1.asInstanceOf[scala.math.BigInt] max n)
     }
   }
+
+  def getFloatBits(num: Float) = java.lang.Float.floatToRawIntBits(num)
 
   def delay[T <: chisel3.core.Data](sig: T, length: Int):T = {
     if (length == 0) {

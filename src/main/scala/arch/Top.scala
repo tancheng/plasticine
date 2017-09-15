@@ -4,10 +4,20 @@ import chisel3._
 import chisel3.util._
 import fringe._
 
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 import plasticine.spade._
 import plasticine.pisa.ir._
 import scala.language.reflectiveCalls
+
+// import AccelTop
+abstract class TopInterface extends Bundle {
+  // Host scalar interface
+  var raddr = Input(UInt(1.W))
+  var wen  = Input(Bool())
+  var waddr = Input(UInt(1.W))
+  var wdata = Input(Bits(1.W))
+  var rdata = Output(Bits(1.W))
+}
 
 class VerilatorInterface(p: TopParams) extends Bundle {
   // Host scalar interface
@@ -18,7 +28,7 @@ class VerilatorInterface(p: TopParams) extends Bundle {
   val rdata = Output(Bits(p.fringeParams.dataWidth.W))
 
   // DRAM interface - currently only one stream
-  val dram = new DRAMStream(32, 16)
+  val dram = Vec(p.fringeParams.numChannels, new DRAMStream(32, 16))
 
   // Configuration interface
   val config = Flipped(Decoupled(Bool()))
@@ -49,13 +59,16 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
   private val streamParams = List.fill(numMemoryChannels) { streamPar }
 
   p.target match {
-    case "verilator" | "vcs" =>
+    case "vcs" =>
       // Simulation Fringe
       val blockingDRAMIssue = false
       val fringe = Module(new Fringe(
         p.fringeParams.dataWidth,
         p.fringeParams.numArgIns,
         p.fringeParams.numArgOuts,
+        p.fringeParams.numArgIOs,
+        p.fringeParams.numChannels,
+        p.fringeParams.numArgInstrs,
         streamParams,
         streamParams,
         List[StreamParInfo](),  // streamIns
@@ -77,7 +90,7 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
       plasticine.io.argIns.zip(fringe.io.argIns) foreach { case (pArgIn, fArgIn) => pArgIn.bits := fArgIn }
       fringe.io.argOuts.zip(plasticine.io.argOuts) foreach { case (fringeArgOut, accelArgOut) =>
           fringeArgOut.bits := accelArgOut.bits
-          fringeArgOut.valid := 1.U
+          fringeArgOut.valid := accelArgOut.valid
       }
       fringe.io.memStreams <> plasticine.io.memStreams
       plasticine.io.enable := fringe.io.enable

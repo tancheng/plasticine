@@ -1,4 +1,4 @@
-package plasticine.templates
+package templates
 import chisel3._
 import plasticine.spade._
 import plasticine.config._

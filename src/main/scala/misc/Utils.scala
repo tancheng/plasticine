@@ -1,6 +1,8 @@
 package plasticine.misc
+
+import scala.language.reflectiveCalls
 import chisel3._
-import plasticine.templates._
+import templates._
 
 object Utils {
   def log2(x: Int) = (math.log(x) / math.log(2)).toInt

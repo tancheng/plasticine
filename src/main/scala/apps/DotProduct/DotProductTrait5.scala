@@ -8,7 +8,7 @@ import chisel3.util._
 import scala.collection.mutable.ListBuffer
 import GeneratedTopParams.plasticineParams._
 import GeneratedTopParams._
-import plasticine.templates._
+import templates._
 import plasticine.pisa.enums._
 
 trait DotProductTrait5 extends DotProductTrait4  {

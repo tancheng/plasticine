@@ -1,4 +1,4 @@
-//package plasticine.templates
+//package templates
 //
 //import Chisel._
 //import plasticine.Globals

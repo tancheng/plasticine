@@ -1,11 +1,11 @@
-package plasticine.templates
+package templates
 
 import chisel3._
 import chisel3.util._
 
 import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 
 import plasticine.spade._
 import plasticine.config.CrossbarConfig

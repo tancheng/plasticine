@@ -3,8 +3,7 @@ package fringe
 import util._
 import chisel3._
 import chisel3.util._
-import plasticine.templates.SRFF
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 
 /**
  * DRAM Memory Access Generator
@@ -19,28 +18,29 @@ case class MAGOpcode() extends Bundle {
   }
 }
 
-class Command(w: Int) extends Bundle {
-  val addr = UInt(w.W)
+class Command(val addrWidth: Int, val sizeWidth: Int) extends Bundle {
+  val addr = UInt(addrWidth.W)
   val isWr = Bool()
-  val size = UInt(w.W)
+  val isSparse = Bool()
+  val size = UInt(sizeWidth.W)
 
   override def cloneType(): this.type = {
-    new Command(w).asInstanceOf[this.type]
+    new Command(addrWidth, sizeWidth).asInstanceOf[this.type]
   }
 }
 
 // Parallelization and word width information
 case class StreamParInfo(w: Int, v: Int)
 
-class MemoryStream(addrWidth: Int) extends Bundle {
-  val cmd = Flipped(Decoupled(new Command(addrWidth)))
+class MemoryStream(addrWidth: Int, sizeWidth: Int) extends Bundle {
+  val cmd = Flipped(Decoupled(new Command(addrWidth, sizeWidth)))
 
   override def cloneType(): this.type = {
-    new MemoryStream(addrWidth).asInstanceOf[this.type]
+    new MemoryStream(addrWidth, sizeWidth).asInstanceOf[this.type]
   }
 }
 
-class LoadStream(p: StreamParInfo) extends MemoryStream(addrWidth = 64) {
+class LoadStream(p: StreamParInfo) extends MemoryStream(addrWidth = 64, sizeWidth = 16) {
   val rdata = Decoupled(Vec(p.v, UInt(p.w.W)))
 
   override def cloneType(): this.type = {
@@ -48,7 +48,7 @@ class LoadStream(p: StreamParInfo) extends MemoryStream(addrWidth = 64) {
   }
 }
 
-class StoreStream(p: StreamParInfo) extends MemoryStream(addrWidth = 64) {
+class StoreStream(p: StreamParInfo) extends MemoryStream(addrWidth = 64, sizeWidth = 16) {
   val wdata = Flipped(Decoupled(Vec(p.v, UInt(p.w.W))))
   val wresp = Decoupled(Bool())
 
@@ -69,11 +69,15 @@ class AppStreams(loadPar: List[StreamParInfo], storePar: List[StreamParInfo]) ex
 }
 
 class DRAMCommand(w: Int, v: Int) extends Bundle {
-  val addr = UInt(32.W)
+  val addr = UInt(64.W)
+  val size = UInt(32.W)
+  val rawAddr = UInt(64.W)
   val isWr = Bool() // 1
+  val isSparse = Bool()
   val tag = UInt(w.W)
   val streamId = UInt(w.W)
-  val wdata = Vec(v, UInt(w.W)) // v
+  val dramReadySeen = Bool()
+//  val wdata = Vec(v, UInt(w.W)) // v
 
   override def cloneType(): this.type = {
     new DRAMCommand(w, v).asInstanceOf[this.type]
@@ -81,20 +85,41 @@ class DRAMCommand(w: Int, v: Int) extends Bundle {
 
 }
 
-class DRAMResponse(w: Int, v: Int) extends Bundle {
+class DRAMWdata(w: Int, v: Int) extends Bundle {
+  val wdata = Vec(v, UInt(w.W))
+  val wlast = Bool()
+  val streamId = UInt(w.W)
+
+  override def cloneType(): this.type = {
+    new DRAMWdata(w, v).asInstanceOf[this.type]
+  }
+
+}
+
+class DRAMReadResponse(w: Int, v: Int) extends Bundle {
   val rdata = Vec(v, UInt(w.W)) // v
   val tag = UInt(w.W)
   val streamId = UInt(w.W)
 
   override def cloneType(): this.type = {
-    new DRAMResponse(w, v).asInstanceOf[this.type]
+    new DRAMReadResponse(w, v).asInstanceOf[this.type]
   }
+}
 
+class DRAMWriteResponse(w: Int, v: Int) extends Bundle {
+  val tag = UInt(w.W)
+  val streamId = UInt(w.W)
+
+  override def cloneType(): this.type = {
+    new DRAMWriteResponse(w, v).asInstanceOf[this.type]
+  }
 }
 
 class DRAMStream(w: Int, v: Int) extends Bundle {
   val cmd = Decoupled(new DRAMCommand(w, v))
-  val resp = Flipped(Decoupled(new DRAMResponse(w, v)))
+  val wdata = Decoupled(new DRAMWdata(w, v))
+  val rresp = Flipped(Decoupled(new DRAMReadResponse(w, v)))
+  val wresp = Flipped(Decoupled(new DRAMWriteResponse(w, v)))
 
   override def cloneType(): this.type = {
     new DRAMStream(w, v).asInstanceOf[this.type]
@@ -125,6 +150,56 @@ object StreamOut {
 
 object StreamIn {
   def apply(p: StreamParInfo) = Flipped(Decoupled(new StreamIO(p)))
+}
+
+class DebugSignals extends Bundle {
+  val num_enable = Output(UInt(32.W))
+  val num_cmd_valid = Output(UInt(32.W))
+  val num_cmd_valid_enable = Output(UInt(32.W))
+  val num_cmd_ready = Output(UInt(32.W))
+  val num_cmd_ready_enable = Output(UInt(32.W))
+  val num_resp_valid = Output(UInt(32.W))
+  val num_resp_valid_enable = Output(UInt(32.W))
+  val num_rdata_enq = Output(UInt(32.W))
+  val num_rdata_deq = Output(UInt(32.W))
+  val num_app_rdata_ready = Output(UInt(32.W))
+
+  // rdata enq
+  val rdata_enq0_0 = Output(UInt(32.W))
+  val rdata_enq0_1 = Output(UInt(32.W))
+  val rdata_enq0_15 = Output(UInt(32.W))
+
+  val rdata_enq1_0 = Output(UInt(32.W))
+  val rdata_enq1_1 = Output(UInt(32.W))
+  val rdata_enq1_15 = Output(UInt(32.W))
+
+  // rdata deq
+  val rdata_deq0_0 = Output(UInt(32.W))
+  val rdata_deq0_1 = Output(UInt(32.W))
+  val rdata_deq0_15 = Output(UInt(32.W))
+
+  val rdata_deq1_0 = Output(UInt(32.W))
+  val rdata_deq1_1 = Output(UInt(32.W))
+  val rdata_deq1_15 = Output(UInt(32.W))
+
+  // wdata enq
+  val wdata_enq0_0 = Output(UInt(32.W))
+  val wdata_enq0_1 = Output(UInt(32.W))
+  val wdata_enq0_15 = Output(UInt(32.W))
+
+  val wdata_enq1_0 = Output(UInt(32.W))
+  val wdata_enq1_1 = Output(UInt(32.W))
+  val wdata_enq1_15 = Output(UInt(32.W))
+
+  // wdata deq
+  val wdata_deq0_0 = Output(UInt(32.W))
+  val wdata_deq0_1 = Output(UInt(32.W))
+  val wdata_deq0_15 = Output(UInt(32.W))
+
+  val wdata_deq1_0 = Output(UInt(32.W))
+  val wdata_deq1_1 = Output(UInt(32.W))
+  val wdata_deq1_15 = Output(UInt(32.W))
+
 }
 
 //class StreamOutAccel(p: StreamParInfo) extends Bundle {

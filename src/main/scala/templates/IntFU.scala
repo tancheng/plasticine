@@ -1,9 +1,9 @@
-package plasticine.templates
+package templates
 
 import chisel3._
 import chisel3.util._
 
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 
 import scala.collection.immutable.Map
 import plasticine.pisa.enums._

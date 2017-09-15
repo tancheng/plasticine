@@ -1,5 +1,6 @@
-package plasticine.templates
+package templates
 import chisel3._
+import scala.language.reflectiveCalls
 import plasticine.spade._
 import plasticine.config._
 import plasticine.pisa.enums._

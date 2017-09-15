@@ -1,8 +1,8 @@
-package plasticine.templates
+package templates
 
 import plasticine.pisa.parser.Parser
 import plasticine.misc.Utils
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 
 import chisel3._
 

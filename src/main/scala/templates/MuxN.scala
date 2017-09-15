@@ -1,9 +1,9 @@
-package plasticine.templates
+package templates
 
+import scala.language.reflectiveCalls
 import chisel3._
 import chisel3.util._
-import plasticine.templates.Utils.log2Up
-import scala.language.reflectiveCalls
+import templates.Utils.log2Up
 
 //class MuxN(val numInputs: Int, w: Int) extends Module {
 //  val numSelectBits = log2Up(numInputs)

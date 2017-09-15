@@ -1,7 +1,7 @@
-package plasticine.templates
+package templates
 
-import chisel3._
 import scala.language.reflectiveCalls
+import chisel3._
 
 /**
  * Pulser: Converts a rising edge to a 1-cycle pulse

@@ -1,7 +1,7 @@
-package plasticine.templates
+package templates
 
-import chisel3._
 import scala.language.reflectiveCalls
+import chisel3._
 
 /**
  * Depulser: 1-cycle pulse to a steady high signal

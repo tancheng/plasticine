@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <vector>
 #include <queue>
+#include <set>
 #include <map>
 #include <poll.h>
 #include <fcntl.h>
@@ -49,8 +50,10 @@ int sendResp(simCmd *cmd) {
   return cmd->id;
 }
 
-uint64_t numCycles = 0;
+// Set containing allocated pages
+set<uint64_t> allocatedPages;
 queue<simCmd*> pendingOps;
+uint64_t numCycles = 0;
 
 extern "C" {
   // Callback function from SV when there is valid data
@@ -71,7 +74,7 @@ extern "C" {
   int tick() {
     bool exitTick = false;
     int finishSim = 0;
-    numCycles++;
+    getCycles((long long int*)(&numCycles));
 
     // Handle pending operations, if any
     if (pendingOps.size() > 0) {
@@ -124,8 +127,9 @@ extern "C" {
           resp.cmd = cmd->cmd;
           *(uint64_t*)resp.data = (uint64_t)ptr;
           resp.size = sizeof(size_t);
-          EPRINTF("[SIM] MALLOC(%lu), returning %p\n", size, (void*)ptr);
+          EPRINTF("[SIM] MALLOC(%lu), returning %p - %p\n", size, (void*)ptr, (void*)((uint8_t*)ptr + size));
           respChannel->send(&resp);
+
           break;
         }
         case FREE: {
@@ -170,12 +174,23 @@ extern "C" {
           start();
           exitTick = true;
           break;
-        case STEP:
+        case STEP: {
           exitTick = true;
           if (!useIdealDRAM) {
             mem->update();
           }
           break;
+        }
+        case GET_CYCLES: {
+          exitTick = true;
+          simCmd resp;
+          resp.id = cmd->id;
+          resp.cmd = cmd->cmd;
+          *(uint64_t*)resp.data = numCycles;
+          resp.size = sizeof(size_t);
+          respChannel->send(&resp);
+          break;
+        }
         case READ_REG: {
             reg = *((uint32_t*)cmd->data);
 
@@ -204,6 +219,14 @@ extern "C" {
             mem->printStats(true);
           }
           finishSim = 1;
+
+          simCmd resp;
+          resp.id = cmd->id;
+          resp.cmd = cmd->cmd;
+          resp.size = 0;
+          EPRINTF("[SIM] FIN received, terminating\n");
+          respChannel->send(&resp);
+
           exitTick = true;
           break;
         default:
@@ -214,11 +237,13 @@ extern "C" {
   }
 
   void printAllEnv() {
+    EPRINTF("[SIM]  *** All environment variables visible *** \n");
     int tmp = 0;
     while (environ[tmp]) {
       EPRINTF("[SIM] environ[%d] = %s\n", tmp, environ[tmp]);
       tmp++;
     }
+    EPRINTF("[SIM]  ***************************************** \n");
   }
 
   // Called before simulation begins
@@ -227,7 +252,7 @@ extern "C" {
     prctl(PR_SET_PDEATHSIG, SIGHUP);
 
     /**
-     * Slave interface to host {
+     * Open slave interface to host {
      */
       // 0. Create Channel structures
       cmdChannel = new Channel(SIM_CMD_FD, -1, sizeof(simCmd));
@@ -240,8 +265,41 @@ extern "C" {
       sendResp(cmd);
     /**} End Slave interface to Host */
 
-    initDRAM();
+    /**
+     * Set VPD / VCD based on environment variables
+     */
+    char *vpd = getenv("VPD_ON");
+    if (vpd != NULL) {
+      if (vpd[0] != 0 && atoi(vpd) > 0) {
+        startVPD();
+        EPRINTF("[SIM] VPD Waveforms ENABLED\n");
+      } else {
+        EPRINTF("[SIM] VPD Waveforms DISABLED\n");
+      }
+    } else {
+      EPRINTF("[SIM] VPD Waveforms DISABLED\n");
+    }
 
+    char *vcd = getenv("VCD_ON");
+    if (vcd != NULL) {
+      if (vcd[0] != 0 && atoi(vcd) > 0) {
+        startVCD();
+        EPRINTF("[SIM] VCD Waveforms ENABLED\n");
+      } else {
+        EPRINTF("[SIM] VCD Waveforms DISABLED\n");
+      }
+    } else {
+      EPRINTF("[SIM] VCD Waveforms DISABLED\n");
+    }
+
+
+
+    /**
+     * Initialize peripheral simulators
+     */
+    initDRAM();
     initStreams();
+
+
   }
 }

@@ -1,9 +1,10 @@
-package plasticine.templates
+package templates
 
+import scala.language.reflectiveCalls
 import chisel3._
 import chisel3.util._
-import plasticine.templates.Utils.log2Up
-import scala.language.reflectiveCalls
+import fringe.FringeGlobals
+import templates.Utils.log2Up
 
 /**
  * Regfile: Regfile parameterized by width and height similar to SRAM
@@ -12,11 +13,23 @@ import scala.language.reflectiveCalls
  * @param numArgIns: Number of 'argin' registers that can be read in parallel
  * @param numArgOuts: Number of 'argOut' registers that can be written to in parallel
  */
-class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: Int = 0) extends Module {
-  val addrWidth = log2Up(d)
-  val argInRange = List(0, 1) ++ ((2) until (2 + numArgIns - 2)).toList
-  val argOutRange = List(1) ++ ((numArgIns) until (numArgIns + numArgOuts - 1)).toList
+class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: Int = 0, val numArgIOs: Int = 0) extends Module {
+  val addrWidth = if (FringeGlobals.target == "zynq") 32 else log2Up(d)
+  val pureArgIns = numArgIns-numArgIOs
+  val pureArgOuts = numArgOuts-numArgIOs
+  val argInRange = List(0, 1) ++ (2 until numArgIns).toList
+  val argOutRange = List(1) ++ (2 until (2+numArgIOs)).toList ++ ((numArgIns) until (numArgIns + pureArgOuts - 1)).toList
+  // Console.println("argin: " + argInRange + ", argout: " + argOutRange)
 
+  /*
+      _____________________________
+     |  |  |  |  |  |  |  |  |  |  |
+     ```````````````````````````````
+       ^ ^   ^ ^   ^ ^   ^ ^   ^ ^
+  StatusRegs  |   ArgIOs  |  ArgInstrs
+          ArgIns       ArgOuts
+                   
+  */
   // Helper function to convert an argOut index into
   // register index. Used in the unit test
   def argOut2RegIdx(argOut: Int) = {
@@ -46,8 +59,17 @@ class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: In
 
   val regs = List.tabulate(d) { i =>
     val ff = Module(new FF(w))
-    ff.io.in := (if (argOutRange contains i) Mux(io.argOuts(regIdx2ArgOut(i)).valid, io.argOuts(regIdx2ArgOut(i)).bits, io.wdata) else io.wdata)
-    ff.io.enable := (if (argOutRange contains i) io.argOuts(argOutRange.indexOf(i)).valid | (io.wen & (io.waddr === i.U)) else io.wen & (io.waddr === i.U))
+    if ((argOutRange contains i) & (argInRange contains i)) {
+      ff.io.enable := Mux(io.wen & (io.waddr === i.U), io.wen & (io.waddr === i.U), io.argOuts(argOutRange.indexOf(i)).valid)
+      ff.io.in := Mux(io.wen & (io.waddr === i.U), io.wdata, io.argOuts(regIdx2ArgOut(i)).bits)
+    } else if (argOutRange contains i) {
+      ff.io.enable := io.argOuts(argOutRange.indexOf(i)).valid | (io.wen & (io.waddr === i.U))
+      ff.io.in := Mux(io.argOuts(regIdx2ArgOut(i)).valid, io.argOuts(regIdx2ArgOut(i)).bits, io.wdata)
+    } else {
+      ff.io.enable := io.wen & (io.waddr === i.U)
+      ff.io.in := io.wdata
+    }
+
     ff.io.init := 0.U
     ff
   }
@@ -59,4 +81,30 @@ class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: In
   io.rdata := rport.io.out
 
   io.argIns := Vec(regOuts.zipWithIndex.filter { case (arg, idx) => argInRange.contains(idx) }.map {_._1})
+}
+
+class RegFilePure(val w: Int, val d: Int) extends Module {
+  val addrWidth = log2Up(d)
+
+  val io = IO(new Bundle {
+    val raddr = Input(UInt(addrWidth.W))
+    val wen  = Input(Bool())
+    val waddr = Input(UInt(addrWidth.W))
+    val wdata = Input(Bits(w.W))
+    val rdata = Output(Bits(w.W))
+  })
+
+  val regs = List.tabulate(d) { i =>
+    val ff = Module(new FF(w))
+    ff.io.in := io.wdata
+    ff.io.enable := io.wen & (io.waddr === i.U)
+    ff.io.init := 0.U
+    ff
+  }
+
+  val rport = Module(new MuxN(UInt(w.W), d))
+  val regOuts = Vec(regs.map{_.io.out})
+  rport.io.ins := regOuts
+  rport.io.sel := io.raddr
+  io.rdata := rport.io.out
 }

@@ -1,4 +1,4 @@
-package plasticine.templates
+package templates
 
 import chisel3._
 
@@ -71,4 +71,3 @@ class SRFF(val strongReset: Boolean = false) extends Module {
 
   }
 }
-

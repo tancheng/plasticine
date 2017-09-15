@@ -2,11 +2,11 @@ package plasticine.arch
 
 import chisel3._
 import chisel3.util._
-import plasticine.templates.Opcodes
+import templates.Opcodes
 import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
-import plasticine.templates.CrossbarCore
+import templates.CrossbarCore
 import plasticine.config.{CrossbarConfig}
 import plasticine.spade._
 import scala.language.reflectiveCalls

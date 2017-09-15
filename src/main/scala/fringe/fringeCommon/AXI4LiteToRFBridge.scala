@@ -1,9 +1,9 @@
 package fringe
 
+import scala.language.reflectiveCalls
 import chisel3._
 import chisel3.util._
 import axi4._
-import scala.language.reflectiveCalls
 
 class AXI4LiteToRFBridgeVerilog(val addrWidth: Int, val dataWidth: Int) extends BlackBox {
   val idBits = 1 // AXI-Lite does not have ID field

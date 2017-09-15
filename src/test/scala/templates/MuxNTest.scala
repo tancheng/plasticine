@@ -1,6 +1,6 @@
 // See LICENSE for license details.
 
-package plasticine.templates
+package templates
 
 import chisel3.core._
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}

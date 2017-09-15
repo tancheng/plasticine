@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 package hardfloat
-
+import scala.language.reflectiveCalls
 import Chisel._
 import scala.math._
 import consts._

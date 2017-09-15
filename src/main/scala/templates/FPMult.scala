@@ -1,7 +1,7 @@
-//package plasticine.templates
+//package templates
 //
 //import Chisel._
-//import plasticine.templates.hardfloat._
+//import templates.hardfloat._
 //
 ///**
 // * FPMult: Wrapper around Chisel's floating point multiplier.

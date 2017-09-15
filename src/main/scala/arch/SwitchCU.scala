@@ -2,7 +2,7 @@ package plasticine.arch
 
 import chisel3._
 import chisel3.util._
-import plasticine.templates.Opcodes
+import templates.Opcodes
 import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
@@ -10,7 +10,7 @@ import scala.language.reflectiveCalls
 
 import plasticine.spade._
 import plasticine.config._
-import plasticine.templates._
+import templates._
 
 /**
  * Switch Compute Unit

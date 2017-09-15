@@ -1,15 +1,15 @@
-package plasticine.templates
+package templates
 
+import scala.language.reflectiveCalls
 import chisel3._
 
 //import plasticine.pisa.parser.Parser
 import plasticine.pisa.ir._
 import plasticine.pisa.enums._
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 import plasticine.config.{CounterConfig, SrcValueBundle}
 import scala.collection.mutable.HashMap
 import scala.collection.immutable.Set
-import scala.language.reflectiveCalls
 
 /**
  * CounterCore: Counter with optional start and end delays

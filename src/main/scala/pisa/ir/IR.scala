@@ -5,12 +5,12 @@ import java.io.File
 import scala.collection.immutable.Map
 import plasticine.ArchConfig
 import plasticine.pisa.parser._
-import plasticine.templates.Opcodes
+import templates.Opcodes
 import scala.collection.mutable.HashMap
 import scala.util.Random
 import scala.reflect.runtime.universe._
 import plasticine.arch._
-import plasticine.templates._
+import templates._
 import plasticine.spade._
 import plasticine.pisa.enums._
 import plasticine.pisa.enums._

@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 package hardfloat
-
+import scala.language.reflectiveCalls
 import Chisel._
 
 class ValExec_fNFromRecFN(expWidth: Int, sigWidth: Int) extends Module

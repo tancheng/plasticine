@@ -1,4 +1,4 @@
-//package plasticine.templates
+//package templates
 //
 //import plasticine.pisa.ir._
 //import Chisel._

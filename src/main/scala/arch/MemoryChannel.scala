@@ -2,17 +2,17 @@ package plasticine.arch
 
 import chisel3._
 import chisel3.util.Decoupled
-import plasticine.templates.Opcodes
+import templates.Opcodes
 import plasticine.ArchConfig
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 import scala.language.reflectiveCalls
 
-import plasticine.templates._
+import templates._
 import plasticine.spade._
 import plasticine.config._
 import plasticine.pisa.enums._
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 import plasticine.misc.Utils._
 import fringe._
 

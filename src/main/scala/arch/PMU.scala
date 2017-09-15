@@ -2,7 +2,7 @@ package plasticine.arch
 
 import chisel3._
 import chisel3.util._
-import plasticine.templates._
+import templates._
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 import scala.language.reflectiveCalls
@@ -10,7 +10,7 @@ import scala.language.reflectiveCalls
 import plasticine.spade._
 import plasticine.config._
 import plasticine.pisa.enums._
-import plasticine.templates.Utils.log2Up
+import templates.Utils.log2Up
 
 class PMU(val p: PMUParams) extends CU {
   val io = IO(CUIO(p, () => PMUConfig(p)))

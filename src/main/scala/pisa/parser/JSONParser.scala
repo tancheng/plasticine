@@ -8,8 +8,8 @@ import scala.collection.mutable.HashMap
 import scala.util.Random
 import plasticine.ArchConfig
 import plasticine.pisa.ir._
-import plasticine.templates.Opcodes
-//import plasticine.templates.{DirectionOps, InterconnectHelper, CtrlInterconnectHelper}
+import templates.Opcodes
+//import templates.{DirectionOps, InterconnectHelper, CtrlInterconnectHelper}
 import chisel3._
 
 object Parser {

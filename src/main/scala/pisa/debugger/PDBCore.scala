@@ -4,7 +4,7 @@
 //
 //import plasticine.pisa.parser.Parser
 //import plasticine.pisa.ir._
-//import plasticine.templates._
+//import templates._
 //import plasticine.ArchConfig
 //import scala.collection.mutable.Set
 //import scala.collection.mutable.HashMap
