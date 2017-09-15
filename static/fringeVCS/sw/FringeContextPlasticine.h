@@ -1,5 +1,5 @@
-#ifndef __FRINGE_CONTEXT_VCS_H__
-#define __FRINGE_CONTEXT_VCS_H__
+#ifndef __FRINGE_CONTEXT_PLASTICINE_H__
+#define __FRINGE_CONTEXT_PLASTICINE_H__
 
 #include <spawn.h>
 #include <poll.h>
@@ -17,6 +17,7 @@
 #include "FringeContextBase.h"
 #include "simDefs.h"
 #include "channel.h"
+#include "generated_debugRegs.h"
 
 //Source: http://stackoverflow.com/questions/13893085/posix-spawnp-and-piping-child-output-to-a-string
 class FringeContextPlasticine : public FringeContextBase<void> {
@@ -26,17 +27,73 @@ class FringeContextPlasticine : public FringeContextBase<void> {
   std::string simPath = std::string(getenv("PLASTICINE_HOME")) + "/psim/psim.bin";
   Channel *cmdChannel;
   Channel *respChannel;
+  int initialCycles = -1;
   uint64_t numCycles = 0;
-  uint32_t numArgIns = 3;
-  uint32_t numArgOuts = 3;
+  uint32_t numArgIns = 0;
+  uint32_t numArgInsId = 0;
+  uint32_t numArgOuts = 0;
+  uint32_t numArgIOs = 0;
+  uint32_t numArgIOsId = 0;
+
+  posix_spawn_file_actions_t action;
+  int globalID = 1;
 
   const uint32_t burstSizeBytes = 64;
   const uint32_t commandReg = 0;
   const uint32_t statusReg = 1;
-  const uint64_t maxCycles = 5000;
+  uint64_t maxCycles = 10000000000;
+  uint64_t stepCount = 0;
 
-  posix_spawn_file_actions_t action;
-  int globalID = 1;
+  // Debug flags
+  bool debugRegs = false;
+
+  // Set of environment variables that should be set and visible to the simulator process
+  // Each variable must be explicitly mentioned here
+  // Each specified variable must be set (will trigger an assert otherwise)
+  std::vector<std::string> envVariablesToSim = {
+    "LD_LIBRARY_PATH",
+    "DRAMSIM_HOME",
+    "USE_IDEAL_DRAM",
+    "DRAM_DEBUG",
+    "DRAM_NUM_OUTSTANDING_BURSTS",
+    "VPD_ON",
+    "VCD_ON"
+  };
+
+  char* checkAndGetEnvVar(std::string var) {
+    const char *cvar = var.c_str();
+    char *value = getenv(cvar);
+    ASSERT(value != NULL, "%s is NULL\n", cvar);
+    return value;
+  }
+
+  bool envToBool(std::string var) {
+    const char *cvar = var.c_str();
+    char *value = getenv(cvar);
+    if (value != NULL) {
+      if (value[0] != 0 && atoi(value) > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  long envToLong(std::string var) {
+    const char *cvar = var.c_str();
+    char *value = getenv(cvar);
+    if (value != NULL) {
+      if (value[0] != 0) {
+        return atol(value);
+      } else {
+        return -1;
+      }
+    } else {
+      return -1;
+    }
+  }
 
   int sendCmd(SIM_CMD cmd) {
     simCmd simCmd;
@@ -59,6 +116,9 @@ class FringeContextPlasticine : public FringeContextBase<void> {
       case READY:
         simCmd.size = 0;
         break;
+      case GET_CYCLES:
+        simCmd.size = 0;
+        break;
       default:
         EPRINTF("Command %d not supported!\n", cmd);
         exit(-1);
@@ -75,14 +135,33 @@ class FringeContextPlasticine : public FringeContextBase<void> {
 public:
   void step() {
     sendCmd(STEP);
-    numCycles++;
-    if ((numCycles % 10000) == 0) {
-      EPRINTF("\t%lu cycles elapsed\n", numCycles);
+    numCycles = getCycles();
+    stepCount++;
+
+    int printInterval = 10000;
+    static int nextPrint = printInterval;
+
+    if ((numCycles >= nextPrint)) {
+      EPRINTF("\t%lu cycles elapsed\n", nextPrint);
+      nextPrint += printInterval;
     }
   }
 
+  uint64_t getCycles() {
+    int id = sendCmd(GET_CYCLES);
+    simCmd *resp = recvResp();
+    ASSERT(id == resp->id, "GET_CYCLES resp->id does not match cmd.id!");
+    ASSERT(GET_CYCLES == resp->cmd, "GET_CYCLES resp->cmd does not match cmd.cmd!");
+    uint64_t cycles = *(uint64_t*)resp->data;
+    if (initialCycles == -1) initialCycles = (int) cycles;
+    return (cycles - initialCycles);
+  }
+
   void finish() {
-    sendCmd(FIN);
+    int id = sendCmd(FIN);
+    simCmd *resp = recvResp();
+    ASSERT(id == resp->id, "FIN resp->id does not match cmd.id!");
+    ASSERT(FIN == resp->cmd, "FIN resp->cmd does not match cmd.cmd!");
   }
 
   void reset() {
@@ -198,19 +277,17 @@ public:
     char *args[] = {&argsmem[0][0],nullptr};
 
     // Pass required environment variables to simulator
-    // LD_LIBRARY_PATH
-    // DRAMSIM_HOME
-    // ..(others)..
-    char *ldPath = getenv("LD_LIBRARY_PATH");
-    char *dramPath = getenv("DRAMSIM_HOME");
-    ASSERT(ldPath != NULL, "ldPath is NULL");
-    ASSERT(dramPath != NULL, "dramPath is NULL");
-
-    std::string ldLib = "LD_LIBRARY_PATH=" + std::string(getenv("LD_LIBRARY_PATH"));
-    std::string dramSimHome = "DRAMSIM_HOME=" + std::string(getenv("DRAMSIM_HOME"));
-    std::string idealDram = "USE_IDEAL_DRAM=" + std::string(getenv("USE_IDEAL_DRAM"));
-    std::string envstrings[] = {ldLib, dramSimHome, idealDram};
-    char *envs[] = {&envstrings[0][0], &envstrings[1][0], &envstrings[2][0], nullptr};
+    // Required environment variables must be specified in "envVariablesToSim"
+    char **envs = new char*[envVariablesToSim.size() + 1];
+    std::string *valueStrs = new std::string[envVariablesToSim.size()];
+    int i = 0;
+    for (std::vector<std::string>::iterator it = envVariablesToSim.begin(); it != envVariablesToSim.end(); it++) {
+      std::string var = *it;
+      valueStrs[i] = var + "=" + string(checkAndGetEnvVar(var));
+      envs[i] = &valueStrs[i][0];
+      i++;
+    }
+    envs[envVariablesToSim.size()] = nullptr;
 
     if(posix_spawnp(&sim_pid, args[0], &action, NULL, &args[0], &envs[0]) != 0) {
       EPRINTF("posix_spawnp failed, error = %s\n", strerror(errno));
@@ -223,6 +300,11 @@ public:
 
     // Connect with simulator
     connect();
+
+    // Configure settings from environment
+    debugRegs = envToBool("DEBUG_REGS");
+    long envCycles = atol("MAX_CYCLES");
+    if (envCycles > 0) maxCycles = envCycles;
   }
 
   virtual void load() {
@@ -275,7 +357,7 @@ public:
     // Implement 4-way handshake
     writeReg(statusReg, 0);
     writeReg(commandReg, 1);
-    numCycles = 0;  // restart cycle count (incremented with each step())
+
     while((status == 0) && (numCycles <= maxCycles)) {
       step();
       status = readReg(statusReg);
@@ -286,23 +368,67 @@ public:
       EPRINTF("ERROR: Simulation terminated after %lu cycles\n", numCycles);
       EPRINTF("=========================================\n");
     } else {  // Ran to completion, pull down command signal
+      if (status & 0x2) { // Hardware timeout
+        EPRINTF("=========================================\n");
+        EPRINTF("Hardware timeout after %lu cycles\n", numCycles);
+        EPRINTF("=========================================\n");
+      }
       writeReg(commandReg, 0);
-      while (status == 1) {
+      while (status != 0) {
         step();
         status = readReg(statusReg);
       }
     }
   }
 
-  virtual void setArg(uint32_t arg, uint64_t data) {
+  virtual void setNumArgIns(uint32_t number) {
+    numArgIns = number;
+  }
+  
+  virtual void setNumArgIOs(uint32_t number) {
+    numArgIOs = number;
+  }
+  
+  virtual void setArg(uint32_t arg, uint64_t data, bool isIO) {
     writeReg(arg+2, data);
+    numArgInsId++;
+    if (isIO) numArgIOsId++;
   }
 
-  virtual uint64_t getArg(uint32_t arg) {
-    return readReg(numArgIns+2+arg);
+  virtual uint64_t getArg(uint32_t arg, bool isIO) {
+    numArgOuts++;
+    if (isIO) {
+      return readReg(2+arg);
+    } else {
+      if (numArgIns == 0) {
+        return readReg(1-numArgIOs+2+arg);
+      } else {
+        return readReg(numArgIns-numArgIOs+2+arg);
+      }
+
+    }
+  }
+
+  virtual uint64_t getArgIn(uint32_t arg, bool isIO) {
+    return readReg(2+arg);
+  }
+
+  void dumpDebugRegs() {
+    EPRINTF(" ******* Debug regs *******\n");
+    int argInOffset = numArgIns == 0 ? 1 : numArgIns;
+    int argOutOffset = numArgOuts == 0 ? 1 : numArgOuts;
+    for (int i=0; i<NUM_DEBUG_SIGNALS; i++) {
+      if (i % 16 == 0) EPRINTF("\n");
+      uint64_t value = readReg(argInOffset + argOutOffset + 2 - numArgIOs + i);
+      EPRINTF("\t%s: %08x (%08d)\n", signalLabels[i], value, value);
+    }
+    EPRINTF(" **************************\n");
   }
 
   ~FringeContextPlasticine() {
+    if (debugRegs) {
+      dumpDebugRegs();
+    }
     finish();
   }
 };
