@@ -1,14 +1,16 @@
-package fringe
+package fringe.fringeZynq
 
 import scala.language.reflectiveCalls
 import chisel3._
 import chisel3.util._
 import axi4._
+import fringe._
 import templates._
 import templates.Utils.log2Up
 
 /**
- * FringeZynq: Top module for FPGA shell
+ * FringeZynq:
+ * import fringe._Top module for FPGA shell
  * @param w: Word width
  * @param numArgIns: Number of input scalar arguments
  * @param numArgOuts: Number of output scalar arguments
