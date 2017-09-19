@@ -16,20 +16,20 @@ class RegFileUnitTester(c: RegFile)(implicit args: Array[String]) extends ArgsTe
   // Host interface test: write to all regs, then read from all regs
   println(s"Host interface test")
   val wdata = List.fill(c.d) { rnd.nextInt }
-  poke(c.io.wen, 1)
+  poke(c.io.addrInterface.wen, 1)
   for (i <- 0 until c.d) {
-    poke(c.io.waddr, i)
-    poke(c.io.wdata, wdata(i))
+    poke(c.io.addrInterface.waddr, i)
+    poke(c.io.addrInterface.wdata, wdata(i))
     step(1)
   }
 
-  poke(c.io.wen, 0)
+  poke(c.io.addrInterface.wen, 0)
 
   val rdata = ListBuffer[Int]()
   for (i <- 0 until c.d) {
-    poke(c.io.raddr, i)
+    poke(c.io.addrInterface.raddr, i)
     step(1)
-    rdata.append(peek(c.io.rdata).toInt)
+    rdata.append(peek(c.io.addrInterface.rdata).toInt)
   }
 
   wdata.zip(rdata) foreach { case (exp, obs) =>
@@ -51,9 +51,9 @@ class RegFileUnitTester(c: RegFile)(implicit args: Array[String]) extends ArgsTe
   }
 
   for (i <- 0 until c.d) {
-    poke(c.io.raddr, i)
+    poke(c.io.addrInterface.raddr, i)
     step(1)
-    rdata(i) = peek(c.io.rdata).toInt
+    rdata(i) = peek(c.io.addrInterface.rdata).toInt
   }
 
   expectedRegs.zip(rdata) foreach { case (exp, obs) =>

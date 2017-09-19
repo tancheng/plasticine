@@ -41,11 +41,7 @@ class Fringe(
 
   val io = IO(new Bundle {
     // Host scalar interface
-    val raddr = Input(UInt(addrWidth.W))
-    val wen  = Input(Bool())
-    val waddr = Input(UInt(addrWidth.W))
-    val wdata = Input(Bits(regWidth.W))
-    val rdata = Output(Bits(regWidth.W))
+    val regIO = new RegFilePureInterface(addrWidth, regWidth)
 
     // Accel Control IO
     val enable = Output(Bool())
@@ -109,11 +105,12 @@ class Fringe(
 
   // Scalar, command, and status register file
   val regs = Module(new RegFile(regWidth, numRegs, numArgIns+2, numArgOuts+1+numDebugs, numArgIOs))
-  regs.io.raddr := io.raddr
-  regs.io.waddr := io.waddr
-  regs.io.wen := io.wen
-  regs.io.wdata := io.wdata
-  io.rdata := regs.io.rdata
+  regs.io.addrInterface <> io.regIO
+//  regs.io.raddr := io.raddr
+//  regs.io.waddr := io.waddr
+//  regs.io.wen := io.wen
+//  regs.io.wdata := io.wdata
+//  io.rdata := regs.io.rdata
 
   val command = regs.io.argIns(0)   // commandReg = first argIn
   val curStatus = regs.io.argIns(1) // current status

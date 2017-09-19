@@ -5,7 +5,7 @@ import chisel3._
 import chisel3.util._
 import fringe.FringeGlobals
 import templates.Utils.log2Up
-
+import fringe.{RegFileInterface, RegFilePureInterface}
 /**
  * Regfile: Regfile parameterized by width and height similar to SRAM
  * @param w: Word width
@@ -41,15 +41,7 @@ class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: In
     argOutRange.indexOf(regIdx)
   }
 
-  val io = IO(new Bundle {
-    val raddr = Input(UInt(addrWidth.W))
-    val wen  = Input(Bool())
-    val waddr = Input(UInt(addrWidth.W))
-    val wdata = Input(Bits(w.W))
-    val rdata = Output(Bits(w.W))
-    val argIns = Output(Vec(numArgIns, (UInt(w.W))))
-    val argOuts = Vec(numArgOuts, Flipped(Decoupled((UInt(w.W)))))
-  })
+  val io = IO(new RegFileInterface(addrWidth, w, numArgIns, numArgOuts))
 
   // Sanity-check module parameters
   Predef.assert(numArgIns >= 0, s"Invalid numArgIns ($numArgIns): must be >= 0.")
@@ -60,14 +52,14 @@ class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: In
   val regs = List.tabulate(d) { i =>
     val ff = Module(new FF(w))
     if ((argOutRange contains i) & (argInRange contains i)) {
-      ff.io.enable := Mux(io.wen & (io.waddr === i.U), io.wen & (io.waddr === i.U), io.argOuts(argOutRange.indexOf(i)).valid)
-      ff.io.in := Mux(io.wen & (io.waddr === i.U), io.wdata, io.argOuts(regIdx2ArgOut(i)).bits)
+      ff.io.enable := Mux(io.addrInterface.wen & (io.addrInterface.waddr === i.U), io.addrInterface.wen & (io.addrInterface.waddr === i.U), io.argOuts(argOutRange.indexOf(i)).valid)
+      ff.io.in := Mux(io.addrInterface.wen & (io.addrInterface.waddr === i.U), io.addrInterface.wdata, io.argOuts(regIdx2ArgOut(i)).bits)
     } else if (argOutRange contains i) {
-      ff.io.enable := io.argOuts(argOutRange.indexOf(i)).valid | (io.wen & (io.waddr === i.U))
-      ff.io.in := Mux(io.argOuts(regIdx2ArgOut(i)).valid, io.argOuts(regIdx2ArgOut(i)).bits, io.wdata)
+      ff.io.enable := io.argOuts(argOutRange.indexOf(i)).valid | (io.addrInterface.wen & (io.addrInterface.waddr === i.U))
+      ff.io.in := Mux(io.argOuts(regIdx2ArgOut(i)).valid, io.argOuts(regIdx2ArgOut(i)).bits, io.addrInterface.wdata)
     } else {
-      ff.io.enable := io.wen & (io.waddr === i.U)
-      ff.io.in := io.wdata
+      ff.io.enable := io.addrInterface.wen & (io.addrInterface.waddr === i.U)
+      ff.io.in := io.addrInterface.wdata
     }
 
     ff.io.init := 0.U
@@ -77,8 +69,8 @@ class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: In
   val rport = Module(new MuxN(UInt(w.W), d))
   val regOuts = Vec(regs.map{_.io.out})
   rport.io.ins := regOuts
-  rport.io.sel := io.raddr
-  io.rdata := rport.io.out
+  rport.io.sel := io.addrInterface.raddr
+  io.addrInterface.rdata := rport.io.out
 
   io.argIns := Vec(regOuts.zipWithIndex.filter { case (arg, idx) => argInRange.contains(idx) }.map {_._1})
 }
@@ -86,13 +78,7 @@ class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: In
 class RegFilePure(val w: Int, val d: Int) extends Module {
   val addrWidth = log2Up(d)
 
-  val io = IO(new Bundle {
-    val raddr = Input(UInt(addrWidth.W))
-    val wen  = Input(Bool())
-    val waddr = Input(UInt(addrWidth.W))
-    val wdata = Input(Bits(w.W))
-    val rdata = Output(Bits(w.W))
-  })
+  val io = IO(new RegFilePureInterface(addrWidth, w))
 
   val regs = List.tabulate(d) { i =>
     val ff = Module(new FF(w))

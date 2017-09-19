@@ -64,8 +64,15 @@ object PCUGen extends CommonDriver {
 object PMUGen extends CommonDriver {
   type DUTType = PMU
   override val moduleName = "PMU"
-  val params = new PMUParams { }
+  val params = GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams]
   def dut = () => new PMU(params)
+}
+
+object PMUSim extends CommonDriver {
+  type DUTType = TopPMU
+  override val moduleName = "TopPMU"
+  val params = GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams]
+  def dut = () => new TopPMU(params)
 }
 
 object VectorSwitchGen extends CommonDriver {

@@ -76,11 +76,11 @@ class FringeZynq(
     axiLiteBridge.io.S_AXI <> io.S_AXI
 
     fringeCommon.reset := ~reset
-    fringeCommon.io.raddr := axiLiteBridge.io.raddr
-    fringeCommon.io.wen   := axiLiteBridge.io.wen
-    fringeCommon.io.waddr := axiLiteBridge.io.waddr
-    fringeCommon.io.wdata := axiLiteBridge.io.wdata
-    axiLiteBridge.io.rdata := fringeCommon.io.rdata
+    fringeCommon.io.regIO.raddr := axiLiteBridge.io.raddr
+    fringeCommon.io.regIO.wen   := axiLiteBridge.io.wen
+    fringeCommon.io.regIO.waddr := axiLiteBridge.io.waddr
+    fringeCommon.io.regIO.wdata := axiLiteBridge.io.wdata
+    axiLiteBridge.io.rdata := fringeCommon.io.regIO.rdata
   }
 
   fringeCommon.io.aws_top_enable := io.externalEnable

@@ -553,7 +553,7 @@ class MAGCore(
 //  connectDbgSignal(getCounter(wdataValid & wdataReady & issued), "wvalid & wready & issued")
 
   // Print all debugging signals into a header file
-  val debugFileName = "cpp/generated_debugRegs.h"
+  val debugFileName = "generated_debugRegs.h"
   val debugPW = new PrintWriter(new File(debugFileName))
   debugPW.println(s"""
 #ifndef __DEBUG_REGS_H__

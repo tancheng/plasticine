@@ -202,6 +202,27 @@ class DebugSignals extends Bundle {
 
 }
 
+class RegFilePureInterface(val addrWidth: Int, val dataWidth: Int) extends Bundle {
+  val raddr = Input(UInt(addrWidth.W))
+  val wen  = Input(Bool())
+  val waddr = Input(UInt(addrWidth.W))
+  val wdata = Input(Bits(dataWidth.W))
+  val rdata = Output(Bits(dataWidth.W))
+
+  override def cloneType(): this.type = {
+    new RegFilePureInterface(addrWidth, dataWidth).asInstanceOf[this.type]
+  }
+}
+
+class RegFileInterface(val addrWidth: Int, val dataWidth: Int, val numArgIns: Int, val numArgOuts: Int) extends Bundle {
+  val addrInterface = new RegFilePureInterface(addrWidth, dataWidth)
+  val argIns = Output(Vec(numArgIns, (UInt(dataWidth.W))))
+  val argOuts = Vec(numArgOuts, Flipped(Decoupled((UInt(dataWidth.W)))))
+
+  override def cloneType(): this.type = {
+    new RegFileInterface(addrWidth, dataWidth, numArgIns, numArgOuts).asInstanceOf[this.type]
+  }
+}
 //class StreamOutAccel(p: StreamParInfo) extends Bundle {
 //  val data = UInt(p.w.W)
 //  val tag = UInt(p.w.W)

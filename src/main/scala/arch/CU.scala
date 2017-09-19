@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 import plasticine.spade._
 
 case class CUIO[+T<:Bundle](p:CUParams, cuConfig: () => T) extends Bundle {
-    // Vector IO
+  // Vector IO
   val vecIn = Vec(p.numVectorIn, Flipped(Decoupled(Vec(p.v, UInt(p.w.W)))))
   val vecOut = Vec(p.numVectorOut, Decoupled(Vec(p.v, UInt(p.w.W))))
 
@@ -21,9 +21,15 @@ case class CUIO[+T<:Bundle](p:CUParams, cuConfig: () => T) extends Bundle {
   val controlIn = Input(Vec(p.numControlIn, Bool()))
   val controlOut = Output(Vec(p.numControlOut, Bool()))
 
+  // Config IO
   val config = Input(cuConfig())
   val configIn = Flipped(Decoupled(UInt(1.W)))
   val configOut = Decoupled(UInt(1.W))
+
+  override def cloneType(): this.type = {
+    new CUIO(p, cuConfig).asInstanceOf[this.type]
+  }
+
 }
 
 trait CU extends Module {

@@ -7,25 +7,27 @@ import fringe._
 import templates.Utils.log2Up
 import plasticine.spade._
 import plasticine.pisa.ir._
+import plasticine.config.PMUConfig
 import scala.language.reflectiveCalls
 
 // import AccelTop
 abstract class TopInterface extends Bundle {
   // Host scalar interface
-  var raddr = Input(UInt(1.W))
-  var wen  = Input(Bool())
-  var waddr = Input(UInt(1.W))
-  var wdata = Input(Bits(1.W))
-  var rdata = Output(Bits(1.W))
+//  var raddr = Input(UInt(1.W))
+//  var wen  = Input(Bool())
+//  var waddr = Input(UInt(1.W))
+//  var wdata = Input(Bits(1.W))
+//  var rdata = Output(Bits(1.W))
 }
 
 class VerilatorInterface(p: TopParams) extends Bundle {
   // Host scalar interface
-  val raddr = Input(UInt(p.fringeParams.addrWidth.W))
-  val wen  = Input(Bool())
-  val waddr = Input(UInt(p.fringeParams.addrWidth.W))
-  val wdata = Input(Bits(p.fringeParams.dataWidth.W))
-  val rdata = Output(Bits(p.fringeParams.dataWidth.W))
+  val regIO = new RegFilePureInterface(p.fringeParams.addrWidth, p.fringeParams.dataWidth)
+//  val raddr = Input(UInt(p.fringeParams.addrWidth.W))
+//  val wen  = Input(Bool())
+//  val waddr = Input(UInt(p.fringeParams.addrWidth.W))
+//  val wdata = Input(Bits(p.fringeParams.dataWidth.W))
+//  val rdata = Output(Bits(p.fringeParams.dataWidth.W))
 
   // DRAM interface - currently only one stream
   val dram = Vec(p.fringeParams.numChannels, new DRAMStream(32, 16))
@@ -33,6 +35,20 @@ class VerilatorInterface(p: TopParams) extends Bundle {
   // Configuration interface
   val config = Flipped(Decoupled(Bool()))
   val configDone = Output(Bool())
+  val configIn = Flipped(Decoupled(UInt(1.W)))
+  val configOut = Decoupled(UInt(1.W))
+}
+
+class VerilatorCUInterface(p: CUParams) extends Bundle {
+  // Host scalar interface
+  val regIO = new RegFilePureInterface(p.w, p.w)
+
+  // DRAM interface - currently only one stream
+  val dram = Vec(1, new DRAMStream(32, 16))
+
+  // Configuration interface
+  val configIn = Flipped(Decoupled(UInt(1.W)))
+  val configOut = Decoupled(UInt(1.W))
 }
 
 /**
@@ -78,11 +94,12 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
       val topIO = io.asInstanceOf[VerilatorInterface]
 
       // Fringe <-> Host connections
-      fringe.io.raddr := topIO.raddr
-      fringe.io.wen   := topIO.wen
-      fringe.io.waddr := topIO.waddr
-      fringe.io.wdata := topIO.wdata
-      topIO.rdata := fringe.io.rdata
+      fringe.io.regIO <> topIO.regIO
+//      fringe.io.raddr := topIO.raddr
+//      fringe.io.wen   := topIO.wen
+//      fringe.io.waddr := topIO.waddr
+//      fringe.io.wdata := topIO.wdata
+//      topIO.rdata := fringe.io.rdata
 
       // Fringe <-> DRAM connections
       topIO.dram <> fringe.io.dram
@@ -101,4 +118,26 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
     case _ =>
       throw new Exception(s"Unknown target '${io.target}'")
   }
+}
+
+// PMU testing
+class TopPMU(p: PMUParams) extends Module {
+  val io = IO(new VerilatorCUInterface(p))
+
+  // CU
+  val pmu = Module(new PMU(p))
+
+  val blockingDRAMIssue = false
+  val fringe = Module(new FringeCU(p, () => PMUConfig(p)))
+
+  val topIO = io.asInstanceOf[VerilatorCUInterface]
+
+  // Fringe <-> Host connections
+  fringe.io.regIO <> topIO.regIO
+
+  // Fringe <-> DRAM connections
+  topIO.dram <> fringe.io.dram
+
+  // Fringe <-> CU connections
+  pmu.io <> fringe.io.cuio
 }
