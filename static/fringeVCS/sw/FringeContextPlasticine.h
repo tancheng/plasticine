@@ -17,7 +17,7 @@
 #include "FringeContextBase.h"
 #include "simDefs.h"
 #include "channel.h"
-#include "generated_debugRegs.h"
+#include "generated.h"
 
 //Source: http://stackoverflow.com/questions/13893085/posix-spawnp-and-piping-child-output-to-a-string
 class FringeContextPlasticine : public FringeContextBase<void> {

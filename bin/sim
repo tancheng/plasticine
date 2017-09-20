@@ -20,6 +20,11 @@ mkdir -p ${OUTDIR}
 echo "Generating $MODULE.."
 sbt "; run-main plasticine.${MODULE}Sim --testArgs --outdir $OUTDIR"
 
+# Create a new "generated" header file that includes all generated header files
+for f in generated*; do
+  echo "#include \"$f\"" >> generated.h
+done
+
 # Move generated headers to OUTDIR
 mv generated* ${OUTDIR}
 
