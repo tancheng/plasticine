@@ -13,11 +13,11 @@ import plasticine.misc.Utils.{getFF, getMux, getCounter, getTimer}
 /**
  * ConfigController: Handles loading configuration bits from DRAM and shifting it through the config network
  */
-class ConfigController(val regAddrWidth: Int, val regDataWidth: Int, val dramAddrWidth: Int, val dramDataWidth: Int) extends Module {
+class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Module {
   val io = IO(new Bundle {
     val regIO = new RegFilePureInterface(regAddrWidth, regDataWidth)
-    val loadStream = new LoadStream(StreamParInfo(32, 16))
-    val archReset = Output(Bool())
+    val loadStream = Flipped(new LoadStream(StreamParInfo(32, 16)))
+    val designReset = Output(Bool())
     val configIn = Decoupled(UInt(1.W))
     val configOut = Flipped(Decoupled(UInt(1.W)))
   })
@@ -47,7 +47,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int, val dramAdd
   val resetTimerDone = getTimer(numResetCycles.U, enableReset, 16)
   switch(state) {
     is (state_READY) {
-      status(0) := false.B
+      status := 0.U
       nextState := state_RESET
       transitionNow := enable
     }
@@ -70,18 +70,18 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int, val dramAdd
     }
     is (state_DONE) {
       nextState := state_READY
-      status(0) := true.B
+      status := 1.U
       transitionNow := ~enable
     }
   }
   // Pseudo-code:
   // state match {
   //   case READY => // Just wait for enable to go high
-  //     if (enable) nextState := RESET, archReset := false, transitionNow := true
-  //     else nextState := READY, archReset := false, transitionNow := false
+  //     if (enable) nextState := RESET, designReset := false, transitionNow := true
+  //     else nextState := READY, designReset := false, transitionNow := false
   //   case RESET =>
-  //      for (i <- 0 until maxResetCycles) archReset := true
-  //      nextState := LOAD, archReset := false, transitionNow := true
+  //      for (i <- 0 until maxResetCycles) designReset := true
+  //      nextState := LOAD, designReset := false, transitionNow := true
   //   case LOAD =>
   //      issueCmd(addr, size, isWr = false)
   //      nextState := CONFIG, transitionNow := true
