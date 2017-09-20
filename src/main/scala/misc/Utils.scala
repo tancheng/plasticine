@@ -27,6 +27,35 @@ object Utils {
     ff.io.out
   }
 
+  def getCounter(en: UInt, width: Int = 32) = {
+    val ctr = Module(new Counter(width))
+    ctr.io.reset := 0.U
+    ctr.io.saturate := 0.U
+    ctr.io.max := ((1.toLong << width) - 1).U
+    ctr.io.stride := 1.U
+    ctr.io.enable := en
+    ctr.io.out
+  }
+
+  def getTimer(max: UInt, en: UInt, width: Int = 32) = {
+    val ctr = Module(new Counter(width))
+    ctr.io.reset := 0.U
+    ctr.io.saturate := 0.U
+    ctr.io.max := max
+    ctr.io.stride := 1.U
+    ctr.io.enable := en
+    ctr.io.done
+  }
+
+  def addWhen(en: UInt, value: UInt) = {
+    val ff = Module(new FF(32))
+    //ff.io.init := 15162342.U
+    ff.io.init := 0.U
+    ff.io.enable := en
+    ff.io.in := ff.io.out + value
+    ff.io.out
+  }
+
   def getFloatBits(num: Float) = java.lang.Float.floatToRawIntBits(num)
   def red(x: String): String = Console.BLACK + Console.RED_B + x + Console.RESET
 }
