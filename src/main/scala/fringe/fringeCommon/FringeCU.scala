@@ -39,6 +39,13 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
 
     // CU interface
     val cuio = Flipped(CUIO(p, cuConfig))
+
+    // Config interface - named from the perspective of the design
+    val configIn = Decoupled(UInt(1.W))
+    val configOut = Flipped(Decoupled(UInt(1.W)))
+
+    // Design reset
+    val designReset = Output(Bool())
   })
 
   val linfo = List(StreamParInfo(32, 16))
@@ -47,11 +54,14 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
 
   val numDebugs = mag.numDebugs
 
-  // Address Map
-  val addrBlockSize = 65536 // 64K
-  val controlStart = 0
-  val scalarStart = controlStart + addrBlockSize
-
+  // Handle address space here
+  // TODO: Can this be done automatically when RegFile is created?
+  // TODO: Read the size configs from an external config file?
+  val addrMapper = new AddressSpaceManager()
+  val (controlStart, controlSize) = addrMapper.createMapping("CONTROL", 65536)
+  val (scalarStart, scalarSize)   = addrMapper.createMapping("SCALAR", 65536)
+  val (configStart, configSize)   = addrMapper.createMapping("CONFIG", 32768)
+  addrMapper.createHeader("generated_addrOffsetMap.h")
 
   // Scalar registers
   val numScalarRegs = p.numScalarIn + p.numScalarOut + numDebugs
@@ -61,15 +71,25 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
   val numControlRegs = p.numControlIn + p.numControlOut
   val controlRegs = Module(new RegFile(regWidth, numControlRegs, p.numControlIn, p.numControlOut, numArgIOs))
 
+  // Configuration controller
+  val configController = Module(new ConfigController(addrWidth, regWidth))
+  io.configIn <> configController.io.configIn
+  io.configOut <> configController.io.configOut
+
   // Address Decoder
   val addrDecoder = Module(new AddressDecoder(
     RegFileParams(addrWidth, regWidth),  // Input
-    List(RegFileParams(addrWidth, regWidth, scalarStart, addrBlockSize), RegFileParams(addrWidth, regWidth, controlStart, addrBlockSize))
+    List(
+      RegFileParams(addrWidth, regWidth, scalarStart, scalarSize),
+      RegFileParams(addrWidth, regWidth, controlStart, controlSize),
+      RegFileParams(addrWidth, regWidth, configStart, configSize)
+    )                                   // Outputs
   ))
   addrDecoder.io.regIn <> io.regIO
   scalarRegs.io.addrInterface <> addrDecoder.io.regOuts(0)
   controlRegs.io.addrInterface <> addrDecoder.io.regOuts(1)
-
+  configController.io.regIO <> addrDecoder.io.regOuts(2)
+  io.designReset := configController.io.designReset // TODO: Must be resettable from controlRegs too
   scalarRegs.io.argOuts.take(p.numScalarOut).zipWithIndex.foreach { case (argOutReg, i) =>
     argOutReg.bits := io.cuio.scalarOut(i).bits
     argOutReg.valid := io.cuio.scalarOut(i).valid
@@ -106,6 +126,7 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
   magConfig.scatterGather := false.B
   mag.io.config := magConfig
 
+  mag.io.app.loads(0) <> configController.io.loadStream
   mag.io.dram <> io.dram(0)
 
   // In simulation, streams are just pass through

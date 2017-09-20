@@ -20,6 +20,9 @@ mkdir -p ${OUTDIR}
 echo "Generating $MODULE.."
 sbt "; run-main plasticine.${MODULE}Sim --testArgs --outdir $OUTDIR"
 
+# Move generated headers to OUTDIR
+mv generated* ${OUTDIR}
+
 # Copy 'src/main/scala/apps/$MODULE/Driver.cpp' to OUTDIR
 cp -r static/fringeVCS/* ${OUTDIR}
 

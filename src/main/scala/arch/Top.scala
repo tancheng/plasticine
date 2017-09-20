@@ -132,12 +132,17 @@ class TopPMU(p: PMUParams) extends Module {
 
   val topIO = io.asInstanceOf[VerilatorCUInterface]
 
-  // Fringe <-> Host connections
+  // Fringe <-> Host
   fringe.io.regIO <> topIO.regIO
 
-  // Fringe <-> DRAM connections
+  // Fringe <-> DRAM
   topIO.dram <> fringe.io.dram
 
-  // Fringe <-> CU connections
+  // Fringe <-> CU data and control IO
   pmu.io <> fringe.io.cuio
+
+  // Fringe <-> CU reset config IO
+  pmu.reset := reset | fringe.io.designReset
+  pmu.io.configIn <> fringe.io.configIn
+  pmu.io.configOut <> fringe.io.configOut
 }
