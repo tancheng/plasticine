@@ -25,8 +25,9 @@ for f in generated*; do
   echo "#include \"$f\"" >> generated.h
 done
 
-# Move generated headers to OUTDIR
+# Move generated headers and tcl scripts to OUTDIR
 mv generated* ${OUTDIR}
+mv bigIP.tcl ${OUTDIR}
 
 # Copy 'src/main/scala/apps/$MODULE/Driver.cpp' to OUTDIR
 cp -r static/fringeVCS/* ${OUTDIR}
