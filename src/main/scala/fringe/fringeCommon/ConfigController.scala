@@ -9,6 +9,7 @@ import templates._
 import templates.Utils.log2Up
 import plasticine.arch.CUIO
 import plasticine.misc.Utils.{getFF, getMux, getCounter, getTimer}
+import scala.collection.mutable.HashMap
 
 /**
  * ConfigController: Handles loading configuration bits from DRAM and shifting it through the config network
@@ -24,14 +25,25 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
 
   // Command, Status, addr, size registers
   val numRegs = 1 + 1 + 1 + 1
-  val regFile = Module(new RegFile(regDataWidth, numRegs, 3, 1, 0))
+  val regFile = Module(new RegFile(regDataWidth, numRegs, 4, 1, 0))
   regFile.io.addrInterface <> io.regIO
 
-  val command = regFile.io.argIns(0)
-  val addr = regFile.io.argIns(1)
-  val size = regFile.io.argIns(2)
-  val status = regFile.io.argOuts(0).bits
-  regFile.io.argOuts(0).valid := true.B
+  val commandReg = 0
+  val statusReg = 1
+  val addrReg = 2
+  val sizeReg = 3
+  def offsetExports = {
+    val m = HashMap[String, Int]()
+    m += "ADDR"    -> addrReg
+    m += "SIZE"    -> sizeReg
+    m
+  }
+
+  val command = regFile.io.argIns(regFile.regIdx2ArgIn(commandReg))
+  val addr = regFile.io.argIns(regFile.regIdx2ArgIn(addrReg))
+  val size = regFile.io.argIns(regFile.regIdx2ArgIn(statusReg))
+  val status = regFile.io.argOuts(regFile.regIdx2ArgOut(statusReg)).bits
+  regFile.io.argOuts(regFile.regIdx2ArgOut(statusReg)).valid := true.B
 
   val enable = command(0)
 

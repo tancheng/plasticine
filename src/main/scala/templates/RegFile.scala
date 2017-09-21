@@ -41,6 +41,14 @@ class RegFile(val w: Int, val d: Int, val numArgIns: Int = 0, val numArgOuts: In
     argOutRange.indexOf(regIdx)
   }
 
+  def argIn2RegIdx(argIn: Int) = {
+    argInRange(argIn)
+  }
+
+  def regIdx2ArgIn(regIdx: Int) = {
+    argInRange.indexOf(regIdx)
+  }
+
   val io = IO(new RegFileInterface(addrWidth, w, numArgIns, numArgOuts))
 
   // Sanity-check module parameters
