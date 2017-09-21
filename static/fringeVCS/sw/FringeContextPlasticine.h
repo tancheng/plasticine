@@ -4,6 +4,7 @@
 #include <spawn.h>
 #include <poll.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -24,7 +25,7 @@ class FringeContextPlasticine : public FringeContextBase<void> {
 
   pid_t sim_pid;
   std::string configPath;
-  std::string simPath = std::string(getenv("PLASTICINE_HOME")) + "/psim/psim.bin";
+  std::string simPath;
   Channel *cmdChannel;
   Channel *respChannel;
   int initialCycles = -1;
@@ -39,8 +40,8 @@ class FringeContextPlasticine : public FringeContextBase<void> {
   int globalID = 1;
 
   const uint32_t burstSizeBytes = 64;
-  const uint32_t commandReg = 0;
-  const uint32_t statusReg = 1;
+  const uint32_t commandReg = COMMAND_OFFSET;
+  const uint32_t statusReg = STATUS_OFFSET;
   uint64_t maxCycles = 10000000000;
   uint64_t stepCount = 0;
 
@@ -52,6 +53,7 @@ class FringeContextPlasticine : public FringeContextBase<void> {
   // Each specified variable must be set (will trigger an assert otherwise)
   std::vector<std::string> envVariablesToSim = {
     "LD_LIBRARY_PATH",
+    "SIM_PATH",
     "DRAMSIM_HOME",
     "USE_IDEAL_DRAM",
     "DRAM_DEBUG",
@@ -147,6 +149,11 @@ public:
     }
   }
 
+  void resetCycles() {
+    initialCycles = -1;
+    numCycles = 0;
+  }
+
   uint64_t getCycles() {
     int id = sendCmd(GET_CYCLES);
     simCmd *resp = recvResp();
@@ -176,7 +183,8 @@ public:
     simCmd cmd;
     cmd.id = globalID++;
     cmd.cmd = WRITE_REG;
-    std::memcpy(cmd.data, &reg, sizeof(uint32_t));
+    uint32_t regWithBase = DEVICE_REG_BASE + reg;
+    std::memcpy(cmd.data, &regWithBase, sizeof(uint32_t));
     std::memcpy(cmd.data+sizeof(uint32_t), &data, sizeof(uint64_t));
     cmd.size = sizeof(uint64_t);
     cmdChannel->send(&cmd);
@@ -188,7 +196,8 @@ public:
     cmd.id = globalID++;
     cmd.cmd = READ_REG;
     cmd.size = 0;
-    std::memcpy(cmd.data, &reg, sizeof(uint32_t));
+    uint32_t regWithBase = DEVICE_REG_BASE + reg;
+    std::memcpy(cmd.data, &regWithBase, sizeof(uint32_t));
     cmdChannel->send(&cmd);
     resp = recvResp();
     ASSERT(resp->cmd == READ_REG, "Response from Sim is not READ_REG");
@@ -264,6 +273,7 @@ public:
     cmdChannel = new Channel(sizeof(simCmd));
     respChannel = new Channel(sizeof(simCmd));
 
+    simPath = string(checkAndGetEnvVar("SIM_PATH"));
     posix_spawn_file_actions_init(&action);
 
     // Create cmdPipe (read) handle at SIM_CMD_FD, respPipe (write) handle at SIM_RESP_FD
@@ -308,7 +318,7 @@ public:
   }
 
   virtual void load() {
-    // Apply board reset for a few cycles
+    // 0. Apply board reset for a few cycles
     for (int i=0; i<5; i++) {
       reset();
     }
@@ -316,43 +326,45 @@ public:
     // Lower board reset
     start();
 
-    // Pass config data
-    // 1. Read config file contents into a buf
-//    size_t size = getFileSize(path.c_str());
-//    uint8_t *buf = (uint8_t*) std::malloc(size);
-//    int nbytes = fileToBuf(buf, path.c_str(), size);
-//    ASSERT(nbytes == size, "Bytes read (%d) does not match file size %lu!\n", nbytes, size);
-//
-//    // 2a. Send CONFIG to simulator, similar to memcpy
-//    simCmd cmd;
-//    cmd.id = globalID++;
-//    cmd.cmd = CONFIG;
-//    uint64_t *data = (uint64_t*)cmd.data;
-//    data[0] = size;
-//    cmd.size = sizeof(uint64_t);
-//    cmdChannel->send(&cmd);
-//
-//    // 2b. Now send config bytes
-//    cmdChannel->sendFixedBytes(buf, size);
-//
-//    // 3. Wait for sim response
-//    //    Simulator must independently advance clock
-//    //    without waiting for step in 'config' mode
-//    simCmd *resp = recvResp();
-//    ASSERT(cmd.id == resp->id, "load resp->id does not match cmd.id!");
-//    ASSERT(cmd.cmd == resp->cmd, "load resp->cmd does not match cmd.cmd!");
-//    std::free(buf);
-//
-//    step();
-//    step();
-//    step();
-//    step();
-//    step();
+    // 1. Config file -> Host DRAM
+    size_t size   = getFileSize(path.c_str());
+    uint8_t *hostConfigMem  = (uint8_t*) std::malloc(size);
+    int nbytes    = fileToBuf(hostConfigMem, configPath.c_str(), size);
+    ASSERT(nbytes == size, "Bytes read (%d) does not match file size %lu!\n", nbytes, size);
+    EPRINTF("[load] Configuration size: %d bytes\n", bytes);
+
+    // 2. Host DRAM -> Device DRAM
+    uint64_t devConfigMem = malloc(size);
+    memcpy(devConfigMem, hostConfigMem, size);
+
+    // 3. Write address and size to config controller registers
+    writeReg(CONFIG_BASE + CONFIG_ADDR_OFFSET, devConfigMem);
+    writeReg(CONFIG_BASE + CONFIG_SIZE_OFFSET, size);
+
+    // 4. Start config controller
+    writeReg(CONFIG_BASE + COMMAND_OFFSET, 1);
+
+    // 5. Poll on config controller's status register
+    resetCycles();
+    uint32_t status = readReg(CONFIG_BASE + STATUS_OFFSET);
+    while (status == 0) {
+      step();
+      status = readReg(CONFIG_BASE + STATUS_OFFSET);
+    }
+
+    EPRINTF("[load] Configuration Complete, Time: lf cycles\n", numCycles);
+    writeReg(CONFIG_BASE + COMMAND_OFFSET, 0);
+    while (status != 0) {
+      step();
+      status = readReg(CONFIG_BASE + STATUS_OFFSET);
+    }
   }
 
   virtual void run() {
     // Current assumption is that the design sets arguments individually
     uint32_t status = 0;
+
+    resetCycles();
 
     // Implement 4-way handshake
     writeReg(statusReg, 0);
@@ -384,11 +396,11 @@ public:
   virtual void setNumArgIns(uint32_t number) {
     numArgIns = number;
   }
-  
+
   virtual void setNumArgIOs(uint32_t number) {
     numArgIOs = number;
   }
-  
+
   virtual void setArg(uint32_t arg, uint64_t data, bool isIO) {
     writeReg(arg+2, data);
     numArgInsId++;
