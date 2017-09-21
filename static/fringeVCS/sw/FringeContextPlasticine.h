@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #include "FringeContextBase.h"
+#include "simAddrMap.h"
 #include "simDefs.h"
 #include "channel.h"
 #include "generated.h"
@@ -141,7 +142,7 @@ public:
     stepCount++;
 
     int printInterval = 10000;
-    static int nextPrint = printInterval;
+    static uint64_t nextPrint = printInterval;
 
     if ((numCycles >= nextPrint)) {
       EPRINTF("\t%lu cycles elapsed\n", nextPrint);
@@ -273,7 +274,7 @@ public:
     cmdChannel = new Channel(sizeof(simCmd));
     respChannel = new Channel(sizeof(simCmd));
 
-    simPath = string(checkAndGetEnvVar("SIM_PATH"));
+    simPath = std::string(checkAndGetEnvVar("SIM_PATH"));
     posix_spawn_file_actions_init(&action);
 
     // Create cmdPipe (read) handle at SIM_CMD_FD, respPipe (write) handle at SIM_RESP_FD
@@ -293,7 +294,7 @@ public:
     int i = 0;
     for (std::vector<std::string>::iterator it = envVariablesToSim.begin(); it != envVariablesToSim.end(); it++) {
       std::string var = *it;
-      valueStrs[i] = var + "=" + string(checkAndGetEnvVar(var));
+      valueStrs[i] = var + "=" + std::string(checkAndGetEnvVar(var));
       envs[i] = &valueStrs[i][0];
       i++;
     }
@@ -331,7 +332,7 @@ public:
     uint8_t *hostConfigMem  = (uint8_t*) std::malloc(size);
     int nbytes    = fileToBuf(hostConfigMem, configPath.c_str(), size);
     ASSERT(nbytes == size, "Bytes read (%d) does not match file size %lu!\n", nbytes, size);
-    EPRINTF("[load] Configuration size: %d bytes\n", bytes);
+    EPRINTF("[load] Configuration size: %d bytes\n", nbytes);
 
     // 2. Host DRAM -> Device DRAM
     uint64_t devConfigMem = malloc(size);
@@ -352,7 +353,7 @@ public:
       status = readReg(CONFIG_BASE + STATUS_OFFSET);
     }
 
-    EPRINTF("[load] Configuration Complete, Time: lf cycles\n", numCycles);
+    EPRINTF("[load] Configuration Complete, Time: %lu cycles\n", numCycles);
     writeReg(CONFIG_BASE + COMMAND_OFFSET, 0);
     while (status != 0) {
       step();
@@ -432,7 +433,7 @@ public:
     for (int i=0; i<NUM_DEBUG_SIGNALS; i++) {
       if (i % 16 == 0) EPRINTF("\n");
       uint64_t value = readReg(argInOffset + argOutOffset + 2 - numArgIOs + i);
-      EPRINTF("\t%s: %08x (%08d)\n", signalLabels[i], value, value);
+      EPRINTF("\t%s: %08lx (%08lu)\n", signalLabels[i], value, value);
     }
     EPRINTF(" **************************\n");
   }

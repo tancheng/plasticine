@@ -3,8 +3,7 @@ EXE=psim.bin
 
 CC=g++
 VCS_OPTS=-full64 -quiet -timescale=1ns/1ps -sverilog -debug_pp -Mdir=${TOP}.csrc +v2k +vcs+lic+wait +vcs+initreg+random +define+CLOCK_PERIOD=0.5 +lint=TFIPC-L
-#CC_OPTS=-LDFLAGS "-L../ -ldramsim -lstdc++ -Wl,-rpath=../" -CFLAGS "-O0 -g -I${VCS_HOME}/include -I../sw -I../hw/DRAMSim2 -I../ -I../hw -fPIC -std=c++11 -L../ -ldramsim -lstdc++ -Wl,-rpath=../"
-CC_OPTS=-LDFLAGS "-L${CURDIR}/ -ldramsim -lstdc++ -Wl,-rpath=../" -CFLAGS "-O0 -g -I${VCS_HOME}/include -I${CURDIR}/sw -I${CURDIR}/hw/DRAMSim2 -I${CURDIR}/ -I${CURDIR}/hw -fPIC -std=c++11 -L${CURDIR}/ -ldramsim -lstdc++ -Wl,-rpath=../"
+CC_OPTS=-LDFLAGS "-L${CURDIR}/ -ldramsim -lstdc++ -Wl,-rpath=../" -CFLAGS "-O0 -g -I${VCS_HOME}/include -I${PLASTICINE_HOME}/static/fringeVCS/sw -I${CURDIR}/hw/DRAMSim2 -I${CURDIR}/ -I${CURDIR}/hw -fPIC -std=c++11 -L${CURDIR}/ -ldramsim -lstdc++ -Wl,-rpath=../"
 
 all: dram sim
 
