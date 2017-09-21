@@ -26,6 +26,9 @@ mv accel.bit.bin ${OUTDIR}
 # Copy 'src/main/scala/apps/$APP/Driver.cpp' to OUTDIR
 cp -r src/main/scala/apps/$APP/cpp ${OUTDIR}
 
+# Copy 'simulator.mk', which specifies the top-level simulator to be used with the app
+cp src/main/scala/apps/$APP/simulator.mk ${OUTDIR}
+
 # Copy Makefile
 cp static/fringeVCS/sw/Makefile ${OUTDIR}
 

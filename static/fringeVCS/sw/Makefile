@@ -2,14 +2,20 @@ CC=g++
 LINK=g++
 CROSS_COMPILE=
 
+SIM_DIR=${PLASTICINE_HOME}/sim_out
+
 FRINGE_SRC=${PLASTICINE_HOME}/static/fringeVCS
-HOST_SRC=./
+HOST_SRC=./cpp
+
+include simulator.mk
+SIM_SRC=${SIM_DIR}/${TOP}
 
 SOURCES := $(wildcard ${HOST_SRC}/*.cpp)
 
 INCLUDES +=													\
 			-I${FRINGE_SRC}/hw 					 	\
 			-I${FRINGE_SRC}/sw 					 	\
+			-I${SIM_SRC}/      					 	\
 
 
 OBJECTS=$(SOURCES:.cpp=.o)
