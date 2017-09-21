@@ -15,6 +15,11 @@ import templates.Utils.log2Up
 class PMU(val p: PMUParams) extends CU {
   val io = IO(CUIO(p, () => PMUConfig(p)))
 
+  val configSR = Module(new ShiftRegister(PMUConfig(p)))
+  configSR.io.in <> io.configIn
+  io.configOut <> configSR.io.out
+  val localConfig = configSR.io.config
+
   val scalarInRegs = p.getRegIDs(ScalarInReg)
   val scalarOutRegs = p.getRegIDs(ScalarOutReg)
   Predef.assert((p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts) >= 1, s"ERROR: No scalar outs defined on PMU")
@@ -22,9 +27,9 @@ class PMU(val p: PMUParams) extends CU {
   // Scalar in Xbar
   val numEffectiveScalarIns = p.getNumRegs(ScalarInReg)
   val scalarInXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.numScalarIn, numEffectiveScalarIns, p.w)))
-  scalarInXbar.io.config := io.config.scalarInXbar
+  scalarInXbar.io.config := localConfig.scalarInXbar
   scalarInXbar.io.ins := Vec(io.scalarIn.map { _.bits })
-//  scalarInXbar.io.ins := Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
+//  scalarInXbar.io.ins := Vec(scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(localConfig.fifoNbufConfig(i) === 1.U, io.scalarIn(i).bits, fifo.io.deq(0)) })
 
 
   // Scalar input FIFOs
@@ -39,7 +44,7 @@ class PMU(val p: PMUParams) extends CU {
     fifo
   }
 
-  val scalarIns = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, scalarInXbar.io.outs(i), fifo.io.deq(0)) }
+  val scalarIns = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(localConfig.fifoNbufConfig(i) === 1.U, scalarInXbar.io.outs(i), fifo.io.deq(0)) }
 //  val scalarIns = Vec(scalarFIFOs.map { _.io.deq(0)})
 
   // Vector input FIFOs
@@ -57,7 +62,7 @@ class PMU(val p: PMUParams) extends CU {
 
   // Counter chain
   val counterChain = Module(new CounterChainCore(p.w, p.numCounters))
-  counterChain.io.config := io.config.counterChain
+  counterChain.io.config := localConfig.counterChain
 
   // Connect max and stride
   val ctrMaxStrideSources = scalarIns
@@ -65,13 +70,13 @@ class PMU(val p: PMUParams) extends CU {
     // max
     val maxMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
     maxMux.io.ins := ctrMaxStrideSources
-    maxMux.io.sel := io.config.counterChain.counters(i).max.value
+    maxMux.io.sel := localConfig.counterChain.counters(i).max.value
     counterChain.io.max(i) := maxMux.io.out
 
     // stride
     val strideMux = Module(new MuxN(UInt(p.w.W), ctrMaxStrideSources.size))
     strideMux.io.ins := ctrMaxStrideSources
-    strideMux.io.sel := io.config.counterChain.counters(i).stride.value
+    strideMux.io.sel := localConfig.counterChain.counters(i).stride.value
     counterChain.io.stride(i) := strideMux.io.out
   }
 
@@ -80,8 +85,8 @@ class PMU(val p: PMUParams) extends CU {
   cbox.io.controlIn := io.controlIn
   io.controlOut := cbox.io.controlOut
 
-  val scalarFifoNotFull = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, false.B, ~fifo.io.full) }
-  val scalarFifoNotEmpty = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(io.config.fifoNbufConfig(i) === 1.U, true.B, ~fifo.io.full) }
+  val scalarFifoNotFull = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(localConfig.fifoNbufConfig(i) === 1.U, false.B, ~fifo.io.full) }
+  val scalarFifoNotEmpty = scalarFIFOs.zipWithIndex.map { case (fifo, i) => Mux(localConfig.fifoNbufConfig(i) === 1.U, true.B, ~fifo.io.full) }
 
   cbox.io.fifoNotFull := Vec(scalarFifoNotFull)
   cbox.io.fifoNotEmpty := Vec(scalarFifoNotEmpty ++ vectorFIFOs.map { ~_.io.empty })
@@ -101,7 +106,7 @@ class PMU(val p: PMUParams) extends CU {
 
   cbox.io.done := counterChain.io.done
 
-  cbox.io.config := io.config.control
+  cbox.io.config := localConfig.control
 
   // Pipeline with FUs and registers
   def getPipeRegs: List[FF] = List.tabulate(p.r) { i =>
@@ -128,7 +133,7 @@ class PMU(val p: PMUParams) extends CU {
     stageEnableFF.io.init := 0.U
     stageEnableFF.io.enable := 1.U
 
-    val stageConfig = io.config.stages(i)
+    val stageConfig = localConfig.stages(i)
 
     def getSourcesMux(s: SelectSource) = {
       val sources = s match {
@@ -276,15 +281,15 @@ class PMU(val p: PMUParams) extends CU {
 
   // Scratchpad
   val scratchpad = Module(new Scratchpad(p))
-  scratchpad.io.config := io.config.scratchpad
-  scratchpad.io.wdata := getMux(vectorFIFOs.map {_.io.deq}, io.config.wdataSelect)
-  scratchpad.io.waddr := getAddr(io.config.waddrSelect)
-  scratchpad.io.raddr := getAddr(io.config.raddrSelect)
-  scratchpad.io.wen := getAddrEnable(io.config.waddrSelect)
+  scratchpad.io.config := localConfig.scratchpad
+  scratchpad.io.wdata := getMux(vectorFIFOs.map {_.io.deq}, localConfig.wdataSelect)
+  scratchpad.io.waddr := getAddr(localConfig.waddrSelect)
+  scratchpad.io.raddr := getAddr(localConfig.raddrSelect)
+  scratchpad.io.wen := getAddrEnable(localConfig.waddrSelect)
   scratchpad.io.wdone := cbox.io.sramSwapWrite
   scratchpad.io.rdone := cbox.io.sramSwapRead
 
-  val readEn = getAddrEnable(io.config.raddrSelect)
+  val readEn = getAddrEnable(localConfig.raddrSelect)
 
   // Output assignment
   def getSourcesMux(s: SelectSource) = {
@@ -312,7 +317,7 @@ class PMU(val p: PMUParams) extends CU {
   }
 
   val scalarOutXbar = Module(new CrossbarCore(UInt(p.w.W), ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w)))
-  scalarOutXbar.io.config := io.config.scalarOutXbar
+  scalarOutXbar.io.config := localConfig.scalarOutXbar
   val scalarOutIns = Vec(scalarOutRegs.map { r => pipeRegs.last(r).io.out } ++ scratchpad.io.rdata.getElements.take(p.numScratchpadScalarOuts))
 //  val scalarOutIns = Vec(pipeRegs.last.take(p.numPipelineScalarOuts).map { _.io.out } ++ scratchpad.io.rdata.getElements.take(p.numScratchpadScalarOuts))
   scalarOutXbar.io.ins := scalarOutIns
@@ -325,15 +330,15 @@ class PMU(val p: PMUParams) extends CU {
     out.bits := xbarOut
     out.valid := stageEnables.last.io.out   // Output produced by read addr logic only, which is controlledby enable(0)
                                             // TODO: Fix after threading enable signals
-//    out.valid := getValids(io.config.scalarValidOut(i))
+//    out.valid := getValids(localConfig.scalarValidOut(i))
   }
 
   io.vecOut.zipWithIndex.foreach { case (out, i) =>
     out.bits := scratchpad.io.rdata
-//    out.valid := RegNext(stageEnables.last.io.out & io.config.rdataEnable(i), 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
+//    out.valid := RegNext(stageEnables.last.io.out & localConfig.rdataEnable(i), 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
     out.valid := RegNext(readEn, 0.U) // Output produced by read addr logic only, which is controlledby enable(0)
                                                               // TODO: Fix after threading enable signals
-//    out.valid := getValids(io.config.vectorValidOut(i))
+//    out.valid := getValids(localConfig.vectorValidOut(i))
   }
 
 }
