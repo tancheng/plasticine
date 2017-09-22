@@ -305,6 +305,8 @@ public:
       exit(-1);
     }
 
+    EPRINTF("Simulator process PID: %d\n", sim_pid);
+
     // Close Sim side of pipes
     close(cmdChannel->readFd());
     close(respChannel->writeFd());

@@ -41,7 +41,7 @@ class VerilatorInterface(p: TopParams) extends Bundle {
 
 class VerilatorCUInterface(p: CUParams) extends Bundle {
   // Host scalar interface
-  val regIO = new RegFilePureInterface(p.w, p.w)
+  val regIO = new RegFilePureInterface(32, 64)
 
   // DRAM interface - currently only one stream
   val dram = Vec(1, new DRAMStream(32, 16))

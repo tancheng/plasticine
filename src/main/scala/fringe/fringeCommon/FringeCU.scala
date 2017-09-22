@@ -120,6 +120,7 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
   val magConfig = Wire(new MAGOpcode())
   magConfig.scatterGather := false.B
   mag.io.config := magConfig
+  mag.io.enable := configController.io.configEnabled
 
   mag.io.app.loads(0) <> configController.io.loadStream
   mag.io.dram <> io.dram(0)

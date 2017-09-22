@@ -115,7 +115,7 @@ class MAGCore(
   if (enableHwAsserts) {
     for (i <- 0 until numStreams) {
       val str3 = s"ERROR: addrFifo $i enqVld is high when not enabled!"
-      if (FringeGlobals.target != "verilator") assert((io.enable & cmds(i).valid) | (io.enable & ~cmds(i).valid) | (~io.enable & ~cmds(i).valid), str3)
+//      if (FringeGlobals.target != "verilator") assert((io.enable & cmds(i).valid) | (io.enable & ~cmds(i).valid) | (~io.enable & ~cmds(i).valid), str3)
     }
   }
 

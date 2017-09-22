@@ -21,6 +21,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
     val designReset = Output(Bool())
     val configIn = Decoupled(UInt(1.W))
     val configOut = Flipped(Decoupled(UInt(1.W)))
+    val configEnabled = Output(Bool())
   })
 
   // Command, Status, addr, size registers
@@ -41,11 +42,12 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
 
   val command = regFile.io.argIns(regFile.regIdx2ArgIn(commandReg))
   val addr = regFile.io.argIns(regFile.regIdx2ArgIn(addrReg))
-  val size = regFile.io.argIns(regFile.regIdx2ArgIn(statusReg))
+  val size = regFile.io.argIns(regFile.regIdx2ArgIn(sizeReg))
   val status = regFile.io.argOuts(regFile.regIdx2ArgOut(statusReg)).bits
   regFile.io.argOuts(regFile.regIdx2ArgOut(statusReg)).valid := true.B
 
   val enable = command(0)
+  io.configEnabled := enable
 
   // FSM to load config bits and shift it through the network
   val numStates = 5  // READY, RESET, LOAD, CONFIG, DONE
@@ -62,10 +64,12 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       status := 0.U
       nextState := state_RESET
       transitionNow := enable
+      io.loadStream.cmd.valid := false.B
     }
     is (state_RESET) {
       nextState := state_LOAD
       transitionNow := resetTimerDone
+      io.loadStream.cmd.valid := false.B
     }
     is (state_LOAD) {
       nextState := state_CONFIG
@@ -79,11 +83,13 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
     is (state_CONFIG) {
       nextState := state_DONE
       transitionNow := io.configOut.valid
+      io.loadStream.cmd.valid := false.B
     }
     is (state_DONE) {
       nextState := state_READY
       status := 1.U
       transitionNow := ~enable
+      io.loadStream.cmd.valid := false.B
     }
   }
   // Pseudo-code:

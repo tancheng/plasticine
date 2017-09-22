@@ -30,6 +30,9 @@ mv generated* ${OUTDIR}
 mv bigIP.tcl ${OUTDIR}
 
 # Copy 'src/main/scala/apps/$MODULE/Driver.cpp' to OUTDIR
-cp -r static/fringeVCS/* ${OUTDIR}
+cp -r static/fringeVCS/hw ${OUTDIR}
+cp    static/fringeVCS/Makefile ${OUTDIR}
 
 echo "TOP=Top${MODULE}" > ${OUTDIR}/Makefile.common
+
+make -C ${OUTDIR}

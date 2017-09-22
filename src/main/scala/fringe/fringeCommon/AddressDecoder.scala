@@ -52,8 +52,8 @@ class AddressDecoder(val pin: RegFileParams, val pout: List[RegFileParams]) exte
 	val rdata = getMux(io.regOuts.map{_.rdata}.toList, tag)
 
   // Convert deciding bits to select signals
-  outputOrder.foreach { i =>
-    io.regOuts(i).wen := io.regIn.wen & (if (i == 0) true.B else ((0 until i).toList.map { j => ~decidingBitWaddr(j) }.reduce{_&_})) & decidingBitWaddr(i)
+  outputOrder.zipWithIndex.foreach { case (i, idx) =>
+    io.regOuts(i).wen := io.regIn.wen & (if (idx == 0) true.B else ((0 until idx).toList.map { j => ~decidingBitWaddr(j) }.reduce{_&_})) & decidingBitWaddr(i)
     io.regOuts(i).waddr := io.regIn.waddr & masks(i).U
     io.regOuts(i).raddr := io.regIn.raddr & masks(i).U
     io.regOuts(i).wdata := io.regIn.wdata

@@ -31,5 +31,6 @@ cp src/main/scala/apps/$APP/simulator.mk ${OUTDIR}
 
 # Copy Makefile
 cp static/fringeVCS/sw/Makefile ${OUTDIR}
+cp static/fringeVCS/sw/run.sh   ${OUTDIR}
 
 # Build manually

@@ -22,7 +22,7 @@ OBJECTS=$(SOURCES:.cpp=.o)
 
 DEFINES=$(OBJECTS:.o=.d)
 
-CXXFLAGS=-DPLASTICINE -D__DELITE_CPP_STANDALONE__ -D__USE_STD_STRING__ -std=c++11
+CXXFLAGS=-DPLASTICINE -D__DELITE_CPP_STANDALONE__ -D__USE_STD_STRING__ -std=c++11 -O0 -g
 LDFLAGS=-Wl,--hash-style=both -lstdc++ -pthread -lpthread -lm
 
 all: pre-build-checks Top
@@ -46,7 +46,7 @@ Top: $(OBJECTS)
 
 ## Clean up
 clean:
-	rm -f $(OBJECTS) $(DEFINES) *.a *.vcd *.vpd *.dat *.log ${TOP} Top
+	rm -f $(OBJECTS) $(DEFINES) *.a *.vcd *.vpd *.dat *.log ${TOP} Top ucli.key
 
 # Set the default Makefile goal to be 'all', else it will default to executing
 # the first target in ${TOP}.mk
