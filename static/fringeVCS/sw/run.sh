@@ -9,7 +9,7 @@ export LD_LIBRARY_PATH=$DRAMSIM_HOME:$LD_LIBRARY_PATH
 export USE_IDEAL_DRAM=0
 export DRAM_DEBUG=0
 export DRAM_NUM_OUTSTANDING_BURSTS=-1
-export VPD_ON=1
-export VCD_ON=0
+export VPD_ON=0
+export VCD_ON=1
 
 ./Top $@ 2>&1 | tee sim.log
