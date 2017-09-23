@@ -41,13 +41,13 @@ class AddressDecoder(val pin: RegFileParams, val pout: List[RegFileParams]) exte
     else io.regIn.waddr(log2Up(startAddrs(i)))
   }
   val decidingBitRaddr = outputOrder.map { i =>
-    if (startAddrs(i) == 0) true.B
+    if (startAddrs(i) == 0) false.B   // False instead of true because this is used in priority encoder
     else io.regIn.raddr(log2Up(startAddrs(i)))
   }
 
   val masks = outputOrder.map { i => (1 << (log2Up(pout(i).size + startAddrs(i)))) - 1 }
 
-  val tag = getFF(PriorityEncoder(Vec(decidingBitRaddr)), true.B)
+  val tag = getFF(PriorityEncoder(Vec(List(false.B) ++ decidingBitRaddr.drop(1))), true.B)
 
 	val rdata = getMux(io.regOuts.map{_.rdata}.toList, tag)
 

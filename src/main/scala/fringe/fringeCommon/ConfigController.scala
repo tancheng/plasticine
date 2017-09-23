@@ -8,7 +8,7 @@ import chisel3.util._
 import templates._
 import templates.Utils.log2Up
 import plasticine.arch.CUIO
-import plasticine.misc.Utils.{getFF, getMux, getCounter, getTimer}
+import plasticine.misc.Utils.{getFF, getMux, getCounter, getTimer, convertVec}
 import scala.collection.mutable.HashMap
 
 /**
@@ -59,17 +59,28 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
   val numResetCycles = 1000
   val enableReset = state === state_RESET
   val resetTimerDone = getTimer(numResetCycles.U, enableReset, 16)
+
+  val piso = Module(new PISO(UInt(1.W), 512))
+  piso.io.in.bits   := convertVec(io.loadStream.rdata.bits, 1, 512)
+  piso.io.in.valid     := io.loadStream.rdata.valid
+  io.loadStream.rdata.ready := piso.io.in.ready
+  io.configIn.bits  := piso.io.out.bits
+  io.configIn.valid := piso.io.out.valid
+  piso.io.out.ready := ~io.configOut.valid
+
   switch(state) {
     is (state_READY) {
       status := 0.U
       nextState := state_RESET
       transitionNow := enable
       io.loadStream.cmd.valid := false.B
+      piso.io.clear := true.B
     }
     is (state_RESET) {
       nextState := state_LOAD
       transitionNow := resetTimerDone
       io.loadStream.cmd.valid := false.B
+      piso.io.clear := true.B
     }
     is (state_LOAD) {
       nextState := state_CONFIG
@@ -79,17 +90,20 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       io.loadStream.cmd.bits.isSparse := false.B
       io.loadStream.cmd.valid := true.B
       transitionNow := io.loadStream.cmd.ready
+      piso.io.clear := true.B
     }
     is (state_CONFIG) {
       nextState := state_DONE
       transitionNow := io.configOut.valid
       io.loadStream.cmd.valid := false.B
+      piso.io.clear := false.B
     }
     is (state_DONE) {
       nextState := state_READY
       status := 1.U
       transitionNow := ~enable
       io.loadStream.cmd.valid := false.B
+      piso.io.clear := false.B
     }
   }
   // Pseudo-code:
