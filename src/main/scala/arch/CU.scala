@@ -23,6 +23,7 @@ case class CUIO[+T<:Bundle](p:CUParams, cuConfig: () => T) extends Bundle {
 
   // Config IO
   val config = Input(cuConfig())
+  val configTest = Output(cuConfig())
   val configIn = Flipped(Decoupled(UInt(1.W)))
   val configOut = Decoupled(UInt(1.W))
 
