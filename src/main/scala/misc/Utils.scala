@@ -2,6 +2,7 @@ package plasticine.misc
 
 import scala.language.reflectiveCalls
 import chisel3._
+import chisel3.util.Cat
 import templates._
 
 object Utils {
@@ -55,6 +56,18 @@ object Utils {
     ff.io.in := ff.io.out + value
     ff.io.out
   }
+
+  def convertVec(inVec: Vec[UInt], outw: Int, outv: Int) = {
+    // 1. Cat everything
+    val unifiedUInt = inVec.reverse.reduce { Cat(_,_) }
+
+    // 2. Split apart
+    val out = Vec(List.tabulate(outv) { i =>
+      unifiedUInt(i*outw+outw-1, i*outw)
+    })
+    out
+  }
+
 
   def getFloatBits(num: Float) = java.lang.Float.floatToRawIntBits(num)
   def red(x: String): String = Console.BLACK + Console.RED_B + x + Console.RESET
