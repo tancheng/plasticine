@@ -65,7 +65,6 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
   piso.io.in.valid     := io.loadStream.rdata.valid
   io.loadStream.rdata.ready := piso.io.in.ready
   io.configIn.bits  := piso.io.out.bits
-  io.configIn.valid := piso.io.out.valid
   piso.io.out.ready := ~io.configOut.valid
 
   switch(state) {
@@ -75,12 +74,14 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       transitionNow := enable
       io.loadStream.cmd.valid := false.B
       piso.io.clear := true.B
+      io.configIn.valid := false.B
     }
     is (state_RESET) {
       nextState := state_LOAD
       transitionNow := resetTimerDone
       io.loadStream.cmd.valid := false.B
       piso.io.clear := true.B
+      io.configIn.valid := false.B
     }
     is (state_LOAD) {
       nextState := state_CONFIG
@@ -91,12 +92,14 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       io.loadStream.cmd.valid := true.B
       transitionNow := io.loadStream.cmd.ready
       piso.io.clear := true.B
+      io.configIn.valid := false.B
     }
     is (state_CONFIG) {
       nextState := state_DONE
       transitionNow := io.configOut.valid
       io.loadStream.cmd.valid := false.B
       piso.io.clear := false.B
+      io.configIn.valid := piso.io.out.valid
     }
     is (state_DONE) {
       nextState := state_READY
@@ -104,6 +107,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       transitionNow := ~enable
       io.loadStream.cmd.valid := false.B
       piso.io.clear := false.B
+      io.configIn.valid := false.B
     }
   }
   // Pseudo-code:
