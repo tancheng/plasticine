@@ -19,6 +19,7 @@ class BinaryCodegen() extends Traversal {
       case n: CrossbarBits    => Predef.assert(cnode.isInstanceOf[CrossbarConfig])
       case n: PCUBits         => Predef.assert(cnode.isInstanceOf[PCUConfig])
       case n: PMUBits         => Predef.assert(cnode.isInstanceOf[PMUConfig])
+      case n: DummyPMUBits         => Predef.assert(cnode.isInstanceOf[DummyPMUConfig])
       case n: ScratchpadBits         => Predef.assert(cnode.isInstanceOf[ScratchpadConfig])
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
@@ -79,7 +80,7 @@ class BinaryCodegen() extends Traversal {
         genBinary(n.stride, cn.stride) ++
         genBinary(n.max, cn.max)
       case (n: CrossbarBits, cn: CrossbarConfig)          =>
-        toBinary(n.outSelect, cn.outSelect.getWidth)
+        toBinary(n.outSelect.map { _ + 1}, cn.outSelect.getWidth)
       case (n: PCUBits, cn: PCUConfig)                    =>
         val accumBits = toBinary(n.accumInit, cn.accumInit.getWidth)
         val fifoNbufBits = toBinary(n.fifoNbufConfig, cn.fifoNbufConfig.getWidth)
@@ -109,6 +110,22 @@ class BinaryCodegen() extends Traversal {
         List.tabulate(cn.stages.size) { i =>
           genBinary(n.stages(i), cn.stages(i))
         }.flatten
+
+      case (n: DummyPMUBits, cn: DummyPMUConfig)                    =>
+        toBinary(n.fifoNbufConfig, cn.fifoNbufConfig.getWidth) ++
+        toBinary(n.rdataEnable, cn.rdataEnable.getWidth) ++
+        genBinary(n.raddrSelect, cn.raddrSelect) ++
+        genBinary(n.waddrSelect, cn.waddrSelect) ++
+        toBinary(n.wdataSelect, cn.wdataSelect.getWidth) ++
+        genBinary(n.scratchpad, cn.scratchpad) ++
+        genBinary(n.scalarOutXbar, cn.scalarOutXbar) ++
+        genBinary(n.scalarInXbar, cn.scalarInXbar) ++
+        genBinary(n.control, cn.control) ++
+        genBinary(n.counterChain, cn.counterChain) ++
+        List.tabulate(cn.stages.size) { i =>
+          genBinary(n.stages(i), cn.stages(i))
+        }.flatten
+
       case (n: SwitchCUBits, cn: SwitchCUConfig)                    =>
         toBinary(n.fifoNbufConfig, cn.fifoNbufConfig.getWidth) ++
         genBinary(n.control, cn.control) ++

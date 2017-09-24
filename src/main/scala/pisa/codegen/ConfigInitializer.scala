@@ -21,6 +21,7 @@ class ConfigInitializer() extends Traversal {
       case n: CrossbarBits    => Predef.assert(cnode.isInstanceOf[CrossbarConfig])
       case n: PCUBits         => Predef.assert(cnode.isInstanceOf[PCUConfig])
       case n: PMUBits         => Predef.assert(cnode.isInstanceOf[PMUConfig])
+      case n: DummyPMUBits         => Predef.assert(cnode.isInstanceOf[DummyPMUConfig])
       case n: ScratchpadBits         => Predef.assert(cnode.isInstanceOf[ScratchpadConfig])
       case n: PipeStageBits   => Predef.assert(cnode.isInstanceOf[PipeStageConfig])
       case n: PlasticineBits  => Predef.assert(cnode.isInstanceOf[PlasticineConfig])
@@ -77,6 +78,18 @@ class ConfigInitializer() extends Traversal {
         init(n.counterChain, cn.counterChain)
         for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
       case (n: PMUBits, cn: PMUConfig)                    =>
+        cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
+        cn.rdataEnable.zip(n.rdataEnable) foreach { case (wire, value) => wire := (value > 0).B }
+        init(n.raddrSelect, cn.raddrSelect)
+        init(n.waddrSelect, cn.waddrSelect)
+        cn.wdataSelect := n.wdataSelect.U
+        init(n.scratchpad, cn.scratchpad)
+        init(n.scalarOutXbar, cn.scalarOutXbar)
+        init(n.scalarInXbar, cn.scalarInXbar)
+        init(n.control, cn.control)
+        init(n.counterChain, cn.counterChain)
+        for(i <- 0 until cn.stages.size) { init(n.stages(i), cn.stages(i)) }
+      case (n: DummyPMUBits, cn: DummyPMUConfig)                    =>
         cn.fifoNbufConfig.zip(n.fifoNbufConfig) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         cn.rdataEnable.zip(n.rdataEnable) foreach { case (wire, value) => wire := (value > 0).B }
         init(n.raddrSelect, cn.raddrSelect)

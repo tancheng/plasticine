@@ -353,6 +353,37 @@ object PMUBits {
   }
 }
 
+case class DummyPMUBits(
+  var stages: Array[PipeStageBits],
+  var counterChain: CounterChainBits,
+  var control: PMUControlBoxBits,
+  var scalarInXbar: CrossbarBits,
+  var scalarOutXbar: CrossbarBits,
+  var scratchpad: ScratchpadBits,
+  var wdataSelect: Int,
+  var waddrSelect: SrcValueTuple,
+  var raddrSelect: SrcValueTuple,
+  var rdataEnable: List[Int],
+  var fifoNbufConfig: List[Int]
+) extends CUBits
+object DummyPMUBits {
+  def zeroes(p: PMUParams) = {
+    new DummyPMUBits (
+      Array.tabulate(p.d) { i => PipeStageBits.zeroes(p.r, p.w) },
+      CounterChainBits.zeroes(p.w, p.numCounters),
+      PMUControlBoxBits.zeroes(p),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w)),
+      CrossbarBits.zeroes(ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w)),
+      ScratchpadBits.zeroes,
+      0,
+      SrcValueTuple.zeroes(p.w),
+      SrcValueTuple.zeroes(p.w),
+      List.fill(p.numVectorOut) { 0 },
+      List.fill(p.getNumRegs(ScalarInReg)) { 0 }
+    )
+  }
+}
+
 case class SwitchCUBits(
   var counterChain: CounterChainBits,
   var control: SwitchCUControlBoxBits,

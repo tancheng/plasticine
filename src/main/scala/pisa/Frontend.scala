@@ -87,6 +87,7 @@ trait PISADesign extends ConfigFileInterface {
     case p: CounterChainBits => new CounterChainConfig(GeneratedTopParams.plasticineParams.w, 3)
     case p: PCUBits        => new PCUConfig(GeneratedTopParams.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams])
     case p: PMUBits        => new PMUConfig(GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams])
+    case p: DummyPMUBits        => new DummyPMUConfig(GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams])
     case _ => throw new Exception(s"[getConfigTop] Unsupported '$node'")
   }
 

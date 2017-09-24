@@ -192,6 +192,28 @@ case class PMUConfig(p: PMUParams) extends AbstractConfig {
   }
 }
 
+case class DummyPMUConfig(p: PMUParams) extends AbstractConfig {
+  val enableSources = List[SelectSource](ReadEnSrc, WriteEnSrc, XSrc, PrevStageSrc)
+  val addrSources = List[SelectSource](XSrc, CounterSrc, ALUSrc, ScalarFIFOSrc, ConstSrc)
+  val operandSources = List[SelectSource](XSrc, ConstSrc, CounterSrc, ScalarFIFOSrc, PrevStageSrc)
+
+  val stages = Vec(p.d, new PipeStageConfig(p.r, p.w,p.numCounters, enableSources, 1, operandSources))
+  val counterChain = CounterChainConfig(p.w, p.numCounters)
+  val control = PMUControlBoxConfig(p)
+  val scalarInXbar = CrossbarConfig(ScalarSwitchParams(p.numScalarIn, p.getNumRegs(ScalarInReg), p.w))
+  val scalarOutXbar = CrossbarConfig(ScalarSwitchParams(p.getNumRegs(ScalarOutReg) + p.numScratchpadScalarOuts, p.numScalarOut, p.w))
+  val scratchpad = ScratchpadConfig(p)
+  val wdataSelect = UInt(log2Up(p.numVectorIn).W)
+  val waddrSelect = SrcValueBundle(addrSources, log2Up(p.scratchpadSizeWords))
+  val raddrSelect = SrcValueBundle(addrSources, log2Up(p.scratchpadSizeWords))
+  val rdataEnable = Vec(p.numVectorOut, Bool())
+  val fifoNbufConfig = Vec(p.getNumRegs(ScalarInReg), UInt(log2Up(p.scalarFIFODepth).W))
+
+  override def cloneType(): this.type = {
+    new DummyPMUConfig(p).asInstanceOf[this.type]
+  }
+}
+
 case class SwitchCUConfig(p: SwitchCUParams) extends AbstractConfig {
   val counterChain = CounterChainConfig(p.w, p.numCounters)
   val control = SwitchCUControlBoxConfig(p)

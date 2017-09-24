@@ -12,6 +12,17 @@ import plasticine.config._
 import plasticine.pisa.enums._
 import templates.Utils.log2Up
 
+class DummyPMU(val p: PMUParams) extends CU {
+  val io = IO(CUIO(p, () => DummyPMUConfig(p)))
+
+  val configSR = Module(new ShiftRegister(DummyPMUConfig(p)))
+  configSR.io.in <> io.configIn
+  io.configOut <> configSR.io.out
+  val localConfig = configSR.io.config
+  io.configTest <> localConfig
+
+}
+
 class PMU(val p: PMUParams) extends CU {
   val io = IO(CUIO(p, () => PMUConfig(p)))
 

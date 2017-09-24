@@ -7,7 +7,7 @@ import fringe._
 import templates.Utils.log2Up
 import plasticine.spade._
 import plasticine.pisa.ir._
-import plasticine.config.PMUConfig
+import plasticine.config.{PMUConfig, DummyPMUConfig}
 import scala.language.reflectiveCalls
 
 // import AccelTop
@@ -49,6 +49,8 @@ class VerilatorCUInterface(p: CUParams) extends Bundle {
   // Configuration interface
   val configIn = Flipped(Decoupled(UInt(1.W)))
   val configOut = Decoupled(UInt(1.W))
+
+  val configTest = Output(DummyPMUConfig(p.asInstanceOf[PMUParams]))
 }
 
 /**
@@ -128,7 +130,7 @@ class TopPMU(p: PMUParams) extends Module {
   val pmu = Module(new PMU(p))
 
   val blockingDRAMIssue = false
-  val fringe = Module(new FringeCU(p, () => PMUConfig(p)))
+  val fringe = Module(new FringeCU(p, () => DummyPMUConfig(p)))
 
   val topIO = io.asInstanceOf[VerilatorCUInterface]
 
@@ -145,4 +147,5 @@ class TopPMU(p: PMUParams) extends Module {
   pmu.reset := reset | fringe.io.designReset
   pmu.io.configIn <> fringe.io.configIn
   pmu.io.configOut <> fringe.io.configOut
+  io.configTest <> pmu.io.configTest
 }
