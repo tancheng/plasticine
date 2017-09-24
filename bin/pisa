@@ -33,4 +33,5 @@ cp src/main/scala/apps/$APP/simulator.mk ${OUTDIR}
 cp static/fringeVCS/sw/Makefile ${OUTDIR}
 cp static/fringeVCS/sw/run.sh   ${OUTDIR}
 
-# Build manually
+# Build generated app
+make -C ${OUTDIR}
