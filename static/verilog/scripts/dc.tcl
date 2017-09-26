@@ -73,7 +73,7 @@ set_dont_use tcbn45gsbwpml/*D0BWP
 
 # define clock
 # create_clock clk -name ideal_clock1 -period 1
-create_clock clk -name clk -period $CLK_PERIOD
+create_clock clock -name clock -period $CLK_PERIOD
 # compile_ultra -gate_clock
 # disable OPT-1206
 # set compile_seqmap_propagate_constants false
