@@ -33,6 +33,9 @@ mv bigIP.tcl ${OUTDIR}
 cp -r static/fringeVCS/hw ${OUTDIR}
 cp    static/fringeVCS/Makefile ${OUTDIR}
 
+# Use common module name "CU" for all CUs
+if [ $MODULE == "PCU" ] || [ $MODULE == "PMU" ]; then MODULE=CU; fi
+
 echo "TOP=Top${MODULE}" > ${OUTDIR}/Makefile.common
 
 make -C ${OUTDIR}
