@@ -22,3 +22,12 @@ sbt "; run-main plasticine.${MODULE}Gen --testArgs --outdir $OUTDIR"
 
 # Copy 'src/main/scala/apps/$MODULE/Driver.cpp' to OUTDIR
 cp -r static/verilog/* $OUTDIR
+
+# Rename outdir to whatever the verilog file's name is
+VERILOG_FILE_NAME=$(basename $(find $OUTDIR -iname *.v) | cut -f1 -d'.')
+NEW_OUTDIR=${OUT_DIR}/${VERILOG_FILE_NAME}
+mv $OUTDIR $NEW_OUTDIR
+echo "Changed output directory name from $OUTDIR -> $NEW_OUTDIR"
+
+echo "TOP_MODULE=${VERILOG_FILE_NAME}" > ${NEW_OUTDIR}/Makefile.common
+
