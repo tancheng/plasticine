@@ -72,6 +72,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       status := 0.U
       nextState := state_RESET
       transitionNow := enable
+      io.designReset := ~io.configOut.valid
       io.loadStream.cmd.valid := false.B
       piso.io.clear := true.B
       io.configIn.valid := false.B
@@ -79,6 +80,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
     is (state_RESET) {
       nextState := state_LOAD
       transitionNow := resetTimerDone
+      io.designReset := true.B
       io.loadStream.cmd.valid := false.B
       piso.io.clear := true.B
       io.configIn.valid := false.B
@@ -91,6 +93,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       io.loadStream.cmd.bits.isSparse := false.B
       io.loadStream.cmd.valid := true.B
       transitionNow := io.loadStream.cmd.ready
+      io.designReset := true.B
       piso.io.clear := true.B
       io.configIn.valid := false.B
     }
@@ -98,6 +101,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       nextState := state_DONE
       transitionNow := io.configOut.valid
       io.loadStream.cmd.valid := false.B
+      io.designReset := true.B
       piso.io.clear := false.B
       io.configIn.valid := piso.io.out.valid
     }
@@ -105,6 +109,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
       nextState := state_READY
       status := 1.U
       transitionNow := ~enable
+      io.designReset := true.B
       io.loadStream.cmd.valid := false.B
       piso.io.clear := false.B
       io.configIn.valid := false.B

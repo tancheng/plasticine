@@ -6,6 +6,7 @@ import chisel3.Module
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import plasticine.arch._
 import plasticine.spade._
+import plasticine.config._
 import templates._
 import fringe._
 
@@ -68,11 +69,26 @@ object PMUGen extends CommonDriver {
   def dut = () => new PMU(params)
 }
 
-object PMUSim extends CommonDriver {
-  type DUTType = TopPMU
+abstract class CUSim[P <: CUParams, D <: CU, C <: AbstractConfig]() extends CommonDriver {
+  type DUTType = TopCU[P, D, C]
+  def params: P
+  def cu: D
+  def config: C
+  def dut = () => new TopCU(() => params, () => cu, () => config)
+}
+
+object PMUSim extends CUSim[PMUParams, PMU, PMUConfig] {
   override val moduleName = "TopPMU"
-  val params = GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams]
-  def dut = () => new TopPMU(params)
+  def params = GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams]
+  def cu = new PMU(params)
+  def config = new PMUConfig(params)
+}
+
+object PCUSim extends CUSim[PCUParams, PCU, PCUConfig] {
+  override val moduleName = "TopPCU"
+  def params = GeneratedTopParams.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]
+  def cu = new PCU(params)(0,0)
+  def config = new PCUConfig(params)
 }
 
 object VectorSwitchGen extends CommonDriver {

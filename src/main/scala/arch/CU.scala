@@ -26,6 +26,7 @@ case class CUIO[+T<:Bundle](p:CUParams, cuConfig: () => T) extends Bundle {
   val configTest = Output(cuConfig())
   val configIn = Flipped(Decoupled(UInt(1.W)))
   val configOut = Decoupled(UInt(1.W))
+  val configReset = Input(Bool())
 
   override def cloneType(): this.type = {
     new CUIO(p, cuConfig).asInstanceOf[this.type]

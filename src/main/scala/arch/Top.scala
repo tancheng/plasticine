@@ -7,27 +7,15 @@ import fringe._
 import templates.Utils.log2Up
 import plasticine.spade._
 import plasticine.pisa.ir._
-import plasticine.config.{PMUConfig, DummyPMUConfig}
+import plasticine.config._
 import scala.language.reflectiveCalls
 
 // import AccelTop
-abstract class TopInterface extends Bundle {
-  // Host scalar interface
-//  var raddr = Input(UInt(1.W))
-//  var wen  = Input(Bool())
-//  var waddr = Input(UInt(1.W))
-//  var wdata = Input(Bits(1.W))
-//  var rdata = Output(Bits(1.W))
-}
+abstract class TopInterface extends Bundle
 
-class VerilatorInterface(p: TopParams) extends Bundle {
+class VerilatorInterface(p: TopParams) extends TopInterface {
   // Host scalar interface
   val regIO = new RegFilePureInterface(p.fringeParams.addrWidth, p.fringeParams.dataWidth)
-//  val raddr = Input(UInt(p.fringeParams.addrWidth.W))
-//  val wen  = Input(Bool())
-//  val waddr = Input(UInt(p.fringeParams.addrWidth.W))
-//  val wdata = Input(Bits(p.fringeParams.dataWidth.W))
-//  val rdata = Output(Bits(p.fringeParams.dataWidth.W))
 
   // DRAM interface - currently only one stream
   val dram = Vec(p.fringeParams.numChannels, new DRAMStream(32, 16))
@@ -39,7 +27,7 @@ class VerilatorInterface(p: TopParams) extends Bundle {
   val configOut = Decoupled(UInt(1.W))
 }
 
-class VerilatorCUInterface(p: CUParams) extends Bundle {
+class VerilatorCUInterface[+C<:AbstractConfig](config: C) extends TopInterface {
   // Host scalar interface
   val regIO = new RegFilePureInterface(32, 64)
 
@@ -50,7 +38,7 @@ class VerilatorCUInterface(p: CUParams) extends Bundle {
   val configIn = Flipped(Decoupled(UInt(1.W)))
   val configOut = Decoupled(UInt(1.W))
 
-  val configTest = Output(DummyPMUConfig(p.asInstanceOf[PMUParams]))
+  val configTest = Output(config.cloneType)
 }
 
 /**
@@ -97,11 +85,6 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
 
       // Fringe <-> Host connections
       fringe.io.regIO <> topIO.regIO
-//      fringe.io.raddr := topIO.raddr
-//      fringe.io.wen   := topIO.wen
-//      fringe.io.waddr := topIO.waddr
-//      fringe.io.wdata := topIO.wdata
-//      topIO.rdata := fringe.io.rdata
 
       // Fringe <-> DRAM connections
       topIO.dram <> fringe.io.dram
@@ -122,17 +105,17 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
   }
 }
 
-// PMU testing
-class TopPMU(p: PMUParams) extends Module {
-  val io = IO(new VerilatorCUInterface(p))
+// CU testing
+class TopCU[+P<:CUParams, +D<:CU, +C<:AbstractConfig](params: () => P, dut: () => D, config: () => C) extends Module {
+  val io = IO(new VerilatorCUInterface(config()))
 
   // CU
-  val pmu = Module(new PMU(p))
+  val cu = Module(dut())
 
   val blockingDRAMIssue = false
-  val fringe = Module(new FringeCU(p, () => DummyPMUConfig(p)))
+  val fringe = Module(new FringeCU(params(), config))
 
-  val topIO = io.asInstanceOf[VerilatorCUInterface]
+  val topIO = io.asInstanceOf[VerilatorCUInterface[C]]
 
   // Fringe <-> Host
   fringe.io.regIO <> topIO.regIO
@@ -141,11 +124,61 @@ class TopPMU(p: PMUParams) extends Module {
   topIO.dram <> fringe.io.dram
 
   // Fringe <-> CU data and control IO
-  pmu.io <> fringe.io.cuio
+  cu.io <> fringe.io.cuio
 
   // Fringe <-> CU reset config IO
-  pmu.reset := reset | fringe.io.designReset
-  pmu.io.configIn <> fringe.io.configIn
-  pmu.io.configOut <> fringe.io.configOut
-  io.configTest <> pmu.io.configTest
+  cu.reset := reset | fringe.io.designReset
+  cu.io.configIn <> fringe.io.configIn
+  cu.io.configOut <> fringe.io.configOut
+  cu.io.configReset := reset
+  io.configTest <> cu.io.configTest
+
+  // Print out total config bits
+  val pcuParams = GeneratedTopParams.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]
+  val pmuParams = GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams]
+  val vswitchParams = GeneratedTopParams.plasticineParams.vectorSwitchParams(0)(0)
+  val sswitchParams = GeneratedTopParams.plasticineParams.scalarSwitchParams(0)(0)
+  val cswitchParams = GeneratedTopParams.plasticineParams.controlSwitchParams(0)(0)
+  val switchCUParams = GeneratedTopParams.plasticineParams.switchCUParams(0)(0)
+  val scalarCUParams = GeneratedTopParams.plasticineParams.scalarCUParams(0)(0)
+  val memChannelParams = GeneratedTopParams.plasticineParams.memoryChannelParams(0)(0)
+
+  val numRows = 16
+  val numCols = 8
+  val numPCUs = numRows * numCols / 2
+  val numPMUs = numRows * numCols / 2
+  val numScalarCUs = (numRows+1) * 2
+  val numSwitches = (numRows+1) * (numCols+1)
+
+  val width = numPCUs * PCUConfig(pcuParams).getWidth +
+              numPMUs * PMUConfig(pmuParams).getWidth +
+              numSwitches * CrossbarConfig(vswitchParams).getWidth +
+              numSwitches * CrossbarConfig(sswitchParams).getWidth +
+              numSwitches * CrossbarConfig(cswitchParams).getWidth +
+              numSwitches * SwitchCUConfig(switchCUParams).getWidth +
+              numScalarCUs * ScalarCUConfig(scalarCUParams).getWidth +
+              numScalarCUs * MemoryChannelConfig(memChannelParams).getWidth
+
+  println(
+s"""Plasticine Configuration:
+  Grid Size   : $numRows x $numCols (${numRows * numCols})
+  # PCUs      : $numPCUs
+  # PMUs      : $numPMUs
+  # switches  : $numSwitches
+  # scalarCUs : $numScalarCUs
+
+  Total configuration bits size (bits) : $width
+                              (bytes)  : ${width / 8.0f}
+                              (KB)     : ${width / (8.0f * 1024)}
+
+  Breakdown (bits / component):
+      # PCU       : ${PCUConfig(pcuParams).getWidth}, ${numPCUs * PCUConfig(pcuParams).getWidth} total
+      # PMU       : ${PMUConfig(pmuParams).getWidth}, ${numPMUs * PMUConfig(pmuParams).getWidth} total
+      # VSwitch   : ${CrossbarConfig(vswitchParams).getWidth}, ${numSwitches * CrossbarConfig(vswitchParams).getWidth} total
+      # SSwitch   : ${CrossbarConfig(sswitchParams).getWidth}, ${numSwitches * CrossbarConfig(sswitchParams).getWidth} total
+      # CSwitch   : ${CrossbarConfig(cswitchParams).getWidth}, ${numSwitches * CrossbarConfig(cswitchParams).getWidth} total
+      # SwitchCU  : ${SwitchCUConfig(switchCUParams).getWidth}, ${numSwitches * SwitchCUConfig(switchCUParams).getWidth} total
+      # Scalar CU : ${ScalarCUConfig(scalarCUParams).getWidth}, ${numScalarCUs * ScalarCUConfig(scalarCUParams).getWidth} total
+      # MemChan   : ${MemoryChannelConfig(memChannelParams).getWidth}, ${numScalarCUs * MemoryChannelConfig(memChannelParams).getWidth} total
+""")
 }

@@ -45,6 +45,7 @@ class PCU(val p: PCUParams)(row: Int, col: Int) extends CU {
 
   val configSR = Module(new ShiftRegister(PCUConfig(p)))
   configSR.io.in <> io.configIn
+  configSR.reset := io.configReset
   io.configOut <> configSR.io.out
   val localConfig = configSR.io.config
 

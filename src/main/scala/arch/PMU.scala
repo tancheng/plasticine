@@ -17,6 +17,7 @@ class DummyPMU(val p: PMUParams) extends CU {
 
   val configSR = Module(new ShiftRegister(DummyPMUConfig(p)))
   configSR.io.in <> io.configIn
+  configSR.reset := io.configReset
   io.configOut <> configSR.io.out
   val localConfig = configSR.io.config
   io.configTest <> localConfig
@@ -28,6 +29,7 @@ class PMU(val p: PMUParams) extends CU {
 
   val configSR = Module(new ShiftRegister(PMUConfig(p)))
   configSR.io.in <> io.configIn
+  configSR.reset := io.configReset
   io.configOut <> configSR.io.out
   val localConfig = configSR.io.config
 

@@ -99,6 +99,9 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
     argOutReg.valid := true.B
   }
 
+  // TODO: Remove this
+  io.cuio.controlIn.foreach { _ := 0.U }
+
   // Hardware time out (for debugging)
 //  val timeoutCycles = 12000000000L
 //  val timeoutCtr = Module(new Counter(40))
