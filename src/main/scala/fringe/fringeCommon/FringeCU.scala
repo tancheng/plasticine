@@ -7,6 +7,7 @@ import templates._
 import templates.Utils.log2Up
 import plasticine.arch.CUIO
 import plasticine.spade.CUParams
+import plasticine.misc.Utils._
 
 /**
  * FringeCU: Shell around all CUs
@@ -67,8 +68,9 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
   val scalarRegs = Module(new RegFile(regWidth, numScalarRegs, p.numScalarIn, p.numScalarOut+numDebugs, numArgIOs))
 
   // Control registers
-  val numControlRegs = p.numControlIn + p.numControlOut
-  val controlRegs = Module(new RegFile(regWidth, numControlRegs, p.numControlIn, p.numControlOut, numArgIOs))
+  val numControlRegs = 2*p.numControlIn + p.numControlOut
+  val controlRegs = Module(new RegFile(regWidth, numControlRegs, 2*p.numControlIn, p.numControlOut+1, numArgIOs))
+  addrMapper.addOffset("CONTROL_PULSE_REG", p.numControlIn)
 
   // Configuration controller
   val configController = Module(new ConfigController(addrWidth, regWidth))
@@ -94,13 +96,19 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
     argOutReg.bits := io.cuio.scalarOut(i).bits
     argOutReg.valid := io.cuio.scalarOut(i).valid
   }
-  controlRegs.io.argOuts.zipWithIndex.foreach { case (argOutReg, i) =>
-    argOutReg.bits := io.cuio.controlOut(i)
+  controlRegs.io.argOuts.drop(1).zipWithIndex.foreach { case (argOutReg, i) =>
+    argOutReg.bits := getCounter(io.cuio.controlOut(i), 16, configController.io.designReset)
     argOutReg.valid := true.B
   }
 
-  // TODO: Remove this
-  io.cuio.controlIn.foreach { _ := 0.U }
+  io.cuio.controlIn.zipWithIndex.foreach { case (bit, idx) =>
+    val pulserWidth = 16
+    val pulserReg = controlRegs.io.argIns(p.numControlIn + idx)
+    val pulser = Module(new PulserSM(pulserWidth))
+    pulser.io.max := pulserReg(pulserWidth-1, 0)
+    pulser.io.in  := pulserReg(pulserReg.getWidth - 1)
+    bit := controlRegs.io.argIns(idx) | pulser.io.out
+  }
 
   // Hardware time out (for debugging)
 //  val timeoutCycles = 12000000000L

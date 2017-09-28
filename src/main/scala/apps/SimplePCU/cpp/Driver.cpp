@@ -1,6 +1,9 @@
 #include "FringeContext.h"
 #include "PrettyPrintMacros.h"
 
+
+
+
 int main(int argc, char *argv[]) {
 //  ASSERT(argc >= 2, "Usage: %s <arraySize>\n", argv[0]);
 //  int N = atoi(argv[1]);
@@ -8,6 +11,20 @@ int main(int argc, char *argv[]) {
   // Create an execution context.
   FringeContext *c1 = new FringeContext("./accel.bit.bin");
   c1->load();
+
+  // Send a pulse in to controlIn(0)
+  c1->writeReg(CONTROL_BASE + CONTROL_PULSE_REG_OFFSET + 0, (((uint64_t)1 << 63) | 1));
+
+  // Poll on controlOut(0)
+  bool timeout = c1->pollOn(CONTROL_BASE + 2*CONTROL_PULSE_REG_OFFSET);
+  if (timeout) {
+    EPRINTF("Timeout during poll\n");
+    delete c1;
+    exit(-1);
+  }
+
+  // Enable is auto-shut off
+//  c1->writeReg(CONTROL_BASE + 0, 0);
 
 //  printf("%s", KGRN);
 //
