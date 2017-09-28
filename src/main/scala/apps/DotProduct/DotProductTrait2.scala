@@ -83,9 +83,9 @@ trait DotProductTrait2 extends DotProductTrait1  {
     // PipeCU463_x1092_0.udcounters=[ScalBuf464 -> TokBuf962]
     // cus(1)(1).asPCUBits.udcs=[Some(TokBuf962),None,None,None,None]
     cus(1)(1).asPCUBits.control.udcInit=List(0,-1,-1,-1,-1)
-    cus(1)(1).asPCUBits.control.tokenInAndTree = List(0, 0, 0, 0)
-    cus(1)(1).asPCUBits.control.fifoAndTree = List(0, 0, 0, 0, 0, 0, 0, 0)
-    cus(1)(1).asPCUBits.control.siblingAndTree = List(1, 0, 0, 0, 0)
+    cus(1)(1).asPCUBits.control.tokenInAndTree = Array(0, 0, 0, 0)
+    cus(1)(1).asPCUBits.control.fifoAndTree = Array(0, 0, 0, 0, 0, 0, 0, 0)
+    cus(1)(1).asPCUBits.control.siblingAndTree = Array(1, 0, 0, 0, 0)
     // PipeCU463_x1092_0 isPipelining=true isStreaming=false
     cus(1)(1).asPCUBits.control.streamingMuxSelect = 0
     // sm35311[0] -> ScalBuf464 swapWrite=PipeCU366_x1087_0.doneOut

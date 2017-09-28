@@ -30,6 +30,7 @@ class PISO[T<:Data](val t: T, val numInputs: Int) extends Module {
   }
 
   val count = Module(new UpDownCtr((log2Up(numInputs+1))))
+  count.io.enable := 1.U
   count.io.initval := 0.U
   count.io.max := numInputs.U
   count.io.strideInc := numInputs.U

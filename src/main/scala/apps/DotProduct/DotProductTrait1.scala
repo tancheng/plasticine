@@ -61,9 +61,9 @@ trait DotProductTrait1 {
     // PipeCU366_x1087_0.udcounters=[ScalBuf464 -> CredBuf956]
     // cus(0)(0).asPCUBits.udcs=[Some(CredBuf956),None,None,None,None]
     cus(0)(0).asPCUBits.control.udcInit=List(2,-1,-1,-1,-1)
-    cus(0)(0).asPCUBits.control.tokenInAndTree = List(0, 0, 0, 0)
-    cus(0)(0).asPCUBits.control.fifoAndTree = List(0, 0, 0, 0, 1, 1, 0, 0)
-    cus(0)(0).asPCUBits.control.siblingAndTree = List(1, 0, 0, 0, 0)
+    cus(0)(0).asPCUBits.control.tokenInAndTree = Array(0, 0, 0, 0)
+    cus(0)(0).asPCUBits.control.fifoAndTree = Array(0, 0, 0, 0, 1, 1, 0, 0)
+    cus(0)(0).asPCUBits.control.siblingAndTree = Array(1, 0, 0, 0, 0)
     // PipeCU366_x1087_0 isPipelining=true isStreaming=false
     cus(0)(0).asPCUBits.control.streamingMuxSelect = 0
     cus(0)(0).asPCUBits.control.incrementXbar.outSelect(0) = 1

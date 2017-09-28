@@ -135,6 +135,7 @@ class ConfigInitializer() extends Traversal {
         cn.mode := n.mode.U
 
       case (n: PCUControlBoxBits, cn: PCUControlBoxConfig)      =>
+        cn.udcEnable.zip(n.udcInit) foreach { case (wire, value) => wire := value.U }
         cn.udcInit.zip(n.udcInit) foreach { case (wire, value) => wire := (if (value == -1) 0.U else value.U) }
         init(n.tokenOutXbar, cn.tokenOutXbar)
         init(n.swapWriteXbar, cn.swapWriteXbar)

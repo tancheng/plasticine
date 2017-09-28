@@ -19,6 +19,7 @@ class UpDownCtr(val w: Int) extends Module {
     val init     = Input(Bool())
     val inc      = Input(Bool())
     val dec      = Input(Bool())
+    val enable   = Input(Bool())
     val gtz      = Output(Bool())  // greater-than-zero
     val isMax    = Output(Bool())
     val out      = Output(UInt(w.W))
@@ -33,7 +34,7 @@ class UpDownCtr(val w: Int) extends Module {
 
   // If inc and dec go high at the same time, the counter
   // should change value based on strideInc and strideDec
-  reg.io.enable := io.inc | io.dec | io.init
+  reg.io.enable := io.enable & (io.inc | io.dec | io.init)
 
   val incval = Mux(io.inc, io.strideInc, 0.U)
   val decval = Mux(io.dec, io.strideDec, 0.U)

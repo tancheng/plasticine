@@ -14,21 +14,34 @@ import plasticine.pisa.enums._
 object SimplePCU extends PISADesign with SimplePCUTrait
 trait SimplePCUTrait {
   val pcuBits = PCUBits.zeroes(cuParams(0)(0).asInstanceOf[PCUParams])
-  pcuBits.control.udcInit=List(2,-1,-1,-1,-1)
-  pcuBits.control.tokenInAndTree = List(0, 0, 0, 0)
-  pcuBits.control.fifoAndTree = List(0, 0, 0, 0, 1, 1, 0, 0)
-  pcuBits.control.siblingAndTree = List(1, 0, 0, 0, 0)
+
+  // Helper methods to create datapath
+  // Datapath has operand sources, opcodes, destinations, forwarded results
+  // What is the format I want, that captures the above?
+
+  // Pain points:
+  // 1. Datapath too verbose
+  // 2. Passing forward values is annoying
+  // 3. Control is almost impossible
+
+  // Counters
+  pcuBits.counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 256), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 0), par=16)
+
+  // Drive udc with controlIn(0). Drive PCU's enable on udc0
+  // controlIn(0) -> udc(0) -> enable
+  pcuBits.control.incrementXbar.outSelect(0) = 0
+  pcuBits.control.udcEnable(0) = 1
+  pcuBits.control.siblingAndTree(0) = 1
   pcuBits.control.streamingMuxSelect = 0
-  pcuBits.control.incrementXbar.outSelect(0) = 1
-  pcuBits.control.tokenOutXbar.outSelect(0) = 4
-  pcuBits.control.tokenOutXbar.outSelect(1) = 4
+
+  // PCU is done when counter0 is done
+  // counter(0).done -> controlOut(0)
   pcuBits.control.doneXbar.outSelect(0) = 0
-  pcuBits.fifoNbufConfig=List(-1,-1,-1,-1)
-  pcuBits.scalarOutXbar.outSelect(1) = 0
-  pcuBits.counterChain.chain = List(0,0,0,0)
-  pcuBits.counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 32), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 0), par=16)
-  pcuBits.stages(0).opA = SVT(VectorFIFOSrc, 0)
-  pcuBits.stages(0).opB = SVT(VectorFIFOSrc, 1)
+  pcuBits.control.tokenOutXbar.outSelect(0) = 4
+
+  // Datapath
+  pcuBits.stages(0).opA = SVT(CounterSrc, 0)
+  pcuBits.stages(0).opB = SVT(CounterSrc, 0)
   pcuBits.stages(0).opC = SVT()
   pcuBits.stages(0).opcode = FixMul
   pcuBits.stages(0).res = List(SVT(CurrStageDst, 0))
@@ -71,6 +84,22 @@ trait SimplePCUTrait {
   pcuBits.stages(7).opcode = BypassA
   pcuBits.stages(7).res = List(SVT(CurrStageDst, 5))
   pcuBits.stages(7).fwd(5) = SVT(ALUSrc, 7)
+
+  // Route scalar to output
+  pcuBits.scalarOutXbar.outSelect(1) = 0
+
+  // Control: Just use tokenIn
+//  pcuBits.control.udcInit=List(2,-1,-1,-1,-1)
+//  pcuBits.control.tokenInAndTree = List(0, 0, 0, 0)
+//  pcuBits.control.fifoAndTree = List(0, 0, 0, 0, 1, 1, 0, 0)
+//  pcuBits.control.siblingAndTree = List(1, 0, 0, 0, 0)
+//  pcuBits.control.streamingMuxSelect = 0
+//  pcuBits.control.incrementXbar.outSelect(0) = 1
+//  pcuBits.control.tokenOutXbar.outSelect(0) = 4
+//  pcuBits.control.tokenOutXbar.outSelect(1) = 4
+//  pcuBits.control.doneXbar.outSelect(0) = 0
+//  pcuBits.fifoNbufConfig=List(-1,-1,-1,-1)
+//  pcuBits.scalarOutXbar.outSelect(1) = 0
 
   def main(args: String*) = pcuBits
 }

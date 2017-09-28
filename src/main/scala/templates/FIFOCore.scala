@@ -33,6 +33,7 @@ abstract class FIFOBase(val w: Int, val d: Int, val v: Int) extends Module {
 
   // Create size register
   val sizeUDC = Module(new UpDownCtr(log2Up(d+1)))
+  sizeUDC.io.enable := 1.U
   val size = sizeUDC.io.out
   io.fifoSize := size
   val remainingSlots = d.U - size

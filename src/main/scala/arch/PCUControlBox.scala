@@ -57,6 +57,7 @@ class PCUControlBox(val p: PCUParams) extends Module {
   // Up-down counters to handle tokens and credits
   val udCounters = List.tabulate(p.numUDCs) { i =>
     val udc = Module(new UpDownCtr(p.udCtrWidth))
+    udc.io.enable := io.config.udcEnable(i)
     udc.io.initAtConfig := true.B
     udc.io.init := false.B
     udc.io.initval := io.config.udcInit(i)
@@ -68,8 +69,8 @@ class PCUControlBox(val p: PCUParams) extends Module {
     udc.io.max := max
 
     // asserts
-    assert(~udc.io.inc | (udc.io.inc & (udc.io.out < max)) | (udc.io.inc & udc.io.dec), s"UDC $i overflow!")
-    assert(~udc.io.dec | (udc.io.dec & (udc.io.out > 0.U)) | (udc.io.inc & udc.io.dec), s"UDC $i underflow!")
+    assert(~udc.io.enable | (udc.io.enable & (~udc.io.inc | (udc.io.inc & (udc.io.out < max)) | (udc.io.inc & udc.io.dec))), s"UDC $i overflow!")
+    assert(~udc.io.enable | (udc.io.enable & (~udc.io.dec | (udc.io.dec & (udc.io.out > 0.U)) | (udc.io.inc & udc.io.dec))), s"UDC $i underflow!")
     udc
   }
 

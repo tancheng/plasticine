@@ -423,28 +423,30 @@ object ScalarCUBits {
 }
 
 case class PCUControlBoxBits(
-  var tokenInAndTree: List[Int],
-  var fifoAndTree: List[Int],
-  var siblingAndTree: List[Int],
+  var tokenInAndTree: Array[Int],
+  var fifoAndTree: Array[Int],
+  var siblingAndTree: Array[Int],
   var streamingMuxSelect: Int,
   var incrementXbar: CrossbarBits,
   var doneXbar: CrossbarBits,
   var swapWriteXbar: CrossbarBits,
   var tokenOutXbar: CrossbarBits,
-  var udcInit: List[Int]
+  var udcInit: List[Int],
+  var udcEnable: Array[Int]
 ) extends AbstractBits
 object PCUControlBoxBits {
   def zeroes(p: PCUParams) = {
     new PCUControlBoxBits(
-        List.fill(p.numControlIn) { 0 },   // tokenInAndTree
-        List.fill(p.numScalarIn + p.numVectorIn) { 0 }, // fifoAndTree
-        List.fill(p.numUDCs) { 0 }, // siblingAndTree
+        Array.fill(p.numControlIn) { 0 },   // tokenInAndTree
+        Array.fill(p.numScalarIn + p.numVectorIn) { 0 }, // fifoAndTree
+        Array.fill(p.numUDCs) { 0 }, // siblingAndTree
         0,   // streamingMuxSelect
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numUDCs)),  // incrementXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numCounters, 1)),  // doneXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numControlIn, p.numScalarIn)), // swapWriteXbar
         CrossbarBits.zeroes(ControlSwitchParams(p.numScalarIn + 2, p.numControlOut)), // tokenOutXbar
-        List.fill(p.numUDCs) { 0 } // udcInit
+        List.fill(p.numUDCs) { 0 }, // udcInit
+        Array.fill(p.numUDCs) { 0 } // udcEnable
       )
   }
 }

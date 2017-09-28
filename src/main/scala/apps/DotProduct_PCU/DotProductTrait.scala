@@ -15,9 +15,9 @@ object DotProduct_PCU extends PISADesign with DotProductTrait_PCU
 trait DotProductTrait_PCU {
   val pcuBits = PCUBits.zeroes(cuParams(0)(0).asInstanceOf[PCUParams])
   pcuBits.control.udcInit=List(2,-1,-1,-1,-1)
-  pcuBits.control.tokenInAndTree = List(0, 0, 0, 0)
-  pcuBits.control.fifoAndTree = List(0, 0, 0, 0, 1, 1, 0, 0)
-  pcuBits.control.siblingAndTree = List(1, 0, 0, 0, 0)
+  pcuBits.control.tokenInAndTree = Array(0, 0, 0, 0)
+  pcuBits.control.fifoAndTree = Array(0, 0, 0, 0, 1, 1, 0, 0)
+  pcuBits.control.siblingAndTree = Array(1, 0, 0, 0, 0)
   pcuBits.control.streamingMuxSelect = 0
   pcuBits.control.incrementXbar.outSelect(0) = 1
   pcuBits.control.tokenOutXbar.outSelect(0) = 4
