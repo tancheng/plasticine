@@ -41,8 +41,8 @@ class FringeContextPlasticine : public FringeContextBase<void> {
   int globalID = 1;
 
   const uint32_t burstSizeBytes = 64;
-  const uint32_t commandReg = COMMAND_OFFSET;
-  const uint32_t statusReg = STATUS_OFFSET;
+  const uint32_t commandReg = CONTROL_BASE + COMMAND_OFFSET;
+  const uint32_t statusReg = CONTROL_BASE + STATUS_OFFSET;
   uint64_t maxCycles = 10000000000;
   uint64_t stepCount = 0;
 
@@ -361,6 +361,19 @@ public:
       step();
       status = readReg(CONFIG_BASE + STATUS_OFFSET);
     }
+  }
+
+  bool pollOn(uint32_t regID) {
+    uint32_t value = 0;
+    uint64_t start = numCycles;
+    uint64_t elapsed = numCycles - start;
+    while((value == 0) && (elapsed <= maxCycles)) {
+      step();
+      value = readReg(regID);
+      elapsed = numCycles - start;
+      EPRINTF("elapsed = %lu\n", elapsed);
+    }
+    return (elapsed > maxCycles);
   }
 
   virtual void run() {
