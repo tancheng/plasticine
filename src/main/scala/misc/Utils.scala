@@ -28,9 +28,9 @@ object Utils {
     ff.io.out
   }
 
-  def getCounter(en: UInt, width: Int = 32) = {
+  def getCounter(en: UInt, width: Int = 32, r: UInt = 0.U) = {
     val ctr = Module(new Counter(width))
-    ctr.io.reset := 0.U
+    ctr.io.reset := r
     ctr.io.saturate := 0.U
     ctr.io.max := ((1.toLong << width) - 1).U
     ctr.io.stride := 1.U
