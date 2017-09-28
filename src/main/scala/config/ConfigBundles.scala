@@ -343,6 +343,7 @@ case class PCUControlBoxConfig(val p: PCUParams) extends AbstractConfig {
   val swapWriteXbar = CrossbarConfig(ControlSwitchParams(p.numControlIn, p.getNumRegs(ScalarInReg)))
   val tokenOutXbar = CrossbarConfig(ControlSwitchParams(p.getNumRegs(ScalarInReg) + 2, p.numControlOut))
   val udcInit = Vec(p.numUDCs, UInt(p.udCtrWidth.W))
+  val udcEnable = Vec(p.numUDCs, Bool())
 
   override def cloneType(): this.type = {
     new PCUControlBoxConfig(p).asInstanceOf[this.type]
