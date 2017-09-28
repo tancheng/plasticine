@@ -56,7 +56,7 @@ class ConfigController(val regAddrWidth: Int, val regDataWidth: Int) extends Mod
   val transitionNow = Wire(Bool())
   val state = getFF(nextState, transitionNow)
 
-  val numResetCycles = 1000
+  val numResetCycles = 100
   val enableReset = state === state_RESET
   val resetTimerDone = getTimer(numResetCycles.U, enableReset, 16)
 
