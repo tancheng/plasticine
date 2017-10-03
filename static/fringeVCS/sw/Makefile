@@ -47,6 +47,7 @@ Top: $(OBJECTS)
 ## Clean up
 clean:
 	rm -f $(OBJECTS) $(DEFINES) *.a *.vcd *.vpd *.dat *.log ${TOP} Top ucli.key
+	rm -rf dot
 
 # Set the default Makefile goal to be 'all', else it will default to executing
 # the first target in ${TOP}.mk
