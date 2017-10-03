@@ -25,7 +25,7 @@ object Opcodes {
     (FixAdd , (a,b,c)    => a+b),
     (FixSub , (a,b,c)    => a-b),
     (FixMul , (a,b,c)    => a*b),
-//    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
+    (FixDiv , (a,b,c)    => a*b),  // No divider temporarily
     (FixAnd , (a,b,c)    => a&b),
     (FixOr , (a,b,c)    => a|b),
     (FixEql , (a,b,c)   => a===b),
