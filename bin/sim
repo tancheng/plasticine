@@ -36,12 +36,12 @@ mv generated* ${OUTDIR}
 mv bigIP.tcl ${OUTDIR}
 
 # Copy 'src/main/scala/apps/$MODULE/Driver.cpp' to OUTDIR
-cp -r static/fringeVCS/hw ${OUTDIR}
-cp    static/fringeVCS/Makefile ${OUTDIR}
+cp -r static/$TARGET/hw ${OUTDIR}
+cp    static/$TARGET/Makefile ${OUTDIR}
 
 # Use common module name "CU" for all CUs
 if [ $MODULE == "PCU" ] || [ $MODULE == "PMU" ]; then MODULE=CU; fi
 
 echo "TOP=Top${MODULE}" > ${OUTDIR}/Makefile.common
 
-make -C ${OUTDIR}
+#make -C ${OUTDIR}
