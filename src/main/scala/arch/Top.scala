@@ -41,14 +41,18 @@ class VerilatorCUInterface[+C<:AbstractConfig](config: C) extends TopInterface {
   val configTest = Output(config.cloneType)
 }
 
+trait SynthModule extends Module {
+  implicit val target: String
+}
+
 /**
  * Top: Top module including Fringe and Accel
  * @param w: Word width
  * @param numArgIns: Number of input scalar arguments
  * @param numArgOuts: Number of output scalar arguments
  */
-class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
-  val io = p.target match {
+class Top(p: TopParams, initBits: Option[AbstractBits] = None)(implicit val target: String) extends SynthModule {
+  val io = target match {
     case "vcs"        => IO(new VerilatorInterface(p))
     case _ => throw new Exception(s"Unknown target '${p.target}'")
   }
@@ -64,7 +68,7 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
   private val streamPar = StreamParInfo(32, 16)
   private val streamParams = List.fill(numMemoryChannels) { streamPar }
 
-  p.target match {
+  target match {
     case "vcs" =>
       // Simulation Fringe
       val blockingDRAMIssue = false
@@ -106,32 +110,43 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None) extends Module {
 }
 
 // CU testing
-class TopCU[+P<:CUParams, +D<:CU, +C<:AbstractConfig](params: () => P, dut: () => D, config: () => C) extends Module {
-  val io = IO(new VerilatorCUInterface(config()))
+class TopCU[+P<:CUParams, +D<:CU, +C<:AbstractConfig](params: () => P, dut: () => D, config: () => C)(implicit val target: String) extends SynthModule {
 
-  // CU
-  val cu = Module(dut())
+  val io = target match {
+    case "vcs"        => IO(new VerilatorCUInterface(config()))
+    case _            => throw new Exception(s"Unknown target '${target}'")
+  }
 
-  val blockingDRAMIssue = false
-  val fringe = Module(new FringeCU(params(), config))
+  target match {
+    case "vcs" =>
+      // CU
+      val cu = Module(dut())
 
-  val topIO = io.asInstanceOf[VerilatorCUInterface[C]]
+      val blockingDRAMIssue = false
+      val fringe = Module(new FringeCU(params(), config))
 
-  // Fringe <-> Host
-  fringe.io.regIO <> topIO.regIO
+      val topIO = io.asInstanceOf[VerilatorCUInterface[C]]
 
-  // Fringe <-> DRAM
-  topIO.dram <> fringe.io.dram
+      // Fringe <-> Host
+      fringe.io.regIO <> topIO.regIO
 
-  // Fringe <-> CU data and control IO
-  cu.io <> fringe.io.cuio
+      // Fringe <-> DRAM
+      topIO.dram <> fringe.io.dram
 
-  // Fringe <-> CU reset config IO
-  cu.reset := reset | fringe.io.designReset
-  cu.io.configIn <> fringe.io.configIn
-  cu.io.configOut <> fringe.io.configOut
-  cu.io.configReset := reset
-  io.configTest <> cu.io.configTest
+      // Fringe <-> CU data and control IO
+      cu.io <> fringe.io.cuio
+
+      // Fringe <-> CU reset config IO
+      cu.reset := reset | fringe.io.designReset
+      cu.io.configIn <> fringe.io.configIn
+      cu.io.configOut <> fringe.io.configOut
+      cu.io.configReset := reset
+      io.configTest <> cu.io.configTest
+
+    case _ =>
+      throw new Exception(s"Unknown target '${target}'")
+  }
+
 
   // Print out total config bits
   val pcuParams = GeneratedTopParams.plasticineParams.cuParams(0)(0).asInstanceOf[PCUParams]

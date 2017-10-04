@@ -2,11 +2,17 @@
 
 OUT_DIR=sim_out
 if [ $# -lt 1 ]; then
-  echo "Usage: $0 <Module>"
+  echo "Usage: $0 <Module> [target]"
   exit -1
 fi
 
 MODULE=$1
+TARGET=vcs
+
+if [ $# -ge 2 ]; then
+  TARGET=$2
+fi
+
 #argsArray=( "$@" )
 
 #sbtArgs=${argsArray[@]:0:$#}
@@ -18,7 +24,7 @@ mkdir -p ${OUTDIR}
 
 # Generate binary
 echo "Generating $MODULE.."
-sbt "; run-main plasticine.${MODULE}Sim --testArgs --outdir $OUTDIR"
+sbt "; run-main plasticine.${MODULE}Sim --testArgs --outdir $OUTDIR --target $TARGET"
 
 # Create a new "generated" header file that includes all generated header files
 for f in generated*; do

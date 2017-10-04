@@ -12,10 +12,12 @@ import fringe._
 
 trait CommonDriver {
   /**
-   * 'args' variable that holds commandline arguments
+   * Some implicit variables available to modules that declare them as 'implicit val' in their definitions
    * TODO: Is using a var the best way to handle this?
    */
   implicit var args: Array[String] = _
+  implicit var target: String = _
+
   case class SplitArgs(chiselArgs: Array[String], testArgs: Array[String])
 
   type DUTType <: Module
@@ -38,6 +40,7 @@ trait CommonDriver {
     val splitArgs = separateChiselArgs(args)
     this.args = splitArgs.testArgs
     val targetDir = if (this.args.contains("--outdir")) this.args(this.args.indexOf("--outdir") + 1) else s"genVerilog/${moduleName}"
+    this.target = if (this.args.contains("--target")) this.args(this.args.indexOf("--target") + 1) else "vcs"
     chisel3.Driver.execute(Array[String]("--target-dir", targetDir), dut)
   }
 }
