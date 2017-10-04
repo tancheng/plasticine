@@ -8,7 +8,6 @@ runLog
 *.tags
 .o
 .alib
-build/
 generated/
 lib_managed/
 target/
