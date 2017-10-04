@@ -52,7 +52,7 @@ class ZynqInterface() extends TopInterface {
 }
 
 trait SynthModule extends Module {
-  implicit val target: String
+  val target: String
 }
 
 /**
@@ -62,6 +62,8 @@ trait SynthModule extends Module {
  * @param numArgOuts: Number of output scalar arguments
  */
 class Top(p: TopParams, initBits: Option[AbstractBits] = None)(implicit val target: String) extends SynthModule {
+  FringeGlobals.target = target
+
   val io = target match {
     case "vcs"        => IO(new VerilatorInterface(p))
     case _ => throw new Exception(s"Unknown target '${p.target}'")
@@ -121,7 +123,7 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None)(implicit val targ
 
 // CU testing
 class TopCU[+P<:CUParams, +D<:CU, +C<:AbstractConfig](params: () => P, dut: () => D, config: () => C)(implicit val target: String) extends SynthModule {
-
+  FringeGlobals.target = target
   val io = target match {
     case "vcs"         => IO(new VerilatorCUInterface(config()))
     case "zynq"        => IO(new ZynqInterface())
