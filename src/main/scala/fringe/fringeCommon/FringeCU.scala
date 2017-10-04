@@ -15,7 +15,11 @@ import plasticine.misc.Utils._
  * @param numArgIns: Number of input scalar arguments
  * @param numArgOuts: Number of output scalar arguments
  */
-class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
+class FringeCU[+T<:Bundle](
+  val p: CUParams,
+  val cuConfig: () => T,
+  val numChannels: Int
+) extends Module {
   val addrWidth = 32
   val regWidth = 64 // Force 64-bit registers
   val commandReg = 0  // TODO: These vals are used in test only, logic below does not use them.
@@ -23,7 +27,6 @@ class FringeCU[+T<:Bundle](val p: CUParams, cuConfig: () => T) extends Module {
   val numOutstandingBursts = 1024
   val burstSizeBytes = 64
   val blockingDRAMIssue = false
-  val numChannels = 1
 
   val numArgIOs = 0
 

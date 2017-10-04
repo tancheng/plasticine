@@ -3,6 +3,8 @@ package plasticine.arch
 import chisel3._
 import chisel3.util._
 import fringe._
+import fringe.fringeZynq._
+import axi4._
 
 import templates.Utils.log2Up
 import plasticine.spade._
@@ -39,6 +41,14 @@ class VerilatorCUInterface[+C<:AbstractConfig](config: C) extends TopInterface {
   val configOut = Decoupled(UInt(1.W))
 
   val configTest = Output(config.cloneType)
+}
+
+class ZynqInterface() extends TopInterface {
+  val axiLiteParams = new AXI4BundleParameters(32, 32, 1)
+  val axiParams = new AXI4BundleParameters(32, 512, 6)
+
+  val S_AXI = Flipped(new AXI4Lite(axiLiteParams))
+  val M_AXI = Vec(1, new AXI4Inlined(axiParams))
 }
 
 trait SynthModule extends Module {
@@ -113,17 +123,23 @@ class Top(p: TopParams, initBits: Option[AbstractBits] = None)(implicit val targ
 class TopCU[+P<:CUParams, +D<:CU, +C<:AbstractConfig](params: () => P, dut: () => D, config: () => C)(implicit val target: String) extends SynthModule {
 
   val io = target match {
-    case "vcs"        => IO(new VerilatorCUInterface(config()))
+    case "vcs"         => IO(new VerilatorCUInterface(config()))
+    case "zynq"        => IO(new ZynqInterface())
+    case _            => throw new Exception(s"Unknown target '${target}'")
+  }
+
+  val numChannels = target match {
+    case "vcs"         => 1
+    case "zynq"        => 1
     case _            => throw new Exception(s"Unknown target '${target}'")
   }
 
   target match {
     case "vcs" =>
-      // CU
       val cu = Module(dut())
 
       val blockingDRAMIssue = false
-      val fringe = Module(new FringeCU(params(), config))
+      val fringe = Module(new FringeCU(params(), config, numChannels))
 
       val topIO = io.asInstanceOf[VerilatorCUInterface[C]]
 
@@ -137,11 +153,35 @@ class TopCU[+P<:CUParams, +D<:CU, +C<:AbstractConfig](params: () => P, dut: () =
       cu.io <> fringe.io.cuio
 
       // Fringe <-> CU reset config IO
-      cu.reset := reset | fringe.io.designReset
+      cu.reset := reset.toBool | fringe.io.designReset
       cu.io.configIn <> fringe.io.configIn
       cu.io.configOut <> fringe.io.configOut
       cu.io.configReset := reset
-      io.configTest <> cu.io.configTest
+      topIO.configTest <> cu.io.configTest
+
+    case "zynq" =>
+      val topIO = io.asInstanceOf[ZynqInterface]
+      val cu = Module(dut())
+
+      val blockingDRAMIssue = false
+      val fringe = Module(new FringeCUZynq(params(), config, numChannels, topIO.axiLiteParams, topIO.axiParams))
+
+
+      // Fringe <-> Host
+      fringe.io.S_AXI <> topIO.S_AXI
+
+      // Fringe <-> DRAM
+      topIO.M_AXI <> fringe.io.M_AXI
+
+      // Fringe <-> CU data and control IO
+      cu.io <> fringe.io.cuio
+
+      // Fringe <-> CU reset config IO
+      val activeHighReset = ~reset.toBool
+      cu.reset := activeHighReset | fringe.io.designReset
+      cu.io.configIn <> fringe.io.configIn
+      cu.io.configOut <> fringe.io.configOut
+      cu.io.configReset := activeHighReset
 
     case _ =>
       throw new Exception(s"Unknown target '${target}'")
