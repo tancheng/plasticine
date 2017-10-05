@@ -9,6 +9,7 @@ vivado.mk:
 	cp hw/build/*.v .
 	cp hw/build/fsbl.elf._ ./fsbl.elf
 	cp hw/build/u-boot.elf._ ./u-boot.elf
+	cp hw/build/convert_bitstream ./
 
 clean: vivado.mk
 	make -f vivado.mk clean
