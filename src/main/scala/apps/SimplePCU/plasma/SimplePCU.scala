@@ -25,7 +25,7 @@ trait SimplePCUTrait {
   // 3. Control is almost impossible
 
   // Counters
-  pcuBits.counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 256), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 0), par=16)
+  pcuBits.counterChain.counters(0) = CounterRCBits(max=SVT(ConstSrc, 256), stride=SVT(ConstSrc, 1), min=SVT(ConstSrc, 0), par=8)
 
   // Drive udc with controlIn(0). Drive PCU's enable on udc0
   // controlIn(0) -> udc(0) -> enable

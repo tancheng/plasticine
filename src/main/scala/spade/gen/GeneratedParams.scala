@@ -26,8 +26,9 @@ object GeneratedTopParams extends TopParams with GeneratedParams {
   genParams
 }
 case class GeneratedPCUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numVectorIn:Int, override val numVectorOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends PCUParams {
-  override val w = 32
-  override val v = 16
+  override val w = 16
+  override val v = 8
+//  override val v = 16
   override val numCounters = 5
   override val numUDCs = 5
   regColors += List(CounterReg,ReduceReg)
