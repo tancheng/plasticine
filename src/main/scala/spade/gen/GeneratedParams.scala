@@ -52,8 +52,8 @@ case class GeneratedPCUParams(override val numScalarIn:Int, override val numScal
 }
 
 case class GeneratedPMUParams(override val numScalarIn:Int, override val numScalarOut:Int, override val numVectorIn:Int, override val numVectorOut:Int, override val numControlIn:Int, override val numControlOut:Int) extends PMUParams {
-  override val w = 32
-  override val v = 16
+  override val w = 16
+  override val v = 8
   override val numCounters = 8
   override val numUDCs = 0
   regColors += List(CounterReg)
