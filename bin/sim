@@ -18,7 +18,7 @@ fi
 #sbtArgs=${argsArray[@]:0:$#}
 
 # Create new output directory (and nuke the old one)
-OUTDIR=${OUT_DIR}/${MODULE}
+OUTDIR=${OUT_DIR}/${MODULE}_${TARGET}
 rm -rf ${OUTDIR}
 mkdir -p ${OUTDIR}
 

@@ -30,11 +30,11 @@ cp -r src/main/scala/apps/$APP/cpp ${OUTDIR}
 cp src/main/scala/apps/$APP/simulator.mk ${OUTDIR}
 
 # Copy Makefile
-cp static/fringeVCS/sw/Makefile ${OUTDIR}
-cp static/fringeVCS/sw/run.sh   ${OUTDIR}
-cp static/fringeVCS/sw/digraphExtractor.sh   ${OUTDIR}
-cp static/fringeVCS/sw/buildDot.sh   ${OUTDIR}
-cp static/fringeVCS/sw/dot.mk   ${OUTDIR}
+cp static/vcs/sw/Makefile ${OUTDIR}
+cp static/vcs/sw/run.sh   ${OUTDIR}
+cp static/vcs/sw/digraphExtractor.sh   ${OUTDIR}
+cp static/vcs/sw/buildDot.sh   ${OUTDIR}
+cp static/vcs/sw/dot.mk   ${OUTDIR}
 
 
 # Build generated app

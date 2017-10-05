@@ -4,7 +4,7 @@ CROSS_COMPILE=
 
 SIM_DIR=${PLASTICINE_HOME}/sim_out
 
-FRINGE_SRC=${PLASTICINE_HOME}/static/fringeVCS
+FRINGE_SRC=${PLASTICINE_HOME}/static/vcs
 HOST_SRC=./cpp
 
 include simulator.mk
