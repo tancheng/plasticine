@@ -11,6 +11,7 @@ import plasticine.spade._
 import plasticine.config._
 import plasticine.pisa.enums._
 import templates.Utils.log2Up
+import plasticine.misc.Utils.getCounter
 
 class DummyPMU(val p: PMUParams) extends CU {
   val io = IO(CUIO(p, () => DummyPMUConfig(p)))
@@ -24,7 +25,7 @@ class DummyPMU(val p: PMUParams) extends CU {
 
 }
 
-class PMU(val p: PMUParams) extends CU {
+class PMU(val p: PMUParams)(row: Int, col: Int) extends CU {
   val io = IO(CUIO(p, () => PMUConfig(p)))
 
   val configSR = Module(new ShiftRegister(PMUConfig(p)))
@@ -353,5 +354,119 @@ class PMU(val p: PMUParams) extends CU {
                                                               // TODO: Fix after threading enable signals
 //    out.valid := getValids(localConfig.vectorValidOut(i))
   }
+
+  /***************************************************************************************
+   *
+   *                               DOT DEBUGGING
+   *
+   **************************************************************************************/
+  val captureDotValues = readEnable | writeEnable | stageEnables.map {_.io.out(0)}.reduce {_|_}
+  val dotCycleCount = getCounter(captureDotValues)
+
+  def prefix =
+p"""
+digraph PMU${row}${col} {  // Cycle ${dotCycleCount}
+    node [pin=true];
+    label="Cycle $dotCycleCount"
+"""
+
+  def suffix =
+p"""
+} // Cycle ${dotCycleCount}
+"""
+
+	val height = 30
+	val width = 70
+  val regsToPrint = 4
+  val lanesToPrint = 1
+  val xoffset:Float = 3
+  val yoffset:Float = 2
+
+  def nodeName(stage: Int, lane: Int) = s"s${stage}_l${lane}"
+  def opName(stage: Int, lane: Int) = s"op${stage}_l${lane}"
+  def regPortName(reg: Int) = s"r${reg}"
+
+  def getRow(stage: Int, lane: Int, reg: Int, active: Boolean) = {
+    val bgcolor = if (active) "white" else "gray"
+p"""<TR><TD HEIGHT="${height}" WIDTH="${width}" FIXEDSIZE="true" BGCOLOR="$bgcolor" PORT="${regPortName(reg)}">${pipeRegs(stage)(reg).io.out}</TD></TR>
+"""
+  }
+
+  def printRegFile(stage: Int, lane: Int) {
+    val tablePrefix = s"""<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">"""
+    val tableSuffix = s"""</TABLE>"""
+    printf(
+p"""${nodeName(stage, lane)} [shape=plaintext, pos="${stage*xoffset}, ${lane*yoffset}!", label=<
+  $tablePrefix
+""")
+    for (r <- 0 until regsToPrint) {
+      when (localConfig.stages(stage).regEnables(r)) {
+        printf(getRow(stage, lane, r, true))
+      }.otherwise {
+        printf(getRow(stage, lane, r, false))
+      }
+    }
+    printf(
+p"""$tableSuffix
+>];
+""")
+    printf(p"""${opName(stage, lane)} [shape=square, label="OP"]""")
+    printf(p"""${opName(stage, lane)} [shape=square, pos="${stage*xoffset-xoffset/2}, ${lane*yoffset}!", label="OP"]""")
+  }
+
+  def printRegFiles {
+    (0 until p.d) foreach { stage =>
+      (0 until lanesToPrint) foreach { lane =>
+        printRegFile(stage, lane)
+      }
+    }
+  }
+
+  def doOperandStuff(opConfig: SrcValueBundle, stage: Int, lane: Int) = {
+    val rhs = opName(stage, lane)
+//    when (opConfig.is(ConstSrc)) {
+//      printf(p"""c_${nodeName(stage, lane)} [shape=square, label="${opConfig.value}"]""")
+//      printf(p"c_${nodeName(stage, lane)} -> ${rhs}\n")
+//    }
+    when (opConfig.is(PrevStageSrc)) {
+      val srcStage = stage - 1
+      val srcLane = lane
+      val reg = opConfig.value
+      val str = s"${nodeName(srcStage, srcLane)}:r%d -> ${rhs}\n"
+      printf(str, reg)
+    }
+  }
+
+  def connectRegFiles {
+    (0 until p.d) foreach { stage =>
+      (0 until lanesToPrint) foreach { lane =>
+
+          if (stage > 0) {
+            // Print operand (stuff -> op) connections: get (stage, lane, reg) numbers based on opConfigs
+            doOperandStuff(localConfig.stages(stage).opA, stage, lane)
+            doOperandStuff(localConfig.stages(stage).opB, stage, lane)
+            doOperandStuff(localConfig.stages(stage).opC, stage, lane)
+          }
+          // Print output (op -> stuff) connections
+          (0 until math.min(p.r, regsToPrint)) foreach { r =>
+            when (localConfig.stages(stage).result(r)) {
+              printf(s"${opName(stage, lane)} -> ${nodeName(stage, lane)}:${regPortName(r)}\n")
+            }
+          }
+        }
+    }
+  }
+
+  // Conditional printing
+  def printDot {
+    when (captureDotValues) {
+      printf(prefix)
+      printRegFiles
+      connectRegFiles
+      printf(suffix)
+    }
+  }
+
+  printDot
 
 }

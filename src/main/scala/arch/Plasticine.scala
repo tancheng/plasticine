@@ -101,7 +101,7 @@ class Plasticine(val p: PlasticineParams, val f: FringeParams, val initBits: Opt
             cu.io.config := config.cu(i)(j).asInstanceOf[PCUConfig]
             cu
           case p: PMUParams =>
-            val cu = Module(new PMU(p))
+            val cu = Module(new PMU(p)(i,j))
             cu.io.config := config.cu(i)(j).asInstanceOf[PMUConfig]
             cu
         }

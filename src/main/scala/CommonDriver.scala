@@ -69,7 +69,7 @@ object PMUGen extends CommonDriver {
   type DUTType = PMU
   override val moduleName = "PMU"
   val params = GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams]
-  def dut = () => new PMU(params)
+  def dut = () => new PMU(params)(0,0)
 }
 
 abstract class CUSim[P <: CUParams, D <: CU, C <: AbstractConfig]() extends CommonDriver {
@@ -83,7 +83,7 @@ abstract class CUSim[P <: CUParams, D <: CU, C <: AbstractConfig]() extends Comm
 object PMUSim extends CUSim[PMUParams, PMU, PMUConfig] {
   override val moduleName = "TopPMU"
   def params = GeneratedTopParams.plasticineParams.cuParams(0)(1).asInstanceOf[PMUParams]
-  def cu = new PMU(params)
+  def cu = new PMU(params)(0,0)
   def config = new PMUConfig(params)
 }
 
